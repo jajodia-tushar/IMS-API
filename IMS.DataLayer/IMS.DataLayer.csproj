@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dal\" />
+    <ProjectReference Include="..\IMS.Contracts\IMS.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

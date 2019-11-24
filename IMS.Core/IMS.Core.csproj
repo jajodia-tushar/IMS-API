@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="services\" />
+    <ProjectReference Include="..\IMS.Contracts\IMS.Contracts.csproj" />
+    <ProjectReference Include="..\IMS.DataLayer\IMS.DataLayer.csproj" />
+    <ProjectReference Include="..\IMS.TokenManagement\IMS.TokenManagement.csproj" />
   </ItemGroup>
 
 </Project>
