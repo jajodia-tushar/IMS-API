@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using IMS.Core.services;
 using IMS.DataLayer.Dal;
+using IMS.DataLayer.Interfaces;
+using IMS.Entities.Interfaces;
 using IMS.TokenManagement;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -46,9 +48,11 @@ namespace IMS_API
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                     };
                 });
-            services.AddSingleton<TokenService>();
-            services.AddSingleton<UserDal>();
-            services.AddSingleton<LoginService>();
+
+
+            services.AddTransient<IUserDal, MockUserDal>();
+            services.AddTransient<ITokenProvider, JwtTokenProvider>();
+            services.AddTransient<ILoginService, LoginService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

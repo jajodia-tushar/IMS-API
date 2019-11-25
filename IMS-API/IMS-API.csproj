@@ -17,7 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\IMS.Contracts\IMS.Contracts.csproj" />
     <ProjectReference Include="..\IMS.Core\IMS.Core.csproj" />
-    <ProjectReference Include="..\IMS.TokenManagement\IMS.TokenManagement.csproj" />
+    <ProjectReference Include="..\IMS.Entities\IMS.Entities.csproj" />
   </ItemGroup>
 
 </Project>

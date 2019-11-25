@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IMS.Contracts\IMS.Contracts.csproj" />
+    <ProjectReference Include="..\IMS.Entities\IMS.Entities.csproj" />
   </ItemGroup>
 
 </Project>

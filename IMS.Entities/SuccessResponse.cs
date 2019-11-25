@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Contracts.Models.Responses
+namespace IMS.Entities
 {
     public class SuccessResponse:Response
     {
         public Object Data { set; get; }
         public SuccessResponse()
         {
-            Status = Status.success;
+            Status = Status.Success;
         }
         public SuccessResponse(Object data)
         {
-            Status = Status.success;
+            Status = Status.Success;
             Data = data;
         }
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Contracts.Models.Responses
+namespace IMS.Contracts.Models
 {
     public class FailureResponse:Response
     {
@@ -10,11 +10,11 @@ namespace IMS.Contracts.Models.Responses
         public string ErrorMessage { get; set; }
         public FailureResponse()
         {
-            Status = Status.failure;
+            Status = Status.Failure;
         }
         public FailureResponse(string errorMessage)
         {
-            Status = Status.failure;
+            Status = Status.Failure;
             ErrorMessage = errorMessage;
         }
 
