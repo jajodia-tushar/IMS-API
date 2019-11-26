@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Contracts.Models
+namespace IMS.Contracts
 {
    public  class Role
     {

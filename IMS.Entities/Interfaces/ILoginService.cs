@@ -8,7 +8,7 @@ namespace IMS.Entities.Interfaces
 {
     public interface ILoginService
     {
-        Response Login(LoginRequest loginRequest);
+        LoginResponse Login(LoginRequest loginRequest);
 
     }
 }

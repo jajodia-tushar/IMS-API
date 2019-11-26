@@ -1,4 +1,4 @@
-﻿using IMS.DataLayer.Interfaces;
+﻿using IMS.Entities.Interfaces;
 using IMS.Entities;
 using System;
 using System.Collections.Generic;

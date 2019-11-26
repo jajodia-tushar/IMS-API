@@ -7,6 +7,8 @@ namespace IMS.Entities
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public Status Status { get; set; }
+
+        public Error Error { get; set; }
        
     }
 }

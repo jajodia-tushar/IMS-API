@@ -1,7 +1,6 @@
 ﻿
 
 using IMS.DataLayer.Dal;
-using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.TokenManagement;
@@ -21,20 +20,46 @@ namespace IMS.Core.services
             _tokenProvider = tokenProvider;
         }
 
-        public Response Login(LoginRequest loginRequest)
+        public LoginResponse Login(LoginRequest loginRequest)
         {
-            if (loginRequest.Username == null || loginRequest.Password == null)
-                return new FailureResponse("missing Username/Password");
-            User user = _userDal.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
-            if(user!=null)
+            try { 
+                    LoginResponse loginResponse = new LoginResponse();
+                    if (loginRequest.Username == null || loginRequest.Password == null)
+                    {
+                        loginResponse.Status = Status.Failure;
+                        loginResponse.Error = new Error()
+                        {
+                            ErrorCode = 400,
+                            ErrorMessage = "missing Username/Password"
+                        };
+                        return loginResponse;
+
+                    }
+                    User user = _userDal.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
+                    if (user != null)
+                    {
+                        string token = _tokenProvider.GenerateToken(user);
+                        loginResponse.Status = Status.Success;
+                        loginResponse.AccessToken = token;
+                        loginResponse.User = user;
+                        return loginResponse;
+                    }
+                    else
+                    {
+                        loginResponse.Status = Status.Failure;
+                        loginResponse.Error = new Error()
+                        {
+                            ErrorCode = 401,
+                            ErrorMessage = "Invalid Username/Password"
+                        };
+                        return loginResponse;
+                    }
+             }
+            catch(Exception ex)
             {
-                string token = _tokenProvider.GenerateToken(user);
-                return new SuccessResponse(token);
+                throw ex;
             }
-            else
-            {
-                return new FailureResponse("Invalid Username/Password");
-            }
+            
         }
     }
 }

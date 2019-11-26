@@ -2,69 +2,74 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
-
-
+using IMS.Contracts;
+using IMS.Entities;
 
 namespace IMS.Core.Translators
 {
     public static class Translator
     {
-        public static Contracts.Models.Response ToDataContractsObject(Entities.Response entityLoginResponse)
+        public static Contracts.LoginResponse ToDataContractsObject(Entities.LoginResponse entityLoginResponse)
         {
-            if(entityLoginResponse is Entities.SuccessResponse )
+            Contracts.LoginResponse loginResponse = new Contracts.LoginResponse();
+            if (entityLoginResponse.Status == Entities.Status.Success)
             {
-                Entities.SuccessResponse entitySuccessResponse = (Entities.SuccessResponse)entityLoginResponse;
-                return new Contracts.Models.SuccessResponse(entitySuccessResponse.Data);
+                loginResponse.Status = Contracts.Status.Success;
+                loginResponse.AccessToken = entityLoginResponse.AccessToken;
+                loginResponse.User = ToDataContractsObject(entityLoginResponse.User);
             }
             else
             {
-                Entities.FailureResponse entityFailureResponse = (Entities.FailureResponse)entityLoginResponse;
-                return new Contracts.Models.FailureResponse(entityFailureResponse.ErrorMessage);
-
+                loginResponse.Status = Contracts.Status.Failure;
+                loginResponse.Error = ToDataContractsObject(entityLoginResponse.Error); 
             }
+            return loginResponse;
+
         }
 
-        /* public IMS.Entities.User ToEntityObject(User user)
-{
-}
-
-public IMS.Entities.LoginRequest ToEntitiyObject(LoginRequest loginRequest)
-{
-    //TODO: Write translations here
-}
-
-public LoginResponse ToDataContractObject(IMS.Entities.LoginResponse loginResponse)
-{
-    //TODO: Write translations here
-
-}
-
-public User ToDataContractObject(IMS.Entities.User user)
-{
-
-}
-
-
-public User TranslateToUser(UserDto userDto)
-{
-    return new User()
+       
+        public static Contracts.Error ToDataContractsObject(Entities.Error error)
+        {
+            return new Contracts.Error()
             {
-                Id = userDto.UserId,
-                Username = userDto.Username,
-                Fullname = userDto.Firstname + userDto.Secondname,
-                Role=userDto.Role
+                ErrorCode = error.ErrorCode,
+                ErrorMessage = error.ErrorMessage
             };
-}
-*/
-        public static Entities.LoginRequest ToEntitiesObject(Contracts.Models.LoginRequest contractsLoginRequest)
+        }
+
+        public static Contracts.User ToDataContractsObject(Entities.User user)
+        {
+            return new Contracts.User()
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Password = null,
+                Firstname = user.Firstname,
+                Lastname = user.Lastname,
+                Email = user.Email,
+                Role = ToDataContractsObject(user.Role)
+
+            };
+        }
+
+        public static Contracts.Role ToDataContractsObject(Entities.Role role)
+        {
+            return new Contracts.Role()
+                       {
+                           Id = role.Id,
+                            Name = role.Name
+                       };
+        }
+        public static Entities.LoginRequest ToEntitiesObject(Contracts.LoginRequest contractsLoginRequest)
         {
             return new Entities.LoginRequest()
             {
                 Username = contractsLoginRequest.Username,
-                Password=contractsLoginRequest.Password
+                Password = contractsLoginRequest.Password
 
             };
         }
-    }
+
+
+     }
 }

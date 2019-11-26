@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IMS.Contracts.Models;
+using IMS.Contracts;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -24,15 +24,27 @@ namespace IMS_API.Controllers
 
         // POST: api/Login
         [HttpPost]
-        public IActionResult Post([FromBody] LoginRequest login)
+        public Response Login([FromBody] LoginRequest login)
         {
-            IMS.Entities.LoginRequest entityLoginRequest= Translator.ToEntitiesObject(login);
-            IMS.Entities.Response entityLoginResponse = _loginService.Login(entityLoginRequest);
-            IMS.Contracts.Models.Response contractsLoginResponse = Translator.ToDataContractsObject(entityLoginResponse);
-            if (contractsLoginResponse.Status == IMS.Contracts.Models.Status.Success)
-                return Ok(contractsLoginResponse);
-            else
-                return Unauthorized(contractsLoginResponse);
+            try
+            {
+                IMS.Entities.LoginRequest entityLoginRequest = Translator.ToEntitiesObject(login);
+                IMS.Entities.LoginResponse entityLoginResponse = _loginService.Login(entityLoginRequest);
+                IMS.Contracts.LoginResponse contractsLoginResponse = Translator.ToDataContractsObject(entityLoginResponse);
+                return contractsLoginResponse;
+            }
+            catch
+            {
+                return new IMS.Contracts.LoginResponse()
+                        {
+                            Status = Status.Failure,
+                            Error = new Error()
+                            {
+                                ErrorCode = 500,
+                                ErrorMessage = "Internal server error"
+                            }
+                        };
+            }
         }
 
        
