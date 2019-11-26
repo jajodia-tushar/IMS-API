@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using IMS.DataLayer.Interfaces;
 
 namespace IMS_API
 {
@@ -50,7 +51,7 @@ namespace IMS_API
                 });
 
 
-            services.AddTransient<IUserDal, MockUserDal>();
+            services.AddTransient<IUserDbContext, MockUserDbContext>();
             services.AddTransient<ITokenProvider, JwtTokenProvider>();
             services.AddTransient<ILoginService, LoginService>();
         }

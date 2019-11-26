@@ -1,11 +1,12 @@
 ﻿
+using IMS.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Entities.Interfaces
+namespace IMS.DataLayer.Interfaces
 {
-    public interface IUserDal
+    public interface IUserDbContext
     {
         User GetUserByCredintials(string username, string password);
     }

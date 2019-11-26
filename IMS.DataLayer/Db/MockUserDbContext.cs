@@ -3,10 +3,11 @@ using IMS.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using IMS.DataLayer.Interfaces;
 
 namespace IMS.DataLayer.Dal
 {
-    public class MockUserDal : IUserDal
+    public class MockUserDbContext : IUserDbContext
     {
         private static List<User> _users=new List<User>()
             {

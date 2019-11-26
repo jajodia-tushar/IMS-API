@@ -3,10 +3,11 @@ using IMS.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using IMS.DataLayer.Interfaces;
 
 namespace IMS.DataLayer.Dal
 {
-    public class UserDal : IUserDal
+    public class UserDbContext : IUserDbContext
     {
         public User GetUserByCredintials(string username, string password)
         {
