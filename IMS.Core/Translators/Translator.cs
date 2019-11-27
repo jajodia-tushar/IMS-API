@@ -9,6 +9,45 @@ namespace IMS.Core.Translators
 {
     public static class Translator
     {
+        public static Entities.EmployeeValidationRequest ToEntitiesObject(Contracts.EmployeeValidationRequest request)
+        {
+            return new Entities.EmployeeValidationRequest()
+            {
+                Id = request.Id
+
+            };
+        }
+        public static Contracts.EmployeeValidationResponse ToDataContractsObject(Entities.EmployeeValidationResponse entityresponse)
+        {
+            Contracts.EmployeeValidationResponse employeeValidationResponse = new Contracts.EmployeeValidationResponse();
+            if (entityresponse.Status == Entities.Status.Success)
+            {
+                employeeValidationResponse.Status = Contracts.Status.Success;
+                employeeValidationResponse.Employee = ToDataContractsObject(entityresponse.Employee);
+            }
+            else
+            {
+                employeeValidationResponse.Status = Contracts.Status.Failure;
+                employeeValidationResponse.Error = ToDataContractsObject(entityresponse.Error);
+            }
+            return employeeValidationResponse;
+        }
+
+        private static Contracts.Employee ToDataContractsObject(Entities.Employee employee)
+        {
+            return new Contracts.Employee()
+            {
+                Id = employee.Id,
+                Firstname = employee.Firstname,
+                Lastname = employee.Lastname,
+                Email = employee.Email,
+                MobileNumber = null,
+                TCardNo = null,
+                AccessCardNo = null,
+                IsActive = employee.IsActive
+            };
+        }
+
         public static Contracts.LoginResponse ToDataContractsObject(Entities.LoginResponse entityLoginResponse)
         {
             Contracts.LoginResponse loginResponse = new Contracts.LoginResponse();
@@ -26,8 +65,7 @@ namespace IMS.Core.Translators
             return loginResponse;
 
         }
-
-       
+      
         public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
             return new Contracts.Error()

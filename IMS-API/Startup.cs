@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using IMS.DataLayer.Interfaces;
+using IMS.DataLayer.Db;
 
 namespace IMS_API
 {
@@ -54,7 +55,9 @@ namespace IMS_API
             services.AddTransient<IUserDbContext, UserDbContext>();
             services.AddTransient<ITokenProvider, JwtTokenProvider>();
             services.AddTransient<ILoginService, LoginService>();
-            
+            services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
