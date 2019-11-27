@@ -51,9 +51,10 @@ namespace IMS_API
                 });
 
 
-            services.AddTransient<IUserDbContext, MockUserDbContext>();
+            services.AddTransient<IUserDbContext, UserDbContext>();
             services.AddTransient<ITokenProvider, JwtTokenProvider>();
             services.AddTransient<ILoginService, LoginService>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
