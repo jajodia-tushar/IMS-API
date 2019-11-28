@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using IMS.Contracts;
+using IMS.Core.Translators;
+using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,26 +15,49 @@ namespace IMS_API.Controllers
     [ApiController]
     public class ShelfController : ControllerBase
     {
-        //Shelf CRUD
 
-        //Get all shelves - List<Shelf>
-        
-        //Get shelves by Id - Shelf
+        private IShelfService _shelfService;
 
-        //Create
-        /*
-         * name
-         * introduce field to store shelf code
-         */
+        public ShelfController(IShelfService shelfService)
+        {
+            _shelfService = shelfService;
+        }
+        // GET: api/Shelf
+        [HttpGet]
+        public List<Shelf> Get()
+        {
+            IMS.Contracts.ShelfResponse contractsShelfResponse;
+            IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfList();
+            contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
+            List<Shelf> shelfList = contractsShelfResponse.GetShelves;
 
-        /*
-         * Soft Delete
-         * 
-         */
+            return shelfList;
+           
+        }
 
-        /*
-         * Update - Low Priority
-         */
+        // GET: api/Shelf/5
+        [HttpGet("{id}", Name = "Get")]
+        public string Get(int id)
+        {
+            return "value";
+        }
 
+        // POST: api/Shelf
+        [HttpPost]
+        public void Post([FromBody] string value)
+        {
+        }
+
+        // PUT: api/Shelf/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] string value)
+        {
+        }
+
+        // DELETE: api/ApiWithActions/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+        }
     }
 }

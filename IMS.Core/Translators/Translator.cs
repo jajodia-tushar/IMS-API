@@ -58,7 +58,36 @@ namespace IMS.Core.Translators
             return loginResponse;
 
         }
-      
+
+
+        public static Contracts.ShelfResponse ToDataContractsObject(Entities.ShelfResponse entityShelfResponse)
+        {
+            Contracts.ShelfResponse shelfResponse = new Contracts.ShelfResponse();
+            if (entityShelfResponse.Status == Entities.Status.Success)
+            {
+                shelfResponse.Status = Contracts.Status.Success;
+                shelfResponse.Shelf = ToDataContractsObject(entityShelfResponse.Shelf);
+            }
+            else
+            {
+               shelfResponse.Status = Contracts.Status.Failure;
+                shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
+            }
+            return shelfResponse;
+
+        }
+
+        public static Contracts.Shelf ToDataContractsObject(Entities.Shelf shelf)
+        {
+            return new Contracts.Shelf()
+            {
+                 ShelfId = shelf.ShelfId,
+                 ShelfName = shelf.ShelfName
+                
+            };
+        }
+
+
         public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
             return new Contracts.Error()
