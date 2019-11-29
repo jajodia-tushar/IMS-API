@@ -9,14 +9,7 @@ namespace IMS.Core.Translators
 {
     public static class Translator
     {
-        public static Entities.EmployeeValidationRequest ToEntitiesObject(Contracts.EmployeeValidationRequest request)
-        {
-            return new Entities.EmployeeValidationRequest()
-            {
-                Id = request.Id
 
-            };
-        }
         public static Contracts.EmployeeValidationResponse ToDataContractsObject(Entities.EmployeeValidationResponse entityresponse)
         {
             Contracts.EmployeeValidationResponse employeeValidationResponse = new Contracts.EmployeeValidationResponse();

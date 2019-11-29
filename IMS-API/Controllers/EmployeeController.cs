@@ -21,14 +21,14 @@ namespace IMS_API.Controllers
             this.employeeService = employeeService;
         }
 
-        [HttpPost]
-        public Response EmployeeIdValidate([FromBody] EmployeeValidationRequest request)
+        // GET: api/Default/5
+        [HttpGet("{id}", Name = "Get")]
+        public EmployeeValidationResponse Get(int id)
         {
             EmployeeValidationResponse contractsEmployeeValidationResponse = null;
             try
             {
-                IMS.Entities.EmployeeValidationRequest entityEmployeeValidationRequest = Translator.ToEntitiesObject(request);
-                IMS.Entities.EmployeeValidationResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(entityEmployeeValidationRequest);
+                IMS.Entities.EmployeeValidationResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(id);
                 contractsEmployeeValidationResponse = Translator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
             catch
@@ -44,7 +44,6 @@ namespace IMS_API.Controllers
                 };
             }
             return contractsEmployeeValidationResponse;
-
         }
     }
 }

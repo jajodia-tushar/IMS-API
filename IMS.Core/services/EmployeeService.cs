@@ -14,12 +14,12 @@ namespace IMS.Core.services
         {
             this.employeeDbContext = employeeDbContext;
         }
-        public EmployeeValidationResponse ValidateEmployee(EmployeeValidationRequest employeeValidationRequest)
+        public EmployeeValidationResponse ValidateEmployee(int id)
         {
             EmployeeValidationResponse employeeValidationResponse = new EmployeeValidationResponse();
             try
             {
-                if (employeeValidationRequest.Id <= 0)
+                if (id <= 0)
                 {
                     employeeValidationResponse.Status = Status.Failure;
                     employeeValidationResponse.Error = new Error()
@@ -29,7 +29,7 @@ namespace IMS.Core.services
                     };
                     return employeeValidationResponse;
                 }
-                Employee employee = employeeDbContext.getEmployeeById(employeeValidationRequest.Id);
+                Employee employee = employeeDbContext.getEmployeeById(id);
                 if (employee != null)
                 {
                     employeeValidationResponse.Status = Status.Success;
