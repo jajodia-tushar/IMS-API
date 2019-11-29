@@ -22,7 +22,7 @@ namespace IMS_API.Controllers
         }
 
         [HttpPost]
-        public Response Login([FromBody] EmployeeValidationRequest request)
+        public Response EmployeeIdValidate([FromBody] EmployeeValidationRequest request)
         {
             EmployeeValidationResponse contractsEmployeeValidationResponse = null;
             try

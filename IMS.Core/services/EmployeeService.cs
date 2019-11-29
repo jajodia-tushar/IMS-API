@@ -25,7 +25,7 @@ namespace IMS.Core.services
                     employeeValidationResponse.Error = new Error()
                     {
                         ErrorCode = Constants.ErrorCodes.BadRequest,
-                        ErrorMessage = Constants.ErrorMessages.MissingUsernameOrPassword
+                        ErrorMessage = Constants.ErrorMessages.InvalidId
                     };
                     return employeeValidationResponse;
                 }
