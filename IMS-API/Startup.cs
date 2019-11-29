@@ -21,6 +21,7 @@ using Microsoft.IdentityModel.Tokens;
 using IMS.DataLayer.Interfaces;
 using IMS.Logging;
 using IMS.DataLayer.Db;
+using Microsoft.AspNetCore.Http;
 
 namespace IMS_API
 {
@@ -55,13 +56,14 @@ namespace IMS_API
 
             services.AddTransient<IUserDbContext, MockUserDbContext>();
             services.AddTransient<ITokenProvider, JwtTokenProvider>();
-           // services.AddTransient<ILogManagement, LogImplementation>();
+            services.AddTransient<ILogManager, LogImplementation>();
             services.AddTransient<ILogDbContext, LogDbContext>();
             services.AddTransient<ILoginService, LoginService>();
 
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
         }

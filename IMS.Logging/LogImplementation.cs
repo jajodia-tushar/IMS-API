@@ -3,25 +3,26 @@ using System.Diagnostics;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 
 namespace IMS.Logging
 {
-    public class LogImplementation : ILogManagement
+    public class LogImplementation : ILogManager
     {
-        private ITokenProvider _tokenProvider;
+       
         private ILogDbContext _logDbContext;
-        public LogImplementation(ITokenProvider tokenProvider,ILogDbContext logDbContext)
+        public LogImplementation(ILogDbContext logDbContext)
         {
-            _tokenProvider = tokenProvider;
+           
             _logDbContext = logDbContext;
         }
-        public void Log(object request, Response response)
+        public void Log(object request, Response response, int userId)
         {
             try
             {  
 
-                int userId = _tokenProvider.GetUserIdFromToken(); //_tokenProvider.getUserFromToken();
+                //int userId = _tokenProvider.GetUserIdFromHeadersAuthorization(authorizationValues); //_tokenProvider.getUserFromToken();
                 string callType = GetCalledMethod();
                 string severity = "No";
                 if(response.Status==Status.Failure)
@@ -58,6 +59,11 @@ namespace IMS.Logging
             if (requestType != null)
                 return JsonConvert.SerializeObject(requestType);
             return null;
+        }
+
+        public void Log(StringValues authenticateToken, object request, Response response)
+        {
+            throw new NotImplementedException();
         }
     }
 }

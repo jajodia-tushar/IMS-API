@@ -9,6 +9,7 @@ namespace IMS.Entities.Interfaces
     public interface ILoginService
     {
         LoginResponse Login(LoginRequest loginRequest);
+        void TestLog();
 
     }
 }
