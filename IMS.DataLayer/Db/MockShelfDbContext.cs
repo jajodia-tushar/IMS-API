@@ -39,5 +39,13 @@ namespace IMS.DataLayer
                         }
                    );
         }
+
+        public List<Shelf> AddShelf(Shelf shelf)
+        {
+            shelf.Id = _shelf.Count + 1;
+            shelf.isActive = true;
+            _shelf.Add(shelf);
+            return _shelf;
+        }
     }
 }

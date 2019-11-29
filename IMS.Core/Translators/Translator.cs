@@ -79,7 +79,7 @@ namespace IMS.Core.Translators
 
         public static Entities.Shelf ToEntitiesObject(Contracts.Shelf shelf)
         {
-            return new Contracts.Shelf()
+            return new Entities.Shelf()
             {
                 Id = shelf.Id,
                 Name = shelf.Name,

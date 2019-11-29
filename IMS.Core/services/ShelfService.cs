@@ -79,5 +79,40 @@ namespace IMS.Core.services
 
             return shelfResponse;
         }
+
+        public ShelfResponse AddShelf(Shelf shelf)
+        {
+            ShelfResponse shelfResponse = new ShelfResponse();
+            List<Shelf> Shelf = _shelfDbContext.AddShelf(shelf);
+            try
+            {
+                if (Shelf == null)
+                {
+                    shelfResponse.Status = Status.Failure;
+                    shelfResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.NotFound,
+                        ErrorMessage = Constants.ErrorMessages.InvalidShelfId
+                    };
+
+
+                }
+                if (Shelf != null)
+                {
+                    shelfResponse.Status = Status.Success;
+                    shelfResponse.Shelves = new List<Shelf> { Shelf };
+                }
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+
+            }
+
+            return shelfResponse;
+
+
+        }
     }
 }

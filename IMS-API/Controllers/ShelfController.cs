@@ -53,7 +53,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.Shelf entityShelf = Translator.ToEntitiesObject(shelf);
-                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.AddShelf(shelf);
+                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.AddShelf(entityShelf);
                 contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
             }
             catch
