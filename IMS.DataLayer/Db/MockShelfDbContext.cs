@@ -13,14 +13,15 @@ namespace IMS.DataLayer
                {
                    Id = 1,
                    Name = "First Floor",
-                   Code ="A"
+                   Code ="A",
+                   isActive=true
                },
             new Shelf()
                {
                     Id = 2,
                    Name = "Sixth Floor",
-                   Code="B"
-                   
+                   Code="B",
+                   isActive = true
                },
 
         };

@@ -118,6 +118,16 @@ namespace IMS.Core.Translators
             };
         }
 
+        public static Contracts.Shelf ToDataContractsObject(Entities.Shelf shelf)
+        {
+            return new Contracts.Shelf()
+            {
+                Id = shelf.Id,
+                Name=shelf.Name,
+                isActive=shelf.isActive
+
+            };
+        }
         public static Contracts.Role ToDataContractsObject(Entities.Role role)
         {
             return new Contracts.Role()
