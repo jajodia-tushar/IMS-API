@@ -11,21 +11,22 @@ namespace IMS.DataLayer
         {
             new Shelf()
                {
-                   ShelfId = 1,
-                   ShelfName = "First Floor"
+                   Id = 1,
+                   Name = "First Floor",
+                   Code ="A"
                },
             new Shelf()
                {
-                    ShelfId = 2,
-                   ShelfName = "Sixth Floor"
+                    Id = 2,
+                   Name = "Sixth Floor",
+                   Code="B"
+                   
                },
 
         };
-        public ShelfResponse GetShelfList()
+        public List<Shelf> GetShelfList()
         {
-            ShelfResponse shelfResponse = new ShelfResponse();
-              shelfResponse.GetShelves = _shelf;
-            return shelfResponse;
+            return _shelf;
         }
     }
 }

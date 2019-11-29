@@ -24,14 +24,13 @@ namespace IMS_API.Controllers
         }
         // GET: api/Shelf
         [HttpGet]
-        public List<Shelf> Get()
+        public ShelfResponse Get()
         {
             IMS.Contracts.ShelfResponse contractsShelfResponse;
             IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfList();
             contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
-            List<Shelf> shelfList = contractsShelfResponse.GetShelves;
-
-            return shelfList;
+            return contractsShelfResponse;
+          
            
         }
 

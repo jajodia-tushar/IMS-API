@@ -6,8 +6,9 @@ namespace IMS.Entities
 {
     public class Shelf
     {
-        public int ShelfId { get; set; }
+        public int Id { get; set; }
 
-        public string ShelfName { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
     }
 }

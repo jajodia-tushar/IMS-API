@@ -17,10 +17,36 @@ namespace IMS.Core.services
         }
         public ShelfResponse GetShelfList()
         {
-            ShelfResponse shelfList = new ShelfResponse();
+            ShelfResponse shelfResponse = new ShelfResponse();
+            //List<Shelf> shelf = _shelfDbContext.GetShelfList();
+            try
+            {
+                if (_shelfDbContext.GetShelfList() == null)
+                {
+                    shelfResponse.Status = Status.Failure;
+                    shelfResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.NotFound,
+                        ErrorMessage = Constants.ErrorMessages.EmptyShelfList
+                    };
+                    return shelfResponse;
 
-            shelfList = _shelfDbContext.GetShelfList();
-            return shelfList;
+                }
+                if(_shelfDbContext.GetShelfList() != null)
+                {
+                    shelfResponse.Status = Status.Success;
+                    shelfResponse.shelfList = _shelfDbContext.GetShelfList();
+                    return shelfResponse;
+                }
+            }
+            catch(Exception exception)
+            {
+
+                throw exception;
+
+            }
+          
+            return shelfResponse;
         }
     }
 }

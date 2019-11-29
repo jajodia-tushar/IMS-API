@@ -7,6 +7,6 @@ namespace IMS.DataLayer
 {
     public interface IShelfDb
     {
-        ShelfResponse GetShelfList();
+        List<Shelf> GetShelfList();
     }
 }

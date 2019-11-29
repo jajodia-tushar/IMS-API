@@ -66,29 +66,35 @@ namespace IMS.Core.Translators
             if (entityShelfResponse.Status == Entities.Status.Success)
             {
                 shelfResponse.Status = Contracts.Status.Success;
-                shelfResponse.Shelf = ToDataContractsObject(entityShelfResponse.Shelf);
+                shelfResponse.shelfList = ToDataContractsObject(entityShelfResponse.shelfList);
             }
             else
             {
                shelfResponse.Status = Contracts.Status.Failure;
-                shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
+               shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
             }
             return shelfResponse;
 
         }
 
-        public static Contracts.Shelf ToDataContractsObject(Entities.Shelf shelf)
+        private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfList)
         {
-            return new Contracts.Shelf()
+            List<Contracts.Shelf> contractsShelfList = new List<Contracts.Shelf>();
+            foreach (var entityList in shelfList)
             {
-                 ShelfId = shelf.ShelfId,
-                 ShelfName = shelf.ShelfName
-                
-            };
+                Contracts.Shelf shelf = new Contracts.Shelf();
+                shelf.Id = entityList.Id;
+                shelf.Name = entityList.Name;
+                shelf.Code = entityList.Code;
+                contractsShelfList.Add(shelf);
+
+            }
+            return contractsShelfList;
+
         }
 
 
-        public static Contracts.Error ToDataContractsObject(Entities.Error error)
+            public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
             return new Contracts.Error()
             {
