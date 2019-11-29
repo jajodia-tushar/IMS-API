@@ -47,15 +47,14 @@ namespace IMS_API.Controllers
 
         // POST: api/Shelf
         [HttpPost]
-        public void Post([FromBody] Shelf she
-            )
+        public void Post([FromBody] Shelf shelf)
         {
-            LoginResponse contractsLoginResponse = null;
+           ShelfResponse contractsShelfResponse = null;
             try
             {
-                IMS.Entities.LoginRequest entityLoginRequest = Translator.ToEntitiesObject(login);
-                IMS.Entities.LoginResponse entityLoginResponse = _loginService.Login(entityLoginRequest);
-                contractsLoginResponse = Translator.ToDataContractsObject(entityLoginResponse);
+                IMS.Entities.Shelf entityShelf = Translator.ToEntitiesObject(shelf);
+                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.AddShelf(shelf);
+                contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
             }
             catch
             {

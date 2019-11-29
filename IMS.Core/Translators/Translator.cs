@@ -77,6 +77,17 @@ namespace IMS.Core.Translators
 
         }
 
+        public static Entities.Shelf ToEntitiesObject(Contracts.Shelf shelf)
+        {
+            return new Contracts.Shelf()
+            {
+                Id = shelf.Id,
+                Name = shelf.Name,
+                isActive = shelf.isActive
+
+            };
+        }
+
         private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfList)
         {
             List<Contracts.Shelf> contractsShelfList = new List<Contracts.Shelf>();
@@ -118,16 +129,6 @@ namespace IMS.Core.Translators
             };
         }
 
-        public static Contracts.Shelf ToDataContractsObject(Entities.Shelf shelf)
-        {
-            return new Contracts.Shelf()
-            {
-                Id = shelf.Id,
-                Name=shelf.Name,
-                isActive=shelf.isActive
-
-            };
-        }
         public static Contracts.Role ToDataContractsObject(Entities.Role role)
         {
             return new Contracts.Role()
