@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Entities
+namespace IMS.Contracts
 {
-    public class EmployeeValidationResponse :Response
+    public class GetEmployeeByIdResponse : Response
     {
         public Employee Employee { get; set; }
     }

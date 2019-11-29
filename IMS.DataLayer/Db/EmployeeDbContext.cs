@@ -63,11 +63,11 @@ namespace IMS.DataLayer.Db
             {
                 Id = (int)reader["Id"],
                 Email = (string)reader["Email"],
-                MobileNumber = (string)reader["mobile_number"],
+                ContactNumber = (string)reader["mobile_number"],
                 Firstname = (string)reader["firstname"],
                 Lastname = (string)reader["lastname"],
-                TCardNo = (string)reader["Tcard_No"],
-                AccessCardNo = (string)reader["AccessCard_No"],
+                TCardNumber = (string)reader["TCardNumber"],
+                AccessCardNumber = (string)reader["AccessCardNumber"],
                 IsActive=(bool)reader["IsActive"]
             };
         }

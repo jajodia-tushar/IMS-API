@@ -16,9 +16,9 @@ namespace IMS.DataLayer.Db
                    Firstname ="Rochit",
                    Lastname ="Aggarwal",
                    Email="rochitaggarwal54@gmail.com",
-                   MobileNumber="1234567890",
-                   TCardNo="",
-                   AccessCardNo="",
+                   ContactNumber="1234567890",
+                   TCardNumber="",
+                   AccessCardNumber="",
                    IsActive=true
                },
                new Employee()
@@ -27,9 +27,9 @@ namespace IMS.DataLayer.Db
                    Firstname ="Dhvani",
                    Lastname ="Sheth",
                    Email="dshethl54@gmail.com",
-                   MobileNumber="0987654321",
-                   TCardNo="302",
-                   AccessCardNo="302",
+                   ContactNumber="0987654321",
+                   TCardNumber="302",
+                   AccessCardNumber="302",
                    IsActive=true
                },
                 new Employee()
@@ -38,9 +38,9 @@ namespace IMS.DataLayer.Db
                    Firstname ="Vijay",
                    Lastname ="Mohan",
                    Email="vijayl54@gmail.com",
-                   MobileNumber="53628101012",
-                   TCardNo="",
-                   AccessCardNo="",
+                   ContactNumber="53628101012",
+                   TCardNumber="",
+                   AccessCardNumber="",
                    IsActive=true
                }
             };

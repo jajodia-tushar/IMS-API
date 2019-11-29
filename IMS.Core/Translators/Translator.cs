@@ -10,9 +10,9 @@ namespace IMS.Core.Translators
     public static class Translator
     {
 
-        public static Contracts.EmployeeValidationResponse ToDataContractsObject(Entities.EmployeeValidationResponse entityresponse)
+        public static Contracts.GetEmployeeByIdResponse ToDataContractsObject(Entities.GetEmployeeByIdResponse entityresponse)
         {
-            Contracts.EmployeeValidationResponse employeeValidationResponse = new Contracts.EmployeeValidationResponse();
+            Contracts.GetEmployeeByIdResponse employeeValidationResponse = new Contracts.GetEmployeeByIdResponse();
             if (entityresponse.Status == Entities.Status.Success)
             {
                 employeeValidationResponse.Status = Contracts.Status.Success;
@@ -34,9 +34,9 @@ namespace IMS.Core.Translators
                 Firstname = employee.Firstname,
                 Lastname = employee.Lastname,
                 Email = employee.Email,
-                MobileNumber = null,
-                TCardNo = null,
-                AccessCardNo = null,
+                ContactNumber = null,
+                TCardNumber = null,
+                AccessCardNumber = null,
                 IsActive = employee.IsActive
             };
         }
