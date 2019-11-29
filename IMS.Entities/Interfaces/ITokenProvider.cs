@@ -8,5 +8,6 @@ namespace IMS.Entities.Interfaces
     public interface ITokenProvider
     {
         string GenerateToken(User user);
+        int GetUserIdFromToken();
     }
 }

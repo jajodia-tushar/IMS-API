@@ -39,5 +39,10 @@ namespace IMS.TokenManagement
             
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public int GetUserIdFromToken()
+        {
+            return -1;
+        }
     }
 }

@@ -4,6 +4,7 @@ using IMS.DataLayer.Dal;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using IMS.TokenManagement;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,12 @@ namespace IMS.Core.services
     {
         private IUserDbContext _userDbContext;
         private ITokenProvider _tokenProvider;
+        
         public LoginService(IUserDbContext userDbContext,ITokenProvider tokenProvider)
         {
             _userDbContext = userDbContext;
             _tokenProvider = tokenProvider;
+            
         }
 
         public LoginResponse Login(LoginRequest loginRequest)
@@ -59,8 +62,12 @@ namespace IMS.Core.services
              }
             catch(Exception ex)
             {
+
                 throw ex;
+
+                
             }
+           
             return loginResponse;
 
         }
