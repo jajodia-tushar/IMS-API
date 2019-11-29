@@ -6,7 +6,7 @@ namespace IMS.Contracts
 {
     public class ShelfResponse : Response
     {
-        public List<Shelf> shelfList { get; set; }
+        public List<Shelf> Shelves { get; set; }
        
     }
 }

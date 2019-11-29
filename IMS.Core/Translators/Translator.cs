@@ -66,7 +66,7 @@ namespace IMS.Core.Translators
             if (entityShelfResponse.Status == Entities.Status.Success)
             {
                 shelfResponse.Status = Contracts.Status.Success;
-                shelfResponse.shelfList = ToDataContractsObject(entityShelfResponse.shelfList);
+                shelfResponse.Shelves = ToDataContractsObject(entityShelfResponse.Shelves);
             }
             else
             {

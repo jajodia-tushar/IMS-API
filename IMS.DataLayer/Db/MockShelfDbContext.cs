@@ -5,7 +5,7 @@ using IMS.Entities;
 
 namespace IMS.DataLayer
 {
-    public class MockShelfDbContext : IShelfDb
+    public class MockShelfDbContext : IShelfDbContext
     {
         private static List<Shelf> _shelf = new List<Shelf>()
         {
@@ -27,6 +27,16 @@ namespace IMS.DataLayer
         public List<Shelf> GetShelfList()
         {
             return _shelf;
+        }
+        public Shelf GetShelfById(int id)
+        {
+            return _shelf.Find
+                   (
+                        s =>
+                        {
+                            return s.Id.Equals(id);
+                        }
+                   );
         }
     }
 }

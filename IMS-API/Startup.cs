@@ -73,6 +73,8 @@ namespace IMS_API
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddSingleton<IInventoryService, InventoryService>();
+            services.AddTransient<IShelfService, ShelfService>();
+            services.AddTransient<IShelfDbContext, MockShelfDbContext>();
 
 
 

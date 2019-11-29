@@ -5,8 +5,9 @@ using System.Text;
 
 namespace IMS.DataLayer
 {
-    public interface IShelfDb
+    public interface IShelfDbContext
     {
         List<Shelf> GetShelfList();
+        Shelf GetShelfById(int id);
     }
 }

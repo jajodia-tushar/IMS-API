@@ -9,19 +9,19 @@ namespace IMS.Core.services
 {
     public class ShelfService : IShelfService
     {
-        private IShelfDb _shelfDbContext;
+        private IShelfDbContext _shelfDbContext;
 
-        public ShelfService(IShelfDb shelfDbContext)
+        public ShelfService(IShelfDbContext shelfDbContext)
         {
             _shelfDbContext = shelfDbContext;
         }
         public ShelfResponse GetShelfList()
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            //List<Shelf> shelf = _shelfDbContext.GetShelfList();
+            List<Shelf> Shelf = _shelfDbContext.GetShelfList();
             try
             {
-                if (_shelfDbContext.GetShelfList() == null)
+                if (Shelf == null)
                 {
                     shelfResponse.Status = Status.Failure;
                     shelfResponse.Error = new Error()
@@ -29,14 +29,12 @@ namespace IMS.Core.services
                         ErrorCode = Constants.ErrorCodes.NotFound,
                         ErrorMessage = Constants.ErrorMessages.EmptyShelfList
                     };
-                    return shelfResponse;
-
+                   
                 }
-                if(_shelfDbContext.GetShelfList() != null)
+                if(Shelf != null)
                 {
                     shelfResponse.Status = Status.Success;
-                    shelfResponse.shelfList = _shelfDbContext.GetShelfList();
-                    return shelfResponse;
+                    shelfResponse.Shelves = Shelf;
                 }
             }
             catch(Exception exception)
@@ -46,6 +44,39 @@ namespace IMS.Core.services
 
             }
           
+            return shelfResponse;
+        }
+
+        public ShelfResponse GetShelfById(int id)
+        {
+            ShelfResponse shelfResponse = new ShelfResponse();
+            Shelf Shelf = _shelfDbContext.GetShelfById(id);
+            try
+            {
+                if (Shelf == null)
+                {
+                    shelfResponse.Status = Status.Failure;
+                    shelfResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.NotFound,
+                        ErrorMessage = Constants.ErrorMessages.InvalidShelfId
+                    };
+                    
+
+                }
+                if (Shelf != null)
+                {
+                    shelfResponse.Status = Status.Success;
+                    shelfResponse.Shelves = new List<Shelf> { Shelf };
+                }
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+
+            }
+
             return shelfResponse;
         }
     }

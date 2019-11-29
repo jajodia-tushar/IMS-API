@@ -7,6 +7,6 @@ namespace IMS.Entities
     public class ShelfResponse : Response
     {
        
-        public List<Shelf> shelfList{get ; set; }
+        public List<Shelf> Shelves{get ; set; }
     }
 }
