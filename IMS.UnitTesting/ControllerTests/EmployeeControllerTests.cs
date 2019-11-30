@@ -19,7 +19,7 @@ namespace IMS.UnitTesting.ControllerTests
         }
 
         [Fact]
-        public void GetEmployee_Should_Return_Employee_If_Employee_Id_Is_Valid()
+        public void GetEmployeeById_Should_Return_Employee_If_Employee_Id_Is_Valid()
         {
             var entityEmployeeResponse = new IMS.Entities.GetEmployeeByIdResponse
             {
@@ -39,7 +39,7 @@ namespace IMS.UnitTesting.ControllerTests
             Assert.Equal(actual, expected);
         }
         [Fact]
-        public void GetItemById_Should_Return_Valid_Response_If_Item_Id_Is_InValid()
+        public void GetEmployeeById_Should_Return_NullEmployee_If_Employee_Id_Is_InValid()
         {
             var entityEmployeeResponse = new IMS.Entities.GetEmployeeByIdResponse
             {
@@ -70,7 +70,7 @@ namespace IMS.UnitTesting.ControllerTests
         }
 
         [Fact]
-        public void GetItemById_Should_Return_Valid_Response_If_Item_Id_Is_Null()
+        public void GetEmployeeById_Should_Return_NullEmployee_If_Employee_Id_Is_Null()
         {
             var entityEmployeeResponse = new IMS.Entities.GetEmployeeByIdResponse
             {
