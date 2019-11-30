@@ -14,5 +14,6 @@ namespace IMS.Contracts
         public string TCardNumber { get; set; }
         public string AccessCardNumber { get; set; }
         public bool IsActive { get; set; }
+        public IEnumerable<object> Status { get; set; }
     }
 }

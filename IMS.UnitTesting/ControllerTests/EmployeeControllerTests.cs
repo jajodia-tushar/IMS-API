@@ -1,0 +1,135 @@
+﻿using IMS.Contracts;
+using IMS.Entities.Interfaces;
+using IMS_API.Controllers;
+using Moq;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Xunit;
+
+namespace IMS.UnitTesting.ControllerTests
+{
+    public class EmployeeControllerTests
+    {
+        public Mock<IEmployeeService> _moqEmployeeService;
+        public EmployeeControllerTests()
+        {
+            _moqEmployeeService = new Mock<IEmployeeService>();
+        }
+
+        [Fact]
+        public void GetEmployee_Should_Return_Employee_If_Employee_Id_Is_Valid()
+        {
+            var entityEmployeeResponse = new IMS.Entities.GetEmployeeByIdResponse
+            {
+                Status = IMS.Entities.Status.Success,
+                Employee = GetEntitiesTypeEmployee()
+            };
+            var expectedResult = new IMS.Contracts.GetEmployeeByIdResponse
+            {
+                Status = IMS.Contracts.Status.Success,
+                Employee = GetContractTypeEmployee()
+            };
+            _moqEmployeeService.Setup(m => m.ValidateEmployee(1126)).Returns(entityEmployeeResponse);
+            var employeeController = new EmployeeController(_moqEmployeeService.Object);
+            IMS.Contracts.GetEmployeeByIdResponse actualResult = employeeController.GetEmployeeById(1126);
+            var actual = JsonConvert.SerializeObject(actualResult);
+            var expected = JsonConvert.SerializeObject(expectedResult);
+            Assert.Equal(actual, expected);
+        }
+        [Fact]
+        public void GetItemById_Should_Return_Valid_Response_If_Item_Id_Is_InValid()
+        {
+            var entityEmployeeResponse = new IMS.Entities.GetEmployeeByIdResponse
+            {
+                Status = IMS.Entities.Status.Failure,
+                Error = new IMS.Entities.Error()
+                {
+                    ErrorCode=IMS.Core.Constants.ErrorCodes.NotFound,
+                    ErrorMessage= IMS.Core.Constants.ErrorMessages.InvalidId
+                },
+                Employee = null
+            };
+            var expectedResult = new IMS.Contracts.GetEmployeeByIdResponse
+            {
+                Status = IMS.Contracts.Status.Failure,
+                Error = new IMS.Contracts.Error()
+                {
+                    ErrorCode = IMS.Core.Constants.ErrorCodes.NotFound,
+                    ErrorMessage = IMS.Core.Constants.ErrorMessages.InvalidId
+                },
+                Employee = null
+            };
+            _moqEmployeeService.Setup(m => m.ValidateEmployee(9012718)).Returns(entityEmployeeResponse);
+            var employeeController = new EmployeeController(_moqEmployeeService.Object);
+            IMS.Contracts.GetEmployeeByIdResponse actualResult = employeeController.GetEmployeeById(9012718);
+            var actual = JsonConvert.SerializeObject(actualResult);
+            var expected = JsonConvert.SerializeObject(expectedResult);
+            Assert.Equal(actual, expected);
+        }
+
+        [Fact]
+        public void GetItemById_Should_Return_Valid_Response_If_Item_Id_Is_Null()
+        {
+            var entityEmployeeResponse = new IMS.Entities.GetEmployeeByIdResponse
+            {
+                Status = IMS.Entities.Status.Failure,
+                Error = new IMS.Entities.Error()
+                {
+                    ErrorCode = IMS.Core.Constants.ErrorCodes.NotFound,
+                    ErrorMessage = IMS.Core.Constants.ErrorMessages.InvalidId
+                },
+                Employee = null
+            };
+            var expectedResult = new IMS.Contracts.GetEmployeeByIdResponse
+            {
+                Status = IMS.Contracts.Status.Failure,
+                Error = new IMS.Contracts.Error()
+                {
+                    ErrorCode = IMS.Core.Constants.ErrorCodes.NotFound,
+                    ErrorMessage = IMS.Core.Constants.ErrorMessages.InvalidId
+                },
+                Employee = null
+            };
+            _moqEmployeeService.Setup(m => m.ValidateEmployee(0)).Returns(entityEmployeeResponse);
+            var employeeController = new EmployeeController(_moqEmployeeService.Object);
+            IMS.Contracts.GetEmployeeByIdResponse actualResult = employeeController.GetEmployeeById(0);
+            var actual = JsonConvert.SerializeObject(actualResult);
+            var expected = JsonConvert.SerializeObject(expectedResult);
+            Assert.Equal(actual, expected);
+        }
+
+
+        public IMS.Entities.Employee GetEntitiesTypeEmployee()
+        {
+            IMS.Entities.Employee _entityTypeEmployee = new IMS.Entities.Employee()
+            {
+                Id = 1126,
+                Firstname = "Rochit",
+                Lastname = "Aggarwal",
+                ContactNumber = "1234567890",
+                Email = "rrrr@gmail.com",
+                AccessCardNumber = "cs234",
+                TCardNumber = "123roch",
+                IsActive = true
+            };
+            return _entityTypeEmployee;
+        }
+        public IMS.Contracts.Employee GetContractTypeEmployee()
+        {
+            IMS.Contracts.Employee _contractsTypeEmployee = new IMS.Contracts.Employee()
+            {
+                Id = 1126,
+                Firstname = "Rochit",
+                Lastname = "Aggarwal",
+                ContactNumber = null,
+                Email = "rrrr@gmail.com",
+                AccessCardNumber = null,
+                TCardNumber =null,
+                IsActive = true
+            };
+            return _contractsTypeEmployee;
+        }
+    }
+}

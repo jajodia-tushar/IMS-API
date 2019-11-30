@@ -23,7 +23,7 @@ namespace IMS_API.Controllers
 
         // GET: api/Default/5
         [HttpGet("{id}", Name = "Get")]
-        public GetEmployeeByIdResponse Get(int id)
+        public GetEmployeeByIdResponse GetEmployeeById(int id)
         {
             GetEmployeeByIdResponse contractsEmployeeValidationResponse = null;
             try
