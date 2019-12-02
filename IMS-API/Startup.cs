@@ -55,8 +55,11 @@ namespace IMS_API
             services.AddTransient<IUserDbContext, UserDbContext>();
             services.AddTransient<ITokenProvider, JwtTokenProvider>();
             services.AddTransient<ILoginService, LoginService>();
+
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
+            services.AddTransient<IDbConnectionProvider, MySqlConnectionProvider>();
+
 
         }
 

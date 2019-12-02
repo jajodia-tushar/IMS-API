@@ -12,18 +12,18 @@ namespace IMS.DataLayer.Dal
 {
     public class UserDbContext : IUserDbContext
     {
-        private IConfiguration _configuration;
-        public UserDbContext(IConfiguration configuration)
+        private IDbConnectionProvider _dbProvider;
+
+        public UserDbContext(IDbConnectionProvider dbConnectionProvider)
         {
-            _configuration = configuration;
+            _dbProvider = dbConnectionProvider;
         }
-       
         public User GetUserByCredintials(string username, string password)
         {
             User user = null;
             MySqlDataReader reader = null;
-
-            using (var connection = new MySqlConnection(_configuration["imsdb"]))
+           
+            using ( var connection = _dbProvider.GetConnection())
             {
                 try
                 {
@@ -45,6 +45,7 @@ namespace IMS.DataLayer.Dal
                         user = Extract(reader);
 
                     }
+                    
                   
 
                 }
