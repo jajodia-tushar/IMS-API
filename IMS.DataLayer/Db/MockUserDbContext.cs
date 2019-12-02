@@ -64,9 +64,6 @@ namespace IMS.DataLayer.Dal
                            return u.Username.Equals(username) && u.Password.Equals(password);
                         }
                    );
-        }
-
-       
-       
+        }   
     }
 }
