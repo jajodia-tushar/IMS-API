@@ -17,7 +17,7 @@ namespace IMS.DataLayer.Db
                    Lastname ="Aggarwal",
                    Email="rochitaggarwal54@gmail.com",
                    ContactNumber="1234567890",
-                   TCardNumber="",
+                   TemporaryCardNumber="",
                    AccessCardNumber="",
                    IsActive=true
                },
@@ -28,7 +28,7 @@ namespace IMS.DataLayer.Db
                    Lastname ="Sheth",
                    Email="dshethl54@gmail.com",
                    ContactNumber="0987654321",
-                   TCardNumber="302",
+                   TemporaryCardNumber="302",
                    AccessCardNumber="302",
                    IsActive=true
                },
@@ -39,7 +39,7 @@ namespace IMS.DataLayer.Db
                    Lastname ="Mohan",
                    Email="vijayl54@gmail.com",
                    ContactNumber="53628101012",
-                   TCardNumber="",
+                   TemporaryCardNumber="",
                    AccessCardNumber="",
                    IsActive=true
                }

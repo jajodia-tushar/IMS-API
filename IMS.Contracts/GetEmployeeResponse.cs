@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IMS.Contracts
 {
-    public class GetEmployeeByIdResponse : Response
+    public class GetEmployeeResponse : Response
     {
         public Employee Employee { get; set; }
     }

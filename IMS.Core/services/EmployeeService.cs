@@ -14,9 +14,9 @@ namespace IMS.Core.services
         {
             this.employeeDbContext = employeeDbContext;
         }
-        public GetEmployeeByIdResponse ValidateEmployee(int id)
+        public GetEmployeeResponse ValidateEmployee(int id)
         {
-            GetEmployeeByIdResponse employeeValidationResponse = new GetEmployeeByIdResponse();
+            GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
             {
                 if (id <= 0)

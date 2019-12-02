@@ -63,7 +63,7 @@ namespace IMS.UnitTesting.CoreTests
                 Lastname = "Aggarwal",
                 Email = "rochitaggarwal54@gmail.com",
                 ContactNumber = "",
-                TCardNumber= "",
+                TemporaryCardNumber= "",
                 AccessCardNumber = "",
                 IsActive = true
             };

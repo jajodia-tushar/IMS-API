@@ -66,7 +66,7 @@ namespace IMS.DataLayer.Db
                 ContactNumber = (string)reader["mobile_number"],
                 Firstname = (string)reader["firstname"],
                 Lastname = (string)reader["lastname"],
-                TCardNumber = (string)reader["TCardNumber"],
+                TemporaryCardNumber = (string)reader["TCardNumber"],
                 AccessCardNumber = (string)reader["AccessCardNumber"],
                 IsActive=(bool)reader["IsActive"]
             };

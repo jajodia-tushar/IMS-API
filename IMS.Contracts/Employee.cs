@@ -11,7 +11,7 @@ namespace IMS.Contracts
         public string Lastname { get; set; }
         public string Email { get; set; }
         public string ContactNumber { get; set; }
-        public string TCardNumber { get; set; }
+        public string TemporaryCardNumber { get; set; }
         public string AccessCardNumber { get; set; }
         public bool IsActive { get; set; }
         public IEnumerable<object> Status { get; set; }

@@ -23,17 +23,17 @@ namespace IMS_API.Controllers
 
         // GET: api/Default/5
         [HttpGet("{id}", Name = "Get")]
-        public GetEmployeeByIdResponse GetEmployeeById(int id)
+        public GetEmployeeResponse GetEmployeeById(int id)
         {
-            GetEmployeeByIdResponse contractsEmployeeValidationResponse = null;
+            GetEmployeeResponse contractsEmployeeValidationResponse = null;
             try
             {
-                IMS.Entities.GetEmployeeByIdResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(id);
+                IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(id);
                 contractsEmployeeValidationResponse = Translator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
             catch
             {
-                contractsEmployeeValidationResponse = new IMS.Contracts.GetEmployeeByIdResponse()
+                contractsEmployeeValidationResponse = new IMS.Contracts.GetEmployeeResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
