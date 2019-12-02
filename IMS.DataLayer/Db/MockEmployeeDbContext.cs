@@ -44,7 +44,7 @@ namespace IMS.DataLayer.Db
                    IsActive=true
                }
             };
-        public Employee getEmployeeById(int id)
+        public Employee GetEmployeeById(int id)
         {
             return employees.Find
                    (

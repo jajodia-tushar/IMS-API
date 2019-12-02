@@ -17,7 +17,7 @@ namespace IMS.DataLayer.Db
             _configuration = configuration;
         }
 
-        public Employee getEmployeeById(int id)
+        public Employee GetEmployeeById(int id)
         {
             Employee employee = null;
             MySqlDataReader reader = null;

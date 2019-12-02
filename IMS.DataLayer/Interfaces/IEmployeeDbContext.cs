@@ -7,6 +7,6 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface IEmployeeDbContext
     {
-        Employee getEmployeeById(int id);
+        Employee GetEmployeeById(int id);
     }
 }
