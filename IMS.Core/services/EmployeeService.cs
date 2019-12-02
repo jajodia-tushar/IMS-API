@@ -29,7 +29,7 @@ namespace IMS.Core.services
                     };
                     return employeeValidationResponse;
                 }
-                Employee employee = employeeDbContext.getEmployeeById(id);
+                Employee employee = employeeDbContext.GetEmployeeById(id);
                 if (employee != null)
                 {
                     employeeValidationResponse.Status = Status.Success;

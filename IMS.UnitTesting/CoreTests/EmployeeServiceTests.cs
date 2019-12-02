@@ -34,7 +34,7 @@ namespace IMS.UnitTesting.CoreTests
         public void Returns_Errors_And_Status_Failure_When_Id_Is_Wrong()
         {
             Employee employee = null;
-            _moqEmployeeDbContext.Setup(e => e.getEmployeeById(It.Is<int>(i => i.Equals(1134)))).Returns(employee);
+            _moqEmployeeDbContext.Setup(e => e.GetEmployeeById(It.Is<int>(i => i.Equals(1134)))).Returns(employee);
             var employeeService = new EmployeeService(_moqEmployeeDbContext.Object);
             var response = employeeService.ValidateEmployee(1134);
             Assert.Equal(Status.Failure, response.Status);
@@ -47,7 +47,7 @@ namespace IMS.UnitTesting.CoreTests
         public void Returns_Employee_And_Status_Success_Login_Service_When_Id_Is_Valid()
         {
             Employee employee = GetEmployeeDetails();
-            _moqEmployeeDbContext.Setup(e => e.getEmployeeById(It.Is<int>(i => i.Equals(1126)))).Returns(employee);
+            _moqEmployeeDbContext.Setup(e => e.GetEmployeeById(It.Is<int>(i => i.Equals(1126)))).Returns(employee);
             var employeeService = new EmployeeService(_moqEmployeeDbContext.Object);
             var response = employeeService.ValidateEmployee(1126);
             var actual = JsonConvert.SerializeObject(employee);
