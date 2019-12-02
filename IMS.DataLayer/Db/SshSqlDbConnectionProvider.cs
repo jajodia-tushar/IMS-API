@@ -9,39 +9,49 @@ using System.Text;
 namespace IMS.DataLayer.Db
 {
     public class SshSqlDbConnectionProvider : IDbConnectionProvider
-    { private SshClient _sshClient;
-        private uint _localPort;
+    { private static SshClient _sshClient;
+        private static uint _localPort;
         private IConfiguration _configuration;
         public SshSqlDbConnectionProvider(IConfiguration configuration)
         {
             _configuration = configuration;
-         (_sshClient, _localPort) = ConnectSsh(
-                                                _configuration["Ssh:Server"],
-                                                _configuration["Ssh:UserName"],
-                                                _configuration["Ssh:Password"]
-                                              );
+         
         }
         public MySqlConnection GetConnection()
-        {      if(!_sshClient.IsConnected)
-                (_sshClient, _localPort) = ConnectSsh(
-                                                   _configuration["Ssh:Server"],
-                                                   _configuration["Ssh:UserName"],
-                                                   _configuration["Ssh:Password"]
-                                                 );
+        {  try
+            {
+                if (!IsSshClientConnected())
+                    (_sshClient, _localPort) = ConnectSsh(
+                                                       _configuration["Ssh:Server"],
+                                                       _configuration["Ssh:UserName"],
+                                                       _configuration["Ssh:Password"]
+                                                     );
 
-            MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder
+                MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder
                 {
                     Server = _configuration["Ssh:DbPort"],
-                
+
                     Port = _localPort,
                     UserID = _configuration["Ssh:DbUserName"],
                     Password = _configuration["Ssh:DbPassword"],
                 };
 
-                return  new MySqlConnection(csb.ConnectionString);
+                return new MySqlConnection(csb.ConnectionString);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
                
             
         }
+
+        private static bool IsSshClientConnected()
+        {    if (_sshClient != null )
+                return _sshClient.IsConnected;
+            return false;
+        }
+
         public static (SshClient SshClient, uint Port) ConnectSsh(string sshHostName, string sshUserName, string sshPassword = null,
     string sshKeyFile = null, string sshPassPhrase = null, int sshPort = 22, string databaseServer = "localhost", int databasePort = 3306)
         {

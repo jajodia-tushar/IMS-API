@@ -16,7 +16,14 @@ namespace IMS.DataLayer.Db
         private IConfiguration _configuration;
         public MySqlConnection GetConnection()
         {
-            return new MySqlConnection(_configuration["Rds"]);
+            try
+            {
+                return new MySqlConnection(_configuration["Rds"]);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
     }
 }
