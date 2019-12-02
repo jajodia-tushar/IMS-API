@@ -24,16 +24,19 @@ namespace IMS.Logging
 
                 //int userId = _tokenProvider.GetUserIdFromHeadersAuthorization(authorizationValues); //_tokenProvider.getUserFromToken();
                 string callType = GetCalledMethod();
-                string severity = "No";
-                if(response.Status==Status.Failure)
-                severity=LogConstants.CallTypeSeverityMapping.SeverityOf[callType];
+                string severity = LogConstants.Severity.No;
+                string status =LogConstants.Status.Failure;
+                if (response != null && response.Status == Status.Failure)
+                {
+                    severity = LogConstants.CallTypeSeverityMapping.SeverityOf[callType];
+                    status = GetResponseStatus(response);
+                }
                 string requestJson = ConvertToString(request);
-                string status = GetResponseStatus(response);
                 string responseJson = ConvertToString(response);
                 _logDbContext.Log(userId,status, callType, severity, requestJson, responseJson);
                
             }
-            catch
+            catch(Exception e)
             {
                 return;
             }
@@ -61,9 +64,6 @@ namespace IMS.Logging
             return null;
         }
 
-        public void Log(StringValues authenticateToken, object request, Response response)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

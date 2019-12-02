@@ -8,6 +8,8 @@ using Xunit;
 using IMS.Core.services;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace IMS.UnitTest.CoreTests
 {
@@ -15,17 +17,21 @@ namespace IMS.UnitTest.CoreTests
     {
         public Mock<IUserDbContext> _moqUserDbContext;
         public Mock<ITokenProvider> _moqTokenProvider;
+        public Mock<ILogManager> _moqLogManager;
+        public Mock<IHttpContextAccessor> _moqHttpContextAccessor;
         public LoginServiceTests()
         {
             _moqUserDbContext = new Mock<IUserDbContext>();
             _moqTokenProvider = new Mock<ITokenProvider>();
+            _moqLogManager = new Mock<ILogManager>();
+            _moqHttpContextAccessor = new Mock<IHttpContextAccessor>();
         }
 
         [Fact]
         public void Returns_Errors_And_Status_Failure_When_Username_And_Password_Is_Null()
         {
             var loginRequest = GetLoginRequestWithNullValues();
-            var loginServiceObject = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object);
+            var loginServiceObject = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object,_moqHttpContextAccessor.Object,_moqLogManager.Object);
             var response = loginServiceObject.Login(loginRequest);
             Assert.Equal(Status.Failure, response.Status);
             Assert.Equal(Constants.ErrorCodes.BadRequest, response.Error.ErrorCode);
@@ -38,7 +44,7 @@ namespace IMS.UnitTest.CoreTests
             var loginRequest = GetValidLoginRequest();
             User user = null;
             _moqUserDbContext.Setup(m => m.GetUserByCredintials(It.Is<String>(s => s.Equals(loginRequest.Username)), It.Is<String>(s => s.Equals(loginRequest.Password)))).Returns(user);
-            var loginService = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object);
+            var loginService = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var response = loginService.Login(loginRequest);
             Assert.Equal(Status.Failure, response.Status);
             Assert.Equal(Constants.ErrorCodes.UnAuthorized, response.Error.ErrorCode);
@@ -52,7 +58,7 @@ namespace IMS.UnitTest.CoreTests
             string token = "abcdefghijklmnopqrstuvwxyz";
             _moqUserDbContext.Setup(m => m.GetUserByCredintials(It.Is<String>(s => s.Equals(loginRequest.Username)), It.Is<String>(s => s.Equals(loginRequest.Password)))).Returns(user);
             _moqTokenProvider.Setup(m => m.GenerateToken(user)).Returns(token);
-            var loginService = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object);
+            var loginService = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var response = loginService.Login(loginRequest);
             Assert.Equal(token, response.AccessToken);
         }

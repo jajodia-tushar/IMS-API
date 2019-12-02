@@ -7,6 +7,7 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface ILogDbContext
     {
-        void Log(Object request,Response response,int userId);
+       void Log(int userId, string status, string callType, string severity, string request, string response);
+
     }
 }

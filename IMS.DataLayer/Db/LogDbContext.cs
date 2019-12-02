@@ -10,23 +10,24 @@ namespace IMS.DataLayer.Db
 {
     public class LogDbContext : ILogDbContext
     {  
-        private IConfiguration _configuration;
-         public LogDbContext(IConfiguration configuration)
+        private IDbConnectionProvider _dbConnectionProvider;
+         public LogDbContext(IDbConnectionProvider dbConnectionProvider)
         {
-            _configuration = configuration;  
+            _dbConnectionProvider = dbConnectionProvider;
         }
-        public void Log(int userId,string status,string callType, string severity, string request, string response)
+        public void Log(int userId, string status, string callType, string severity, string request, string response)
         {
-            using (var connection = new MySqlConnection(_configuration["imsdb"]))
+
+            try
             {
-                try
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
                 {
 
                     connection.Open();
 
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spAddLogData";
+                    command.CommandText = "spAddLog";
 
 
                     command.Parameters.AddWithValue("@userid", userId);
@@ -35,17 +36,18 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@severity", severity);
                     command.Parameters.AddWithValue("@request", request);
                     command.Parameters.AddWithValue("@response", response);
-                   
+
 
 
 
                     command.ExecuteNonQuery();
                 }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
         }
     }
 }

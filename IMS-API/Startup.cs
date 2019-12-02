@@ -60,11 +60,13 @@ namespace IMS_API
             services.AddTransient<ILogDbContext, LogDbContext>();
             services.AddTransient<ILoginService, LoginService>();
 
+
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IInventoryService, InventoryService>();
+            //services.AddSingleton<IInventoryService, InventoryService>();
+
 
 
         }

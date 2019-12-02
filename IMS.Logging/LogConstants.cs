@@ -18,17 +18,20 @@ namespace IMS.Logging
             public const string High = "High";
             public const string Medium = "Medium";
             public const string Low = "Low";
+            public const string No = "No";
 
         }
         public static class CallTypes
         {
             public const string Login = "Login";
+           
         }
         public static class CallTypeSeverityMapping
         {
             public static Dictionary<string, string> SeverityOf = new Dictionary<string, string>
             {
                 {CallTypes.Login,Severity.Critical }
+                
             };
         }
 
