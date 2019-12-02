@@ -7,6 +7,6 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface IDbConnectionProvider
     {
-        MySqlConnection GetConnection();
+        MySqlConnection GetConnection(string databaseName);
     }
 }

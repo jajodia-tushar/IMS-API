@@ -17,9 +17,9 @@ namespace IMS.DataLayer.Db
             _configuration = configuration;
          
         }
-        public MySqlConnection GetConnection()
+        public MySqlConnection GetConnection(string databaseName)
         {  try
-            {
+             {
                 if (!IsSshClientConnected())
                     (_sshClient, _localPort) = ConnectSsh(
                                                        _configuration["Ssh:Server"],
@@ -29,11 +29,12 @@ namespace IMS.DataLayer.Db
 
                 MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder
                 {
-                    Server = _configuration["Ssh:DbPort"],
+                    Server = _configuration["Sql:Server"],
+                    Database=databaseName,
 
                     Port = _localPort,
-                    UserID = _configuration["Ssh:DbUserName"],
-                    Password = _configuration["Ssh:DbPassword"],
+                    UserID = _configuration["Sql:UserName"],
+                    Password = _configuration["Sql:Password"],
                 };
 
                 return new MySqlConnection(csb.ConnectionString);

@@ -14,11 +14,20 @@ namespace IMS.DataLayer.Db
             _configuration = configuration;
         }
         private IConfiguration _configuration;
-        public MySqlConnection GetConnection()
+        public MySqlConnection GetConnection(string databaseName)
         {
             try
             {
-                return new MySqlConnection(_configuration["Rds"]);
+               
+               
+                
+                string server = _configuration["Sql:Server"];
+                string port = _configuration["Sql:Port"];
+                string username = _configuration["Sql:UserName"];
+                string password = _configuration["Sql:Password"];
+                string connectionString = $"server={server};port={port};Database={databaseName}; uid={ username };pwd= { password }; convert zero datetime=True;";
+                return new MySqlConnection(connectionString);
+                
             }
             catch(Exception e)
             {

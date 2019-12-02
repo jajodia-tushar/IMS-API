@@ -23,7 +23,7 @@ namespace IMS.DataLayer.Dal
             User user = null;
             MySqlDataReader reader = null;
            
-            using ( var connection = _dbProvider.GetConnection())
+            using ( var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -32,7 +32,7 @@ namespace IMS.DataLayer.Dal
 
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetUserByCredintials";
+                    command.CommandText = "spGetUserByCredentials";
 
 
                     command.Parameters.AddWithValue("@username", username);
