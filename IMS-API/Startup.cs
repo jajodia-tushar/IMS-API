@@ -58,7 +58,7 @@ namespace IMS_API
 
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
-            services.AddTransient<IDbConnectionProvider, MySqlConnectionProvider>();
+            services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
 
 
         }
