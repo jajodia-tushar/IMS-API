@@ -26,17 +26,19 @@ namespace IMS.Core.services
         public Response TestMethod()
         {
             Response customizedResponse = new Response();
-            int userId = -1;
+            User user = null;
             try
             {
 
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValid = false;//_tokenProvider.IsValidToken(token, out userId);
+                bool isValid = false;//_tokenProvider.IsValidToken(token);
+
+
                                      /* the above method checks whether token is valid or not with database
                                       * if it is valid then returns true and sets userId
                                       * else returns false without setting userId
                                       */
-                User user = Utility.GetUserFromToken(token);
+                user = Utility.GetUserFromToken(token);
                 if (isValid)
                 {
 
@@ -64,10 +66,10 @@ namespace IMS.Core.services
                 };
 
             }
-            /*finally
+            finally
             {
-                _logManager.Log(null,customizedResponse,userId);
-            }*/
+                _logManager.Log(null,customizedResponse,user.Id);
+            }
             return customizedResponse;
         }
     }

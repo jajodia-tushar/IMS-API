@@ -64,6 +64,7 @@ namespace IMS_API
             services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IInventoryService, InventoryService>();
 
 
         }
