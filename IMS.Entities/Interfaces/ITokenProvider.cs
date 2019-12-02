@@ -9,6 +9,7 @@ namespace IMS.Entities.Interfaces
     public interface ITokenProvider
     {
         string GenerateToken(User user);
+        bool IsValidToken(string token);
         //int GetUserIdFromHeadersAuthorization(StringValues authorizationValues);
     }
 }

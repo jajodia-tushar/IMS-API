@@ -6,6 +6,6 @@ namespace IMS.Entities.Interfaces
 {
     public interface IInventoryService
     {
-        void TestMethod();
+        Response TestMethod();
     }
 }
