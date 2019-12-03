@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IMS.Core.services;
+using IMS.DataLayer.Dal;
+using IMS.Entities.Interfaces;
+using IMS.TokenManagement;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMS_API.Controllers
@@ -12,10 +17,16 @@ namespace IMS_API.Controllers
     [Authorize]
     public class ValuesController : ControllerBase
     {
+
+
+
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+
+        
             return new string[] { "value1", "value2" };
         }
 

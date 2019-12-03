@@ -7,5 +7,6 @@ namespace IMS.DataLayer
     public class Databases
     {
         public const string IMS = "ims";
+        public const string LOGGING = "logging";
     }
 }

@@ -2,7 +2,9 @@
 using IMS.Entities;
 using IMS.Entities.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,9 +26,10 @@ namespace IMS.TokenManagement
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             
             var claims = new[] {
-                new Claim(ClaimTypes.Name,user.Id.ToString()),
+                new Claim("UserId",user.Id.ToString()),
                 new Claim("Username",user.Username),
                 new Claim(ClaimTypes.Role,user.Role.Name),
+                new Claim("RoleId",user.Role.Id.ToString()),
                  new Claim("Firstname",user.Firstname),
                  new Claim("Lastname",user.Lastname)
             };
@@ -38,6 +41,17 @@ namespace IMS.TokenManagement
                 signingCredentials: credentials);
             
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public bool IsValidToken(string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool StoreToken(string token)
+        {
+            //throw new NotImplementedException();
+            return true;
         }
     }
 }

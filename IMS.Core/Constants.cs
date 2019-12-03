@@ -14,7 +14,11 @@ namespace IMS.Core
 
             public const string ServerError = "Internal Server Error";
 
+            public const string TokenExpired = "Token Expired";
+
             public const string InvalidId = "Invalid Employee Id";
+
+
         }
         public static class ErrorCodes
         {

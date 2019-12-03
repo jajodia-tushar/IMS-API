@@ -21,35 +21,36 @@ namespace IMS_API.Controllers
         {
             _loginService = loginService;
         }
-        
+
 
         // POST: api/Login
         [HttpPost]
-        public Response Login([FromBody] LoginRequest login)
+        public async Task<LoginResponse> Login([FromBody] LoginRequest login)
         {
-            LoginResponse contractsLoginResponse = null ;
+            var a = this.HttpContext.Request.Headers["Authorization"];
+            LoginResponse contractsLoginResponse = null;
             try
             {
                 IMS.Entities.LoginRequest entityLoginRequest = Translator.ToEntitiesObject(login);
-                IMS.Entities.LoginResponse entityLoginResponse = _loginService.Login(entityLoginRequest);
+                IMS.Entities.LoginResponse entityLoginResponse = await _loginService.Login(entityLoginRequest);
                 contractsLoginResponse = Translator.ToDataContractsObject(entityLoginResponse);
             }
             catch
             {
                 contractsLoginResponse = new IMS.Contracts.LoginResponse()
-                        {
-                            Status = Status.Failure,
-                            Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.ServerError,
-                                ErrorMessage = Constants.ErrorMessages.ServerError
-                            }
-                        };
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
             }
             return contractsLoginResponse;
 
         }
-
-
+        
+       
     }
 }
