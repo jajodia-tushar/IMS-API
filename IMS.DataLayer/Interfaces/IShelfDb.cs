@@ -9,7 +9,9 @@ namespace IMS.DataLayer
     {
         List<Shelf> GetShelfList();
         Shelf GetShelfById(int id);
-       List<Shelf> AddShelf(Shelf shelf);
+        List<Shelf> AddShelf(Shelf shelf);
         Shelf GetShelfByName(Shelf shelf);
+        bool GetShelfByCode(string shelfCode);
+        List<Shelf> DeleteShelf(string shelfCode);
     }
 }

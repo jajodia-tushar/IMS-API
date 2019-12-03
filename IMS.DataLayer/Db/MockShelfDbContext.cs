@@ -61,5 +61,32 @@ namespace IMS.DataLayer
 
             return shelf;
         }
+
+        public bool GetShelfByCode(string shelfCode)
+        {
+            foreach (var list in _shelf)
+            {
+                if (list.Code.Equals(shelfCode))
+                {
+                    return true;
+
+                }
+            }
+
+            return false;
+        }
+
+        public List<Shelf> DeleteShelf(string shelfCode)
+        {
+           Shelf shelf = _shelf.Find
+                  (
+                       s =>
+                       {
+                           return s.Code.Equals(shelfCode);
+                       }
+                  );
+            shelf.isActive = false;
+            return _shelf;
+        }
     }
 }

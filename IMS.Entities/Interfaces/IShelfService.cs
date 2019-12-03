@@ -9,5 +9,6 @@ namespace IMS.Entities.Interfaces
        ShelfResponse GetShelfList();
         ShelfResponse GetShelfById(int id);
         ShelfResponse AddShelf(IMS.Entities.Shelf shelf);
+        ShelfResponse Delete(string shelfCode);
     }
 }

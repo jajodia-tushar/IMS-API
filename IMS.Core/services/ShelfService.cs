@@ -101,5 +101,26 @@ namespace IMS.Core.services
 
 
         }
+
+        public ShelfResponse Delete(string shelfCode)
+        {
+            ShelfResponse shelfResponse = new ShelfResponse();
+            bool shelfPresent = _shelfDbContext.GetShelfByCode(shelfCode);
+            if (shelfPresent == true)
+            {
+                List<Shelf> shelfList = _shelfDbContext.DeleteShelf(shelfCode);
+                shelfResponse.Status = Status.Success;
+                shelfResponse.Shelves = shelfList;
+            }
+            else
+            {
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidShelfId;
+
+            }
+
+            return shelfResponse;
+
+        }
     }
 }

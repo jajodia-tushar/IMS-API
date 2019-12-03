@@ -74,14 +74,36 @@ namespace IMS_API.Controllers
 
         // PUT: api/Shelf/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void put(int id)
         {
+           
         }
 
-        // DELETE: api/ApiWithActions/5
+        // DELETE: api/Shelf/B
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ShelfResponse Delete(string id)
         {
+            ShelfResponse contractShelfResponse = null;
+            try
+            {
+
+                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.Delete(id);
+                contractShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
+
+            }
+            catch
+            {
+                contractShelfResponse = new IMS.Contracts.ShelfResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+            }
+            return contractShelfResponse;
         }
     }
 }
