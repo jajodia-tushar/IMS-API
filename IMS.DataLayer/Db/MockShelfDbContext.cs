@@ -28,7 +28,7 @@ namespace IMS.DataLayer
         {
             return _shelf;
         }
-        public Shelf GetShelfByShelfCode(string shelfCode)
+        public Shelf GetShelfByShelf(string shelfCode)
         {
             return _shelf.Find
                    (
@@ -47,18 +47,18 @@ namespace IMS.DataLayer
             return _shelf;
         }
 
-        public Shelf GetShelfByName(Shelf shelf)
+        public bool IsShelfPresent(Shelf shelf)
         {
             foreach(var list in _shelf)
             {
                 if(list.Name == shelf.Name && list.Code == shelf.Code)
                 {
-                    return null;
+                    return true;
                     
                 }
             }
 
-            return shelf;
+            return false;
         }
 
         public bool GetShelfByCode(string shelfCode)
@@ -86,6 +86,25 @@ namespace IMS.DataLayer
                   );
             shelf.isActive = false;
             return _shelf;
+        }
+
+        public Shelf GetShelfByShelfCode(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool GetShelfStatusByCode(string shelfCode)
+        {
+            Shelf shelf = _shelf.Find
+                  (
+                       s =>
+                       {
+                           return s.Code.Equals(shelfCode);
+                       }
+                  );
+           
+            
+            return shelf.isActive ;
         }
     }
 }

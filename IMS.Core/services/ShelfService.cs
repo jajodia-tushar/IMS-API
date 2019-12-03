@@ -83,11 +83,11 @@ namespace IMS.Core.services
         public ShelfResponse AddShelf(Shelf shelf)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            Shelf shelfPresent = _shelfDbContext.GetShelfByName(shelf);
+            bool shelfPresent = _shelfDbContext.IsShelfPresent(shelf);
             try
             {
 
-                if (shelfPresent != null)
+                if (shelfPresent == false)
                 {
                     List<Shelf> shelfList = _shelfDbContext.AddShelf(shelf);
                     shelfResponse.Status = Status.Success;
@@ -96,8 +96,11 @@ namespace IMS.Core.services
                 else
                 {
                     shelfResponse.Status = Status.Failure;
-                    shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfIsAlreadyPresent;
-
+                    shelfResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.BadRequest,
+                        ErrorMessage = Constants.ErrorMessages.ShelfIsAlreadyPresent
+                    };
                 }
 
             }
@@ -118,17 +121,23 @@ namespace IMS.Core.services
             bool shelfPresent = _shelfDbContext.GetShelfByCode(shelfCode);
             try
             {
-                if (shelfPresent == true)
+
+                if (shelfPresent == true && _shelfDbContext.GetShelfStatusByCode(shelfCode) == true)
                 {
-                    List<Shelf> shelfList = _shelfDbContext.DeleteShelf(shelfCode);
-                    shelfResponse.Status = Status.Success;
-                    shelfResponse.Shelves = shelfList;
+                   
+                        List<Shelf> shelfList = _shelfDbContext.DeleteShelf(shelfCode);
+                        shelfResponse.Status = Status.Success;
+                        shelfResponse.Shelves = shelfList;
+                   
                 }
                 else
                 {
                     shelfResponse.Status = Status.Failure;
-                    shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidShelfCode;
-
+                    shelfResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.BadRequest,
+                        ErrorMessage = Constants.ErrorMessages.ShelfNotPresent
+                    };
                 }
             }
             catch (Exception exception)
