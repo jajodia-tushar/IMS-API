@@ -4,10 +4,12 @@ using System.Text;
 
 namespace IMS.Entities
 {
-    public enum Status
-    {   Warning,
-        Failure,
-        Success
-        
+    public enum Severity
+    {
+        Critical,
+        High,
+        Medium,
+        Low,
+        No
     }
 }
