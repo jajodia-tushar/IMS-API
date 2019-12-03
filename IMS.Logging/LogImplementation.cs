@@ -18,7 +18,7 @@ namespace IMS.Logging
            
             _logDbContext = logDbContext;
         }
-        public async Task Log(object request, Response response, int userId)
+        public void Log(object request, Response response, int userId)
         {
             try
             {  
@@ -28,12 +28,10 @@ namespace IMS.Logging
                 string status = GetStatus(response);
                 string requestJson = ConvertToString(request);
                 string responseJson = ConvertToString(response);
-                await _logDbContext.Log(userId,status, callType, severity, requestJson, responseJson);
-               
+                _logDbContext.Log(userId,status, callType, severity, requestJson, responseJson);
             }
             catch(Exception e)
             {
-                return;
             }
         }
 
@@ -43,7 +41,7 @@ namespace IMS.Logging
             if (response!=null)
             {
                 if (response.Status == Status.Failure)
-                    severity = LogConstants.CallTypeSeverityMapping.SeverityOf[callType];
+                    severity = LogConstants.CallTypes.SeverityMapping[callType];
                 else
                     severity = LogConstants.Severity.No;
             }

@@ -87,7 +87,7 @@ namespace IMS.Core.services
             finally
             {
 
-                await _logger.Log(loginRequest, loginResponse,-1);
+                new Task(() => { _logger.Log(loginRequest, loginResponse, -1); }).Start();
             }
 
             return loginResponse;

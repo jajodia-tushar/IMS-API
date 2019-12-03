@@ -8,7 +8,7 @@ namespace IMS.Logging
     {
         public static class Status
         {
-            public const string Success="Success";
+            public const string Success = "Success";
             public const string Failure = "Failure";
             public const string No = "No";
 
@@ -25,17 +25,13 @@ namespace IMS.Logging
         public static class CallTypes
         {
             public const string Login = "Login";
-            
-           
-        }
-        public static class CallTypeSeverityMapping
-        {
-            public static Dictionary<string, string> SeverityOf = new Dictionary<string, string>
+
+            public static Dictionary<string, string> SeverityMapping = new Dictionary<string, string>
             {
                 {CallTypes.Login,Severity.Critical }
-                
+
             };
         }
-
     }
+
 }

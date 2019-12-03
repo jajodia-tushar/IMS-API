@@ -16,7 +16,7 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
-        public async Task Log(int userId, string status, string callType, string severity, string request, string response)
+        public void Log(int userId, string status, string callType, string severity, string request, string response)
         {
 
             try
@@ -41,7 +41,7 @@ namespace IMS.DataLayer.Db
 
 
 
-                    command.ExecuteNonQuery();
+                    command.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)

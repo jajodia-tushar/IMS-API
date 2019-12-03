@@ -9,6 +9,6 @@ namespace IMS.Logging
 {
     public interface ILogManager
     {
-        Task Log(Object request, Response response, int UserId);
+        void Log(Object request, Response response, int UserId);
     }
 }
