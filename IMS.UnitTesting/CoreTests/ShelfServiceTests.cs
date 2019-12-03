@@ -29,12 +29,7 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void Return_Shelf_When_Shelf_When_Id_Is_Valid()
         {
-            var employeeService = new Core.services.ShelfService(_moqShelfDbContext.Object);
-            var response = employeeService.GetShelfById("A");
-            Assert.Equal(Status.Success, response.Status);
-            List<Shelf> shelves = GetShelf();
-            Assert.Equal(response.Shelves, shelves);
-
+            throw new NotImplementedException();
         }
 
         [Fact]
