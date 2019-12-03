@@ -37,7 +37,7 @@ namespace IMS_API.Controllers
 
         // GET: api/Shelf/5
         [HttpGet("{id}", Name = "Get")]
-        public ShelfResponse Get(int id)
+        public ShelfResponse Get(string id)
         {
             IMS.Contracts.ShelfResponse contractsShelfResponse;
             IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfById(id);

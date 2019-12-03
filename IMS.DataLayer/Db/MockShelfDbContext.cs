@@ -1,7 +1,6 @@
-﻿using System;
+﻿using IMS.Entities;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using IMS.Entities;
 
 namespace IMS.DataLayer
 {
@@ -29,13 +28,13 @@ namespace IMS.DataLayer
         {
             return _shelf;
         }
-        public Shelf GetShelfById(int id)
+        public Shelf GetShelfByShelfCode(string shelfCode)
         {
             return _shelf.Find
                    (
                         s =>
                         {
-                            return s.Id.Equals(id);
+                            return s.Code.Equals(shelfCode);
                         }
                    );
         }

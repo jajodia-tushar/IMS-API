@@ -7,7 +7,7 @@ namespace IMS.Entities.Interfaces
      public interface IShelfService
     {
        ShelfResponse GetShelfList();
-        ShelfResponse GetShelfById(int id);
+        ShelfResponse GetShelfById(string id);
         ShelfResponse AddShelf(IMS.Entities.Shelf shelf);
         ShelfResponse Delete(string shelfCode);
     }
