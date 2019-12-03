@@ -22,6 +22,8 @@ using IMS.DataLayer.Interfaces;
 using IMS.Logging;
 using IMS.DataLayer.Db;
 using Microsoft.AspNetCore.Http;
+using Swashbuckle.AspNetCore.Swagger;
+using System.IO;
 
 namespace IMS_API
 {
@@ -38,6 +40,17 @@ namespace IMS_API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Title = "IMS API",
+                    Version = "v1",
+                    Description = "Inventory Management Service Web APIs",
+                    Contact = new Contact() { Name = "COD Team", Email = "raggarwal@tavisca.com", Url = "" },
+                });
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "IMS-API.xml");
+                c.IncludeXmlComments(filePath);
+            });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -74,6 +87,11 @@ namespace IMS_API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Api Version 1");
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

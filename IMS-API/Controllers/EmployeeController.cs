@@ -21,8 +21,17 @@ namespace IMS_API.Controllers
             this.employeeService = employeeService;
         }
 
+        /// <summary>
+        /// Retrieve the employee by their ID
+        /// </summary>
+        /// <param name="id">The ID of the desired Employee</param>
+        /// <returns>Details of Employee</returns>
+        /// <response code="200">Returns Employee Details</response>
+        /// <response code="404">If the Employee Id is Invalid</response>
         // GET: api/Default/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetEmployeeById")]
+        [ProducesResponseType(typeof(GetEmployeeResponse), 200)]
+        [ProducesResponseType(typeof(Response), 404)]
         public GetEmployeeResponse GetEmployeeById(int id)
         {
             GetEmployeeResponse contractsEmployeeValidationResponse = null;
