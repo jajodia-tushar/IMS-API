@@ -25,7 +25,7 @@ namespace IMS_API.Controllers
 
         // POST: api/Login
         [HttpPost]
-        public async Task<Response> Login([FromBody] LoginRequest login)
+        public async Task<LoginResponse> Login([FromBody] LoginRequest login)
         {
             var a = this.HttpContext.Request.Headers["Authorization"];
             LoginResponse contractsLoginResponse = null;
