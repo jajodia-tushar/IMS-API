@@ -22,9 +22,27 @@ namespace IMS_API.Controllers
             _loginService = loginService;
         }
 
+        /// <summary>
+        /// Validates the user using the login credentials and returns user details and access token
+        /// </summary>
+        /// <remarks>
+        /// Note that login contains username and password.
+        /// 
+        ///     POST 
+        ///     {
+        ///        "username":"string",
+        ///        "password":"string"
+        ///     }
+        ///     
+        /// </remarks>
+        /// <returns>User Details and Access Token</returns>
+        /// <response code="200">Returns valid user details and access token</response>
+        /// <response code="401">If the username and password is invalid</response>
 
         // POST: api/Login
         [HttpPost]
+        [ProducesResponseType(typeof(LoginResponse), 200)]
+        [ProducesResponseType(typeof(Response), 401)]
         public async Task<LoginResponse> Login([FromBody] LoginRequest login)
         {
             var a = this.HttpContext.Request.Headers["Authorization"];
