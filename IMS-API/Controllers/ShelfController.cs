@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using IMS.Contracts;
+using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -47,7 +48,7 @@ namespace IMS_API.Controllers
 
         // POST: api/Shelf
         [HttpPost]
-        public void Post([FromBody] Shelf shelf)
+        public ShelfResponse Post([FromBody] Shelf shelf)
         {
            ShelfResponse contractsShelfResponse = null;
             try
@@ -58,7 +59,7 @@ namespace IMS_API.Controllers
             }
             catch
             {
-                contractsLoginResponse = new IMS.Contracts.LoginResponse()
+                contractsShelfResponse = new IMS.Contracts.ShelfResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -68,7 +69,7 @@ namespace IMS_API.Controllers
                     }
                 };
             }
-            return contractsLoginResponse;
+            return contractsShelfResponse;
         }
 
         // PUT: api/Shelf/5

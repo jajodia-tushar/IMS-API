@@ -10,5 +10,6 @@ namespace IMS.DataLayer
         List<Shelf> GetShelfList();
         Shelf GetShelfById(int id);
        List<Shelf> AddShelf(Shelf shelf);
+        Shelf GetShelfByName(Shelf shelf);
     }
 }

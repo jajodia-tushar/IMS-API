@@ -47,5 +47,19 @@ namespace IMS.DataLayer
             _shelf.Add(shelf);
             return _shelf;
         }
+
+        public Shelf GetShelfByName(Shelf shelf)
+        {
+            foreach(var list in _shelf)
+            {
+                if(list.Name == shelf.Name && list.Code == shelf.Code)
+                {
+                    return null;
+                    
+                }
+            }
+
+            return shelf;
+        }
     }
 }

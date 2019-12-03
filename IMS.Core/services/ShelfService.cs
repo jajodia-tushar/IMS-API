@@ -83,33 +83,20 @@ namespace IMS.Core.services
         public ShelfResponse AddShelf(Shelf shelf)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            List<Shelf> Shelf = _shelfDbContext.AddShelf(shelf);
-            try
+            Shelf shelfPresent = _shelfDbContext.GetShelfByName(shelf);
+            if (shelfPresent != null)
             {
-                if (Shelf == null)
-                {
-                    shelfResponse.Status = Status.Failure;
-                    shelfResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.NotFound,
-                        ErrorMessage = Constants.ErrorMessages.InvalidShelfId
-                    };
-
-
-                }
-                if (Shelf != null)
-                {
-                    shelfResponse.Status = Status.Success;
-                    shelfResponse.Shelves = new List<Shelf> { Shelf };
-                }
+                List<Shelf> shelfList = _shelfDbContext.AddShelf(shelf);
+                shelfResponse.Status = Status.Success;
+                shelfResponse.Shelves = shelfList;
             }
-            catch (Exception exception)
+            else
             {
-
-                throw exception;
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfIsAlreadyPresent;
 
             }
-
+            
             return shelfResponse;
 
 

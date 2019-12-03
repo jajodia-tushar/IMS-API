@@ -83,7 +83,8 @@ namespace IMS.Core.Translators
             {
                 Id = shelf.Id,
                 Name = shelf.Name,
-                isActive = shelf.isActive
+                isActive = shelf.isActive,
+                Code = shelf.Code
 
             };
         }
