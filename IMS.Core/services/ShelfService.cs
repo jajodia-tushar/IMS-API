@@ -59,7 +59,7 @@ namespace IMS.Core.services
                     shelfResponse.Error = new Error()
                     {
                         ErrorCode = Constants.ErrorCodes.NotFound,
-                        ErrorMessage = Constants.ErrorMessages.InvalidShelfId
+                        ErrorMessage = Constants.ErrorMessages.InvalidShelfCode
                     };
                     
 
@@ -84,19 +84,29 @@ namespace IMS.Core.services
         {
             ShelfResponse shelfResponse = new ShelfResponse();
             Shelf shelfPresent = _shelfDbContext.GetShelfByName(shelf);
-            if (shelfPresent != null)
+            try
             {
-                List<Shelf> shelfList = _shelfDbContext.AddShelf(shelf);
-                shelfResponse.Status = Status.Success;
-                shelfResponse.Shelves = shelfList;
-            }
-            else
-            {
-                shelfResponse.Status = Status.Failure;
-                shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfIsAlreadyPresent;
+
+                if (shelfPresent != null)
+                {
+                    List<Shelf> shelfList = _shelfDbContext.AddShelf(shelf);
+                    shelfResponse.Status = Status.Success;
+                    shelfResponse.Shelves = shelfList;
+                }
+                else
+                {
+                    shelfResponse.Status = Status.Failure;
+                    shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfIsAlreadyPresent;
+
+                }
 
             }
-            
+            catch (Exception exception)
+            {
+
+                throw exception;
+
+            }
             return shelfResponse;
 
 
@@ -106,16 +116,25 @@ namespace IMS.Core.services
         {
             ShelfResponse shelfResponse = new ShelfResponse();
             bool shelfPresent = _shelfDbContext.GetShelfByCode(shelfCode);
-            if (shelfPresent == true)
+            try
             {
-                List<Shelf> shelfList = _shelfDbContext.DeleteShelf(shelfCode);
-                shelfResponse.Status = Status.Success;
-                shelfResponse.Shelves = shelfList;
+                if (shelfPresent == true)
+                {
+                    List<Shelf> shelfList = _shelfDbContext.DeleteShelf(shelfCode);
+                    shelfResponse.Status = Status.Success;
+                    shelfResponse.Shelves = shelfList;
+                }
+                else
+                {
+                    shelfResponse.Status = Status.Failure;
+                    shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidShelfCode;
+
+                }
             }
-            else
+            catch (Exception exception)
             {
-                shelfResponse.Status = Status.Failure;
-                shelfResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidShelfId;
+
+                throw exception;
 
             }
 
