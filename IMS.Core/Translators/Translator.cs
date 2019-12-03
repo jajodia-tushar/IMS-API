@@ -98,6 +98,7 @@ namespace IMS.Core.Translators
                 shelf.Id = entityList.Id;
                 shelf.Name = entityList.Name;
                 shelf.Code = entityList.Code;
+                shelf.isActive = entityList.isActive;
                 contractsShelfList.Add(shelf);
 
             }

@@ -64,8 +64,7 @@ namespace IMS_API.Controllers
                     Status = Status.Failure,
                     Error = new Error()
                     {
-                        ErrorCode = Constants.ErrorCodes.ServerError,
-                        ErrorMessage = Constants.ErrorMessages.ServerError
+                        ErrorMessage = Constants.ErrorMessages.ShelfIsAlreadyPresent
                     }
                 };
             }
