@@ -47,5 +47,11 @@ namespace IMS.TokenManagement
         {
             throw new NotImplementedException();
         }
+
+        public bool StoreToken(string token)
+        {
+            //throw new NotImplementedException();
+            return true;
+        }
     }
 }

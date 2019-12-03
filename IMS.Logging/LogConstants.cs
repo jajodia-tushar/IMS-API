@@ -10,6 +10,7 @@ namespace IMS.Logging
         {
             public const string Success="Success";
             public const string Failure = "Failure";
+            public const string No = "No";
 
         }
         public static class Severity
@@ -24,6 +25,7 @@ namespace IMS.Logging
         public static class CallTypes
         {
             public const string Login = "Login";
+            
            
         }
         public static class CallTypeSeverityMapping

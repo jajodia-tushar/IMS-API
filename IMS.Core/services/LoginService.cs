@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.Core.services
 {
@@ -31,7 +32,8 @@ namespace IMS.Core.services
 
         }
 
-        public LoginResponse Login(LoginRequest loginRequest)
+        
+        public async Task<LoginResponse> Login(LoginRequest loginRequest)
         {
             User user = null;
 
@@ -55,6 +57,7 @@ namespace IMS.Core.services
                 if (user != null)
                 {
                     string token = _tokenProvider.GenerateToken(user);
+                    _tokenProvider.StoreToken(token);
                     loginResponse.Status = Status.Success;
                     loginResponse.AccessToken = token;
                     loginResponse.User = user;
@@ -84,18 +87,12 @@ namespace IMS.Core.services
             finally
             {
 
-                _logger.Log(loginRequest, loginResponse,-1);
+                await _logger.Log(loginRequest, loginResponse,-1);
             }
 
             return loginResponse;
 
         }
-        public void TestLog()
-        {
-            StringValues authorizationToken = StringValues.Empty;
-          _httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-            _logger.Log( null, new Response { Status=Status.Success},-1);
-            
-         }
+        
     }
 }

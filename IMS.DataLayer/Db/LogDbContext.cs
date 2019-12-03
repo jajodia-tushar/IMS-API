@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -15,12 +16,12 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
-        public void Log(int userId, string status, string callType, string severity, string request, string response)
+        public async Task Log(int userId, string status, string callType, string severity, string request, string response)
         {
 
             try
             {
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.LOGGING))
                 {
 
                     connection.Open();

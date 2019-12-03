@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
@@ -17,29 +18,45 @@ namespace IMS.Logging
            
             _logDbContext = logDbContext;
         }
-        public void Log(object request, Response response, int userId)
+        public async Task Log(object request, Response response, int userId)
         {
             try
             {  
 
-                //int userId = _tokenProvider.GetUserIdFromHeadersAuthorization(authorizationValues); //_tokenProvider.getUserFromToken();
                 string callType = GetCalledMethod();
-                string severity = LogConstants.Severity.No;
-                string status =LogConstants.Status.Failure;
-                if (response != null && response.Status == Status.Failure)
-                {
-                    severity = LogConstants.CallTypeSeverityMapping.SeverityOf[callType];
-                    status = GetResponseStatus(response);
-                }
+                string severity = GetSeverity(response,callType);
+                string status = GetStatus(response);
                 string requestJson = ConvertToString(request);
                 string responseJson = ConvertToString(response);
-                _logDbContext.Log(userId,status, callType, severity, requestJson, responseJson);
+                await _logDbContext.Log(userId,status, callType, severity, requestJson, responseJson);
                
             }
             catch(Exception e)
             {
                 return;
             }
+        }
+
+        private string GetSeverity(Response response,string callType)
+        {
+            string severity = LogConstants.Severity.Critical;
+            if (response!=null)
+            {
+                if (response.Status == Status.Failure)
+                    severity = LogConstants.CallTypeSeverityMapping.SeverityOf[callType];
+                else
+                    severity = LogConstants.Severity.No;
+            }
+
+                return severity;
+        }
+
+        private string GetStatus(Response response)
+        { 
+           string status = LogConstants.Status.Failure;
+            if (response !=null && response.Status == Status.Success)
+                status = LogConstants.Status.Success;
+            return status;
         }
 
         private string GetCalledMethod()

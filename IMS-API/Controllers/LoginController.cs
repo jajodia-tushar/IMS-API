@@ -25,14 +25,14 @@ namespace IMS_API.Controllers
 
         // POST: api/Login
         [HttpPost]
-        public Response Login([FromBody] LoginRequest login)
+        public async Task<Response> Login([FromBody] LoginRequest login)
         {
             var a = this.HttpContext.Request.Headers["Authorization"];
             LoginResponse contractsLoginResponse = null;
             try
             {
                 IMS.Entities.LoginRequest entityLoginRequest = Translator.ToEntitiesObject(login);
-                IMS.Entities.LoginResponse entityLoginResponse = _loginService.Login(entityLoginRequest);
+                IMS.Entities.LoginResponse entityLoginResponse = await _loginService.Login(entityLoginRequest);
                 contractsLoginResponse = Translator.ToDataContractsObject(entityLoginResponse);
             }
             catch
@@ -50,12 +50,7 @@ namespace IMS_API.Controllers
             return contractsLoginResponse;
 
         }
-        [HttpGet]
-        public string Test()
-        {
-            _loginService.TestLog();
-
-            return "done";
-        }
+        
+       
     }
 }

@@ -10,6 +10,7 @@ namespace IMS.Entities.Interfaces
     {
         string GenerateToken(User user);
         bool IsValidToken(string token);
+        bool StoreToken(string token);
         //int GetUserIdFromHeadersAuthorization(StringValues authorizationValues);
     }
 }
