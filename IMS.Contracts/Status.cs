@@ -7,7 +7,8 @@ namespace IMS.Contracts
     public enum Status
     {
         Failure,
-        Success
+        Success,
+        Warning
         
     }
 }

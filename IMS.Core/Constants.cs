@@ -20,6 +20,7 @@ namespace IMS.Core
 
 
         }
+       
         public static class ErrorCodes
         {
             public const int BadRequest = 400;

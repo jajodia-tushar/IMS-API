@@ -5,9 +5,10 @@ using System.Text;
 namespace IMS.Entities
 {
     public enum Status
-    {   Warning,
+    {  
         Failure,
-        Success
-        
+        Success,
+        Warning
+
     }
 }
