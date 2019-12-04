@@ -18,17 +18,16 @@ namespace IMS.Logging
            
             _logDbContext = logDbContext;
         }
-        public void Log(object request, Response response, int userId)
+        public void Log(Object request, Object response, string callType, Status status, Severity severity, int userId)
         {
             try
             {  
 
-                string callType = GetCalledMethod();
-                string severity = GetSeverity(response,callType);
-                string status = GetStatus(response);
+              
+               
                 string requestJson = ConvertToString(request);
                 string responseJson = ConvertToString(response);
-                _logDbContext.Log(userId,status, callType, severity, requestJson, responseJson);
+                _logDbContext.Log(userId,status.ToString(), callType, severity.ToString(), requestJson, responseJson);
             }
             catch(Exception e)
             {

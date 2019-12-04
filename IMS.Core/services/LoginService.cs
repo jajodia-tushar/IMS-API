@@ -86,8 +86,11 @@ namespace IMS.Core.services
             }
             finally
             {
+                Severity severity = Severity.No;
+                if (loginResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
 
-                new Task(() => { _logger.Log(loginRequest, loginResponse, -1); }).Start();
+                new Task(() => { _logger.Log(loginRequest, loginResponse,"Login", loginResponse.Status, severity, -1); }).Start();
             }
 
             return loginResponse;
