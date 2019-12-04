@@ -10,6 +10,7 @@ namespace IMS.Entities.Interfaces
     public interface ILoginService
     {
         Task<LoginResponse> Login(LoginRequest loginRequest);
+       
         
     }
 }

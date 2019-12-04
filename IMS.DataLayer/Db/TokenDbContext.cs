@@ -1,4 +1,5 @@
 ﻿using IMS.DataLayer.Interfaces;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,7 +16,46 @@ namespace IMS.DataLayer.Db
         {
             _dbProvider = dbConnectionProvider;
         }
-        public async Task<bool> StoreToken(string accessToken, string hashToken, DateTime expirationTime)
+
+        public async Task<bool> IsValidToken(string hashToken)
+        {
+            bool isValid = false;
+            MySqlDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetTokenFromHashToken";
+
+
+                    command.Parameters.AddWithValue("@tokenhash", hashToken);
+
+                    reader = command.ExecuteReader();
+
+                    int rows = 0;
+                    while (reader.Read())
+                    {
+                        rows++;
+
+                    }
+                    if (rows == 1)
+                        isValid = true;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return isValid;
+        }
+
+            public async Task<bool> StoreToken(string accessToken, string hashToken, DateTime expirationTime)
         {
             bool isStoredToken = false;
             string timestamp = ConvertToString(expirationTime);

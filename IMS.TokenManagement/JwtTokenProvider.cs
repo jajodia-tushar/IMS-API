@@ -25,7 +25,7 @@ namespace IMS.TokenManagement
             _configuration = configuration;
             _tokenDbContext = tokenDbContext;
         }
-        public async Task<string> GenerateToken(User user)
+        public string GenerateToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -48,9 +48,19 @@ namespace IMS.TokenManagement
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool> IsValidToken(string token)
-        {
-            throw new NotImplementedException();
+        public async Task<bool> IsValidToken(string accessToken)
+        { bool isValid = false;
+            try
+            {
+                string hashToken = GetAccessTokenHashValue(accessToken);
+               isValid = await _tokenDbContext.IsValidToken(hashToken);
+
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+            return isValid;
         }
 
         public async Task<bool> StoreToken(string accessToken,DateTime expirationTime)

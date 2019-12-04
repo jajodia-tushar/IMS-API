@@ -8,5 +8,6 @@ namespace IMS.DataLayer.Interfaces
    public  interface ITokenDbContext
     {
         Task<bool> StoreToken(string accessToken, string hashToken, DateTime expirationTime);
+        Task<bool> IsValidToken(string hashToken);
     }
 }
