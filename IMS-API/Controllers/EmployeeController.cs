@@ -13,6 +13,7 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class EmployeeController : ControllerBase
     {
         private IEmployeeService employeeService;

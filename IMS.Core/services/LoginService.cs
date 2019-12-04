@@ -58,7 +58,7 @@ namespace IMS.Core.services
                 {
                     string token =  _tokenProvider.GenerateToken(user);
                     DateTime  expirationTime = GetExpirationTime(user.Role.Name);
-                    await _tokenProvider.StoreToken(token,expirationTime);
+                  //  await _tokenProvider.StoreToken(token,expirationTime);
                     loginResponse.Status = Status.Success;
                     loginResponse.AccessToken = token;
                     loginResponse.User = user;
@@ -75,7 +75,7 @@ namespace IMS.Core.services
 
                 }
             }
-            catch
+            catch(Exception e)
             {
                 loginResponse.Status = Status.Failure;
                 loginResponse.Error = new Error()
