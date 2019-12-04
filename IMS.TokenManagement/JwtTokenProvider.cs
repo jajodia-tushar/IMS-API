@@ -1,4 +1,5 @@
 ﻿
+using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -9,18 +10,22 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.TokenManagement
 {
     public class JwtTokenProvider:ITokenProvider
     {
         private IConfiguration _configuration;
-        public JwtTokenProvider(IConfiguration configuration)
+        private ITokenDbContext _tokenDbContext;
+        public JwtTokenProvider(IConfiguration configuration,ITokenDbContext tokenDbContext)
         {
             _configuration = configuration;
+            _tokenDbContext = tokenDbContext;
         }
-        public string GenerateToken(User user)
+        public async Task<string> GenerateToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -43,15 +48,55 @@ namespace IMS.TokenManagement
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public bool IsValidToken(string token)
+        public async Task<bool> IsValidToken(string token)
         {
             throw new NotImplementedException();
         }
 
-        public bool StoreToken(string token)
+        public async Task<bool> StoreToken(string accessToken,User user)
         {
-            //throw new NotImplementedException();
-            return true;
+            try
+            {
+                DateTime expirationTime = DateTime.Now;
+                int minutes = GetExpiartionTime(user.Role.Name);
+                expirationTime.AddMinutes(minutes);
+                string hashToken = GetAccessTokenHashValue(accessToken);
+                int userId = user.Id;
+                bool isTokenStored = await _tokenDbContext.StoreToken(accessToken, hashToken, expirationTime);
+                if (!isTokenStored)
+                    throw new Exception("Token Not Stored");
+                return true;
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
+        public static string GetAccessTokenHashValue(string accessTokenJwtString)
+        {
+            string returnValue = null;
+
+
+
+            if (!String.IsNullOrEmpty(accessTokenJwtString))
+            {
+                using (MD5 md5Hash = MD5.Create())
+                {
+                    byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(accessTokenJwtString));
+                    returnValue = Convert.ToBase64String(data);
+                }
+            }
+
+
+
+            return Convert.ToBase64String(Encoding.Unicode.GetBytes(returnValue));
+        }
+       
+
+        private int GetExpiartionTime(string role)
+        {
+            string rolename = role.ToLower();
+            return TokenConstants.Roles.ExpirationTime[rolename];
         }
     }
 }

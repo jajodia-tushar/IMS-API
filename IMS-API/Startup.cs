@@ -72,7 +72,7 @@ namespace IMS_API
             services.AddTransient<ILogManager, LogImplementation>();
             services.AddTransient<ILogDbContext, LogDbContext>();
             services.AddTransient<ILoginService, LoginService>();
-
+            services.AddTransient<ITokenDbContext, TokenDbContext>();
 
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();

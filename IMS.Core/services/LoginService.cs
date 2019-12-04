@@ -56,8 +56,8 @@ namespace IMS.Core.services
                 user = _userDbContext.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
                 if (user != null)
                 {
-                    string token = _tokenProvider.GenerateToken(user);
-                    _tokenProvider.StoreToken(token);
+                    string token = await _tokenProvider.GenerateToken(user);
+                    await _tokenProvider.StoreToken(token,user);
                     loginResponse.Status = Status.Success;
                     loginResponse.AccessToken = token;
                     loginResponse.User = user;
