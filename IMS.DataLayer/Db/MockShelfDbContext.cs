@@ -24,7 +24,7 @@ namespace IMS.DataLayer
                },
 
         };
-        public List<Shelf> GetShelfList()
+        public List<Shelf> GetAllShelves()
         {
             return _shelf;
         }
@@ -61,7 +61,7 @@ namespace IMS.DataLayer
             return false;
         }
 
-        public bool GetShelfByCode(string shelfCode)
+        public bool IsShelfPresentByCode(string shelfCode)
         {
             foreach (var list in _shelf)
             {
@@ -75,7 +75,7 @@ namespace IMS.DataLayer
             return false;
         }
 
-        public List<Shelf> DeleteShelf(string shelfCode)
+        public List<Shelf> DeleteShelfByCode(string shelfCode)
         {
            Shelf shelf = _shelf.Find
                   (

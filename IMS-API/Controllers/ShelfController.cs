@@ -23,6 +23,20 @@ namespace IMS_API.Controllers
         {
             _shelfService = shelfService;
         }
+        /// <summary>
+        /// Getting all Shelf List 
+        /// </summary>
+        /// <remarks>
+        /// Note that it doesn't contain any data
+        /// 
+        ///     GET 
+        ///     {
+        ///     }
+        ///     
+        /// </remarks>
+        /// <returns>All Shelves List</returns>
+        /// <response code="200">Returns shelves List </response>
+        /// <response code="404">If shelves list is empty </response>
         // GET: api/Shelf
         [HttpGet]
         public ShelfResponse Get()
@@ -34,7 +48,21 @@ namespace IMS_API.Controllers
           
            
         }
-
+        /// <summary>
+        /// Getting Shelf by it's Code and return shelf Object
+        /// </summary>
+        /// <remarks>
+        /// Note that shelf data contains shelfCode 
+        /// 
+        ///     GET 
+        ///     {
+        ///        "Code":"string"
+        ///     }
+        ///     
+        /// </remarks>
+        /// <returns>Shelf Object</returns>
+        /// <response code="200">Returns shelf Object </response>
+        /// <response code="404">If shelf Code is Invalid </response>
         // GET: api/Shelf/5
         [HttpGet("{id}", Name = "GetShelf")]
         public ShelfResponse Get(string id)
@@ -45,6 +73,26 @@ namespace IMS_API.Controllers
             return contractsShelfResponse;
             
         }
+
+        /// <summary>
+        /// Adding new Shelf and return List of shelves
+        /// </summary>
+        /// <remarks>
+        /// Note that new shelf data contains shelfId, shelfName and shelfCode 
+        /// 
+        ///     POST 
+        ///     {
+        ///        "Id":"int",
+        ///        "Name":"string",
+        ///        "IsActive":"bool",
+        ///        "Code":"string"
+        ///        
+        ///     }
+        ///     
+        /// </remarks>
+        /// <returns>All Shelves List</returns>
+        /// <response code="200">Returns shelves List </response>
+        /// <response code="400">If shelf is Already present </response>
 
         // POST: api/Shelf
         [HttpPost]
@@ -78,6 +126,23 @@ namespace IMS_API.Controllers
         {
            
         }
+
+        /// <summary>
+        /// Deleting Shelf by it's Code and return List of remaining shelves
+        /// </summary>
+        /// <remarks>
+        /// Note that shelf data contains shelfCode 
+        /// 
+        ///     DELETE
+        ///     {
+        ///        "Code":"string"
+        ///     }
+        ///     
+        /// </remarks>
+        /// <returns>All Shelves List</returns>
+        /// <response code="200">Returns remaining shelves List </response>
+        /// <response code="400">If shelf is Already Deleted or Not Present in Shelf Table </response>
+
 
         // DELETE: api/Shelf/B
         [HttpDelete("{id}")]

@@ -7,12 +7,12 @@ namespace IMS.DataLayer
 {
     public interface IShelfDbContext
     {
-        List<Shelf> GetShelfList();
+        List<Shelf> GetAllShelves();
         Shelf GetShelfByShelfCode(string id);
         List<Shelf> AddShelf(Shelf shelf);
         bool IsShelfPresent(Shelf shelf);
-        bool GetShelfByCode(string shelfCode);
-        List<Shelf> DeleteShelf(string shelfCode);
+        bool IsShelfPresentByCode(string shelfCode);
+        List<Shelf> DeleteShelfByCode(string shelfCode);
         bool GetShelfStatusByCode(string shelfCode);
     }
 }

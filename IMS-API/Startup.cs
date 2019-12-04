@@ -115,6 +115,7 @@ namespace IMS_API
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
+
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "IMS API Version 1");
             });

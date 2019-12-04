@@ -18,7 +18,7 @@ namespace IMS.Core.services
         public ShelfResponse GetShelfList()
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            List<Shelf> Shelf = _shelfDbContext.GetShelfList();
+            List<Shelf> Shelf = _shelfDbContext.GetAllShelves();
             try
             {
                 if (Shelf == null)
@@ -118,14 +118,14 @@ namespace IMS.Core.services
         public ShelfResponse Delete(string shelfCode)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            bool shelfPresent = _shelfDbContext.GetShelfByCode(shelfCode);
+            bool shelfPresent = _shelfDbContext.IsShelfPresentByCode(shelfCode);
             try
             {
 
                 if (shelfPresent == true && _shelfDbContext.GetShelfStatusByCode(shelfCode) == true)
                 {
                    
-                        List<Shelf> shelfList = _shelfDbContext.DeleteShelf(shelfCode);
+                        List<Shelf> shelfList = _shelfDbContext.DeleteShelfByCode(shelfCode);
                         shelfResponse.Status = Status.Success;
                         shelfResponse.Shelves = shelfList;
                    
