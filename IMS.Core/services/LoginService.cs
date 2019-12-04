@@ -57,7 +57,8 @@ namespace IMS.Core.services
                 if (user != null)
                 {
                     string token = await _tokenProvider.GenerateToken(user);
-                    await _tokenProvider.StoreToken(token,user);
+                    DateTime  expiratinTime = GetExpirationTime(user.Role.Name,DateTime.Now);
+                    await _tokenProvider.StoreToken(token,expiratinTime);
                     loginResponse.Status = Status.Success;
                     loginResponse.AccessToken = token;
                     loginResponse.User = user;
@@ -96,6 +97,13 @@ namespace IMS.Core.services
             return loginResponse;
 
         }
-        
+        private DateTime GetExpirationTime(string role,DateTime presentTime)
+        {
+            string rolename = role.ToLower();
+            int minutes=Constants.Roles.ExpirationTime[rolename];
+            presentTime.AddMinutes(minutes);
+            return presentTime;
+        }
+
     }
 }

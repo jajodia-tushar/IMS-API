@@ -11,7 +11,7 @@ namespace IMS.Entities.Interfaces
     {
         Task<string> GenerateToken(User user);
         Task<bool> IsValidToken(string token);
-        Task<bool> StoreToken(string token,User user);
+        Task<bool> StoreToken(string token,DateTime expirationTime);
         //int GetUserIdFromHeadersAuthorization(StringValues authorizationValues);
     }
 }

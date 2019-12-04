@@ -53,17 +53,14 @@ namespace IMS.TokenManagement
             throw new NotImplementedException();
         }
 
-        public async Task<bool> StoreToken(string accessToken,User user)
+        public async Task<bool> StoreToken(string accessToken,DateTime expirationTime)
         {
             try
             {
-                DateTime expirationTime = DateTime.Now;
-                int minutes = GetExpiartionTime(user.Role.Name);
-                expirationTime.AddMinutes(minutes);
+               
                 string hashToken = GetAccessTokenHashValue(accessToken);
-                int userId = user.Id;
                 bool isTokenStored = await _tokenDbContext.StoreToken(accessToken, hashToken, expirationTime);
-                if (!isTokenStored)
+                 if (!isTokenStored)
                     throw new Exception("Token Not Stored");
                 return true;
             }
@@ -93,10 +90,6 @@ namespace IMS.TokenManagement
         }
        
 
-        private int GetExpiartionTime(string role)
-        {
-            string rolename = role.ToLower();
-            return TokenConstants.Roles.ExpirationTime[rolename];
-        }
+       
     }
 }
