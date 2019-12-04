@@ -100,7 +100,7 @@ namespace IMS.Core.services
         private DateTime GetExpirationTime(string role)
         {
             string rolename = role.ToLower();
-            double minutes=Constants.Roles.ExpirationTime[rolename];
+            double minutes=Constants.Roles.ExpirationTimeInMinutes[rolename];
             DateTime expirationTime = DateTime.Now.AddMinutes(minutes);
             return expirationTime;
         }

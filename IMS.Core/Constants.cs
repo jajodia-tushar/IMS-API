@@ -34,7 +34,7 @@ namespace IMS.Core
             public const string Admin = "admin";
             public const string Shelf = "shelf";
             public const string Clerk = "clerk";
-            public static Dictionary<string, int> ExpirationTime = new Dictionary<string, int>()
+            public static Dictionary<string, int> ExpirationTimeInMinutes = new Dictionary<string, int>()
             {
                 { Roles.SuperAdmin,30 },
                 { Roles.Admin,30 },
