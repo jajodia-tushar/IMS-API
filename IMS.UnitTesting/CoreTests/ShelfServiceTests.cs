@@ -55,7 +55,7 @@ namespace IMS.UnitTesting.CoreTests
                    Id = 1,
                    Name = "First Floor",
                    Code ="A",
-                   isActive=true
+                   IsActive=true
 
                 },
 

@@ -83,7 +83,7 @@ namespace IMS.Core.Translators
             {
                 Id = shelf.Id,
                 Name = shelf.Name,
-                isActive = shelf.isActive,
+                IsActive = shelf.IsActive,
                 Code = shelf.Code
 
             };
@@ -98,7 +98,7 @@ namespace IMS.Core.Translators
                 shelf.Id = entityList.Id;
                 shelf.Name = entityList.Name;
                 shelf.Code = entityList.Code;
-                shelf.isActive = entityList.isActive;
+                shelf.IsActive = entityList.IsActive;
                 contractsShelfList.Add(shelf);
 
             }

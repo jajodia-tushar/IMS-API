@@ -36,7 +36,7 @@ namespace IMS_API.Controllers
         }
 
         // GET: api/Shelf/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetShelf")]
         public ShelfResponse Get(string id)
         {
             IMS.Contracts.ShelfResponse contractsShelfResponse;

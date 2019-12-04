@@ -13,14 +13,14 @@ namespace IMS.DataLayer
                    Id = 1,
                    Name = "First Floor",
                    Code ="A",
-                   isActive=true
+                   IsActive=true
                },
             new Shelf()
                {
                     Id = 2,
                    Name = "Sixth Floor",
                    Code="B",
-                   isActive = true
+                   IsActive = true
                },
 
         };
@@ -42,7 +42,7 @@ namespace IMS.DataLayer
         public List<Shelf> AddShelf(Shelf shelf)
         {
             shelf.Id = _shelf.Count + 1;
-            shelf.isActive = true;
+            shelf.IsActive = true;
             _shelf.Add(shelf);
             return _shelf;
         }
@@ -84,7 +84,7 @@ namespace IMS.DataLayer
                            return s.Code.Equals(shelfCode);
                        }
                   );
-            shelf.isActive = false;
+            shelf.IsActive = false;
             return _shelf;
         }
 
@@ -104,7 +104,7 @@ namespace IMS.DataLayer
                   );
            
             
-            return shelf.isActive ;
+            return shelf.IsActive ;
         }
     }
 }
