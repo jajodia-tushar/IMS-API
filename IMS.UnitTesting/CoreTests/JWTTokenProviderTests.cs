@@ -30,7 +30,7 @@ namespace IMS.UnitTest.CoreTests
         {
             var user = GetUserDetails();
             JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
-            var response = jwtTokenprovider.GenerateToken(user);
+            var response = jwtTokenprovider.GenerateToken(user,DateTime.Now);
             Assert.IsType<String>(response);
         }
 
@@ -39,7 +39,7 @@ namespace IMS.UnitTest.CoreTests
         {
             var user = GetUserDetails();
             JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
-            var response = jwtTokenprovider.GenerateToken(user);
+            var response = jwtTokenprovider.GenerateToken(user,DateTime.Now);
             Assert.NotNull(response);
         }
 
@@ -48,7 +48,7 @@ namespace IMS.UnitTest.CoreTests
         {
             var user = GetUserDetails();
             JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
-            var response =  jwtTokenprovider.GenerateToken(user);
+            var response =  jwtTokenprovider.GenerateToken(user,DateTime.Now);
             string[] words = response.Split('.');
             string payload = words[1];
             var payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(payload));
