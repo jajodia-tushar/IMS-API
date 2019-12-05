@@ -41,10 +41,10 @@ namespace IMS_API.Controllers
         [HttpGet]
         public async Task<ShelfResponse> Get()
         {
-            IMS.Contracts.ShelfResponse contractsShelfResponse;
-            IMS.Entities.ShelfResponse entityShelfResponse = await _shelfService.GetShelfList();
-            contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
-            return contractsShelfResponse;
+            IMS.Contracts.ShelfResponse dtoShelfResponse;
+            IMS.Entities.ShelfResponse doShelfResponse = await _shelfService.GetShelfList();
+            dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
+            return dtoShelfResponse;
         }
         /// <summary>
         /// Getting Shelf by it's Code and return shelf Object
@@ -65,10 +65,10 @@ namespace IMS_API.Controllers
         [HttpGet("{shelfCode}", Name = "GetShelf")]
         public ShelfResponse Get(string shelfCode)
         {
-            IMS.Contracts.ShelfResponse contractsShelfResponse;
-            IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfByShelfCode(shelfCode);
-            contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
-            return contractsShelfResponse;
+            IMS.Contracts.ShelfResponse dtoShelfResponse;
+            IMS.Entities.ShelfResponse doShelfResponse = _shelfService.GetShelfByShelfCode(shelfCode);
+            dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
+            return dtoShelfResponse;
             
         }
 
@@ -96,16 +96,16 @@ namespace IMS_API.Controllers
         [HttpPost]
         public ShelfResponse Post([FromBody] Shelf shelf)
         {
-           ShelfResponse contractsShelfResponse = null;
+           ShelfResponse dtoShelfResponse = null;
             try
             {
-                IMS.Entities.Shelf entityShelf = Translator.ToEntitiesObject(shelf);
-                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.AddShelf(entityShelf);
-                contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
+                IMS.Entities.Shelf doShelf = Translator.ToEntitiesObject(shelf);
+                IMS.Entities.ShelfResponse doShelfResponse = _shelfService.AddShelf(doShelf);
+                dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
             }
             catch
             {
-                contractsShelfResponse = new IMS.Contracts.ShelfResponse()
+                dtoShelfResponse = new IMS.Contracts.ShelfResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -115,7 +115,7 @@ namespace IMS_API.Controllers
                     }
                 };
             }
-            return contractsShelfResponse;
+            return dtoShelfResponse;
         }
 
         // PUT: api/Shelf/5
@@ -146,17 +146,17 @@ namespace IMS_API.Controllers
         [HttpDelete("{shelfCode}")]
         public ShelfResponse DeleteShelfByShelfCode(string shelfCode)
         {
-            ShelfResponse contractShelfResponse = null;
+            ShelfResponse dtoShelfResponse = null;
             try
             {
 
-                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.Delete(shelfCode);
-                contractShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
+                IMS.Entities.ShelfResponse doShelfResponse = _shelfService.Delete(shelfCode);
+                dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
 
             }
             catch
             {
-                contractShelfResponse = new IMS.Contracts.ShelfResponse()
+                dtoShelfResponse = new IMS.Contracts.ShelfResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -166,7 +166,7 @@ namespace IMS_API.Controllers
                     }
                 };
             }
-            return contractShelfResponse;
+            return dtoShelfResponse;
         }
     }
 }
