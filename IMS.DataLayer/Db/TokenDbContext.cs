@@ -37,14 +37,14 @@ namespace IMS.DataLayer.Db
 
                     reader = command.ExecuteReader();
 
-                    int rows = 0;
+                    
                     while (reader.Read())
                     {
-                        rows++;
+                        isValid = true;
 
                     }
-                    if (rows == 1)
-                        isValid = true;
+                  
+                       
                 }
                 catch (Exception ex)
                 {
