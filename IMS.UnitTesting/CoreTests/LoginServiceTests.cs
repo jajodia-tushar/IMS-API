@@ -1,15 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using IMS.Core;
-using IMS.Entities.Interfaces;
 using Moq;
 using Xunit;
-using IMS.Core.services;
-using IMS.DataLayer.Interfaces;
-using IMS.Entities;
-using IMS.Logging;
 using Microsoft.AspNetCore.Http;
+using IMS.DataLayer.Interfaces;
+using IMS.Core.services;
+using IMS.Entities;
+using IMS.Entities.Interfaces;
+using IMS.Core;
+using IMS.Logging;
 
 namespace IMS.UnitTest.CoreTests
 {

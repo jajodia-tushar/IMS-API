@@ -19,6 +19,13 @@ namespace IMS.Core
             public const string InvalidId = "Invalid Employee Id";
 
 
+            public const string EmptyShelfList = "Shelf List is not Found";
+
+            public const string InvalidShelfCode = "Invalid Shelf Code";
+            public const string ShelfIsAlreadyPresent = "Shelf Is Already Present";
+
+           
+            public const string ShelfNotPresent = "Shelf is not Present";
         }
        
         public static class ErrorCodes

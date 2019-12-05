@@ -73,6 +73,8 @@ namespace IMS_API
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddSingleton<IInventoryService, InventoryService>();
+            services.AddTransient<IShelfService, ShelfService>();
+            services.AddTransient<IShelfDbContext, MockShelfDbContext>();
 
 
 
@@ -105,6 +107,7 @@ namespace IMS_API
             result.RequireSignedTokens = false;
 
             return result;
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -112,6 +115,7 @@ namespace IMS_API
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
+
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "IMS API Version 1");
             });

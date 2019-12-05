@@ -58,8 +58,56 @@ namespace IMS.Core.Translators
             return loginResponse;
 
         }
-      
-        public static Contracts.Error ToDataContractsObject(Entities.Error error)
+
+
+        public static Contracts.ShelfResponse ToDataContractsObject(Entities.ShelfResponse entityShelfResponse)
+        {
+            Contracts.ShelfResponse shelfResponse = new Contracts.ShelfResponse();
+            if (entityShelfResponse.Status == Entities.Status.Success)
+            {
+                shelfResponse.Status = Contracts.Status.Success;
+                shelfResponse.Shelves = ToDataContractsObject(entityShelfResponse.Shelves);
+            }
+            else
+            {
+               shelfResponse.Status = Contracts.Status.Failure;
+               shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
+            }
+            return shelfResponse;
+
+        }
+
+        public static Entities.Shelf ToEntitiesObject(Contracts.Shelf shelf)
+        {
+            return new Entities.Shelf()
+            {
+                Id = shelf.Id,
+                Name = shelf.Name,
+                IsActive = shelf.IsActive,
+                Code = shelf.Code
+
+            };
+        }
+        
+        private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)
+        {
+            List<Contracts.Shelf> dtoShelves = new List<Contracts.Shelf>();
+            foreach (var shelf in shelfs)
+            {
+                Contracts.Shelf dtoShelf = new Contracts.Shelf();
+                dtoShelf.Id = shelf.Id;
+                dtoShelf.Name = shelf.Name;
+                dtoShelf.Code = shelf.Code;
+                dtoShelf.IsActive = shelf.IsActive;
+                dtoShelves.Add(dtoShelf);
+
+            }
+            return dtoShelves;
+
+        }
+
+
+            public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
             return new Contracts.Error()
             {
