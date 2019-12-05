@@ -19,10 +19,11 @@ namespace IMS.Core.services
         public async Task<ShelfResponse> GetShelfList()
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            List<Shelf> Shelf = await _shelfDbContext.GetAllShelves();
             try
             {
-                if (Shelf == null)
+                List<Shelf> shelves = await _shelfDbContext.GetAllShelves();
+
+                if (shelves == null || shelves.Count == 0)
                 {
                     shelfResponse.Status = Status.Failure;
                     shelfResponse.Error = new Error()
@@ -32,10 +33,10 @@ namespace IMS.Core.services
                     };
                    
                 }
-                if(Shelf != null)
+                else
                 {
                     shelfResponse.Status = Status.Success;
-                    shelfResponse.Shelves = Shelf;
+                    shelfResponse.Shelves = shelves;
                 }
             }
             catch(Exception exception)
@@ -84,7 +85,7 @@ namespace IMS.Core.services
         public async Task< ShelfResponse> AddShelf(Shelf shelf)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            bool shelfPresent = await _shelfDbContext.IsShelfPresent(shelf);
+            bool shelfPresent = await _shelfDbContext.IsShelfPresentByCode(shelf.Code);
             try
             {
 

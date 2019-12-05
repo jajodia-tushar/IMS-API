@@ -1,8 +1,10 @@
 ﻿using IMS.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using IMS.DataLayer.Interfaces;
 
-namespace IMS.DataLayer
+namespace IMS.DataLayer.Db
 {
     public class MockShelfDbContext : IShelfDbContext
     {
@@ -24,11 +26,11 @@ namespace IMS.DataLayer
                },
 
         };
-        public List<Shelf> GetAllShelves()
+        public async Task<List<Shelf>> GetAllShelves()
         {
             return _shelf;
         }
-        public Shelf GetShelfByShelf(string shelfCode)
+        public async Task< Shelf> GetShelfByShelfCode(string shelfCode)
         {
             return _shelf.Find
                    (
@@ -39,7 +41,7 @@ namespace IMS.DataLayer
                    );
         }
 
-        public List<Shelf> AddShelf(Shelf shelf)
+        public async Task< List<Shelf>> AddShelf(Shelf shelf)
         {
             shelf.Id = _shelf.Count + 1;
             shelf.IsActive = true;
@@ -47,21 +49,7 @@ namespace IMS.DataLayer
             return _shelf;
         }
 
-        public bool IsShelfPresent(Shelf shelf)
-        {
-            foreach(var list in _shelf)
-            {
-                if(list.Name == shelf.Name && list.Code == shelf.Code)
-                {
-                    return true;
-                    
-                }
-            }
-
-            return false;
-        }
-
-        public bool IsShelfPresentByCode(string shelfCode)
+        public async Task< bool> IsShelfPresentByCode(string shelfCode)
         {
             foreach (var list in _shelf)
             {
@@ -75,7 +63,7 @@ namespace IMS.DataLayer
             return false;
         }
 
-        public List<Shelf> DeleteShelfByCode(string shelfCode)
+        public async Task< List<Shelf>> DeleteShelfByCode(string shelfCode)
         {
            Shelf shelf = _shelf.Find
                   (
@@ -88,12 +76,8 @@ namespace IMS.DataLayer
             return _shelf;
         }
 
-        public Shelf GetShelfByShelfCode(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool GetShelfStatusByCode(string shelfCode)
+  
+        public async Task <bool> GetShelfStatusByCode(string shelfCode)
         {
             Shelf shelf = _shelf.Find
                   (

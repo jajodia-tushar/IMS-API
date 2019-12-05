@@ -95,14 +95,14 @@ namespace IMS.Core.Translators
             foreach (var shelf in shelfs)
             {
                 Contracts.Shelf dtoShelf = new Contracts.Shelf();
-                shelf.Id = shelf.Id;
-                shelf.Name = shelf.Name;
-                shelf.Code = shelf.Code;
-                shelf.IsActive = shelf.IsActive;
+                dtoShelf.Id = shelf.Id;
+                dtoShelf.Name = shelf.Name;
+                dtoShelf.Code = shelf.Code;
+                dtoShelf.IsActive = shelf.IsActive;
                 dtoShelves.Add(dtoShelf);
 
             }
-            return contractsShelfList;
+            return dtoShelves;
 
         }
 

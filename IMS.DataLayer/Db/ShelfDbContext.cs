@@ -145,10 +145,7 @@ namespace IMS.DataLayer
             return shelfStatus;
         }
 
-        public async Task< bool> IsShelfPresent(Shelf shelf)
-        {
-            return await IsShelfPresentByCode(shelf.Code);
-        }
+       
 
         public async Task<bool> IsShelfPresentByCode(string shelfCode)
         {
