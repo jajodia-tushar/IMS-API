@@ -91,10 +91,10 @@ namespace IMS_API
             var result = new TokenValidationParameters
             {
                 ValidateIssuer = false,
-                ValidIssuer = "jbb",
+                ValidIssuer = "noissuer",
 
                 ValidateAudience = false,
-                ValidAudience = "jjb",
+                ValidAudience = "noaudience",
 
                 ValidateIssuerSigningKey = false,
                

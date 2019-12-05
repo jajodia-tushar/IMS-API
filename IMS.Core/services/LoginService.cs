@@ -56,9 +56,9 @@ namespace IMS.Core.services
                 user = _userDbContext.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
                 if (user != null)
                 {
-                    string token =  _tokenProvider.GenerateToken(user);
-                    DateTime  expirationTime = GetExpirationTime(user.Role.Name);
-                  //  await _tokenProvider.StoreToken(token,expirationTime);
+                    DateTime expirationTime = GetExpirationTime(user.Role.Name);
+                    string token =  _tokenProvider.GenerateToken(user,expirationTime);
+                    await _tokenProvider.StoreToken(token,expirationTime);
                     loginResponse.Status = Status.Success;
                     loginResponse.AccessToken = token;
                     loginResponse.User = user;

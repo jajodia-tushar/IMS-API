@@ -9,9 +9,9 @@ namespace IMS.Entities.Interfaces
 {
     public interface ITokenProvider
     {
-        string GenerateToken(User user);
+        string GenerateToken(User user, DateTime expirationTime);
         Task<bool> IsValidToken(string token);
         Task<bool> StoreToken(string token,DateTime expirationTime);
-        //int GetUserIdFromHeadersAuthorization(StringValues authorizationValues);
+       
     }
 }

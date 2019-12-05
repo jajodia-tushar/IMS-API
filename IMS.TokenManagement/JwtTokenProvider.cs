@@ -25,7 +25,7 @@ namespace IMS.TokenManagement
             _configuration = configuration;
             _tokenDbContext = tokenDbContext;
         }
-        public string GenerateToken(User user)
+        public string GenerateToken(User user,DateTime expirationTime)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -42,7 +42,7 @@ namespace IMS.TokenManagement
             var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
                _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(60),
+                expires: expirationTime,
                 signingCredentials: credentials);
             
             return new JwtSecurityTokenHandler().WriteToken(token);
