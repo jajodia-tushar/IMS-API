@@ -63,10 +63,10 @@ namespace IMS_API.Controllers
         /// <response code="404">If shelf Code is Invalid </response>
         // GET: api/Shelf/5
         [HttpGet("{shelfCode}", Name = "GetShelf")]
-        public ShelfResponse Get(string shelfCode)
+        public async Task<ShelfResponse> Get(string shelfCode)
         {
             IMS.Contracts.ShelfResponse dtoShelfResponse;
-            IMS.Entities.ShelfResponse doShelfResponse = _shelfService.GetShelfByShelfCode(shelfCode);
+            IMS.Entities.ShelfResponse doShelfResponse =await _shelfService.GetShelfByShelfCode(shelfCode);
             dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
             return dtoShelfResponse;
             
@@ -94,13 +94,13 @@ namespace IMS_API.Controllers
 
         // POST: api/Shelf
         [HttpPost]
-        public ShelfResponse Post([FromBody] Shelf shelf)
+        public async Task< ShelfResponse> Post([FromBody] Shelf shelf)
         {
            ShelfResponse dtoShelfResponse = null;
             try
             {
                 IMS.Entities.Shelf doShelf = Translator.ToEntitiesObject(shelf);
-                IMS.Entities.ShelfResponse doShelfResponse = _shelfService.AddShelf(doShelf);
+                IMS.Entities.ShelfResponse doShelfResponse =await _shelfService.AddShelf(doShelf);
                 dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
             }
             catch
@@ -144,13 +144,13 @@ namespace IMS_API.Controllers
 
         // DELETE: api/Shelf/B
         [HttpDelete("{shelfCode}")]
-        public ShelfResponse DeleteShelfByShelfCode(string shelfCode)
+        public async Task< ShelfResponse> DeleteShelfByShelfCode(string shelfCode)
         {
             ShelfResponse dtoShelfResponse = null;
             try
             {
 
-                IMS.Entities.ShelfResponse doShelfResponse = _shelfService.Delete(shelfCode);
+                IMS.Entities.ShelfResponse doShelfResponse = await _shelfService.Delete(shelfCode);
                 dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
 
             }

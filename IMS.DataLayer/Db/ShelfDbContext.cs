@@ -17,10 +17,9 @@ namespace IMS.DataLayer
         {
             _dbProvider = dbConnectionProvider;
         }
-        public List<Shelf> AddShelf(Shelf shelf)
+        public async Task<List<Shelf>> AddShelf(Shelf shelf)
         {
             List<Shelf> Shelves = null;
-            MySqlDataReader reader = null;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -35,7 +34,7 @@ namespace IMS.DataLayer
                     command.Parameters.AddWithValue("@IsActive", true);
                     command.Parameters.AddWithValue("@Code", shelf.Code);
                     command.ExecuteNonQuery();
-                    Shelves = GetAllShelves();
+                    Shelves = await GetAllShelves();
                 }
                 catch (Exception e)
                 {
@@ -47,10 +46,10 @@ namespace IMS.DataLayer
             return Shelves;
         }
 
-        public List<Shelf> DeleteShelfByCode(string shelfCode)
+        public async Task< List<Shelf>> DeleteShelfByCode(string shelfCode)
         {
             List<Shelf> Shelves = null;
-            MySqlDataReader reader = null;
+        
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -63,7 +62,7 @@ namespace IMS.DataLayer
                     command.Parameters.AddWithValue("@Code", shelfCode);
                   
                     command.ExecuteNonQuery();
-                    Shelves = GetAllShelves();
+                    Shelves =await  GetAllShelves();
                 }
                 catch (Exception e)
                 {
@@ -109,12 +108,12 @@ namespace IMS.DataLayer
             return shelves;
         }
 
-        public Shelf GetShelfByShelfCode(string Code)
+        public async Task<Shelf> GetShelfByShelfCode(string Code)
         {
             Shelf shelf = null;
             try
             {
-                List<Shelf> _shelves = GetAllShelves();
+                List<Shelf> _shelves = await GetAllShelves();
                 _shelves.ForEach((myShelfe) => {
                     if (myShelfe.Code == Code)
                         shelf = myShelfe;
@@ -127,13 +126,13 @@ namespace IMS.DataLayer
             return shelf;
         }
 
-        public bool GetShelfStatusByCode(string shelfCode)
+        public async Task<bool> GetShelfStatusByCode(string shelfCode)
         {
            
             bool shelfStatus=false;
             try
             {
-                List<Shelf> _shelves = GetAllShelves();
+                List<Shelf> _shelves =await GetAllShelves();
                 _shelves.ForEach((myShelfe) => {
                     if (myShelfe.Code == shelfCode)
                         shelfStatus= myShelfe.IsActive;
@@ -146,18 +145,18 @@ namespace IMS.DataLayer
             return shelfStatus;
         }
 
-        public bool IsShelfPresent(Shelf shelf)
+        public async Task< bool> IsShelfPresent(Shelf shelf)
         {
-            return IsShelfPresentByCode(shelf.Code);
+            return await IsShelfPresentByCode(shelf.Code);
         }
 
-        public bool IsShelfPresentByCode(string shelfCode)
+        public async Task<bool> IsShelfPresentByCode(string shelfCode)
         {
             
             bool isShelfPresentByCode=false;
                 try
                 {
-                    List<Shelf> _shelves = GetAllShelves();
+                    List<Shelf> _shelves =await GetAllShelves();
                     _shelves.ForEach((myShelfe)=> {
                     if (myShelfe.Code == shelfCode)
                         isShelfPresentByCode = true;

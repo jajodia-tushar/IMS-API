@@ -48,10 +48,10 @@ namespace IMS.Core.services
             return shelfResponse;
         }
 
-        public ShelfResponse GetShelfByShelfCode(string shelfCode)
+        public async Task<ShelfResponse> GetShelfByShelfCode(string shelfCode)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            Shelf Shelf = _shelfDbContext.GetShelfByShelfCode(shelfCode);
+            Shelf Shelf =await _shelfDbContext.GetShelfByShelfCode(shelfCode);
             try
             {
                 if (Shelf == null)
@@ -81,16 +81,16 @@ namespace IMS.Core.services
             return shelfResponse;
         }
 
-        public ShelfResponse AddShelf(Shelf shelf)
+        public async Task< ShelfResponse> AddShelf(Shelf shelf)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            bool shelfPresent = _shelfDbContext.IsShelfPresent(shelf);
+            bool shelfPresent = await _shelfDbContext.IsShelfPresent(shelf);
             try
             {
 
                 if (shelfPresent == false)
                 {
-                    List<Shelf> shelfList = _shelfDbContext.AddShelf(shelf);
+                    List<Shelf> shelfList =await _shelfDbContext.AddShelf(shelf);
                     shelfResponse.Status = Status.Success;
                     shelfResponse.Shelves = shelfList;
                 }
@@ -116,17 +116,17 @@ namespace IMS.Core.services
 
         }
 
-        public ShelfResponse Delete(string shelfCode)
+        public async Task<ShelfResponse> Delete(string shelfCode)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            bool shelfPresent = _shelfDbContext.IsShelfPresentByCode(shelfCode);
+            bool shelfPresent = await _shelfDbContext.IsShelfPresentByCode(shelfCode);
             try
             {
 
-                if (shelfPresent == true && _shelfDbContext.GetShelfStatusByCode(shelfCode) == true)
+                if (shelfPresent == true && await _shelfDbContext.GetShelfStatusByCode(shelfCode) == true)
                 {
                    
-                        List<Shelf> shelfList = _shelfDbContext.DeleteShelfByCode(shelfCode);
+                        List<Shelf> shelfList =await _shelfDbContext.DeleteShelfByCode(shelfCode);
                         shelfResponse.Status = Status.Success;
                         shelfResponse.Shelves = shelfList;
                    

@@ -8,8 +8,8 @@ namespace IMS.Entities.Interfaces
      public interface IShelfService
     {
         Task<ShelfResponse> GetShelfList();
-        ShelfResponse GetShelfByShelfCode(string id);
-        ShelfResponse AddShelf(IMS.Entities.Shelf shelf);
-        ShelfResponse Delete(string shelfCode);
+        Task<ShelfResponse> GetShelfByShelfCode(string id);
+        Task<ShelfResponse> AddShelf(IMS.Entities.Shelf shelf);
+        Task<ShelfResponse> Delete(string shelfCode);
     }
 }
