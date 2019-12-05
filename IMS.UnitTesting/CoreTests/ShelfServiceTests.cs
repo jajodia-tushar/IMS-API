@@ -19,11 +19,7 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void Return_Emptylist_When_There_Are_No_shelves()
         {
-            var employeeService = new Core.services.ShelfService(_moqShelfDbContext.Object);
-            var response = employeeService.GetShelfList();
-            Assert.Equal(Status.Failure, response.Status);
-            Assert.Equal(Constants.ErrorCodes.NotFound, response.Error.ErrorCode);
-            Assert.Equal(Constants.ErrorMessages.EmptyShelfList, response.Error.ErrorMessage);
+            throw new NotImplementedException();
         }
 
         [Fact]
@@ -44,29 +40,10 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void Return_Invalid_Shelf_Id_Message_When_Shelf_Id_Is_Invalid()
         {
-            var employeeService = new Core.services.ShelfService(_moqShelfDbContext.Object);
-            var response = employeeService.GetShelfById("A");
-            Assert.Equal(Constants.ErrorCodes.NotFound, response.Error.ErrorCode);
-            Assert.Equal(Constants.ErrorMessages.InvalidShelfCode, response.Error.ErrorMessage);
+            throw new NotImplementedException();
         }
 
-        private List<Shelf> GetShelf()
-        {
-            List<Shelf> shelves = new List<Shelf>()
-            {
-                new Shelf()
-                {
-
-                   Id = 1,
-                   Name = "First Floor",
-                   Code ="A",
-                   IsActive=true
-
-                },
-
-            };
-            return shelves;
-        }
+      
             
     }
       

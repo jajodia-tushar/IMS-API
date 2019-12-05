@@ -68,7 +68,7 @@ namespace IMS_API.Controllers
         public ShelfResponse Get(string shelfCode)
         {
             IMS.Contracts.ShelfResponse contractsShelfResponse;
-            IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfById(shelfCode);
+            IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfByShelfCode(shelfCode);
             contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
             return contractsShelfResponse;
             

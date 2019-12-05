@@ -47,10 +47,10 @@ namespace IMS.Core.services
             return shelfResponse;
         }
 
-        public ShelfResponse GetShelfById(string id)
+        public ShelfResponse GetShelfByShelfCode(string shelfCode)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            Shelf Shelf = _shelfDbContext.GetShelfByShelfCode(id);
+            Shelf Shelf = _shelfDbContext.GetShelfByShelfCode(shelfCode);
             try
             {
                 if (Shelf == null)
