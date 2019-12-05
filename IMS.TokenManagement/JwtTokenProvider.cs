@@ -52,7 +52,7 @@ namespace IMS.TokenManagement
         { bool isValid = false;
             try
             {
-                if (accessToken != null)
+                if (!string.IsNullOrEmpty(accessToken))
                 {
 
                     string hashToken = GetAccessTokenHashValue(accessToken);
