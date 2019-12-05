@@ -24,7 +24,7 @@ namespace IMS.Core
             public const string InvalidShelfCode = "Invalid Shelf Code";
             public const string ShelfIsAlreadyPresent = "Shelf Is Already Present";
 
-            public const string InvalidId = "Invalid Employee Id";
+           
             public const string ShelfNotPresent = "Shelf is not Present";
         }
        
