@@ -39,14 +39,12 @@ namespace IMS_API.Controllers
         /// <response code="404">If shelves list is empty </response>
         // GET: api/Shelf
         [HttpGet]
-        public ShelfResponse Get()
+        public async Task<ShelfResponse> Get()
         {
             IMS.Contracts.ShelfResponse contractsShelfResponse;
-            IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfList();
+            IMS.Entities.ShelfResponse entityShelfResponse = await _shelfService.GetShelfList();
             contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
             return contractsShelfResponse;
-          
-           
         }
         /// <summary>
         /// Getting Shelf by it's Code and return shelf Object
@@ -145,14 +143,14 @@ namespace IMS_API.Controllers
 
 
         // DELETE: api/Shelf/B
-        [HttpDelete("{id}")]
-        public ShelfResponse Delete(string id)
+        [HttpDelete("{shelfCode}")]
+        public ShelfResponse DeleteShelfByShelfCode(string shelfCode)
         {
             ShelfResponse contractShelfResponse = null;
             try
             {
 
-                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.Delete(id);
+                IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.Delete(shelfCode);
                 contractShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
 
             }

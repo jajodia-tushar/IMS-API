@@ -5,6 +5,8 @@ using IMS.Entities;
 using MySql.Data.MySqlClient;
 using System.Data;
 using IMS.DataLayer.Interfaces;
+using System.Threading.Tasks;
+using System.Data.Common;
 
 namespace IMS.DataLayer
 {
@@ -73,10 +75,10 @@ namespace IMS.DataLayer
             return Shelves;
         }
 
-        public List<Shelf> GetAllShelves()
+        public async Task<List<Shelf>> GetAllShelves()
         {
-            MySqlDataReader reader = null;
-            List<Shelf> _shelves = new List<Shelf>();
+            DbDataReader reader = null;
+            List<Shelf> shelves = new List<Shelf>();
 
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -86,10 +88,10 @@ namespace IMS.DataLayer
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetAllShelves";
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        _shelves.Add(new Shelf()
+                        shelves.Add(new Shelf()
                         {
                             Id = (int)reader["Id"],
                             Name = (string)reader["Name"],
@@ -104,7 +106,7 @@ namespace IMS.DataLayer
                     throw ex;
                 }
             }
-            return _shelves;
+            return shelves;
         }
 
         public Shelf GetShelfByShelfCode(string Code)

@@ -88,18 +88,18 @@ namespace IMS.Core.Translators
 
             };
         }
-
-        private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfList)
+        
+        private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)
         {
-            List<Contracts.Shelf> contractsShelfList = new List<Contracts.Shelf>();
-            foreach (var entityList in shelfList)
+            List<Contracts.Shelf> dtoShelves = new List<Contracts.Shelf>();
+            foreach (var shelf in shelfs)
             {
-                Contracts.Shelf shelf = new Contracts.Shelf();
-                shelf.Id = entityList.Id;
-                shelf.Name = entityList.Name;
-                shelf.Code = entityList.Code;
-                shelf.IsActive = entityList.IsActive;
-                contractsShelfList.Add(shelf);
+                Contracts.Shelf dtoShelf = new Contracts.Shelf();
+                shelf.Id = shelf.Id;
+                shelf.Name = shelf.Name;
+                shelf.Code = shelf.Code;
+                shelf.IsActive = shelf.IsActive;
+                dtoShelves.Add(dtoShelf);
 
             }
             return contractsShelfList;

@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer
 {
     public interface IShelfDbContext
     {
-        List<Shelf> GetAllShelves();
+        Task<List<Shelf>> GetAllShelves();
         Shelf GetShelfByShelfCode(string id);
         List<Shelf> AddShelf(Shelf shelf);
         bool IsShelfPresent(Shelf shelf);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using IMS.DataLayer;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
@@ -15,10 +16,10 @@ namespace IMS.Core.services
         {
             _shelfDbContext = shelfDbContext;
         }
-        public ShelfResponse GetShelfList()
+        public async Task<ShelfResponse> GetShelfList()
         {
             ShelfResponse shelfResponse = new ShelfResponse();
-            List<Shelf> Shelf = _shelfDbContext.GetAllShelves();
+            List<Shelf> Shelf = await _shelfDbContext.GetAllShelves();
             try
             {
                 if (Shelf == null)
