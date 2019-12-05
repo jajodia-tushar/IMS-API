@@ -1,12 +1,16 @@
-﻿using IMS.Entities;
+﻿using IMS.DataLayer.Interfaces;
+using IMS.Entities;
+using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace IMS.DataLayer.Interfaces
 {
     public interface IInventoryDbContext
     {
-        ShelfItemResponse GetShelfItemsByShelfId(int id);
+        ShelfItemsResponse GetShelfItemsByShelfId(int shelfId);
     }
 }
