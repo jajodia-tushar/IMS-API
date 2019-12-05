@@ -52,8 +52,12 @@ namespace IMS.TokenManagement
         { bool isValid = false;
             try
             {
-                string hashToken = GetAccessTokenHashValue(accessToken);
-               isValid = await _tokenDbContext.IsValidToken(hashToken);
+                if (accessToken != null)
+                {
+
+                    string hashToken = GetAccessTokenHashValue(accessToken);
+                    isValid = await _tokenDbContext.IsValidToken(hashToken);
+                }
 
             }
             catch(Exception e)
