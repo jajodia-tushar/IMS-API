@@ -64,11 +64,11 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns shelf Object </response>
         /// <response code="404">If shelf Code is Invalid </response>
         // GET: api/Shelf/5
-        [HttpGet("{id}", Name = "GetShelf")]
-        public ShelfResponse Get(string id)
+        [HttpGet("{shelfCode}", Name = "GetShelf")]
+        public ShelfResponse Get(string shelfCode)
         {
             IMS.Contracts.ShelfResponse contractsShelfResponse;
-            IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfById(id);
+            IMS.Entities.ShelfResponse entityShelfResponse = _shelfService.GetShelfById(shelfCode);
             contractsShelfResponse = Translator.ToDataContractsObject(entityShelfResponse);
             return contractsShelfResponse;
             
