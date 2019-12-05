@@ -9,27 +9,28 @@ using Xunit;
 using IMS.TokenManagement;
 using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json.Linq;
-
-
+using IMS.DataLayer.Interfaces;
 
 namespace IMS.UnitTest.CoreTests
 {
     public class JWTTokenProviderTests
     {
         public IConfiguration _configuration;
+        public Mock<ITokenDbContext> _moqTokenDbContext;
         public JWTTokenProviderTests()
         {
             _configuration = new ConfigurationBuilder()
                .AddJsonFile("appsettings.json")
                .Build();
+            _moqTokenDbContext = new Mock<ITokenDbContext>();
         }
 
         [Fact]
         public void Get_String_Type_JWT_Token_Succeeds()
         {
             var user = GetUserDetails();
-            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration);
-            var response = jwtTokenprovider.GenerateToken(user);
+            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
+            var response = jwtTokenprovider.GenerateToken(user,DateTime.Now);
             Assert.IsType<String>(response);
         }
 
@@ -37,17 +38,17 @@ namespace IMS.UnitTest.CoreTests
         public void Returns_Success_when_Jwt_Token_Is_Not_Null()
         {
             var user = GetUserDetails();
-            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration);
-            var response = jwtTokenprovider.GenerateToken(user);
+            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
+            var response = jwtTokenprovider.GenerateToken(user,DateTime.Now);
             Assert.NotNull(response);
         }
 
         [Fact]
-        public void Returns_Success_When_Check_For_FirstName_And_Lastname_From_JWT_Token_Claims()
+        public async void Returns_Success_When_Check_For_FirstName_And_Lastname_From_JWT_Token_Claims()
         {
             var user = GetUserDetails();
-            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration);
-            var response = jwtTokenprovider.GenerateToken(user);
+            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
+            var response =  jwtTokenprovider.GenerateToken(user,DateTime.Now);
             string[] words = response.Split('.');
             string payload = words[1];
             var payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(payload));

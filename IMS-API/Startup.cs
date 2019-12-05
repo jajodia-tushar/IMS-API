@@ -24,6 +24,7 @@ using IMS.DataLayer.Db;
 using Microsoft.AspNetCore.Http;
 using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace IMS_API
 {
@@ -51,19 +52,12 @@ namespace IMS_API
                 var filePath = Path.Combine(System.AppContext.BaseDirectory, "IMS-API.xml");
                 c.IncludeXmlComments(filePath);
             });
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["Jwt:Issuer"],
-                        ValidAudience = Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                    };
+                    options.TokenValidationParameters = CreateTokenValidationParameters();
+                    
                 });
 
 
@@ -72,7 +66,7 @@ namespace IMS_API
             services.AddTransient<ILogManager, LogImplementation>();
             services.AddTransient<ILogDbContext, LogDbContext>();
             services.AddTransient<ILoginService, LoginService>();
-
+            services.AddTransient<ITokenDbContext, TokenDbContext>();
 
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
@@ -82,6 +76,35 @@ namespace IMS_API
 
 
 
+        }
+        public TokenValidationParameters CreateTokenValidationParameters()
+        {
+            var result = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidIssuer = "noissuer",
+
+                ValidateAudience = false,
+                ValidAudience = "noaudience",
+
+                ValidateIssuerSigningKey = false,
+               
+                SignatureValidator = delegate (string token, TokenValidationParameters parameters)
+                {
+                    var jwt = new JwtSecurityToken(token);
+
+                    return jwt;
+                },
+
+                RequireExpirationTime = false,
+                ValidateLifetime = false,
+
+               
+            };
+
+            result.RequireSignedTokens = false;
+
+            return result;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

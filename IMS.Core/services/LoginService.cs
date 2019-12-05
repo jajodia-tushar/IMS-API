@@ -32,7 +32,7 @@ namespace IMS.Core.services
 
         }
 
-        
+       
         public async Task<LoginResponse> Login(LoginRequest loginRequest)
         {
             User user = null;
@@ -56,8 +56,9 @@ namespace IMS.Core.services
                 user = _userDbContext.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
                 if (user != null)
                 {
-                    string token = _tokenProvider.GenerateToken(user);
-                    _tokenProvider.StoreToken(token);
+                    DateTime expirationTime = GetExpirationTime(user.Role.Name);
+                    string token =  _tokenProvider.GenerateToken(user,expirationTime);
+                    await _tokenProvider.StoreToken(token,expirationTime);
                     loginResponse.Status = Status.Success;
                     loginResponse.AccessToken = token;
                     loginResponse.User = user;
@@ -74,7 +75,7 @@ namespace IMS.Core.services
 
                 }
             }
-            catch
+            catch(Exception e)
             {
                 loginResponse.Status = Status.Failure;
                 loginResponse.Error = new Error()
@@ -96,6 +97,13 @@ namespace IMS.Core.services
             return loginResponse;
 
         }
-        
+        private DateTime GetExpirationTime(string role)
+        {
+            string rolename = role.ToLower();
+            double minutes=Constants.Roles.ExpirationTimeInMinutes[rolename];
+            DateTime expirationTime = DateTime.Now.AddMinutes(minutes);
+            return expirationTime;
+        }
+
     }
 }

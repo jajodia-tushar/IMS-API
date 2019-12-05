@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IMS.DataLayer\IMS.DataLayer.csproj" />
     <ProjectReference Include="..\IMS.Entities\IMS.Entities.csproj" />
   </ItemGroup>
 
