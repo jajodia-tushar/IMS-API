@@ -98,6 +98,54 @@ namespace IMS.Core.Translators
             };
         }
 
+        public static Contracts.ShelfItemsResponse ToDataContractsObject(Entities.ShelfItemsResponse shelfItemsResponseEntity)
+        {
+            Contracts.ShelfItemsResponse shelfItemsResponseContract = new Contracts.ShelfItemsResponse();
+            shelfItemsResponseContract.Status = Contracts.Status.Failure;
+            shelfItemsResponseContract.Error = ToDataContractsObject(shelfItemsResponseEntity.Error);
+            if (shelfItemsResponseEntity.Status == Entities.Status.Success)
+            {
+                shelfItemsResponseContract.Status = Contracts.Status.Success;
+                shelfItemsResponseContract.Error = null;
+                shelfItemsResponseContract.itemQuantityMappings = EntityShelfItemsToContractShelfItems(shelfItemsResponseEntity.itemQuantityMappings);
+            }
+            if (shelfItemsResponseContract.shelf != null)
+                shelfItemsResponseContract.shelf = ToDataContractsObject(shelfItemsResponseEntity.shelf);
+            return shelfItemsResponseContract;
+        }
+
+        private static Contracts.Shelf ToDataContractsObject(Entities.Shelf shelfEntity)
+        {
+            IMS.Contracts.Shelf shelfContract = new Contracts.Shelf();
+            shelfContract.Id = shelfEntity.Id;
+            shelfContract.Name = shelfEntity.Name;
+            shelfContract.isActive = shelfEntity.isActive;
+            shelfContract.Code = shelfContract.Code;
+            return shelfContract;
+        }
+
+        private static List<Contracts.ItemQuantityMapping> EntityShelfItemsToContractShelfItems(List<Entities.ItemQuantityMapping> itemQuantityMappingsEntity)
+        {
+            List<Contracts.ItemQuantityMapping> itemQuantityMappingsContract = new List<Contracts.ItemQuantityMapping>();
+            foreach (Entities.ItemQuantityMapping itemQuantityMapping in itemQuantityMappingsEntity)
+            {
+                IMS.Contracts.ItemQuantityMapping contractItemQuantityMapping = new IMS.Contracts.ItemQuantityMapping()
+                {
+                    Item = new IMS.Contracts.Item() {
+                        Id = itemQuantityMapping.Item.Id,
+                        Name = itemQuantityMapping.Item.Name,
+                        MaxLimit = itemQuantityMapping.Item.MaxLimit,
+                        isActive = itemQuantityMapping.Item.isActive
+                    },
+                    Quantity = itemQuantityMapping.Quantity
+                };
+                itemQuantityMappingsContract.Add(contractItemQuantityMapping);
+            }
+            return itemQuantityMappingsContract;
+        }
+
+        public static Contracts.Error ToDataContractsObject(Entities.Error error)
+
 
         public static Contracts.ShelfResponse ToDataContractsObject(Entities.ShelfResponse entityShelfResponse)
         {

@@ -19,34 +19,29 @@ namespace IMS.Core.services
         public ShelfItemsResponse GetShelfItemsByShelfId(int shelfId)
         {
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
+            shelfItemsResponse.Error = new Error() { };
             shelfItemsResponse.Status = Status.Failure;
             try
             {
-                //Check here if given shelf exists or not if exists get the shelf details
-
-                shelfItemsResponse.itemQuantityMappings = _inventoryDbContext.GetShelfItemsByShelfId(shelfId);
-                if (shelfItemsResponse.itemQuantityMappings.Count > 0)
+                //Use shelfService to know if shelf with given shelf id exists or not
+                if (shelfId > 0)
                 {
-                    shelfItemsResponse.Status = Status.Success;
+                    shelfItemsResponse = _inventoryDbContext.GetShelfItemsByShelfId(shelfId);
+                    if (shelfItemsResponse != null)
+                        return shelfItemsResponse;
+                    shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
+                    shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.EmptyShelf;
                     return shelfItemsResponse;
                 }
-                shelfItemsResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.NotFound,
-                    ErrorMessage = Constants.ErrorMessages.EmptyShelf
-                };
+                shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
+                shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidId;
                 return shelfItemsResponse;
-
-                /*shelfItemsResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.BadRequest,
-                    ErrorMessage = Constants.ErrorMessages.InvalidId
-                };*/
             }
             catch(Exception e)
             {
                 throw e;
             }
+
             return shelfItemsResponse;
         }
     }
