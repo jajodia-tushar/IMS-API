@@ -27,9 +27,11 @@ namespace IMS.UnitTesting.CoreTests
         }
 
         [Fact]
-        public void Return_Shelf_When_Shelf_When_Id_Is_Valid()
+        public void Return_Shelf_When_Shelf_Id_Is_Valid()
         {
+
             throw new NotImplementedException();
+
         }
 
         [Fact]
@@ -42,7 +44,10 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void Return_Invalid_Shelf_Id_Message_When_Shelf_Id_Is_Invalid()
         {
-            throw new NotImplementedException();
+            var employeeService = new Core.services.ShelfService(_moqShelfDbContext.Object);
+            var response = employeeService.GetShelfById("A");
+            Assert.Equal(Constants.ErrorCodes.NotFound, response.Error.ErrorCode);
+            Assert.Equal(Constants.ErrorMessages.InvalidShelfCode, response.Error.ErrorMessage);
         }
 
         private List<Shelf> GetShelf()
