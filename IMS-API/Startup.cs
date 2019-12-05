@@ -57,16 +57,7 @@ namespace IMS_API
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = CreateTokenValidationParameters();
-                    /*new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = false,
-                        ValidateIssuerSigningKey = false,
-                        ValidIssuer = Configuration["Jwt:Issuer"],
-                        ValidAudience = Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                    };*/
+                    
                 });
 
 
