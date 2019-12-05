@@ -58,7 +58,7 @@ namespace IMS.DataLayer.Db
             public async Task<bool> StoreToken(string accessToken, string hashToken, DateTime expirationTime)
         {
             bool isStoredToken = false;
-            string timestamp = ConvertToString(expirationTime);
+            string timestamp = expirationTime.ToString("yyyy-MM-dd HH:mm:ss");
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -81,9 +81,6 @@ namespace IMS.DataLayer.Db
                 return isStoredToken;
             }
         }
-        private string ConvertToString(DateTime e)
-        {
-            return e.Year + "-" + e.Month + "-" + e.Day + " " + e.Hour + ":" + e.Minute + ":" + e.Second;
-        }
+        
     }
 }
