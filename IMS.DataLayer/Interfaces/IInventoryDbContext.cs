@@ -12,5 +12,6 @@ namespace IMS.DataLayer.Interfaces
     public interface IInventoryDbContext
     {
         ShelfItemsResponse GetShelfItemsByShelfId(int shelfId);
+        Shelf GetShelfById(int shelfId);
     }
 }

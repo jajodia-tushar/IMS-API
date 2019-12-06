@@ -101,8 +101,11 @@ namespace IMS.Core.Translators
 
         public static Contracts.ShelfResponse ToDataContractsObject(Entities.ShelfResponse entityShelfResponse)
         {
-            Contracts.ShelfResponse shelfResponse = new Contracts.ShelfResponse();
-            if (entityShelfResponse.Status == Entities.Status.Success)
+            Contracts.ShelfItemsResponse shelfItemsResponseContract = new Contracts.ShelfItemsResponse();
+            shelfItemsResponseContract.Status = Contracts.Status.Failure;
+            if(shelfItemsResponseEntity.Error!=null)
+                shelfItemsResponseContract.Error = ToDataContractsObject(shelfItemsResponseEntity.Error);
+            if (shelfItemsResponseEntity.Status == Entities.Status.Success)
             {
                 shelfResponse.Status = Contracts.Status.Success;
                 shelfResponse.Shelves = ToDataContractsObject(entityShelfResponse.Shelves);
@@ -126,6 +129,12 @@ namespace IMS.Core.Translators
                 Code = shelf.Code
 
             };
+            IMS.Contracts.Shelf shelfContract = new Contracts.Shelf();
+            shelfContract.Id = shelfEntity.Id;
+            shelfContract.Name = shelfEntity.Name;
+            shelfContract.isActive = shelfEntity.IsActive;
+            shelfContract.Code = shelfContract.Code;
+            return shelfContract;
         }
         
         private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)

@@ -17,10 +17,10 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public ShelfItemResponse GetShelfItemsByShelfId(int shelfId)
+        public ShelfItemsResponse GetShelfItemsByShelfId(int shelfId)
         {
             MySqlDataReader reader = null;
-            ShelfItemResponse shelfItemResponse = new ShelfItemResponse();
+            ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
             List<ItemQuantityMapping> itemQuantityMappingList = new List<ItemQuantityMapping>();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
@@ -47,14 +47,14 @@ namespace IMS.DataLayer.Db
                         });
                     }
                     Shelf shelf = GetShelfById(1);
-                    shelfItemResponse.itemQuantityMapping = itemQuantityMappingList;
-                    shelfItemResponse.shelf = shelf;
+                    shelfItemsResponse.itemQuantityMappings = itemQuantityMappingList;
+                    shelfItemsResponse.shelf = shelf;
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return shelfItemResponse;
+                return shelfItemsResponse;
             }
         }
         public Shelf GetShelfById(int shelfId)

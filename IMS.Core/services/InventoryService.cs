@@ -19,7 +19,6 @@ namespace IMS.Core.services
         public ShelfItemsResponse GetShelfItemsByShelfId(int shelfId)
         {
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
-            shelfItemsResponse.Error = new Error() { };
             shelfItemsResponse.Status = Status.Failure;
             try
             {
@@ -27,14 +26,23 @@ namespace IMS.Core.services
                 if (shelfId > 0)
                 {
                     shelfItemsResponse = _inventoryDbContext.GetShelfItemsByShelfId(shelfId);
-                    if (shelfItemsResponse != null)
+                    if (shelfItemsResponse.itemQuantityMappings.Count > 0)
+                    {
+                        shelfItemsResponse.Status = Status.Success;
                         return shelfItemsResponse;
-                    shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
-                    shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.EmptyShelf;
+                    }
+                    shelfItemsResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.NotFound,
+                        ErrorMessage = Constants.ErrorMessages.EmptyShelf
+                    };
                     return shelfItemsResponse;
                 }
-                shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
-                shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidId;
+                shelfItemsResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.BadRequest,
+                    ErrorMessage = Constants.ErrorMessages.InvalidId
+                };
                 return shelfItemsResponse;
             }
             catch(Exception e)
