@@ -21,6 +21,12 @@ namespace IMS_API.Controllers
             this._inventoryService = inventoryService;
         }
 
+        /// <summary>
+        /// Retrieve Shelf Items and Shelf Details by Shelf Code
+        /// </summary>
+        /// <param name="shelfCode">Unique Code of the shelf</param>
+        /// <returns>Items present in Particular Shelf</returns>
+        /// <response code="200">Return Items Present in shelf along with shelf details if shelf code is valid otherwise it returns null with status failure </response>
         // GET: api/Inventory/5
         [HttpGet("{shelfCode}", Name = "GetShelfItemsByShelfCode")]
         public async Task<ShelfItemsResponse> GetShelfItemsByShelfCode(string shelfCode)
@@ -49,24 +55,6 @@ namespace IMS_API.Controllers
                 }
             }
             return shelfItemsResponse;
-        }
-
-        // POST: api/Inventory
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT: api/Inventory/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }
