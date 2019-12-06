@@ -34,7 +34,15 @@ namespace IMS.Core
             public const string NoVendorsYet = "No Vendors To Display";
 
             public const string InvalidToken = "Token is invalid";
+            public const string UnprocessableEntity = "Data is not valid";
+            public const string Conflict = "Item not added";
+            public const string InvalidItemsDetails = "Invalid Item Details";
+            public const string resourceNotFound = "Items Not Found";
 
+            public const string NotUpdated = "Items Not Updated";
+            public const string AlreadyPresent = "Item Already Added";
+            public const string AlreadyDeleted = "Item Already Deleted";
+            public const string LogoutFailed = "Logout Failed";
             public const string LogoutFailed = "Logout Failed";
             public const string OrderNotDeleted = "Vendor Order Not Deleted";
             public const string InvalidOrderId = "Order Id is not Valid";           
@@ -53,6 +61,10 @@ namespace IMS.Core
             public const int UnAuthorized = 401;
             public const int ServerError = 500;
             public const int NotFound = 404;
+            public const int UnprocessableEntity = 422;
+
+            public const int Conflict = 409;
+            public const int ResourceNotFound = 404;
         }
         public static class Roles
         {
