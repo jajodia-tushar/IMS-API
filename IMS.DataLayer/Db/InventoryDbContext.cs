@@ -17,7 +17,7 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public ShelfItemsResponse GetShelfItemsByShelfId(int shelfId)
+        public List<Entities.ItemQuantityMapping> GetShelfItemsByShelfId(int shelfId)
         {
             MySqlDataReader reader = null;
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
@@ -46,45 +46,14 @@ namespace IMS.DataLayer.Db
                             Quantity = (int)reader["ItemQuantityAtShelf"]
                         });
                     }
-                    Shelf shelf = GetShelfById(1);
                     shelfItemsResponse.itemQuantityMappings = itemQuantityMappingList;
-                    shelfItemsResponse.shelf = shelf;
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return shelfItemsResponse;
+                return shelfItemsResponse.itemQuantityMappings;
             }
-        }
-        public Shelf GetShelfById(int shelfId)
-        {
-            MySqlDataReader reader = null;
-            Shelf shelf = new Shelf();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetShelfById";
-                    command.Parameters.AddWithValue("@shelfId", shelfId);
-                    reader = command.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        shelf.Id = (int)reader["Id"];
-                        shelf.Name = (string)reader["Name"];
-                        shelf.IsActive = (bool)reader["IsActive"];
-                        shelf.Code = (string)reader["Code"];
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-            }
-            return shelf;
         }
     }
 }
