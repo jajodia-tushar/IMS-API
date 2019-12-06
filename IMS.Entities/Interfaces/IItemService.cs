@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.Entities.Interfaces
 {
     public interface IItemService
     {
-        ItemResponse GetAllItems();
-        ItemResponse GetItemById(int id);
-        ItemResponse AddItem(ItemRequest itemRequest);
-        ItemResponse Delete(int id);
-        ItemResponse UpdateItem(ItemRequest itemRequest);
+        Task<ItemResponse> GetAllItems();
+        Task<ItemResponse> GetItemById(int id);
+        Task<ItemResponse> AddItem(ItemRequest itemRequest);
+        Task<ItemResponse> Delete(int id);
+        Task<ItemResponse> UpdateItem(ItemRequest itemRequest);
     }
 }

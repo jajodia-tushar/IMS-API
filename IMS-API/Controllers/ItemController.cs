@@ -30,12 +30,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns All The Items From Inventory</response>
         // GET: api/Item
         [HttpGet]
-        public ItemResponse GetAllItems()
+        public async Task<ItemResponse> GetAllItems()
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemResponse entityItemResponse = _itemService.GetAllItems();
+                IMS.Entities.ItemResponse entityItemResponse = await _itemService.GetAllItems();
                 contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
             }
             catch
@@ -62,12 +62,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Item Details if Item Id is valid otherwise it returns null with status failure</response>
         // GET: api/Item/5
         [HttpGet("{id}", Name = "GetItemById")]
-        public ItemResponse GetItemById(int id)
+        public async Task<ItemResponse> GetItemById(int id)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemResponse entityItemResponse = _itemService.GetItemById(id);
+                IMS.Entities.ItemResponse entityItemResponse = await _itemService.GetItemById(id);
                 contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
             }
             catch
@@ -94,13 +94,13 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Items List along with newly created Item if Item is added successfully otherwise it returns null with status failure</response>
         // POST: api/Item
         [HttpPost]
-        public ItemResponse AddItem([FromBody] ItemRequest item)
+        public async Task<ItemResponse> AddItem([FromBody] ItemRequest item)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
                 IMS.Entities.ItemRequest entityItemRequest = Translator.ToEntitiesObject(item);
-                IMS.Entities.ItemResponse entityItemResponse = _itemService.AddItem(entityItemRequest);
+                IMS.Entities.ItemResponse entityItemResponse = await _itemService.AddItem(entityItemRequest);
                 contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
             }
             catch
@@ -127,13 +127,13 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         // PATCH: api/Item
         [HttpPatch]
-        public ItemResponse UpdateItem([FromBody] ItemRequest updatedItem)
+        public async Task<ItemResponse> UpdateItem([FromBody] ItemRequest updatedItem)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
                 IMS.Entities.ItemRequest entityItemRequest = Translator.ToEntitiesObject(updatedItem);
-                IMS.Entities.ItemResponse entityItemResponse = _itemService.UpdateItem(entityItemRequest);
+                IMS.Entities.ItemResponse entityItemResponse = await _itemService.UpdateItem(entityItemRequest);
                 contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
             }
             catch
@@ -159,12 +159,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Item List along with Deactivated Item if that Item is softdeleted successfully otherwise it returns null with status failure</response>
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public ItemResponse DeleteItems(int id)
+        public async Task<ItemResponse> DeleteItems(int id)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemResponse entityItemResponse = _itemService.Delete(id);
+                IMS.Entities.ItemResponse entityItemResponse = await _itemService.Delete(id);
                 contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
             }
             catch

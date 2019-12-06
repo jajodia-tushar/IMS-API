@@ -3,6 +3,7 @@ using IMS.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -26,12 +27,12 @@ namespace IMS.DataLayer.Db
                },
 
             };
-        public List<Item> GetAllItems()
+        public async Task<List<Item>> GetAllItems()
         {
             return _items;
         }
 
-        public Item GetItemById(int id)
+        public async Task<Item> GetItemById(int id)
         {
             Item item = new Item();
             foreach (var i in _items)
@@ -44,7 +45,7 @@ namespace IMS.DataLayer.Db
             return null;
         }
 
-        public int AddItem(ItemRequest itemRequest)
+        public async Task<int> AddItem(ItemRequest itemRequest)
         {
             Item item = new Item();
             var latestAddedItemId = _items.Count + 1;
@@ -56,7 +57,7 @@ namespace IMS.DataLayer.Db
             return latestAddedItemId;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             foreach (var item in _items)
             {
@@ -69,7 +70,7 @@ namespace IMS.DataLayer.Db
             return false;
         }
 
-        public Item UpdateItem(ItemRequest itemRequest)
+        public async Task<Item> UpdateItem(ItemRequest itemRequest)
         {
             foreach (var item in _items)
             {

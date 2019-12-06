@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Text;
 using System.Data;
+using System.Threading.Tasks;
+using System.Data.Common;
 
 namespace IMS.DataLayer.Db
 {
@@ -17,10 +19,10 @@ namespace IMS.DataLayer.Db
         {
             _dbProvider = dbConnectionProvider;
         }
-        public List<Item> GetAllItems()
+        public async Task<List<Item>> GetAllItems()
         {
-            MySqlDataReader reader = null;
-            List<Item> _items = new List<Item>();
+            DbDataReader reader = null;
+            List<Item> items = new List<Item>();
 
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -30,10 +32,10 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetAllItems";
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        _items.Add(new Item()
+                        items.Add(new Item()
                         {
                             Id = (int)reader["Id"],
                             Name = (string)reader["Name"],
@@ -47,12 +49,12 @@ namespace IMS.DataLayer.Db
                     throw ex;
                 }
             }
-            return _items;
+            return items;
         }
 
-        public Item GetItemById(int id)
+        public async Task<Item> GetItemById(int id)
         {
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             Item item = new Item();
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -63,7 +65,7 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetItemById";
                     command.Parameters.AddWithValue("@Id", id);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                     {
                         item.Id = (int)reader["Id"];
@@ -80,10 +82,10 @@ namespace IMS.DataLayer.Db
             return item;
         }
 
-        public int AddItem(ItemRequest itemRequest)
+        public async Task<int> AddItem(ItemRequest itemRequest)
         {
             int latestAddedItemId = 0;
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -96,7 +98,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@Name", itemRequest.Name);
                     command.Parameters.AddWithValue("@MaxLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", 1);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                     {
                         latestAddedItemId = (int)reader["Id"];
@@ -110,9 +112,9 @@ namespace IMS.DataLayer.Db
             return latestAddedItemId;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             bool isDeleted = false;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -123,7 +125,7 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spDelete";
                     command.Parameters.AddWithValue("@Id", id);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                     {
                         bool isActiveValue = (bool)reader["IsActive"];
@@ -139,9 +141,9 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public Item UpdateItem(ItemRequest itemRequest)
+        public async Task<Item> UpdateItem(ItemRequest itemRequest)
         {
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             Item item = new Item();
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -155,7 +157,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@Name", itemRequest.Name);
                     command.Parameters.AddWithValue("@MaximumLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", itemRequest.IsActive);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                     {
                         item.Id = (int)reader["Id"];

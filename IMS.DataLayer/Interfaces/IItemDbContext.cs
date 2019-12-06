@@ -2,15 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Interfaces
 {
     public interface IItemDbContext
     {
-        List<Item> GetAllItems();
-        Item GetItemById(int id);
-        int AddItem(ItemRequest itemRequest);
-        bool Delete(int id);
-        Item UpdateItem(ItemRequest itemRequest);
+        Task<List<Item>> GetAllItems();
+        Task<Item> GetItemById(int id);
+        Task<int> AddItem(ItemRequest itemRequest);
+        Task<bool> Delete(int id);
+        Task<Item> UpdateItem(ItemRequest itemRequest);
     }
 }

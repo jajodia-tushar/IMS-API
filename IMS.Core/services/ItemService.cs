@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.Core.services
 {
@@ -16,17 +17,17 @@ namespace IMS.Core.services
             _itemDbContext = itemDbContext;
         }
 
-        public ItemResponse GetAllItems()
+        public async Task<ItemResponse> GetAllItems()
         {
-            List<Item> _itemList;
+            List<Item> itemList;
             ItemResponse itemResponse = new ItemResponse();
             try
             {
-                _itemList = _itemDbContext.GetAllItems();
-                if (_itemList.Count != 0)
+                itemList = await _itemDbContext.GetAllItems();
+                if (itemList.Count != 0)
                 {
                     itemResponse.Status = Status.Success;
-                    itemResponse.Items = _itemList;
+                    itemResponse.Items = itemList;
                 }
                 else
                 {
@@ -46,18 +47,18 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public ItemResponse GetItemById(int id)
+        public async Task<ItemResponse> GetItemById(int id)
         {
-            List<Item> _itemList = new List<Item>();
+            List<Item> itemList = new List<Item>();
             ItemResponse itemResponse = new ItemResponse();
             try
             {
-                Item item = _itemDbContext.GetItemById(id);
+                Item item = await _itemDbContext.GetItemById(id);
                 if (item.Id == id)
                 {
                     itemResponse.Status = Status.Success;
-                    _itemList.Add(item);
-                    itemResponse.Items = _itemList;
+                    itemList.Add(item);
+                    itemResponse.Items = itemList;
                 }
                 else
                 {
@@ -76,7 +77,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public ItemResponse AddItem(ItemRequest itemRequest)
+        public async Task<ItemResponse> AddItem(ItemRequest itemRequest)
         {
             ItemResponse itemResponse = new ItemResponse();
             try
@@ -92,7 +93,7 @@ namespace IMS.Core.services
                     return itemResponse;
 
                 }
-                if (IsItemAlreadyExists(itemRequest.Name))
+                if (await IsItemAlreadyExists(itemRequest.Name))
                 {
                     itemResponse.Status = Status.Failure;
                     itemResponse.Error = new Error()
@@ -102,12 +103,12 @@ namespace IMS.Core.services
                     };
                     return itemResponse;
                 }
-                int latestAddedItemId = _itemDbContext.AddItem(itemRequest);
-                Item item = _itemDbContext.GetItemById(latestAddedItemId);
+                int latestAddedItemId = await _itemDbContext.AddItem(itemRequest);
+                Item item = await _itemDbContext.GetItemById(latestAddedItemId);
                 if (item.Name == itemRequest.Name)
                 {
                     itemResponse.Status = Status.Success;
-                    itemResponse.Items = _itemDbContext.GetAllItems();
+                    itemResponse.Items = await _itemDbContext.GetAllItems();
                 }
                 else
                 {
@@ -127,12 +128,12 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public ItemResponse Delete(int id)
+        public async Task<ItemResponse> Delete(int id)
         {
             ItemResponse itemResponse = new ItemResponse();
             try
             {
-                if (isItemAlreadyDeleted(id))
+                if (await isItemAlreadyDeleted(id))
                 {
                     itemResponse.Status = Status.Failure;
                     itemResponse.Error = new Error()
@@ -142,11 +143,11 @@ namespace IMS.Core.services
                     };
                     return itemResponse;
                 }
-                bool isDeleted = _itemDbContext.Delete(id);
+                bool isDeleted = await _itemDbContext.Delete(id);
                 if (isDeleted)
                 {
                     itemResponse.Status = Status.Success;
-                    itemResponse.Items = _itemDbContext.GetAllItems();
+                    itemResponse.Items = await _itemDbContext.GetAllItems();
                 }
                 else
                 {
@@ -165,7 +166,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public ItemResponse UpdateItem(ItemRequest itemRequest)
+        public async Task<ItemResponse> UpdateItem(ItemRequest itemRequest)
         {
             ItemResponse itemResponse = new ItemResponse();
             try
@@ -181,11 +182,11 @@ namespace IMS.Core.services
                     return itemResponse;
 
                 }
-                Item item = _itemDbContext.UpdateItem(itemRequest);
+                Item item = await _itemDbContext.UpdateItem(itemRequest);
                 if (item.Id == itemRequest.Id && item.Name == itemRequest.Name && item.MaxLimit == itemRequest.MaxLimit)
                 {
                     itemResponse.Status = Status.Success;
-                    itemResponse.Items = _itemDbContext.GetAllItems();
+                    itemResponse.Items = await _itemDbContext.GetAllItems();
                 }
                 else
                 {
@@ -205,9 +206,9 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public bool IsItemAlreadyExists(string name)
+        public async Task<bool> IsItemAlreadyExists(string name)
         {
-            List<Item> _items = _itemDbContext.GetAllItems();
+            List<Item> _items = await _itemDbContext.GetAllItems();
             foreach (var item in _items)
             {
                 if (item.Name.Equals(name))
@@ -216,9 +217,9 @@ namespace IMS.Core.services
             return false;
         }
 
-        public bool isItemAlreadyDeleted(int id)
+        public async Task<bool> isItemAlreadyDeleted(int id)
         {
-            List<Item> _items = _itemDbContext.GetAllItems();
+            List<Item> _items = await _itemDbContext.GetAllItems();
             foreach (var item in _items)
             {
                 if (item.Id.Equals(id))
