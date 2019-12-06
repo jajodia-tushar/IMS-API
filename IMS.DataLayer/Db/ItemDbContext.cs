@@ -38,7 +38,7 @@ namespace IMS.DataLayer.Db
                             Id = (int)reader["Id"],
                             Name = (string)reader["Name"],
                             MaxLimit = (int)reader["MaximumLimit"],
-                            isActive = (bool)reader["IsActive"]
+                            IsActive = (bool)reader["IsActive"]
                         });
                     }
                 }
@@ -50,10 +50,10 @@ namespace IMS.DataLayer.Db
             return _items;
         }
 
-        public List<Item> GetItemById(int id)
+        public Item GetItemById(int id)
         {
             MySqlDataReader reader = null;
-            List<Item> _items = new List<Item>();
+            Item item = new Item();
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -66,13 +66,10 @@ namespace IMS.DataLayer.Db
                     reader = command.ExecuteReader();
                     if (reader.Read())
                     {
-                        _items.Add(new Item()
-                        {
-                            Id = (int)reader["Id"],
-                            Name = (string)reader["Name"],
-                            MaxLimit = (int)reader["MaximumLimit"],
-                            isActive = (bool)reader["IsActive"]
-                        });
+                        item.Id = (int)reader["Id"];
+                        item.Name = (string)reader["Name"];
+                        item.MaxLimit = (int)reader["MaximumLimit"];
+                        item.IsActive = (bool)reader["IsActive"];
                     }
                 }
                 catch (Exception ex)
@@ -80,12 +77,13 @@ namespace IMS.DataLayer.Db
                     throw ex;
                 }
             }
-            return _items;
+            return item;
         }
 
-        public List<Item> AddItem(ItemRequest itemRequest)
+        public int AddItem(ItemRequest itemRequest)
         {
-            List<Item> _items = new List<Item>();
+            int latestAddedItemId = 0;
+            MySqlDataReader reader = null;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -98,20 +96,24 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@Name", itemRequest.Name);
                     command.Parameters.AddWithValue("@MaxLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", 1);
-                    command.ExecuteNonQuery();
-                    _items = GetAllItems();
+                    reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        latestAddedItemId = (int)reader["Id"];
+                    }
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
             }
-            return _items;
+            return latestAddedItemId;
         }
 
-        public List<Item> Delete(int id)
+        public bool Delete(int id)
         {
-            List<Item> _items = new List<Item>();
+            MySqlDataReader reader = null;
+            bool isDeleted = false;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -121,20 +123,26 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spDelete";
                     command.Parameters.AddWithValue("@Id", id);
-                    command.ExecuteNonQuery();
-                    _items = GetAllItems();
+                    reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        bool isActiveValue = (bool)reader["IsActive"];
+                        if (!isActiveValue)
+                            isDeleted = true;
+                    }
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return _items;
+                return isDeleted;
             }
         }
 
-        public List<Item> UpdateItem(ItemRequest itemRequest)
+        public Item UpdateItem(ItemRequest itemRequest)
         {
-            List<Item> _items = new List<Item>();
+            MySqlDataReader reader = null;
+            Item item = new Item();
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -146,15 +154,21 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@Id", itemRequest.Id);
                     command.Parameters.AddWithValue("@Name", itemRequest.Name);
                     command.Parameters.AddWithValue("@MaximumLimit", itemRequest.MaxLimit);
-                    command.Parameters.AddWithValue("@IsActive", itemRequest.isActive);
-                    command.ExecuteNonQuery();
-                    _items = GetAllItems();
+                    command.Parameters.AddWithValue("@IsActive", itemRequest.IsActive);
+                    reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        item.Id = (int)reader["Id"];
+                        item.Name = (string)reader["Name"];
+                        item.MaxLimit = (int)reader["MaximumLimit"];
+                        item.IsActive = (bool)reader["IsActive"];
+                    }
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return _items;
+                return item;
             }
         }
 

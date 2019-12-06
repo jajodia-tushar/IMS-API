@@ -15,14 +15,14 @@ namespace IMS.DataLayer.Db
                    Id =1,
                    Name = "Pencil",
                    MaxLimit = 4,
-                   isActive = true
+                   IsActive = true
                },
                new Item()
                {
                    Id =2,
                    Name = "Pen",
                    MaxLimit = 4,
-                   isActive = false
+                   IsActive = false
                },
 
             };
@@ -31,45 +31,45 @@ namespace IMS.DataLayer.Db
             return _items;
         }
 
-        public List<Item> GetItemById(int id)
+        public Item GetItemById(int id)
         {
-            List<Item> resultantItem = new List<Item>();
             Item item = new Item();
             foreach (var i in _items)
             {
                 if (i.Id.Equals(id))
                 {
-                    resultantItem.Add(i);
+                    return item;
                 }
             }
-            return resultantItem;
+            return null;
         }
 
-        public List<Item> AddItem(ItemRequest itemRequest)
+        public int AddItem(ItemRequest itemRequest)
         {
             Item item = new Item();
-            var id = _items.Count + 1;
-            item.Id = id;
+            var latestAddedItemId = _items.Count + 1;
+            item.Id = latestAddedItemId;
             item.Name = itemRequest.Name;
             item.MaxLimit = itemRequest.MaxLimit;
-            item.isActive = true;
+            item.IsActive = true;
             _items.Add(item);
-            return GetAllItems();
+            return latestAddedItemId;
         }
 
-        public List<Item> Delete(int id)
+        public bool Delete(int id)
         {
             foreach (var item in _items)
             {
                 if (item.Id.Equals(id))
                 {
-                    item.isActive = false;
+                    item.IsActive = false;
+                    return true;
                 }
             }
-            return GetAllItems();
+            return false;
         }
 
-        public List<Item> UpdateItem(ItemRequest itemRequest)
+        public Item UpdateItem(ItemRequest itemRequest)
         {
             foreach (var item in _items)
             {
@@ -78,10 +78,11 @@ namespace IMS.DataLayer.Db
                     item.Id = itemRequest.Id;
                     item.Name = itemRequest.Name;
                     item.MaxLimit = itemRequest.MaxLimit;
-                    item.isActive = itemRequest.isActive;
+                    item.IsActive = itemRequest.IsActive;
+                    return item;
                 }
             }
-            return GetAllItems();
+            return null;
         }
     }
 }

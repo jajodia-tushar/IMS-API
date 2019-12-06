@@ -124,28 +124,28 @@ namespace IMS.UnitTesting.ControllerTests
                     Id = 1,
                     Name = "Pen",
                     MaxLimit = 5,
-                    isActive = true
+                    IsActive = true
                 },
                 new Entities.Item()
                 {
                     Id = 2,
                     Name = "Bottle",
                     MaxLimit = 5,
-                    isActive = false
+                    IsActive = false
                 },
                 new Entities.Item()
                 {
                     Id = 3,
                     Name = "Bag1",
                     MaxLimit = 5,
-                    isActive = true
+                    IsActive = true
                 },
                 new Entities.Item()
                 {
                     Id = 4,
                     Name = "Bag",
                     MaxLimit = 5,
-                    isActive = true
+                    IsActive = true
                 }
             };
             return _entityTypeItemsList;
@@ -159,21 +159,21 @@ namespace IMS.UnitTesting.ControllerTests
                     Id = 1,
                     Name = "Pen",
                     MaxLimit = 5,
-                    isActive = true
+                    IsActive = true
                 },
                 new Contracts.Item()
                 {
                     Id = 2,
                     Name = "Pencil",
                     MaxLimit = 4,
-                    isActive = true
+                    IsActive = true
                 },
                 new Contracts.Item()
                 {
                     Id = 3,
                     Name = "Bottle",
                     MaxLimit = 5,
-                    isActive = true
+                    IsActive = true
                 }
             };
             return _contractsTypeItemList;
@@ -187,7 +187,7 @@ namespace IMS.UnitTesting.ControllerTests
                     Id = 1,
                     Name = "Pen",
                     MaxLimit = 5,
-                    isActive = true
+                    IsActive = true
                 },
             };
             return _entityTypeSingleItemList;
@@ -201,7 +201,7 @@ namespace IMS.UnitTesting.ControllerTests
                     Id = 1,
                     Name = "Pen",
                     MaxLimit = 5,
-                    isActive = true
+                    IsActive = true
                 },
             };
             return _contractTypeSingleItemList;

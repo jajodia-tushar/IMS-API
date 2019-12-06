@@ -42,9 +42,9 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void GetItemById_Should_Return_Status_Success_And_Valid_Item_When_Item_Id_Is_Present_In_Database()
         {
-            _moqItemDbContext.Setup(m => m.GetItemById(1)).Returns(GetOneItem());
+            _moqItemDbContext.Setup(m => m.GetItemById(3)).Returns(GetOneItem());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object);
-            var resultant = itemServiceObject.GetItemById(1);
+            var resultant = itemServiceObject.GetItemById(3);
             Assert.Equal(Status.Success, resultant.Status);
             Assert.NotEmpty(resultant.Items);
         }
@@ -52,10 +52,10 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void GetItemById_Should_Return_Error_And_Status_Failure_When_Item_Id_Is_Not_Present()
         {
-            List<Item> _items = new List<Item>();
-            _moqItemDbContext.Setup(m => m.GetItemById(1)).Returns(_items);
+            Item item = new Item();
+            _moqItemDbContext.Setup(m => m.GetItemById(3)).Returns(item);
             var itemServiceObject = new ItemService(_moqItemDbContext.Object);
-            var resultant = itemServiceObject.GetItemById(1);
+            var resultant = itemServiceObject.GetItemById(3);
             Assert.Equal(Status.Failure, resultant.Status);
             Assert.Equal(Constants.ErrorCodes.UnprocessableEntity, resultant.Error.ErrorCode);
             Assert.Equal(Constants.ErrorMessages.resourceNotFound, resultant.Error.ErrorMessage);
@@ -74,10 +74,11 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void AddItem_Should_Return_Success_When_Item_Details_Is_Valid()
         {
-            _moqItemDbContext.Setup(m => m.AddItem(It.Is<ItemRequest>(r => r.Name.Equals("Bag") && r.MaxLimit.Equals(5)))).Returns(GetAllItemsList());
+            _moqItemDbContext.Setup(m => m.AddItem(It.Is<ItemRequest>(r => r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(3);
+            _moqItemDbContext.Setup(m => m.GetItemById(3)).Returns(GetOneItem());
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object);
-            var resultant = itemServiceObject.AddItem(new ItemRequest() { Name = "Bag", MaxLimit = 5 });
+            var resultant = itemServiceObject.AddItem(new ItemRequest() { Name = "Bag1", MaxLimit = 5 });
             Assert.Equal(Status.Success, resultant.Status);
             Assert.NotNull(resultant.Items);
         }
@@ -85,7 +86,7 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void Delete_Method_Should_Return_Status_Success_When_Item_Is_Deleted_Correct()
         {
-            _moqItemDbContext.Setup(m => m.Delete(2)).Returns(GetAllItemsList());
+            _moqItemDbContext.Setup(m => m.Delete(2)).Returns(true);
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object);
             var resultant = itemServiceObject.Delete(2);
@@ -96,7 +97,7 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void Delete_Method_Should_Return_Status_Failure_When_Item_Is_Not_Deleted()
         {
-            _moqItemDbContext.Setup(m => m.Delete(3)).Returns(GetAllItemsList());
+            _moqItemDbContext.Setup(m => m.Delete(3)).Returns(false);
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object);
             var resultant = itemServiceObject.Delete(3);
@@ -107,7 +108,8 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public void Update_Item_Should_Return_Success_After_Updating_Valid_Details()
         {
-            _moqItemDbContext.Setup(m => m.UpdateItem(It.Is<ItemRequest>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(GetAllItemsList());
+            _moqItemDbContext.Setup(m => m.UpdateItem(It.Is<ItemRequest>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(GetOneItem());
+            _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetAllItemsList());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object);
             var resultant = itemServiceObject.UpdateItem(new ItemRequest() { Id = 3, Name = "Bag1", MaxLimit = 5 });
             Assert.Equal(Status.Success, resultant.Status);
@@ -131,47 +133,44 @@ namespace IMS.UnitTesting.CoreTests
                    Id =1,
                    Name = "Pencil",
                    MaxLimit = 4,
-                   isActive = true
+                   IsActive = true
                },
                new Item()
                {
                    Id =2,
                    Name = "Bootle",
                    MaxLimit = 5,
-                   isActive = false
+                   IsActive = false
                },
                new Item()
                {
                    Id =3,
                    Name = "Bag1",
                    MaxLimit = 5,
-                   isActive = true
+                   IsActive = true
                },
                new Item()
                {
                    Id =4,
                    Name = "Bag",
                    MaxLimit = 5,
-                   isActive = true
+                   IsActive = true
                }
             };
             return _items;
         }
 
-        List<Item> GetOneItem()
+        Item GetOneItem()
         {
-            List<Item> _items = new List<Item>()
+            return new Item()
             {
-               new Item()
-               {
-                   Id =1,
-                   Name = "Pencil",
-                   MaxLimit = 4,
-                   isActive = true
-               }
+                Id = 3,
+                Name = "Bag1",
+                MaxLimit = 5,
+                IsActive = true
             };
-            return _items;
         }
+        
         List<Item> GetItems()
         {
             List<Item> _items = new List<Item>()
@@ -181,14 +180,14 @@ namespace IMS.UnitTesting.CoreTests
                    Id =1,
                    Name = "Pencil",
                    MaxLimit = 4,
-                   isActive = true
+                   IsActive = true
                },
                new Item()
                {
                    Id =2,
                    Name = "Pen",
                    MaxLimit = 4,
-                   isActive = true
+                   IsActive = true
                }
             };
             return _items;

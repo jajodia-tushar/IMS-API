@@ -8,9 +8,9 @@ namespace IMS.DataLayer.Interfaces
     public interface IItemDbContext
     {
         List<Item> GetAllItems();
-        List<Item> GetItemById(int id);
-        List<Item> AddItem(ItemRequest itemRequest);
-        List<Item> Delete(int id);
-        List<Item> UpdateItem(ItemRequest itemRequest);
+        Item GetItemById(int id);
+        int AddItem(ItemRequest itemRequest);
+        bool Delete(int id);
+        Item UpdateItem(ItemRequest itemRequest);
     }
 }

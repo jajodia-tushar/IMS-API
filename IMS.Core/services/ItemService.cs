@@ -48,14 +48,15 @@ namespace IMS.Core.services
 
         public ItemResponse GetItemById(int id)
         {
-            List<Item> _itemList;
+            List<Item> _itemList = new List<Item>();
             ItemResponse itemResponse = new ItemResponse();
             try
             {
-                _itemList = _itemDbContext.GetItemById(id);
-                if (_itemList.Count != 0)
+                Item item = _itemDbContext.GetItemById(id);
+                if (item.Id == id)
                 {
                     itemResponse.Status = Status.Success;
+                    _itemList.Add(item);
                     itemResponse.Items = _itemList;
                 }
                 else
@@ -78,7 +79,6 @@ namespace IMS.Core.services
         public ItemResponse AddItem(ItemRequest itemRequest)
         {
             ItemResponse itemResponse = new ItemResponse();
-            List<Item> _itemList;
             try
             {
                 if (itemRequest.Name == "")
@@ -102,11 +102,12 @@ namespace IMS.Core.services
                     };
                     return itemResponse;
                 }
-                _itemList = _itemDbContext.AddItem(itemRequest);
-                if (_itemList[_itemList.Count - 1].Name == itemRequest.Name)
+                int latestAddedItemId = _itemDbContext.AddItem(itemRequest);
+                Item item = _itemDbContext.GetItemById(latestAddedItemId);
+                if (item.Name == itemRequest.Name)
                 {
                     itemResponse.Status = Status.Success;
-                    itemResponse.Items = _itemList;
+                    itemResponse.Items = _itemDbContext.GetAllItems();
                 }
                 else
                 {
@@ -128,7 +129,6 @@ namespace IMS.Core.services
 
         public ItemResponse Delete(int id)
         {
-            List<Item> _itemList;
             ItemResponse itemResponse = new ItemResponse();
             try
             {
@@ -142,11 +142,11 @@ namespace IMS.Core.services
                     };
                     return itemResponse;
                 }
-                _itemList = _itemDbContext.Delete(id);
-                if ((_itemList.FindAll(i => i.Id == id && i.isActive == false)).Any())
+                bool isDeleted = _itemDbContext.Delete(id);
+                if (isDeleted)
                 {
                     itemResponse.Status = Status.Success;
-                    itemResponse.Items = _itemList;
+                    itemResponse.Items = _itemDbContext.GetAllItems();
                 }
                 else
                 {
@@ -168,7 +168,6 @@ namespace IMS.Core.services
         public ItemResponse UpdateItem(ItemRequest itemRequest)
         {
             ItemResponse itemResponse = new ItemResponse();
-            List<Item> _itemList;
             try
             {
                 if (itemRequest.Name == "")
@@ -182,11 +181,11 @@ namespace IMS.Core.services
                     return itemResponse;
 
                 }
-                _itemList = _itemDbContext.UpdateItem(itemRequest);
-                if ((_itemList.FindAll(i => i.Id == itemRequest.Id && i.Name == itemRequest.Name)).Any())
+                Item item = _itemDbContext.UpdateItem(itemRequest);
+                if (item.Id == itemRequest.Id && item.Name == itemRequest.Name && item.MaxLimit == itemRequest.MaxLimit)
                 {
                     itemResponse.Status = Status.Success;
-                    itemResponse.Items = _itemList;
+                    itemResponse.Items = _itemDbContext.GetAllItems();
                 }
                 else
                 {
@@ -224,7 +223,7 @@ namespace IMS.Core.services
             {
                 if (item.Id.Equals(id))
                 {
-                    if (item.isActive == false)
+                    if (item.IsActive == false)
                         return true;
                 }
             }
