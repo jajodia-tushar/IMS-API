@@ -27,6 +27,14 @@ namespace IMS.Core
 
 
             public const string ShelfNotPresent = "Shelf is not Present";
+            public const string UnprocessableEntity = "Data is not valid";
+            public const string Conflict = "Item not added";
+            public const string InvalidItemsDetails = "Invalid Item Details";
+            public const string resourceNotFound = "Items Not Found";
+
+            public const string NotUpdated = "Items Not Updated";
+            public const string AlreadyPresent = "Item Already Added";
+            public const string AlreadyDeleted = "Item Already Deleted";
             public const string InValidId = "Invalid Id";
             public const string NoOrdersYet = "No orders to display";
             public const string UnableToPlaceOrder = "Unable to place order, check entered fields";
