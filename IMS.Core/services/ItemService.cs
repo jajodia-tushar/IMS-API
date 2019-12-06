@@ -1,6 +1,8 @@
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,67 +14,150 @@ namespace IMS.Core.services
     public class ItemService : IItemService
     {
         private IItemDbContext _itemDbContext;
-        public ItemService(IItemDbContext itemDbContext)
+        private IUserDbContext _userDbContext;
+        private ITokenProvider _tokenProvider;
+        private IHttpContextAccessor _httpContextAccessor;
+        private ILogManager _logger;
+        public ItemService(IItemDbContext itemDbContext, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, ILogManager logger)
         {
             _itemDbContext = itemDbContext;
+            _tokenProvider = tokenProvider;
+            _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         public async Task<ItemResponse> GetAllItems()
         {
-            List<Item> itemList;
             ItemResponse itemResponse = new ItemResponse();
+            int userId = -1;
             try
             {
-                itemList = await _itemDbContext.GetAllItems();
-                if (itemList.Count != 0)
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    itemResponse.Status = Status.Success;
-                    itemResponse.Items = itemList;
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    List<Item> itemList;
+                    try
+                    {
+                        itemList = await _itemDbContext.GetAllItems();
+                        if (itemList.Count != 0)
+                        {
+                            itemResponse.Status = Status.Success;
+                            itemResponse.Items = itemList;
+                        }
+                        else
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.ResourceNotFound,
+                                ErrorMessage = Constants.ErrorMessages.resourceNotFound
+                            };
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                    return itemResponse;
                 }
                 else
                 {
                     itemResponse.Status = Status.Failure;
                     itemResponse.Error = new Error()
                     {
-                        ErrorCode = Constants.ErrorCodes.ResourceNotFound,
-                        ErrorMessage = Constants.ErrorMessages.resourceNotFound
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
                     };
                 }
 
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (itemResponse.Status == Status.Failure)
+                    severity = Severity.High;
+
+                new Task(() => { _logger.Log(null, itemResponse, "GetAllItems", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
 
         public async Task<ItemResponse> GetItemById(int id)
         {
-            List<Item> itemList = new List<Item>();
             ItemResponse itemResponse = new ItemResponse();
+            int userId = -1;
             try
             {
-                Item item = await _itemDbContext.GetItemById(id);
-                if (item.Id == id)
+                List<Item> itemList = new List<Item>();
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    itemResponse.Status = Status.Success;
-                    itemList.Add(item);
-                    itemResponse.Items = itemList;
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        Item item = await _itemDbContext.GetItemById(id);
+                        if (item.Id == id)
+                        {
+                            itemResponse.Status = Status.Success;
+                            itemList.Add(item);
+                            itemResponse.Items = itemList;
+                        }
+                        else
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.UnprocessableEntity,
+                                ErrorMessage = Constants.ErrorMessages.resourceNotFound
+                            };
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                    return itemResponse;
                 }
                 else
                 {
                     itemResponse.Status = Status.Failure;
                     itemResponse.Error = new Error()
                     {
-                        ErrorCode = Constants.ErrorCodes.UnprocessableEntity,
-                        ErrorMessage = Constants.ErrorMessages.resourceNotFound
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
                     };
                 }
+
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (itemResponse.Status == Status.Failure)
+                    severity = Severity.High;
+
+                new Task(() => { _logger.Log(id, itemResponse, "GetItemById", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
@@ -80,50 +165,86 @@ namespace IMS.Core.services
         public async Task<ItemResponse> AddItem(ItemRequest itemRequest)
         {
             ItemResponse itemResponse = new ItemResponse();
+            int userId = -1;
             try
             {
-                if (itemRequest.Name == "")
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
                     {
-                        ErrorCode = Constants.ErrorCodes.BadRequest,
-                        ErrorMessage = Constants.ErrorMessages.InvalidItemsDetails
-                    };
-                    return itemResponse;
+                        if (itemRequest.Name == "")
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.BadRequest,
+                                ErrorMessage = Constants.ErrorMessages.InvalidItemsDetails
+                            };
+                            return itemResponse;
 
-                }
-                if (await IsItemAlreadyExists(itemRequest.Name))
-                {
-                    itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
+                        }
+                        if (await IsItemAlreadyExists(itemRequest.Name))
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.Conflict,
+                                ErrorMessage = Constants.ErrorMessages.AlreadyPresent
+                            };
+                            return itemResponse;
+                        }
+                        int latestAddedItemId = await _itemDbContext.AddItem(itemRequest);
+                        Item item = await _itemDbContext.GetItemById(latestAddedItemId);
+                        if (item.Name == itemRequest.Name)
+                        {
+                            itemResponse.Status = Status.Success;
+                            itemResponse.Items = await _itemDbContext.GetAllItems();
+                        }
+                        else
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.Conflict,
+                                ErrorMessage = Constants.ErrorMessages.Conflict
+                            };
+                        }
+                    }
+                    catch (Exception ex)
                     {
-                        ErrorCode = Constants.ErrorCodes.Conflict,
-                        ErrorMessage = Constants.ErrorMessages.AlreadyPresent
-                    };
+                        throw ex;
+                    }
                     return itemResponse;
-                }
-                int latestAddedItemId = await _itemDbContext.AddItem(itemRequest);
-                Item item = await _itemDbContext.GetItemById(latestAddedItemId);
-                if (item.Name == itemRequest.Name)
-                {
-                    itemResponse.Status = Status.Success;
-                    itemResponse.Items = await _itemDbContext.GetAllItems();
                 }
                 else
                 {
                     itemResponse.Status = Status.Failure;
                     itemResponse.Error = new Error()
                     {
-                        ErrorCode = Constants.ErrorCodes.Conflict,
-                        ErrorMessage = Constants.ErrorMessages.Conflict
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
                     };
-
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (itemResponse.Status == Status.Failure)
+                    severity = Severity.High;
+
+                new Task(() => { _logger.Log(itemRequest, itemResponse, "AddItem", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
@@ -131,37 +252,74 @@ namespace IMS.Core.services
         public async Task<ItemResponse> Delete(int id)
         {
             ItemResponse itemResponse = new ItemResponse();
+            int userId = -1;
             try
             {
-                if (await isItemAlreadyDeleted(id))
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
                     {
-                        ErrorCode = Constants.ErrorCodes.ResourceNotFound,
-                        ErrorMessage = Constants.ErrorMessages.AlreadyDeleted
-                    };
+                        if (await isItemAlreadyDeleted(id))
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.ResourceNotFound,
+                                ErrorMessage = Constants.ErrorMessages.AlreadyDeleted
+                            };
+                            return itemResponse;
+                        }
+                        bool isDeleted = await _itemDbContext.Delete(id);
+                        if (isDeleted)
+                        {
+                            itemResponse.Status = Status.Success;
+                            itemResponse.Items = await _itemDbContext.GetAllItems();
+                        }
+                        else
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.ResourceNotFound,
+                                ErrorMessage = Constants.ErrorMessages.resourceNotFound
+                            };
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
                     return itemResponse;
-                }
-                bool isDeleted = await _itemDbContext.Delete(id);
-                if (isDeleted)
-                {
-                    itemResponse.Status = Status.Success;
-                    itemResponse.Items = await _itemDbContext.GetAllItems();
                 }
                 else
                 {
                     itemResponse.Status = Status.Failure;
                     itemResponse.Error = new Error()
                     {
-                        ErrorCode = Constants.ErrorCodes.ResourceNotFound,
-                        ErrorMessage = Constants.ErrorMessages.resourceNotFound
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
                     };
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (itemResponse.Status == Status.Failure)
+                    severity = Severity.High;
+
+                new Task(() => { _logger.Log(id, itemResponse, "Delete", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
@@ -169,39 +327,74 @@ namespace IMS.Core.services
         public async Task<ItemResponse> UpdateItem(ItemRequest itemRequest)
         {
             ItemResponse itemResponse = new ItemResponse();
+            int userId = -1;
             try
             {
-                if (itemRequest.Name == "")
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
                     {
-                        ErrorCode = Constants.ErrorCodes.BadRequest,
-                        ErrorMessage = Constants.ErrorMessages.InvalidItemsDetails
-                    };
+                        if (itemRequest.Name == "")
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.BadRequest,
+                                ErrorMessage = Constants.ErrorMessages.InvalidItemsDetails
+                            };
+                            return itemResponse;
+                        }
+                        Item item = await _itemDbContext.UpdateItem(itemRequest);
+                        if (item.Id == itemRequest.Id && item.Name == itemRequest.Name && item.MaxLimit == itemRequest.MaxLimit)
+                        {
+                            itemResponse.Status = Status.Success;
+                            itemResponse.Items = await _itemDbContext.GetAllItems();
+                        }
+                        else
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.Conflict,
+                                ErrorMessage = Constants.ErrorMessages.NotUpdated
+                            };
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
                     return itemResponse;
-
-                }
-                Item item = await _itemDbContext.UpdateItem(itemRequest);
-                if (item.Id == itemRequest.Id && item.Name == itemRequest.Name && item.MaxLimit == itemRequest.MaxLimit)
-                {
-                    itemResponse.Status = Status.Success;
-                    itemResponse.Items = await _itemDbContext.GetAllItems();
                 }
                 else
                 {
                     itemResponse.Status = Status.Failure;
                     itemResponse.Error = new Error()
                     {
-                        ErrorCode = Constants.ErrorCodes.Conflict,
-                        ErrorMessage = Constants.ErrorMessages.NotUpdated
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
                     };
-
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (itemResponse.Status == Status.Failure)
+                    severity = Severity.High;
+
+                new Task(() => { _logger.Log(itemRequest, itemResponse, "UpdateItem", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
