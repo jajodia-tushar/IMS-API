@@ -102,7 +102,8 @@ namespace IMS.Core.Translators
         {
             Contracts.ShelfItemsResponse shelfItemsResponseContract = new Contracts.ShelfItemsResponse();
             shelfItemsResponseContract.Status = Contracts.Status.Failure;
-            shelfItemsResponseContract.Error = ToDataContractsObject(shelfItemsResponseEntity.Error);
+            if(shelfItemsResponseEntity.Error!=null)
+                shelfItemsResponseContract.Error = ToDataContractsObject(shelfItemsResponseEntity.Error);
             if (shelfItemsResponseEntity.Status == Entities.Status.Success)
             {
                 shelfItemsResponseContract.Status = Contracts.Status.Success;
@@ -119,7 +120,7 @@ namespace IMS.Core.Translators
             IMS.Contracts.Shelf shelfContract = new Contracts.Shelf();
             shelfContract.Id = shelfEntity.Id;
             shelfContract.Name = shelfEntity.Name;
-            shelfContract.isActive = shelfEntity.isActive;
+            shelfContract.isActive = shelfEntity.IsActive;
             shelfContract.Code = shelfContract.Code;
             return shelfContract;
         }
