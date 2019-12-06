@@ -256,6 +256,11 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
+                new Task(() => { _logger.Log(id, itemResponse, "Delete", itemResponse.Status, severity, userId); }).Start();
+            }
+            return itemResponse;
+        }
+
         public async Task<ItemResponse> UpdateItem(ItemRequest itemRequest)
         {
             ItemResponse itemResponse = new ItemResponse();
