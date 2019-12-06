@@ -4,7 +4,9 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -17,9 +19,9 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public List<Entities.ItemQuantityMapping> GetShelfItemsByShelfCode(int shelfId)
+        public async Task<List<Entities.ItemQuantityMapping>> GetShelfItemsByShelfCode(int shelfId)
         {
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
             List<ItemQuantityMapping> itemQuantityMappingList = new List<ItemQuantityMapping>();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
@@ -31,7 +33,7 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetShelfItemsByShelfId";
                     command.Parameters.AddWithValue("@shelfId", shelfId);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         itemQuantityMappingList.Add(new ItemQuantityMapping()

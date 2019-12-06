@@ -6,11 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Interfaces
 {
     public interface IInventoryDbContext
     {
-        List<Entities.ItemQuantityMapping> GetShelfItemsByShelfCode(int shelfId);
+        Task<List<Entities.ItemQuantityMapping>> GetShelfItemsByShelfCode(int shelfId);
     }
 }
