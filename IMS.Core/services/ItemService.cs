@@ -262,7 +262,7 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if (await isItemAlreadyDeleted(id))
+                        if (await IsItemAlreadyDeleted(id))
                         {
                             itemResponse.Status = Status.Failure;
                             itemResponse.Error = new Error()
@@ -410,7 +410,7 @@ namespace IMS.Core.services
             return false;
         }
 
-        public async Task<bool> isItemAlreadyDeleted(int id)
+        public async Task<bool> IsItemAlreadyDeleted(int id)
         {
             List<Item> _items = await _itemDbContext.GetAllItems();
             foreach (var item in _items)
