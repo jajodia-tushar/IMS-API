@@ -4,48 +4,58 @@ using IMS.Entities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.Core.services
 {
     public class InventoryService:IInventoryService
     {
         private IInventoryDbContext _inventoryDbContext;
-
-        public InventoryService(IInventoryDbContext inventoryDbContext)
+        private IShelfService _shelfService;
+        public InventoryService(IInventoryDbContext inventoryDbContext,IShelfService shelfService)
         {
             _inventoryDbContext = inventoryDbContext;
+            _shelfService = shelfService;
         }
 
-        public ShelfItemsResponse GetShelfItemsByShelfId(int shelfId)
+        public async Task<ShelfItemsResponse> GetShelfItemsByShelfCode(string shelfCode)
         {
-            ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
-            shelfItemsResponse.Status = Status.Failure;
-            try
+            ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse()
             {
-                //Check here if given shelf exists or not if exists get the shelf details
-
-                shelfItemsResponse.itemQuantityMappings = _inventoryDbContext.GetShelfItemsByShelfId(shelfId);
-                if (shelfItemsResponse.itemQuantityMappings.Count > 0)
-                {
-                    shelfItemsResponse.Status = Status.Success;
-                    return shelfItemsResponse;
-                }
-                shelfItemsResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.NotFound,
-                    ErrorMessage = Constants.ErrorMessages.EmptyShelf
-                };
-                return shelfItemsResponse;
-
-                /*shelfItemsResponse.Error = new Error()
+                Status = Status.Failure,
+                Error = new Error()
                 {
                     ErrorCode = Constants.ErrorCodes.BadRequest,
                     ErrorMessage = Constants.ErrorMessages.InvalidId
-                };*/
-            }
-            catch(Exception e)
+                }
+            };
+            if (!String.IsNullOrEmpty(shelfCode))
             {
-                throw e;
+                try
+                {
+                    ShelfResponse shelfResponse = await _shelfService.GetShelfByShelfCode(shelfCode);
+                    if (shelfResponse.Shelves!=null)
+                    {
+                        shelfItemsResponse.shelf = shelfResponse.Shelves[0];
+                        shelfItemsResponse.itemQuantityMappings = _inventoryDbContext.GetShelfItemsByShelfCode(shelfResponse.Shelves[0].Id);
+                        if (shelfItemsResponse.itemQuantityMappings.Count>0)
+                        {
+                            shelfItemsResponse.Status = Status.Success;
+                            shelfItemsResponse.Error = null;
+                            return shelfItemsResponse;
+                        }
+                        shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
+                        shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.EmptyShelf;
+                        return shelfItemsResponse;
+                    }
+                    shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
+                    shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfNotPresent;
+                    return shelfItemsResponse;
+                }
+                catch(Exception exception)
+                {
+                    throw exception;
+                }
             }
             return shelfItemsResponse;
         }

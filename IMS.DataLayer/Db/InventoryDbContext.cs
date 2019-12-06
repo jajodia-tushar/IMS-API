@@ -17,7 +17,7 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public List<Entities.ItemQuantityMapping> GetShelfItemsByShelfId(int shelfId)
+        public List<Entities.ItemQuantityMapping> GetShelfItemsByShelfCode(int shelfId)
         {
             MySqlDataReader reader = null;
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
@@ -41,7 +41,7 @@ namespace IMS.DataLayer.Db
                                 Id = (int)reader["ItemId"],
                                 Name = (string)reader["ItemName"],
                                 MaxLimit = (int)reader["ItemMaximumLimit"],
-                                isActive = (bool)reader["ItemState"]
+                                IsActive = (bool)reader["ItemState"]
                             },
                             Quantity = (int)reader["ItemQuantityAtShelf"]
                         });

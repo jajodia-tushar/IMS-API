@@ -11,6 +11,6 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface IInventoryDbContext
     {
-        List<Entities.ItemQuantityMapping> GetShelfItemsByShelfId(int shelfId);
+        List<Entities.ItemQuantityMapping> GetShelfItemsByShelfCode(int shelfId);
     }
 }

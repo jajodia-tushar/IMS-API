@@ -110,7 +110,7 @@ namespace IMS.Core.Translators
                 shelfItemsResponseContract.Error = null;
                 shelfItemsResponseContract.itemQuantityMappings = EntityShelfItemsToContractShelfItems(shelfItemsResponseEntity.itemQuantityMappings);
             }
-            if (shelfItemsResponseContract.shelf != null)
+            if (shelfItemsResponseEntity.shelf != null)
                 shelfItemsResponseContract.shelf = ToDataContractsObject(shelfItemsResponseEntity.shelf);
             return shelfItemsResponseContract;
         }
@@ -127,22 +127,22 @@ namespace IMS.Core.Translators
 
         private static List<Contracts.ItemQuantityMapping> EntityShelfItemsToContractShelfItems(List<Entities.ItemQuantityMapping> itemQuantityMappingsEntity)
         {
-            List<Contracts.ItemQuantityMapping> itemQuantityMappingsContract = new List<Contracts.ItemQuantityMapping>();
+            List<Contracts.ItemQuantityMapping> itemQuantityMappingListContract = new List<Contracts.ItemQuantityMapping>();
             foreach (Entities.ItemQuantityMapping itemQuantityMapping in itemQuantityMappingsEntity)
             {
-                IMS.Contracts.ItemQuantityMapping contractItemQuantityMapping = new IMS.Contracts.ItemQuantityMapping()
+                IMS.Contracts.ItemQuantityMapping itemQuantityMappingContract = new IMS.Contracts.ItemQuantityMapping()
                 {
                     Item = new IMS.Contracts.Item() {
                         Id = itemQuantityMapping.Item.Id,
                         Name = itemQuantityMapping.Item.Name,
                         MaxLimit = itemQuantityMapping.Item.MaxLimit,
-                        isActive = itemQuantityMapping.Item.isActive
+                        IsActive = itemQuantityMapping.Item.IsActive
                     },
                     Quantity = itemQuantityMapping.Quantity
                 };
-                itemQuantityMappingsContract.Add(contractItemQuantityMapping);
+                itemQuantityMappingListContract.Add(itemQuantityMappingContract);
             }
-            return itemQuantityMappingsContract;
+            return itemQuantityMappingListContract;
         }
 
 

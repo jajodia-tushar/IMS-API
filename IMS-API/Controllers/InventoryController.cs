@@ -22,26 +22,31 @@ namespace IMS_API.Controllers
         }
 
         // GET: api/Inventory/5
-        [HttpGet("{shelfId}", Name = "GetShelfItemsByShelfId")]
-        public ShelfItemsResponse GetShelfItemsByShelfId(int shelfId)
+        [HttpGet("{shelfCode}", Name = "GetShelfItemsByShelfCode")]
+        public async Task<ShelfItemsResponse> GetShelfItemsByShelfCode(string shelfCode)
         {
-            ShelfItemsResponse shelfItemsResponse = null;
-            try
+            ShelfItemsResponse shelfItemsResponse = new IMS.Contracts.ShelfItemsResponse()
             {
-                IMS.Entities.ShelfItemsResponse shelfItemsResponseEntity = _inventoryService.GetShelfItemsByShelfId(shelfId);
-                shelfItemsResponse = Translator.ToDataContractsObject(shelfItemsResponseEntity);
-            }
-            catch(Exception e)
-            {
-                shelfItemsResponse = new IMS.Contracts.ShelfItemsResponse()
+                Status = Status.Failure,
+                Error = new Error()
                 {
-                    Status = Status.Failure,
-                    Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.ServerError,
-                        ErrorMessage = Constants.ErrorMessages.ServerError
-                    }
-                };
+                    ErrorCode = Constants.ErrorCodes.BadRequest,
+                    ErrorMessage = Constants.ErrorMessages.InvalidId
+                }
+            };
+
+            if (!String.IsNullOrEmpty(shelfCode))
+            {
+                try
+                {
+                    IMS.Entities.ShelfItemsResponse shelfItemsResponseEntity = await _inventoryService.GetShelfItemsByShelfCode(shelfCode);
+                    return Translator.ToDataContractsObject(shelfItemsResponseEntity);
+                }
+                catch (Exception exception)
+                {
+                    shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.ServerError;
+                    shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ServerError;
+                }
             }
             return shelfItemsResponse;
         }
