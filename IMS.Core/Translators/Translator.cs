@@ -120,8 +120,8 @@ namespace IMS.Core.Translators
             IMS.Contracts.Shelf shelfContract = new Contracts.Shelf();
             shelfContract.Id = shelfEntity.Id;
             shelfContract.Name = shelfEntity.Name;
-            shelfContract.isActive = shelfEntity.IsActive;
-            shelfContract.Code = shelfContract.Code;
+            shelfContract.IsActive = shelfEntity.IsActive;
+            shelfContract.Code = shelfEntity.Code;
             return shelfContract;
         }
 
@@ -145,7 +145,6 @@ namespace IMS.Core.Translators
             return itemQuantityMappingsContract;
         }
 
-        public static Contracts.Error ToDataContractsObject(Entities.Error error)
 
 
         public static Contracts.ShelfResponse ToDataContractsObject(Entities.ShelfResponse entityShelfResponse)
