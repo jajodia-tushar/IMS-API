@@ -61,7 +61,7 @@ namespace IMS_API
                 });
 
 
-            services.AddTransient<IUserDbContext, MockUserDbContext>();
+            services.AddTransient<IUserDbContext, UserDbContext>();
             services.AddTransient<ITokenProvider, JwtTokenProvider>();
             services.AddTransient<ILogManager, LogImplementation>();
             services.AddTransient<ILogDbContext, LogDbContext>();
@@ -69,12 +69,12 @@ namespace IMS_API
             services.AddTransient<ITokenDbContext, TokenDbContext>();
 
             services.AddTransient<IEmployeeService, EmployeeService>();
-            services.AddTransient<IEmployeeDbContext, MockEmployeeDbContext>();
+            services.AddTransient<IEmployeeDbContext, EmployeeDbContext>();
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddSingleton<IInventoryService, InventoryService>();
             services.AddTransient<IShelfService, ShelfService>();
-            services.AddTransient<IShelfDbContext, MockShelfDbContext>();
+            services.AddTransient<IShelfDbContext, ShelfDbContext>();
 
 
 

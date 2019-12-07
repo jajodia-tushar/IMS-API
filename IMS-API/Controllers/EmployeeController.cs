@@ -29,7 +29,7 @@ namespace IMS_API.Controllers
         /// <returns>Details of Employee</returns>
         /// <response code="200">Returns Employee Details if employee id is valid otherwise it returns null with status failure</response>
         // GET: api/Default/5
-        [HttpGet("{id}", Name = "GetEmployeeById")]
+        [HttpGet("{employeeId}", Name = "GetEmployeeById")]
         public GetEmployeeResponse GetEmployeeById(String employeeId)
         {
             GetEmployeeResponse contractsEmployeeValidationResponse = null;

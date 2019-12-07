@@ -23,7 +23,7 @@ namespace IMS.Core.services
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
             {
-                if (employeeId!= null)
+                if (employeeId==null)
                 {
                     employeeValidationResponse.Status = Status.Failure;
                     employeeValidationResponse.Error = new Error()
