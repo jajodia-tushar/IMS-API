@@ -14,7 +14,6 @@ namespace IMS.Core.services
     public class ItemService : IItemService
     {
         private IItemDbContext _itemDbContext;
-        private IUserDbContext _userDbContext;
         private ITokenProvider _tokenProvider;
         private IHttpContextAccessor _httpContextAccessor;
         private ILogManager _logger;
@@ -49,46 +48,30 @@ namespace IMS.Core.services
                         else
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.ResourceNotFound,
-                                ErrorMessage = Constants.ErrorMessages.resourceNotFound
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(404, "Items Not Found");
                         }
                     }
                     catch (Exception ex)
                     {
                         throw ex;
                     }
-                    return itemResponse;
                 }
                 else
                 {
                     itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                    itemResponse.Error = GetErrorCodeAndErrorMessage(401, "Token Is Invalid");
                 }
-
             }
             catch
             {
                 itemResponse.Status = Status.Failure;
-                itemResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.ServerError,
-                    ErrorMessage = Constants.ErrorMessages.ServerError
-                };
-
+                itemResponse.Error = GetErrorCodeAndErrorMessage(500, "Internal Server error");
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (itemResponse.Status == Status.Failure)
                     severity = Severity.High;
-
                 new Task(() => { _logger.Log(null, itemResponse, "GetAllItems", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
@@ -118,11 +101,7 @@ namespace IMS.Core.services
                         else
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.UnprocessableEntity,
-                                ErrorMessage = Constants.ErrorMessages.resourceNotFound
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(422,"Items not found");
                         }
                     }
                     catch (Exception ex)
@@ -134,29 +113,19 @@ namespace IMS.Core.services
                 else
                 {
                     itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                    itemResponse.Error = GetErrorCodeAndErrorMessage(401, "Token Is Invalid");
                 }
-
             }
             catch
             {
                 itemResponse.Status = Status.Failure;
-                itemResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.ServerError,
-                    ErrorMessage = Constants.ErrorMessages.ServerError
-                };
+                itemResponse.Error = GetErrorCodeAndErrorMessage(500, "Internal Server Error");
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (itemResponse.Status == Status.Failure)
                     severity = Severity.High;
-
                 new Task(() => { _logger.Log(id, itemResponse, "GetItemById", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
@@ -175,25 +144,16 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if (itemRequest.Name == "")
+                        if (itemRequest.Name == "" || itemRequest.Name.Equals(null))
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.BadRequest,
-                                ErrorMessage = Constants.ErrorMessages.InvalidItemsDetails
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(400, "Invalid Item Details");
                             return itemResponse;
-
                         }
                         if (await IsItemAlreadyExists(itemRequest.Name))
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.Conflict,
-                                ErrorMessage = Constants.ErrorMessages.AlreadyPresent
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(409, "IItem Already Added");
                             return itemResponse;
                         }
                         int latestAddedItemId = await _itemDbContext.AddItem(itemRequest);
@@ -206,11 +166,7 @@ namespace IMS.Core.services
                         else
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.Conflict,
-                                ErrorMessage = Constants.ErrorMessages.Conflict
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(409, "Item Not Added");
                         }
                     }
                     catch (Exception ex)
@@ -222,21 +178,13 @@ namespace IMS.Core.services
                 else
                 {
                     itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                    itemResponse.Error = GetErrorCodeAndErrorMessage(401, "Token Is Invalid");
                 }
             }
             catch
             {
                 itemResponse.Status = Status.Failure;
-                itemResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.ServerError,
-                    ErrorMessage = Constants.ErrorMessages.ServerError
-                };
+                itemResponse.Error = GetErrorCodeAndErrorMessage(500, "Internal Server Error");
             }
             finally
             {
@@ -265,11 +213,7 @@ namespace IMS.Core.services
                         if (await IsItemAlreadyDeleted(id))
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.ResourceNotFound,
-                                ErrorMessage = Constants.ErrorMessages.AlreadyDeleted
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(404, "Item Already Deleted");
                             return itemResponse;
                         }
                         bool isDeleted = await _itemDbContext.Delete(id);
@@ -281,11 +225,7 @@ namespace IMS.Core.services
                         else
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.ResourceNotFound,
-                                ErrorMessage = Constants.ErrorMessages.resourceNotFound
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(404, "Items Not Found");
                         }
                     }
                     catch (Exception ex)
@@ -297,21 +237,13 @@ namespace IMS.Core.services
                 else
                 {
                     itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                    itemResponse.Error = GetErrorCodeAndErrorMessage(401, "Token Is Invalid");
                 }
             }
             catch
             {
                 itemResponse.Status = Status.Failure;
-                itemResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.ServerError,
-                    ErrorMessage = Constants.ErrorMessages.ServerError
-                };
+                itemResponse.Error = GetErrorCodeAndErrorMessage(500, "Internal Server Error");
             }
             finally
             {
@@ -340,11 +272,7 @@ namespace IMS.Core.services
                         if (itemRequest.Name == "")
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.BadRequest,
-                                ErrorMessage = Constants.ErrorMessages.InvalidItemsDetails
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(400, "Invalid Items Details");
                             return itemResponse;
                         }
                         Item item = await _itemDbContext.UpdateItem(itemRequest);
@@ -356,11 +284,7 @@ namespace IMS.Core.services
                         else
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.Conflict,
-                                ErrorMessage = Constants.ErrorMessages.NotUpdated
-                            };
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(409, "Item Not Updated");
                         }
                     }
                     catch (Exception ex)
@@ -372,21 +296,13 @@ namespace IMS.Core.services
                 else
                 {
                     itemResponse.Status = Status.Failure;
-                    itemResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                    itemResponse.Error = GetErrorCodeAndErrorMessage(401, "Token Is Invalid");
                 }
             }
             catch
             {
                 itemResponse.Status = Status.Failure;
-                itemResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.ServerError,
-                    ErrorMessage = Constants.ErrorMessages.ServerError
-                };
+                itemResponse.Error = GetErrorCodeAndErrorMessage(500, "Internal Server Error");
             }
             finally
             {
@@ -422,6 +338,13 @@ namespace IMS.Core.services
                 }
             }
             return false;
+        }
+        public Error GetErrorCodeAndErrorMessage(int code, string message)
+        {
+            Error error = new Error();
+            error.ErrorCode = code;
+            error.ErrorMessage = message;
+            return error;
         }
     }
 }
