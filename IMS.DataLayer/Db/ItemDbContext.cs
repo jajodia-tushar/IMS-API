@@ -66,13 +66,7 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetItemById";
                     command.Parameters.AddWithValue("@Id", id);
                     reader = await command.ExecuteReaderAsync();
-                    if (reader.Read())
-                    {
-                        item.Id = (int)reader["Id"];
-                        item.Name = (string)reader["Name"];
-                        item.MaxLimit = (int)reader["MaximumLimit"];
-                        item.IsActive = (bool)reader["IsActive"];
-                    }
+                    item = ReadValuesFromDatabase(reader);
                 }
                 catch (Exception ex)
                 {
@@ -100,9 +94,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@IsActive", 1);
                     reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
-                    {
                         latestAddedItemId = (int)reader["Id"];
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -158,13 +150,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@MaximumLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", itemRequest.IsActive);
                     reader = await command.ExecuteReaderAsync();
-                    if (reader.Read())
-                    {
-                        item.Id = (int)reader["Id"];
-                        item.Name = (string)reader["Name"];
-                        item.MaxLimit = (int)reader["MaximumLimit"];
-                        item.IsActive = (bool)reader["IsActive"];
-                    }
+                    item = ReadValuesFromDatabase(reader);
                 }
                 catch (Exception ex)
                 {
@@ -173,7 +159,17 @@ namespace IMS.DataLayer.Db
                 return item;
             }
         }
-
-        
+        public Item ReadValuesFromDatabase(DbDataReader reader )
+        {
+            Item item = new Item();
+            while (reader.Read())
+            {
+                item.Id = (int)reader["Id"];
+                item.Name = (string)reader["Name"];
+                item.MaxLimit = (int)reader["MaximumLimit"];
+                item.IsActive = (bool)reader["IsActive"];
+            }
+            return item;
+        }
     }
 }
