@@ -12,7 +12,7 @@ namespace IMS.DataLayer.Db
             {
                new Employee()
                {
-                   Id =1126,
+                   Id ="1126",
                    Firstname ="Rochit",
                    Lastname ="Aggarwal",
                    Email="rochitaggarwal54@gmail.com",
@@ -23,7 +23,7 @@ namespace IMS.DataLayer.Db
                },
                new Employee()
                {
-                   Id = 302,
+                   Id = "302",
                    Firstname ="Dhvani",
                    Lastname ="Sheth",
                    Email="dshethl54@gmail.com",
@@ -34,7 +34,7 @@ namespace IMS.DataLayer.Db
                },
                 new Employee()
                {
-                   Id =1129,
+                   Id ="1129",
                    Firstname ="Vijay",
                    Lastname ="Mohan",
                    Email="vijayl54@gmail.com",
@@ -44,13 +44,13 @@ namespace IMS.DataLayer.Db
                    IsActive=true
                }
             };
-        public Employee GetEmployeeById(int id)
+        public Employee GetEmployeeById(string employeeId)
         {
             return employees.Find
                    (
                         u =>
                         {
-                            return u.Id.Equals(id) ;
+                            return u.Id.Equals(employeeId) ;
                         }
                    );
         }

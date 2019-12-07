@@ -25,17 +25,17 @@ namespace IMS_API.Controllers
         /// <summary>
         /// Retrieve the employee by their ID
         /// </summary>
-        /// <param name="id">The ID of the desired Employee</param>
+        /// <param name="employeeId">The ID of the desired Employee</param>
         /// <returns>Details of Employee</returns>
         /// <response code="200">Returns Employee Details if employee id is valid otherwise it returns null with status failure</response>
         // GET: api/Default/5
         [HttpGet("{id}", Name = "GetEmployeeById")]
-        public GetEmployeeResponse GetEmployeeById(int id)
+        public GetEmployeeResponse GetEmployeeById(String employeeId)
         {
             GetEmployeeResponse contractsEmployeeValidationResponse = null;
             try
             {
-                IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(id);
+                IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(employeeId);
                 contractsEmployeeValidationResponse = Translator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
             catch

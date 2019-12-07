@@ -11,18 +11,18 @@ namespace IMS.DataLayer.Db
 {
     public class EmployeeDbContext : IEmployeeDbContext
     {
-        private IConfiguration _configuration;
-        public EmployeeDbContext(IConfiguration configuration)
+        private IDbConnectionProvider _dbConnectionProvider;
+        public EmployeeDbContext(IDbConnectionProvider dbConnectionProvider)
         {
-            _configuration = configuration;
+            _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public Employee GetEmployeeById(int id)
+        public Employee GetEmployeeById(string employeeId)
         {
             Employee employee = null;
             MySqlDataReader reader = null;
 
-            using (var connection = new MySqlConnection(_configuration["imsdb"]))
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -34,17 +34,23 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetEmployeeById";
 
 
-                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@Id", employeeId);
                     reader = command.ExecuteReader();
 
-
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        employee = Extract(reader);
-
+                        employee = new Employee()
+                        {
+                            Id = ReturnNullOrValueAccordingly(reader["Id"]),
+                            Email = ReturnNullOrValueAccordingly(reader["EmailId"]),
+                            ContactNumber = ReturnNullOrValueAccordingly(reader["MobileNumber"]),
+                            Firstname = ReturnNullOrValueAccordingly(reader["FirstName"]),
+                            Lastname = ReturnNullOrValueAccordingly(reader["LastName"]),
+                            TemporaryCardNumber = ReturnNullOrValueAccordingly(reader["TemporaryCardNumber"]),
+                            AccessCardNumber = ReturnNullOrValueAccordingly(reader["AccessCardNumber"]),
+                            IsActive = (bool)reader["IsActive"]
+                        };
                     }
-
-
                 }
                 catch (Exception ex)
                 {
@@ -56,20 +62,16 @@ namespace IMS.DataLayer.Db
 
             return employee;
         }
-
-        private Employee Extract(MySqlDataReader reader)
+        public static string ReturnNullOrValueAccordingly(object field)
         {
-            return new Employee()
+            try
             {
-                Id = (int)reader["Id"],
-                Email = (string)reader["Email"],
-                ContactNumber = (string)reader["mobile_number"],
-                Firstname = (string)reader["firstname"],
-                Lastname = (string)reader["lastname"],
-                TemporaryCardNumber = (string)reader["TCardNumber"],
-                AccessCardNumber = (string)reader["AccessCardNumber"],
-                IsActive=(bool)reader["IsActive"]
-            };
+                return (string)field;
+            }
+            catch
+            {
+                return "";
+            }
         }
     }
 }

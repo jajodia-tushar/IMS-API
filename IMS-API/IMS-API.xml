@@ -4,11 +4,11 @@
         <name>IMS-API</name>
     </assembly>
     <members>
-        <member name="M:IMS_API.Controllers.EmployeeController.GetEmployeeById(System.Int32)">
+        <member name="M:IMS_API.Controllers.EmployeeController.GetEmployeeById(System.String)">
             <summary>
             Retrieve the employee by their ID
             </summary>
-            <param name="id">The ID of the desired Employee</param>
+            <param name="employeeId">The ID of the desired Employee</param>
             <returns>Details of Employee</returns>
             <response code="200">Returns Employee Details if employee id is valid otherwise it returns null with status failure</response>
         </member>

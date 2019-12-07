@@ -6,6 +6,6 @@ namespace IMS.Entities.Interfaces
 {
     public interface IEmployeeService 
     {
-        GetEmployeeResponse ValidateEmployee(int id);
+        GetEmployeeResponse ValidateEmployee(string employeeId);
     }
 }
