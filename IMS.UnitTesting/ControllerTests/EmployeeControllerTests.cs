@@ -31,9 +31,9 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Employee = GetContractTypeEmployee()
             };
-            _moqEmployeeService.Setup(m => m.ValidateEmployee(1126)).Returns(entityEmployeeResponse);
+            _moqEmployeeService.Setup(m => m.ValidateEmployee("1126")).Returns(entityEmployeeResponse);
             var employeeController = new EmployeeController(_moqEmployeeService.Object);
-            IMS.Contracts.GetEmployeeResponse actualResult = employeeController.GetEmployeeById(1126);
+            IMS.Contracts.GetEmployeeResponse actualResult = employeeController.GetEmployeeById("1126");
             var actual = JsonConvert.SerializeObject(actualResult);
             var expected = JsonConvert.SerializeObject(expectedResult);
             Assert.Equal(actual, expected);
@@ -61,9 +61,9 @@ namespace IMS.UnitTesting.ControllerTests
                 },
                 Employee = null
             };
-            _moqEmployeeService.Setup(m => m.ValidateEmployee(9012718)).Returns(entityEmployeeResponse);
+            _moqEmployeeService.Setup(m => m.ValidateEmployee("9012718")).Returns(entityEmployeeResponse);
             var employeeController = new EmployeeController(_moqEmployeeService.Object);
-            IMS.Contracts.GetEmployeeResponse actualResult = employeeController.GetEmployeeById(9012718);
+            IMS.Contracts.GetEmployeeResponse actualResult = employeeController.GetEmployeeById("9012718");
             var actual = JsonConvert.SerializeObject(actualResult);
             var expected = JsonConvert.SerializeObject(expectedResult);
             Assert.Equal(actual, expected);
@@ -92,9 +92,9 @@ namespace IMS.UnitTesting.ControllerTests
                 },
                 Employee = null
             };
-            _moqEmployeeService.Setup(m => m.ValidateEmployee(0)).Returns(entityEmployeeResponse);
+            _moqEmployeeService.Setup(m => m.ValidateEmployee("")).Returns(entityEmployeeResponse);
             var employeeController = new EmployeeController(_moqEmployeeService.Object);
-            IMS.Contracts.GetEmployeeResponse actualResult = employeeController.GetEmployeeById(0);
+            IMS.Contracts.GetEmployeeResponse actualResult = employeeController.GetEmployeeById("");
             var actual = JsonConvert.SerializeObject(actualResult);
             var expected = JsonConvert.SerializeObject(expectedResult);
             Assert.Equal(actual, expected);
@@ -105,7 +105,7 @@ namespace IMS.UnitTesting.ControllerTests
         {
             IMS.Entities.Employee _entityTypeEmployee = new IMS.Entities.Employee()
             {
-                Id = 1126,
+                Id = "1126",
                 Firstname = "Rochit",
                 Lastname = "Aggarwal",
                 ContactNumber = "1234567890",
@@ -120,7 +120,7 @@ namespace IMS.UnitTesting.ControllerTests
         {
             IMS.Contracts.Employee _contractsTypeEmployee = new IMS.Contracts.Employee()
             {
-                Id = 1126,
+                Id = "1126",
                 Firstname = "Rochit",
                 Lastname = "Aggarwal",
                 ContactNumber = null,
