@@ -40,12 +40,12 @@ namespace IMS.DataLayer.Db
                         {
                             Item = new Item()
                             {
-                                Id = (int)reader["ItemId"],
+                                Id = Convert.ToInt32(reader["ItemId"]),
                                 Name = (string)reader["ItemName"],
-                                MaxLimit = (int)reader["ItemMaximumLimit"],
+                                MaxLimit = Convert.ToInt32(reader["ItemMaximumLimit"]),
                                 IsActive = (bool)reader["ItemState"]
                             },
-                            Quantity = (int)reader["ItemQuantityAtShelf"]
+                            Quantity = Convert.ToInt32(reader["ItemQuantityAtShelf"])
                         });
                     }
                     shelfItemsResponse.itemQuantityMappings = itemQuantityMappingList;
