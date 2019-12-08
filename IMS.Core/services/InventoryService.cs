@@ -31,11 +31,7 @@ namespace IMS.Core.services
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse()
             {
                 Status = Status.Failure,
-                Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.BadRequest,
-                    ErrorMessage = Constants.ErrorMessages.InvalidId
-                }
+                Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidId)
             };
             try
             {
@@ -47,20 +43,18 @@ namespace IMS.Core.services
                         ShelfResponse shelfResponse = await _shelfService.GetShelfByShelfCode(shelfCode);
                         if (shelfResponse.Shelves != null)
                         {
-                            shelfItemsResponse.shelf = shelfResponse.Shelves[0];
-                            shelfItemsResponse.itemQuantityMappings = await _inventoryDbContext.GetShelfItemsByShelfCode(shelfResponse.Shelves[0].Id);
-                            if (shelfItemsResponse.itemQuantityMappings.Count > 0)
+                            shelfItemsResponse.Shelf = shelfResponse.Shelves[0];
+                            shelfItemsResponse.ItemQuantityMappings = await _inventoryDbContext.GetShelfItemsByShelfCode(shelfResponse.Shelves[0].Id);
+                            if (shelfItemsResponse.ItemQuantityMappings.Count > 0)
                             {
                                 shelfItemsResponse.Status = Status.Success;
                                 shelfItemsResponse.Error = null;
                                 return shelfItemsResponse;
                             }
-                            shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
-                            shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.EmptyShelf;
+                            shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.EmptyShelf);
                             return shelfItemsResponse;
                         }
-                        shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
-                        shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfNotPresent;
+                        shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.ShelfNotPresent);
                         return shelfItemsResponse;
                     }
                     catch (Exception exception)
@@ -73,11 +67,7 @@ namespace IMS.Core.services
             catch
             {
                 shelfItemsResponse.Status = Status.Failure;
-                shelfItemsResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.ServerError,
-                    ErrorMessage = Constants.ErrorMessages.ServerError
-                };
+                shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
             }
             finally
             {

@@ -48,13 +48,13 @@ namespace IMS.DataLayer.Db
                             Quantity = Convert.ToInt32(reader["ItemQuantityAtShelf"])
                         });
                     }
-                    shelfItemsResponse.itemQuantityMappings = itemQuantityMappingList;
+                    shelfItemsResponse.ItemQuantityMappings = itemQuantityMappingList;
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return shelfItemsResponse.itemQuantityMappings;
+                return shelfItemsResponse.ItemQuantityMappings;
             }
         }
     }

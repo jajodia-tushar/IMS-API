@@ -6,7 +6,7 @@ namespace IMS.Entities
 {
     public class ShelfItemsResponse:Response
     {
-        public Shelf shelf;
-        public List<ItemQuantityMapping> itemQuantityMappings;
+        public Shelf Shelf;
+        public List<ItemQuantityMapping> ItemQuantityMappings;
     }
 }

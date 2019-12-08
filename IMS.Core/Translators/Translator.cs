@@ -108,10 +108,10 @@ namespace IMS.Core.Translators
             {
                 shelfItemsResponseContract.Status = Contracts.Status.Success;
                 shelfItemsResponseContract.Error = null;
-                shelfItemsResponseContract.itemQuantityMappings = EntityShelfItemsToContractShelfItems(shelfItemsResponseEntity.itemQuantityMappings);
+                shelfItemsResponseContract.itemQuantityMappings = ToDataContractObject(shelfItemsResponseEntity.ItemQuantityMappings);
             }
-            if (shelfItemsResponseEntity.shelf != null)
-                shelfItemsResponseContract.shelf = ToDataContractsObject(shelfItemsResponseEntity.shelf);
+            if (shelfItemsResponseEntity.Shelf != null)
+                shelfItemsResponseContract.shelf = ToDataContractsObject(shelfItemsResponseEntity.Shelf);
             return shelfItemsResponseContract;
         }
 
@@ -125,7 +125,7 @@ namespace IMS.Core.Translators
             return shelfContract;
         }
 
-        private static List<Contracts.ItemQuantityMapping> EntityShelfItemsToContractShelfItems(List<Entities.ItemQuantityMapping> itemQuantityMappingsEntity)
+        private static List<Contracts.ItemQuantityMapping> ToDataContractObject(List<Entities.ItemQuantityMapping> itemQuantityMappingsEntity)
         {
             List<Contracts.ItemQuantityMapping> itemQuantityMappingListContract = new List<Contracts.ItemQuantityMapping>();
             foreach (Entities.ItemQuantityMapping itemQuantityMapping in itemQuantityMappingsEntity)
