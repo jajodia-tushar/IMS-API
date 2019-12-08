@@ -5,6 +5,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IMS.UnitTesting.ControllerTests
@@ -18,7 +19,7 @@ namespace IMS.UnitTesting.ControllerTests
         }
 
         [Fact]
-        public void GetAllItems_Should_Return_Valid_Response_If_ItemRequestData_Is_Valid()
+        public async void GetAllItems_Should_Return_Valid_Response_If_ItemRequestData_Is_Valid()
         {
             var entityItemResponse = new IMS.Entities.ItemResponse()
             {
@@ -30,14 +31,14 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeItemsList()
             };
-            _moqItemService.Setup(m => m.GetAllItems()).Returns(entityItemResponse);
+            _moqItemService.Setup(m => m.GetAllItems()).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = itemController.GetAllItems();
+            IMS.Contracts.ItemResponse actualResult = await itemController.GetAllItems();
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
         [Fact]
-        public void GetItemById_Should_Return_Valid_Response_If_Item_Id_Is_Valid()
+        public async void GetItemById_Should_Return_Valid_Response_If_Item_Id_Is_Valid()
         {
             var entityItemResponse = new IMS.Entities.ItemResponse()
             {
@@ -49,15 +50,15 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeSingleItemList()
             };
-            _moqItemService.Setup(m => m.GetItemById(1)).Returns(entityItemResponse);
+            _moqItemService.Setup(m => m.GetItemById(1)).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = itemController.GetItemById(1);
+            IMS.Contracts.ItemResponse actualResult = await itemController.GetItemById(1);
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
 
         [Fact]
-        public void AddItem_Should_Return_Success_Response_If_Item_Details_Are_Valid()
+        public async void AddItem_Should_Return_Success_Response_If_Item_Details_Are_Valid()
         {
             var entityItemResponse = new IMS.Entities.ItemResponse()
             {
@@ -69,15 +70,15 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeItemsList()
             };
-            _moqItemService.Setup(m => m.AddItem(It.Is<Entities.ItemRequest>(r => r.Name.Equals("Bottle") && r.MaxLimit.Equals(5)))).Returns(entityItemResponse);
+            _moqItemService.Setup(m => m.AddItem(It.Is<Entities.ItemRequest>(r => r.Name.Equals("Bottle") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = itemController.AddItem(new ItemRequest { Name = "Bottle", MaxLimit = 5 });
+            IMS.Contracts.ItemResponse actualResult = await itemController.AddItem(new ItemRequest { Name = "Bottle", MaxLimit = 5 });
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
 
         [Fact]
-        public void UpdateItem_Should_Return_Status_Success_If_Updating_Item_Details_Are_Valid()
+        public async void UpdateItem_Should_Return_Status_Success_If_Updating_Item_Details_Are_Valid()
         {
             var entityItemResponse = new IMS.Entities.ItemResponse()
             {
@@ -89,14 +90,14 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeItemsList()
             };
-            _moqItemService.Setup(m => m.UpdateItem(It.Is<Entities.ItemRequest>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(entityItemResponse);
+            _moqItemService.Setup(m => m.UpdateItem(It.Is<Entities.ItemRequest>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = itemController.UpdateItem(new ItemRequest { Id = 3, Name = "Bag1", MaxLimit = 5 });
+            IMS.Contracts.ItemResponse actualResult = await itemController.UpdateItem(new ItemRequest { Id = 3, Name = "Bag1", MaxLimit = 5 });
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
         [Fact]
-        public void DeleteItems_Should_Return_Success_When_Item_Id_Is_Corrected()
+        public async void DeleteItems_Should_Return_Success_When_Item_Id_Is_Corrected()
         {
             var entityItemResponse = new IMS.Entities.ItemResponse()
             {
@@ -108,9 +109,9 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeItemsList()
             };
-            _moqItemService.Setup(m => m.Delete(2)).Returns(entityItemResponse);
+            _moqItemService.Setup(m => m.Delete(2)).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = itemController.DeleteItems(2);
+            IMS.Contracts.ItemResponse actualResult = await itemController.DeleteItems(2);
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
