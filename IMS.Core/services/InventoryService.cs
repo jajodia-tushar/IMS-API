@@ -39,48 +39,36 @@ namespace IMS.Core.services
             };
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                //string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (!String.IsNullOrEmpty(shelfCode))
                 {
-                    if (!String.IsNullOrEmpty(shelfCode))
+                    try
                     {
-                        try
+                        ShelfResponse shelfResponse = await _shelfService.GetShelfByShelfCode(shelfCode);
+                        if (shelfResponse.Shelves != null)
                         {
-                            ShelfResponse shelfResponse = await _shelfService.GetShelfByShelfCode(shelfCode);
-                            if (shelfResponse.Shelves != null)
+                            shelfItemsResponse.shelf = shelfResponse.Shelves[0];
+                            shelfItemsResponse.itemQuantityMappings = await _inventoryDbContext.GetShelfItemsByShelfCode(shelfResponse.Shelves[0].Id);
+                            if (shelfItemsResponse.itemQuantityMappings.Count > 0)
                             {
-                                shelfItemsResponse.shelf = shelfResponse.Shelves[0];
-                                shelfItemsResponse.itemQuantityMappings = await _inventoryDbContext.GetShelfItemsByShelfCode(shelfResponse.Shelves[0].Id);
-                                if (shelfItemsResponse.itemQuantityMappings.Count > 0)
-                                {
-                                    shelfItemsResponse.Status = Status.Success;
-                                    shelfItemsResponse.Error = null;
-                                    return shelfItemsResponse;
-                                }
-                                shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
-                                shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.EmptyShelf;
+                                shelfItemsResponse.Status = Status.Success;
+                                shelfItemsResponse.Error = null;
                                 return shelfItemsResponse;
                             }
                             shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
-                            shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfNotPresent;
+                            shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.EmptyShelf;
                             return shelfItemsResponse;
                         }
-                        catch (Exception exception)
-                        {
-                            throw exception;
-                        }
+                        shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
+                        shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ShelfNotPresent;
+                        return shelfItemsResponse;
                     }
-                    return shelfItemsResponse;
-                }
-                else
-                {
-                    shelfItemsResponse.Status = Status.Failure;
-                    shelfItemsResponse.Error = new Error()
+                    catch (Exception exception)
                     {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                        throw exception;
+                    }
                 }
+                return shelfItemsResponse;
             }
             catch
             {
