@@ -70,7 +70,7 @@ namespace IMS.Core.Translators
             else
             {
                 loginResponse.Status = Contracts.Status.Failure;
-                loginResponse.Error = ToDataContractsObject(entityLoginResponse.Error); 
+                loginResponse.Error = ToDataContractsObject(entityLoginResponse.Error);
             }
             return loginResponse;
 
@@ -102,7 +102,7 @@ namespace IMS.Core.Translators
         {
             Contracts.ShelfItemsResponse shelfItemsResponseContract = new Contracts.ShelfItemsResponse();
             shelfItemsResponseContract.Status = Contracts.Status.Failure;
-            if(shelfItemsResponseEntity.Error!=null)
+            if (shelfItemsResponseEntity.Error != null)
                 shelfItemsResponseContract.Error = ToDataContractsObject(shelfItemsResponseEntity.Error);
             if (shelfItemsResponseEntity.Status == Entities.Status.Success)
             {
@@ -132,7 +132,8 @@ namespace IMS.Core.Translators
             {
                 IMS.Contracts.ItemQuantityMapping itemQuantityMappingContract = new IMS.Contracts.ItemQuantityMapping()
                 {
-                    Item = new IMS.Contracts.Item() {
+                    Item = new IMS.Contracts.Item()
+                    {
                         Id = itemQuantityMapping.Item.Id,
                         Name = itemQuantityMapping.Item.Name,
                         MaxLimit = itemQuantityMapping.Item.MaxLimit,
@@ -149,19 +150,16 @@ namespace IMS.Core.Translators
 
         public static Contracts.ShelfResponse ToDataContractsObject(Entities.ShelfResponse entityShelfResponse)
         {
-            Contracts.ShelfItemsResponse shelfItemsResponseContract = new Contracts.ShelfItemsResponse();
-            shelfItemsResponseContract.Status = Contracts.Status.Failure;
-            if(shelfItemsResponseEntity.Error!=null)
-                shelfItemsResponseContract.Error = ToDataContractsObject(shelfItemsResponseEntity.Error);
-            if (shelfItemsResponseEntity.Status == Entities.Status.Success)
+            Contracts.ShelfResponse shelfResponse = new Contracts.ShelfResponse();
+            if (entityShelfResponse.Status == Entities.Status.Success)
             {
                 shelfResponse.Status = Contracts.Status.Success;
                 shelfResponse.Shelves = ToDataContractsObject(entityShelfResponse.Shelves);
             }
             else
             {
-               shelfResponse.Status = Contracts.Status.Failure;
-               shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
+                shelfResponse.Status = Contracts.Status.Failure;
+                shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
             }
             return shelfResponse;
 
@@ -177,14 +175,8 @@ namespace IMS.Core.Translators
                 Code = shelf.Code
 
             };
-            IMS.Contracts.Shelf shelfContract = new Contracts.Shelf();
-            shelfContract.Id = shelfEntity.Id;
-            shelfContract.Name = shelfEntity.Name;
-            shelfContract.IsActive = shelfEntity.IsActive;
-            shelfContract.Code = shelfEntity.Code;
-            return shelfContract;
         }
-        
+
         private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)
         {
             List<Contracts.Shelf> dtoShelves = new List<Contracts.Shelf>();
@@ -203,7 +195,7 @@ namespace IMS.Core.Translators
         }
 
 
-            public static Contracts.Error ToDataContractsObject(Entities.Error error)
+        public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
             return new Contracts.Error()
             {
@@ -230,10 +222,10 @@ namespace IMS.Core.Translators
         public static Contracts.Role ToDataContractsObject(Entities.Role role)
         {
             return new Contracts.Role()
-                       {
-                           Id = role.Id,
-                            Name = role.Name
-                       };
+            {
+                Id = role.Id,
+                Name = role.Name
+            };
         }
         public static Entities.LoginRequest ToEntitiesObject(Contracts.LoginRequest contractsLoginRequest)
         {
@@ -246,5 +238,5 @@ namespace IMS.Core.Translators
         }
 
 
-     }
+    }
 }

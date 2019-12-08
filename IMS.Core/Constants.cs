@@ -34,7 +34,6 @@ namespace IMS.Core
             public const string NoVendorsYet = "No Vendors To Display";
 
             public const string InvalidToken = "Token is invalid";
-            public const string EmptyShelf = "No items are present in the shelf";
         }
 
         public static class ErrorCodes
