@@ -67,19 +67,16 @@ namespace IMS_API
             services.AddTransient<ILogDbContext, LogDbContext>();
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<ITokenDbContext, TokenDbContext>();
-
             services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, EmployeeDbContext>();
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            //services.AddSingleton<IInventoryService, InventoryService>();
             services.AddTransient<IShelfService, ShelfService>();
-            services.AddTransient<IShelfDbContext, ShelfDbContext>();
-            services.AddTransient<IVendorDbContext, VendorDbContext>();
+            services.AddTransient<IShelfDbContext,ShelfDbContext>();
+            services.AddTransient<IInventoryService, InventoryService>();
+            services.AddTransient<IInventoryDbContext, InventoryDbContext>();
             services.AddTransient<IVendorService, VendorService>();
-
-
-
+            services.AddTransient<IVendorDbContext, VendorDbContext>();
         }
         public TokenValidationParameters CreateTokenValidationParameters()
         {

@@ -70,7 +70,7 @@ namespace IMS.Core.Translators
             else
             {
                 loginResponse.Status = Contracts.Status.Failure;
-                loginResponse.Error = ToDataContractsObject(entityLoginResponse.Error); 
+                loginResponse.Error = ToDataContractsObject(entityLoginResponse.Error);
             }
             return loginResponse;
 
@@ -98,6 +98,55 @@ namespace IMS.Core.Translators
             };
         }
 
+        public static Contracts.ShelfItemsResponse ToDataContractsObject(Entities.ShelfItemsResponse doShelfItemsResponse)
+        {
+            var dtoShelfItemsResponse = new Contracts.ShelfItemsResponse();
+            dtoShelfItemsResponse.Status = Contracts.Status.Failure;
+            if (doShelfItemsResponse.Error != null)
+                dtoShelfItemsResponse.Error = ToDataContractsObject(doShelfItemsResponse.Error);
+            if (doShelfItemsResponse.Status == Entities.Status.Success)
+            {
+                dtoShelfItemsResponse.Status = Contracts.Status.Success;
+                dtoShelfItemsResponse.Error = null;
+                dtoShelfItemsResponse.itemQuantityMappings = ToDataContractObject(doShelfItemsResponse.ItemQuantityMappings);
+            }
+            if (doShelfItemsResponse.Shelf != null)
+                dtoShelfItemsResponse.shelf = ToDataContractsObject(doShelfItemsResponse.Shelf);
+            return dtoShelfItemsResponse;
+        }
+
+        private static Contracts.Shelf ToDataContractsObject(Entities.Shelf doShelf)
+        {
+            var dtoShelf = new Contracts.Shelf();
+            dtoShelf.Id = doShelf.Id;
+            dtoShelf.Name = doShelf.Name;
+            dtoShelf.IsActive = doShelf.IsActive;
+            dtoShelf.Code = doShelf.Code;
+            return dtoShelf;
+        }
+
+        private static List<Contracts.ItemQuantityMapping> ToDataContractObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)
+        {
+            var dtoItemQuantityMappingList = new List<Contracts.ItemQuantityMapping>();
+            foreach (var itemQuantityMapping in doItemQuantityMappings)
+            {
+                IMS.Contracts.ItemQuantityMapping dtoitemQuantityMapping = new IMS.Contracts.ItemQuantityMapping()
+                {
+                    Item = new IMS.Contracts.Item()
+                    {
+                        Id = itemQuantityMapping.Item.Id,
+                        Name = itemQuantityMapping.Item.Name,
+                        MaxLimit = itemQuantityMapping.Item.MaxLimit,
+                        IsActive = itemQuantityMapping.Item.IsActive
+                    },
+                    Quantity = itemQuantityMapping.Quantity
+                };
+                dtoItemQuantityMappingList.Add(dtoitemQuantityMapping);
+            }
+            return dtoItemQuantityMappingList;
+        }
+
+
 
         public static Contracts.ShelfResponse ToDataContractsObject(Entities.ShelfResponse entityShelfResponse)
         {
@@ -109,8 +158,8 @@ namespace IMS.Core.Translators
             }
             else
             {
-               shelfResponse.Status = Contracts.Status.Failure;
-               shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
+                shelfResponse.Status = Contracts.Status.Failure;
+                shelfResponse.Error = ToDataContractsObject(entityShelfResponse.Error);
             }
             return shelfResponse;
 
@@ -127,10 +176,10 @@ namespace IMS.Core.Translators
 
             };
         }
-        
+
         private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)
         {
-            List<Contracts.Shelf> dtoShelves = new List<Contracts.Shelf>();
+            var dtoShelves = new List<Contracts.Shelf>();
             foreach (var shelf in shelfs)
             {
                 Contracts.Shelf dtoShelf = new Contracts.Shelf();
@@ -146,7 +195,7 @@ namespace IMS.Core.Translators
         }
 
 
-            public static Contracts.Error ToDataContractsObject(Entities.Error error)
+        public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
             return new Contracts.Error()
             {
@@ -173,10 +222,10 @@ namespace IMS.Core.Translators
         public static Contracts.Role ToDataContractsObject(Entities.Role role)
         {
             return new Contracts.Role()
-                       {
-                           Id = role.Id,
-                            Name = role.Name
-                       };
+            {
+                Id = role.Id,
+                Name = role.Name
+            };
         }
         public static Entities.LoginRequest ToEntitiesObject(Contracts.LoginRequest contractsLoginRequest)
         {
@@ -189,5 +238,5 @@ namespace IMS.Core.Translators
         }
 
 
-     }
+    }
 }

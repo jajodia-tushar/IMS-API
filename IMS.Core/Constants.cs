@@ -18,6 +18,7 @@ namespace IMS.Core
 
             public const string InvalidId = "Invalid Employee Id";
 
+            public const string EmptyShelf = "No items are present in the shelf";   
 
             public const string EmptyShelfList = "Shelf List is not Found";
 
@@ -31,8 +32,10 @@ namespace IMS.Core
             public const string UnableToPlaceOrder = "Unable to place order, check entered fields";
             public const string MissingValues = "Missing entries";
             public const string NoVendorsYet = "No Vendors To Display";
+
+            public const string InvalidToken = "Token is invalid";
         }
-       
+
         public static class ErrorCodes
         {
             public const int BadRequest = 400;

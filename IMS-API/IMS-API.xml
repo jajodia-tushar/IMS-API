@@ -12,6 +12,14 @@
             <returns>Details of Employee</returns>
             <response code="200">Returns Employee Details if employee id is valid otherwise it returns null with status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.InventoryController.Get(System.String)">
+            <summary>
+            Retrieve Shelf Items and Shelf Details by Shelf Code
+            </summary>
+            <param name="shelfCode">Unique Code of the shelf</param>
+            <returns>Items present in Particular Shelf</returns>
+            <response code="200">Return Items Present in shelf along with shelf details if shelf code is valid otherwise it returns null with status failure </response>
+        </member>
         <member name="M:IMS_API.Controllers.LoginController.Login(IMS.Contracts.LoginRequest)">
             <summary>
             Validates the user using the login credentials and returns user details and access token
@@ -90,6 +98,21 @@
             <returns>All Shelves List</returns>
             <response code="200">Returns remaining shelves List </response>
             <response code="400">If shelf is Already Deleted or Not Present in Shelf Table </response>
+        </member>
+        <member name="M:IMS_API.Controllers.VendorController.GetVendorById(System.Int32)">
+            <summary>
+            returns vendor object if id is present, otherwise failure
+            </summary>
+            <param name="id">Here vendor id is used to identify the vendor</param>
+            <returns>entire vendor object along with status</returns>
+            <response code="200">Returns VendorOrder object  if Vendor id is valid otherwise it returns null and status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.VendorController.GetAllVendors">
+            <summary>
+            returns all vendors 
+            </summary>
+            <returns>all vendors object along with status</returns>
+            <response code="200">Returns all Vendors object</response>
         </member>
     </members>
 </doc>

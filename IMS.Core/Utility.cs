@@ -42,5 +42,14 @@ namespace IMS.Core
                 return null;
             }
         }
+
+        public static Error ErrorGenerator(int errorCode, string errorMessage)
+        {
+            return new Error()
+            {
+                ErrorCode = errorCode,
+                ErrorMessage = errorMessage
+            };
+        }
     }
 }
