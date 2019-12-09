@@ -12,6 +12,14 @@
             <returns>Details of Employee</returns>
             <response code="200">Returns Employee Details if employee id is valid otherwise it returns null with status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.InventoryController.Get(System.String)">
+            <summary>
+            Retrieve Shelf Items and Shelf Details by Shelf Code
+            </summary>
+            <param name="shelfCode">Unique Code of the shelf</param>
+            <returns>Items present in Particular Shelf</returns>
+            <response code="200">Return Items Present in shelf along with shelf details if shelf code is valid otherwise it returns null with status failure </response>
+        </member>
         <member name="M:IMS_API.Controllers.ItemController.GetAllItems">
             <summary>
             Return All The Items Present In Inventory
@@ -49,14 +57,6 @@
             </summary>
             <param name="id">The ID of that Item</param>
             <response code="200">Returns Item List along with Deactivated Item if that Item is softdeleted successfully otherwise it returns null with status failure</response>
-        </member>
-        <member name="M:IMS_API.Controllers.InventoryController.Get(System.String)">
-            <summary>
-            Retrieve Shelf Items and Shelf Details by Shelf Code
-            </summary>
-            <param name="shelfCode">Unique Code of the shelf</param>
-            <returns>Items present in Particular Shelf</returns>
-            <response code="200">Return Items Present in shelf along with shelf details if shelf code is valid otherwise it returns null with status failure </response>
         </member>
         <member name="M:IMS_API.Controllers.LoginController.Login(IMS.Contracts.LoginRequest)">
             <summary>
