@@ -75,6 +75,8 @@ namespace IMS_API
             //services.AddSingleton<IInventoryService, InventoryService>();
             services.AddTransient<IShelfService, ShelfService>();
             services.AddTransient<IShelfDbContext, ShelfDbContext>();
+            services.AddTransient<IVendorDbContext, VendorDbContext>();
+            services.AddTransient<IVendorService, VendorService>();
 
 
 

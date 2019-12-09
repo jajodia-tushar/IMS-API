@@ -26,6 +26,23 @@ namespace IMS.Core.Translators
             return employeeValidationResponse;
         }
 
+        public static Contracts.GetVendorResponse ToDataContractsObject(Entities.GetVendorResponse getVendorResponseEntity)
+        {
+            Contracts.GetVendorResponse getVendorResponseContract = new Contracts.GetVendorResponse();
+            if (getVendorResponseEntity.Status == Entities.Status.Success)
+            {
+                getVendorResponseContract.Status = Contracts.Status.Success;
+                getVendorResponseContract.Vendor = ToDataContractsObject(getVendorResponseEntity.Vendor);
+            }
+            else
+            {
+                getVendorResponseContract.Status = Contracts.Status.Failure;
+                getVendorResponseContract.Error = ToDataContractsObject(getVendorResponseEntity.Error);
+            }
+            return getVendorResponseContract;
+        }
+
+
         private static Contracts.Employee ToDataContractsObject(Entities.Employee employee)
         {
             return new Contracts.Employee()
@@ -57,6 +74,44 @@ namespace IMS.Core.Translators
             }
             return loginResponse;
 
+        }
+        public static Contracts.GetAllVendorsResponse ToDataContractsObject(Entities.GetAllVendorsResponse entityGetAllVendorsResponse)
+        {
+            Contracts.GetAllVendorsResponse getAllVendorsResponse = new Contracts.GetAllVendorsResponse();
+            if (entityGetAllVendorsResponse.Status == Entities.Status.Success)
+            {
+                getAllVendorsResponse.Status = Contracts.Status.Success;
+                getAllVendorsResponse.Vendors = ToDataContractsObject(entityGetAllVendorsResponse.Vendors);
+            }
+            else
+            {
+                getAllVendorsResponse.Status = Contracts.Status.Failure;
+                getAllVendorsResponse.Error = ToDataContractsObject(entityGetAllVendorsResponse.Error);
+            }
+            return getAllVendorsResponse;
+        }
+
+        private static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> vendors)
+        {
+            List<Contracts.Vendor> vendorsContract = new List<Contracts.Vendor>();
+            foreach (Entities.Vendor vendorInstance in vendors)
+            {
+                vendorsContract.Add(ToDataContractsObject(vendorInstance));
+            }
+            return vendorsContract;
+        }
+        private static Contracts.Vendor ToDataContractsObject(Entities.Vendor vendor)
+        {
+            return new Contracts.Vendor()
+            {
+                Id = vendor.Id,
+                Name = vendor.Name,
+                ContactNumber = vendor.ContactNumber,
+                PAN = vendor.PAN,
+                CompanyIdentificationNumber = vendor.CompanyIdentificationNumber,
+                GST = vendor.GST,
+                Address = vendor.Address
+            };
         }
 
 

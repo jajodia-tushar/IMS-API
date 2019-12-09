@@ -1,0 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace IMS.Entities.Interfaces
+{
+    public interface IVendorService
+    {
+        GetVendorResponse GetVendorById(int vendorId);
+        GetAllVendorsResponse GetAllVendors();
+    }
+}
