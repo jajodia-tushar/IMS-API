@@ -26,13 +26,13 @@ namespace IMS.Core.Translators
             return employeeValidationResponse;
         }
 
-        public static Contracts.GetVendorResponse ToDataContractsObject(Entities.GetVendorResponse getVendorResponseEntity)
+        public static Contracts.VendorResponse ToDataContractsObject(Entities.VendorResponse getVendorResponseEntity)
         {
-            Contracts.GetVendorResponse getVendorResponseContract = new Contracts.GetVendorResponse();
+            Contracts.VendorResponse getVendorResponseContract = new Contracts.VendorResponse();
             if (getVendorResponseEntity.Status == Entities.Status.Success)
             {
                 getVendorResponseContract.Status = Contracts.Status.Success;
-                getVendorResponseContract.Vendor = ToDataContractsObject(getVendorResponseEntity.Vendor);
+                getVendorResponseContract.Vendors = ToDataContractsObject(getVendorResponseEntity.Vendors);
             }
             else
             {
@@ -75,22 +75,6 @@ namespace IMS.Core.Translators
             return loginResponse;
 
         }
-        public static Contracts.GetAllVendorsResponse ToDataContractsObject(Entities.GetAllVendorsResponse entityGetAllVendorsResponse)
-        {
-            Contracts.GetAllVendorsResponse getAllVendorsResponse = new Contracts.GetAllVendorsResponse();
-            if (entityGetAllVendorsResponse.Status == Entities.Status.Success)
-            {
-                getAllVendorsResponse.Status = Contracts.Status.Success;
-                getAllVendorsResponse.Vendors = ToDataContractsObject(entityGetAllVendorsResponse.Vendors);
-            }
-            else
-            {
-                getAllVendorsResponse.Status = Contracts.Status.Failure;
-                getAllVendorsResponse.Error = ToDataContractsObject(entityGetAllVendorsResponse.Error);
-            }
-            return getAllVendorsResponse;
-        }
-
         private static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> vendors)
         {
             List<Contracts.Vendor> vendorsContract = new List<Contracts.Vendor>();

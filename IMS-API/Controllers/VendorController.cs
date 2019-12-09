@@ -23,17 +23,17 @@ namespace IMS_API.Controllers
 
         // GET: api/Default/5
         [HttpGet("{id}", Name = "Get(int id)")]
-        public GetVendorResponse GetVendorById(int id)
+        public VendorResponse GetVendorById(int id)
         {
-            GetVendorResponse contractsVendorValidationResponse = null;
+            VendorResponse contractsVendorValidationResponse = null;
             try
             {
-                IMS.Entities.GetVendorResponse entityVendorValidationResponse = _vendorService.GetVendorById(id);
+                IMS.Entities.VendorResponse entityVendorValidationResponse = _vendorService.GetVendorById(id);
                 contractsVendorValidationResponse = Translator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch
             {
-                contractsVendorValidationResponse = new IMS.Contracts.GetVendorResponse()
+                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -46,17 +46,17 @@ namespace IMS_API.Controllers
             return contractsVendorValidationResponse;
         }
         [HttpGet(Name = "Get()")]
-        public GetAllVendorsResponse GetAllVendors()
+        public VendorResponse GetAllVendors()
         {
-            GetAllVendorsResponse contractsVendorValidationResponse = null;
+            VendorResponse contractsVendorValidationResponse = null;
             try
             {
-                IMS.Entities.GetAllVendorsResponse entityVendorValidationResponse = _vendorService.GetAllVendors();
+                IMS.Entities.VendorResponse entityVendorValidationResponse = _vendorService.GetAllVendors();
                 contractsVendorValidationResponse = Translator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch
             {
-                contractsVendorValidationResponse = new IMS.Contracts.GetAllVendorsResponse()
+                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()

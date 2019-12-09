@@ -21,9 +21,9 @@ namespace IMS.Core.services
 
         }
 
-        public GetAllVendorsResponse GetAllVendors()
+        public VendorResponse GetAllVendors()
         {
-            GetAllVendorsResponse getAllVendorsResponse = new GetAllVendorsResponse();
+            VendorResponse getAllVendorsResponse = new VendorResponse();
             getAllVendorsResponse.Status = Status.Failure;
             getAllVendorsResponse.Error = new Error()
             {
@@ -54,10 +54,11 @@ namespace IMS.Core.services
             return getAllVendorsResponse;
         }
 
-        public GetVendorResponse GetVendorById(int vendorId)
+        public VendorResponse GetVendorById(int vendorId)
         {
-            GetVendorResponse getVendorResponse = new GetVendorResponse();
+            VendorResponse getVendorResponse = new VendorResponse();
             getVendorResponse.Status = Status.Failure;
+            getVendorResponse.Vendors = new List<Vendor>();
             getVendorResponse.Error = new Error()
             {
                 ErrorCode = Constants.ErrorCodes.NotFound,
@@ -71,7 +72,7 @@ namespace IMS.Core.services
                     if (vendor != null)
                     {
                         getVendorResponse.Status = Status.Success;
-                        getVendorResponse.Vendor = vendor;
+                        getVendorResponse.Vendors.Add(vendor);
 
                     }
                     return getVendorResponse;

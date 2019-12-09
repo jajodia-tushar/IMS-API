@@ -6,7 +6,7 @@ namespace IMS.Entities.Interfaces
 {
     public interface IVendorService
     {
-        GetVendorResponse GetVendorById(int vendorId);
-        GetAllVendorsResponse GetAllVendors();
+        VendorResponse GetVendorById(int vendorId);
+        VendorResponse GetAllVendors();
     }
 }

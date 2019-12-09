@@ -4,8 +4,8 @@ using System.Text;
 
 namespace IMS.Entities
 {
-    public class GetVendorResponse : Response
+    public class VendorResponse : Response
     {
-       public Vendor Vendor { get; set; }
+        public List<Vendor> Vendors { get; set; }
     }
 }
