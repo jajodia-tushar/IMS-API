@@ -22,7 +22,7 @@ namespace IMS_API.Controllers
         }
 
         // GET: api/Default/5
-        [HttpGet("{id}", Name = "GetVendorById")]
+        [HttpGet("{id}", Name = "Get(int id)")]
         public GetVendorResponse GetVendorById(int id)
         {
             GetVendorResponse contractsVendorValidationResponse = null;
@@ -45,7 +45,7 @@ namespace IMS_API.Controllers
             }
             return contractsVendorValidationResponse;
         }
-        [HttpGet(Name = "GetAllVendors")]
+        [HttpGet(Name = "Get()")]
         public GetAllVendorsResponse GetAllVendors()
         {
             GetAllVendorsResponse contractsVendorValidationResponse = null;
