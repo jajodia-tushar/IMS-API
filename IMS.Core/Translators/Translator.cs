@@ -127,8 +127,8 @@ namespace IMS.Core.Translators
 
         private static List<Contracts.ItemQuantityMapping> ToDataContractObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)
         {
-            List<Contracts.ItemQuantityMapping> dtoItemQuantityMappingList = new List<Contracts.ItemQuantityMapping>();
-            foreach (Entities.ItemQuantityMapping itemQuantityMapping in doItemQuantityMappings)
+            var dtoItemQuantityMappingList = new List<Contracts.ItemQuantityMapping>();
+            foreach (var itemQuantityMapping in doItemQuantityMappings)
             {
                 IMS.Contracts.ItemQuantityMapping dtoitemQuantityMapping = new IMS.Contracts.ItemQuantityMapping()
                 {
@@ -179,7 +179,7 @@ namespace IMS.Core.Translators
 
         private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)
         {
-            List<Contracts.Shelf> dtoShelves = new List<Contracts.Shelf>();
+            var dtoShelves = new List<Contracts.Shelf>();
             foreach (var shelf in shelfs)
             {
                 Contracts.Shelf dtoShelf = new Contracts.Shelf();
