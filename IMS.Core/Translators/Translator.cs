@@ -100,7 +100,7 @@ namespace IMS.Core.Translators
 
         public static Contracts.ShelfItemsResponse ToDataContractsObject(Entities.ShelfItemsResponse doShelfItemsResponse)
         {
-            Contracts.ShelfItemsResponse dtoShelfItemsResponse = new Contracts.ShelfItemsResponse();
+            var dtoShelfItemsResponse = new Contracts.ShelfItemsResponse();
             dtoShelfItemsResponse.Status = Contracts.Status.Failure;
             if (doShelfItemsResponse.Error != null)
                 dtoShelfItemsResponse.Error = ToDataContractsObject(doShelfItemsResponse.Error);
@@ -117,7 +117,7 @@ namespace IMS.Core.Translators
 
         private static Contracts.Shelf ToDataContractsObject(Entities.Shelf doShelf)
         {
-            IMS.Contracts.Shelf dtoShelf = new Contracts.Shelf();
+            var dtoShelf = new Contracts.Shelf();
             dtoShelf.Id = doShelf.Id;
             dtoShelf.Name = doShelf.Name;
             dtoShelf.IsActive = doShelf.IsActive;
