@@ -99,5 +99,20 @@
             <response code="200">Returns remaining shelves List </response>
             <response code="400">If shelf is Already Deleted or Not Present in Shelf Table </response>
         </member>
+        <member name="M:IMS_API.Controllers.VendorController.GetVendorById(System.Int32)">
+            <summary>
+            returns vendor object if id is present, otherwise failure
+            </summary>
+            <param name="id">Here vendor id is used to identify the vendor</param>
+            <returns>entire vendor object along with status</returns>
+            <response code="200">Returns VendorOrder object  if Vendor id is valid otherwise it returns null and status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.VendorController.GetAllVendors">
+            <summary>
+            returns all vendors 
+            </summary>
+            <returns>all vendors object along with status</returns>
+            <response code="200">Returns all Vendors object</response>
+        </member>
     </members>
 </doc>
