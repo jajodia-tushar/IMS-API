@@ -22,6 +22,12 @@ namespace IMS_API.Controllers
         }
 
         // GET: api/Default/5
+        /// <summary>
+        /// returns vendor object if id is present, otherwise failure
+        /// </summary>
+        /// <param name="id">Here vendor id is used to identify the vendor</param>
+        /// <returns>entire vendor object along with status</returns>
+        /// <response code="200">Returns VendorOrder object  if Vendor id is valid otherwise it returns null and status failure</response>
         [HttpGet("{id}", Name = "Get(int id)")]
         public async Task<VendorResponse> GetVendorById(int id)
         {
@@ -45,6 +51,12 @@ namespace IMS_API.Controllers
             }
             return contractsVendorValidationResponse;
         }
+        // GET: api/
+        /// <summary>
+        /// returns all vendors 
+        /// </summary>
+        /// <returns>all vendors object along with status</returns>
+        /// <response code="200">Returns all Vendors object</response>
         [HttpGet(Name = "Get()")]
         public async Task<VendorResponse> GetAllVendors()
         {
