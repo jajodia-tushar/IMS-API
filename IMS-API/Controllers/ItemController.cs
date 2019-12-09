@@ -61,8 +61,8 @@ namespace IMS_API.Controllers
         /// <returns>Details of Item</returns>
         /// <response code="200">Returns Item Details if Item Id is valid otherwise it returns null with status failure</response>
         // GET: api/Item/5
-        [HttpGet("{id}", Name = "GetItemById")]
-        public async Task<ItemResponse> GetItemById(int id)
+        [HttpGet("{id}", Name = "GetItem")]
+        public async Task<ItemResponse> Get(int id)
         {
             ItemResponse contractItemsResponse = null;
             try
@@ -94,12 +94,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Items List along with newly created Item if Item is added successfully otherwise it returns null with status failure</response>
         // POST: api/Item
         [HttpPost]
-        public async Task<ItemResponse> AddItem([FromBody] ItemRequest item)
+        public async Task<ItemResponse> AddItem([FromBody]  Item item)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemRequest entityItemRequest = Translator.ToEntitiesObject(item);
+                IMS.Entities.Item entityItemRequest = Translator.ToEntitiesObject(item);
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.AddItem(entityItemRequest);
                 contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
             }
@@ -127,12 +127,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         // PATCH: api/Item
         [HttpPatch]
-        public async Task<ItemResponse> UpdateItem([FromBody] ItemRequest updatedItem)
+        public async Task<ItemResponse> UpdateItem([FromBody] Item updatedItem)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemRequest entityItemRequest = Translator.ToEntitiesObject(updatedItem);
+                IMS.Entities.Item entityItemRequest = Translator.ToEntitiesObject(updatedItem);
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.UpdateItem(entityItemRequest);
                 contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
             }

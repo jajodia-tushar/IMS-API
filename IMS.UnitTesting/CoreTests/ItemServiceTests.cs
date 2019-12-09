@@ -77,7 +77,7 @@ namespace IMS.UnitTesting.CoreTests
         public async void AddItem_Should_Return_Error_And_Status_Failure_When_Item_Name_Is_Null()
         {
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
-            var resultant = await itemServiceObject.AddItem(new ItemRequest() { Name = "", MaxLimit = 4 });
+            var resultant = await itemServiceObject.AddItem(new Item() { Name = "", MaxLimit = 4 });
             Assert.Equal(Status.Failure, resultant.Status);
             Assert.Equal(Constants.ErrorCodes.BadRequest, resultant.Error.ErrorCode);
             Assert.Equal(Constants.ErrorMessages.InvalidItemsDetails, resultant.Error.ErrorMessage);
@@ -86,11 +86,11 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void AddItem_Should_Return_Success_When_Item_Details_Is_Valid()
         {
-            _moqItemDbContext.Setup(m => m.AddItem(It.Is<ItemRequest>(r => r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(3));
+            _moqItemDbContext.Setup(m => m.AddItem(It.Is<Item>(r => r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(3));
             _moqItemDbContext.Setup(m => m.GetItemById(3)).Returns(Task.FromResult(GetOneItem()));
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
-            var resultant = await itemServiceObject.AddItem(new ItemRequest() { Name = "Bag1", MaxLimit = 5 });
+            var resultant = await itemServiceObject.AddItem(new Item() { Name = "Bag1", MaxLimit = 5 });
             Assert.Equal(Status.Success, resultant.Status);
             Assert.NotNull(resultant.Items);
         }
@@ -120,10 +120,10 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void Update_Item_Should_Return_Success_After_Updating_Valid_Details()
         {
-            _moqItemDbContext.Setup(m => m.UpdateItem(It.Is<ItemRequest>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(GetOneItem()));
+            _moqItemDbContext.Setup(m => m.UpdateItem(It.Is<Item>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(GetOneItem()));
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetAllItemsList());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
-            var resultant = await itemServiceObject.UpdateItem(new ItemRequest() { Id = 3, Name = "Bag1", MaxLimit = 5 });
+            var resultant = await itemServiceObject.UpdateItem(new Item() { Id = 3, Name = "Bag1", MaxLimit = 5 });
             Assert.Equal(Status.Success, resultant.Status);
             Assert.NotNull(resultant.Items);
         }
@@ -132,7 +132,7 @@ namespace IMS.UnitTesting.CoreTests
         public async void Update_Item_Should_Return_Status_Failure_When_Updating_Item_Details_Is_Not_Valid()
         {
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
-            var resultant = await itemServiceObject.UpdateItem(new ItemRequest() { Id = 3, Name = "", MaxLimit = 5 });
+            var resultant = await itemServiceObject.UpdateItem(new Item() { Id = 3, Name = "", MaxLimit = 5 });
             Assert.Equal(Status.Failure, resultant.Status);
         }
 

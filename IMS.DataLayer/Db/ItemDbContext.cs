@@ -40,7 +40,8 @@ namespace IMS.DataLayer.Db
                             Id = (int)reader["Id"],
                             Name = (string)reader["Name"],
                             MaxLimit = (int)reader["MaximumLimit"],
-                            IsActive = (bool)reader["IsActive"]
+                            IsActive = (bool)reader["IsActive"],
+                            ImageUrl = (string)reader["ImageUrl"]
                         });
                     }
                 }
@@ -76,7 +77,7 @@ namespace IMS.DataLayer.Db
             return item;
         }
 
-        public async Task<int> AddItem(ItemRequest itemRequest)
+        public async Task<int> AddItem(Item itemRequest)
         {
             int latestAddedItemId = 0;
             DbDataReader reader = null;
@@ -92,6 +93,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@Name", itemRequest.Name);
                     command.Parameters.AddWithValue("@MaxLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", 1);
+                    command.Parameters.AddWithValue("@ImageUrl", itemRequest.ImageUrl);
                     reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                         latestAddedItemId = (int)reader["Id"];
@@ -133,7 +135,7 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<Item> UpdateItem(ItemRequest itemRequest)
+        public async Task<Item> UpdateItem(Item itemRequest)
         {
             DbDataReader reader = null;
             Item item = new Item();
@@ -149,6 +151,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@Name", itemRequest.Name);
                     command.Parameters.AddWithValue("@MaximumLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", itemRequest.IsActive);
+                    command.Parameters.AddWithValue("@ImageUrl", itemRequest.ImageUrl);
                     reader = await command.ExecuteReaderAsync();
                     item = ReadValuesFromDatabase(reader);
                 }
@@ -168,6 +171,7 @@ namespace IMS.DataLayer.Db
                 item.Name = (string)reader["Name"];
                 item.MaxLimit = (int)reader["MaximumLimit"];
                 item.IsActive = (bool)reader["IsActive"];
+                item.ImageUrl = (string)reader["ImageUrl"];
             }
             return item;
         }

@@ -52,7 +52,7 @@ namespace IMS.UnitTesting.ControllerTests
             };
             _moqItemService.Setup(m => m.GetItemById(1)).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.GetItemById(1);
+            IMS.Contracts.ItemResponse actualResult = await itemController.Get(1);
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
@@ -70,9 +70,9 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeItemsList()
             };
-            _moqItemService.Setup(m => m.AddItem(It.Is<Entities.ItemRequest>(r => r.Name.Equals("Bottle") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
+            _moqItemService.Setup(m => m.AddItem(It.Is<Entities.Item>(r => r.Name.Equals("Bottle") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.AddItem(new ItemRequest { Name = "Bottle", MaxLimit = 5 });
+            IMS.Contracts.ItemResponse actualResult = await itemController.AddItem(new Item { Name = "Bottle", MaxLimit = 5 });
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
@@ -90,9 +90,9 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeItemsList()
             };
-            _moqItemService.Setup(m => m.UpdateItem(It.Is<Entities.ItemRequest>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
+            _moqItemService.Setup(m => m.UpdateItem(It.Is<Entities.Item>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.UpdateItem(new ItemRequest { Id = 3, Name = "Bag1", MaxLimit = 5 });
+            IMS.Contracts.ItemResponse actualResult = await itemController.UpdateItem(new Item { Id = 3, Name = "Bag1", MaxLimit = 5 });
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }

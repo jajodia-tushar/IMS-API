@@ -92,7 +92,7 @@ namespace IMS.Core.services
                     try
                     {
                         Item item = await _itemDbContext.GetItemById(id);
-                        if (item.Id == id)
+                        if (item.Id.Equals(id))
                         {
                             itemResponse.Status = Status.Success;
                             itemList.Add(item);
@@ -131,7 +131,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public async Task<ItemResponse> AddItem(ItemRequest itemRequest)
+        public async Task<ItemResponse> AddItem(Item item)
         {
             ItemResponse itemResponse = new ItemResponse();
             int userId = -1;
@@ -144,21 +144,21 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if (itemRequest.Name == "" || itemRequest.Name.Equals(null))
+                        if (string.IsNullOrEmpty(item.Name))
                         {
                             itemResponse.Status = Status.Failure;
                             itemResponse.Error = GetErrorCodeAndErrorMessage(400, "Invalid Item Details");
                             return itemResponse;
                         }
-                        if (await IsItemAlreadyExists(itemRequest.Name))
+                        if (await IsItemAlreadyExists(item.Name))
                         {
                             itemResponse.Status = Status.Failure;
-                            itemResponse.Error = GetErrorCodeAndErrorMessage(409, "IItem Already Added");
+                            itemResponse.Error = GetErrorCodeAndErrorMessage(409, "Item Already Added");
                             return itemResponse;
                         }
-                        int latestAddedItemId = await _itemDbContext.AddItem(itemRequest);
-                        Item item = await _itemDbContext.GetItemById(latestAddedItemId);
-                        if (item.Name == itemRequest.Name)
+                        int latestAddedItemId = await _itemDbContext.AddItem(item);
+                        Item createdItem = await _itemDbContext.GetItemById(latestAddedItemId);
+                        if (createdItem.Name.Equals(item.Name))
                         {
                             itemResponse.Status = Status.Success;
                             itemResponse.Items = await _itemDbContext.GetAllItems();
@@ -192,7 +192,7 @@ namespace IMS.Core.services
                 if (itemResponse.Status == Status.Failure)
                     severity = Severity.High;
 
-                new Task(() => { _logger.Log(itemRequest, itemResponse, "AddItem", itemResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(item, itemResponse, "AddItem", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
@@ -256,12 +256,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-                new Task(() => { _logger.Log(id, itemResponse, "Delete", itemResponse.Status, severity, userId); }).Start();
-            }
-            return itemResponse;
-        }
-
-        public async Task<ItemResponse> UpdateItem(ItemRequest itemRequest)
+        public async Task<ItemResponse> UpdateItem(Item item)
         {
             ItemResponse itemResponse = new ItemResponse();
             int userId = -1;
@@ -274,14 +269,14 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if (itemRequest.Name == "")
+                        if (string.IsNullOrEmpty(item.Name))
                         {
                             itemResponse.Status = Status.Failure;
                             itemResponse.Error = GetErrorCodeAndErrorMessage(400, "Invalid Items Details");
                             return itemResponse;
                         }
-                        Item item = await _itemDbContext.UpdateItem(itemRequest);
-                        if (item.Id == itemRequest.Id && item.Name == itemRequest.Name && item.MaxLimit == itemRequest.MaxLimit)
+                        Item updatedItem = await _itemDbContext.UpdateItem(item);
+                        if (updatedItem.Id.Equals(item.Id) && updatedItem.Name.Equals(item.Name) && updatedItem.MaxLimit.Equals(item.MaxLimit))
                         {
                             itemResponse.Status = Status.Success;
                             itemResponse.Items = await _itemDbContext.GetAllItems();
@@ -315,15 +310,15 @@ namespace IMS.Core.services
                 if (itemResponse.Status == Status.Failure)
                     severity = Severity.High;
 
-                new Task(() => { _logger.Log(itemRequest, itemResponse, "UpdateItem", itemResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(item, itemResponse, "UpdateItem", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
 
-        public async Task<bool> IsItemAlreadyExists(string name)
+        private async Task<bool> IsItemAlreadyExists(string name)
         {
-            List<Item> _items = await _itemDbContext.GetAllItems();
-            foreach (var item in _items)
+            List<Item> items = await _itemDbContext.GetAllItems();
+            foreach (var item in items)
             {
                 if (item.Name.Equals(name))
                     return true;
@@ -331,10 +326,10 @@ namespace IMS.Core.services
             return false;
         }
 
-        public async Task<bool> IsItemAlreadyDeleted(int id)
+        private async Task<bool> IsItemAlreadyDeleted(int id)
         {
-            List<Item> _items = await _itemDbContext.GetAllItems();
-            foreach (var item in _items)
+            List<Item> items = await _itemDbContext.GetAllItems();
+            foreach (var item in items)
             {
                 if (item.Id.Equals(id))
                 {

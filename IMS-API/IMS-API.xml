@@ -19,7 +19,7 @@
             <returns>Details of All Items</returns>
             <response code="200">Returns All The Items From Inventory</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.GetItemById(System.Int32)">
+        <member name="M:IMS_API.Controllers.ItemController.Get(System.Int32)">
             <summary>
             Retrieve The Item By Their ID
             </summary>
@@ -27,7 +27,7 @@
             <returns>Details of Item</returns>
             <response code="200">Returns Item Details if Item Id is valid otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.AddItem(IMS.Contracts.ItemRequest)">
+        <member name="M:IMS_API.Controllers.ItemController.AddItem(IMS.Contracts.Item)">
             <summary>
             Creates A New Item
             </summary>
@@ -35,7 +35,7 @@
             <returns>Return All Items Along With Newly Created Item </returns>
             <response code="200">Returns Items List along with newly created Item if Item is added successfully otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.UpdateItem(IMS.Contracts.ItemRequest)">
+        <member name="M:IMS_API.Controllers.ItemController.UpdateItem(IMS.Contracts.Item)">
             <summary>
             Update the Specific Item
             </summary>

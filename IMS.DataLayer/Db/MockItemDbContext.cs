@@ -45,7 +45,7 @@ namespace IMS.DataLayer.Db
             return null;
         }
 
-        public async Task<int> AddItem(ItemRequest itemRequest)
+        public async Task<int> AddItem(Item itemRequest)
         {
             Item item = new Item();
             var latestAddedItemId = _items.Count + 1;
@@ -70,7 +70,7 @@ namespace IMS.DataLayer.Db
             return false;
         }
 
-        public async Task<Item> UpdateItem(ItemRequest itemRequest)
+        public async Task<Item> UpdateItem(Item itemRequest)
         {
             foreach (var item in _items)
             {
