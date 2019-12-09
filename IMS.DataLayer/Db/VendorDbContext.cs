@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
+
 {
     public class VendorDbContext : IVendorDbContext
     {
@@ -17,7 +19,7 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public Vendor GetVendorById(int vendorId)
+        public async Task<Vendor> GetVendorById(int vendorId)
         {
             Vendor vendor= null;
             MySqlDataReader reader = null;
@@ -72,7 +74,7 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public List<Vendor> GetAllVendors()
+        public async Task<List<Vendor>> GetAllVendors()
         {
             List<Vendor> vendors = new List<Vendor>();
             MySqlDataReader reader = null;

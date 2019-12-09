@@ -21,7 +21,7 @@ namespace IMS.Core.services
 
         }
 
-        public VendorResponse GetAllVendors()
+        public async Task<VendorResponse> GetAllVendors()
         {
             VendorResponse getAllVendorsResponse = new VendorResponse();
             getAllVendorsResponse.Status = Status.Failure;
@@ -32,7 +32,7 @@ namespace IMS.Core.services
             };
             try
             {
-                List<Vendor> vendors = _vendorDbContext.GetAllVendors();
+                List<Vendor> vendors = await _vendorDbContext.GetAllVendors();
                 if (vendors != null)
                 {
                     getAllVendorsResponse.Status = Status.Success;
@@ -54,7 +54,7 @@ namespace IMS.Core.services
             return getAllVendorsResponse;
         }
 
-        public VendorResponse GetVendorById(int vendorId)
+        public async Task<VendorResponse> GetVendorById(int vendorId)
         {
             VendorResponse getVendorResponse = new VendorResponse();
             getVendorResponse.Status = Status.Failure;
@@ -68,7 +68,7 @@ namespace IMS.Core.services
             {
                 if (vendorId > 0)
                 {
-                    Vendor vendor = _vendorDbContext.GetVendorById(vendorId);
+                    Vendor vendor = await _vendorDbContext.GetVendorById(vendorId);
                     if (vendor != null)
                     {
                         getVendorResponse.Status = Status.Success;

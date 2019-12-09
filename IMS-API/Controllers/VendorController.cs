@@ -23,12 +23,12 @@ namespace IMS_API.Controllers
 
         // GET: api/Default/5
         [HttpGet("{id}", Name = "Get(int id)")]
-        public VendorResponse GetVendorById(int id)
+        public async Task<VendorResponse> GetVendorById(int id)
         {
             VendorResponse contractsVendorValidationResponse = null;
             try
             {
-                IMS.Entities.VendorResponse entityVendorValidationResponse = _vendorService.GetVendorById(id);
+                IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetVendorById(id);
                 contractsVendorValidationResponse = Translator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch
@@ -46,12 +46,12 @@ namespace IMS_API.Controllers
             return contractsVendorValidationResponse;
         }
         [HttpGet(Name = "Get()")]
-        public VendorResponse GetAllVendors()
+        public async Task<VendorResponse> GetAllVendors()
         {
             VendorResponse contractsVendorValidationResponse = null;
             try
             {
-                IMS.Entities.VendorResponse entityVendorValidationResponse = _vendorService.GetAllVendors();
+                IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetAllVendors();
                 contractsVendorValidationResponse = Translator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch

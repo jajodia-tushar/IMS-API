@@ -3,6 +3,7 @@ using IMS.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -42,12 +43,12 @@ namespace IMS.DataLayer.Db
                },
             };
 
-        public List<Vendor> GetAllVendors()
+        public async Task<List<Vendor>> GetAllVendors()
         {
             return vendors;
         }
 
-        public Vendor GetVendorById(int vendorId)
+        public async Task<Vendor> GetVendorById(int vendorId)
         {
             return vendors.Find
                    (

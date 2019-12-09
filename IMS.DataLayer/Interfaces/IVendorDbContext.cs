@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Interfaces
 {
     public interface IVendorDbContext
     {
-        Vendor GetVendorById(int vendorId);
-        List<Vendor> GetAllVendors();
+        Task<Vendor> GetVendorById(int vendorId);
+        Task<List<Vendor>> GetAllVendors();
     }
 }
