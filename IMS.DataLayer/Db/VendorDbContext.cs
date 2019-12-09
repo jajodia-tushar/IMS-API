@@ -74,7 +74,7 @@ namespace IMS.DataLayer.Db
 
         public List<Vendor> GetAllVendors()
         {
-            List<Vendor> Vendors = new List<Vendor>();
+            List<Vendor> vendors = new List<Vendor>();
             MySqlDataReader reader = null;
 
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
@@ -102,7 +102,7 @@ namespace IMS.DataLayer.Db
                             GST = ReturnNullOrValueAccordingly(reader["Gst"]),
                             CompanyIdentificationNumber = ReturnNullOrValueAccordingly(reader["Cin"])
                         };
-                        Vendors.Add(vendor);
+                        vendors.Add(vendor);
                     }
                 }
                 catch (Exception ex)
@@ -111,7 +111,7 @@ namespace IMS.DataLayer.Db
                 }
 
             }
-            return Vendors;
+            return vendors;
         }
     }
 }

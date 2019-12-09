@@ -83,6 +83,13 @@ namespace IMS.Core.services
             {
                 throw ex;
             }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (getAllVendorsResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log(vendorId, getAllVendorsResponse, "Getting Vendor", getAllVendorsResponse.Status, severity, -1); }).Start();
+            }
             return getVendorResponse;
         }
     }
