@@ -24,8 +24,13 @@ namespace IMS.Core
             public const string InvalidShelfCode = "Invalid Shelf Code";
             public const string ShelfIsAlreadyPresent = "Shelf Is Already Present";
 
-           
+
             public const string ShelfNotPresent = "Shelf is not Present";
+            public const string InValidId = "Invalid Id";
+            public const string NoOrdersYet = "No orders to display";
+            public const string UnableToPlaceOrder = "Unable to place order, check entered fields";
+            public const string MissingValues = "Missing entries";
+            public const string NoVendorsYet = "No Vendors To Display";
         }
        
         public static class ErrorCodes

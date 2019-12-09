@@ -26,6 +26,23 @@ namespace IMS.Core.Translators
             return employeeValidationResponse;
         }
 
+        public static Contracts.VendorResponse ToDataContractsObject(Entities.VendorResponse entityVendorResponse)
+        {
+            Contracts.VendorResponse contractVendorResponse = new Contracts.VendorResponse();
+            if (entityVendorResponse.Status == Entities.Status.Success)
+            {
+                contractVendorResponse.Status = Contracts.Status.Success;
+                contractVendorResponse.Vendors = ToDataContractsObject(entityVendorResponse.Vendors);
+            }
+            else
+            {
+                contractVendorResponse.Status = Contracts.Status.Failure;
+                contractVendorResponse.Error = ToDataContractsObject(entityVendorResponse.Error);
+            }
+            return contractVendorResponse;
+        }
+
+
         private static Contracts.Employee ToDataContractsObject(Entities.Employee employee)
         {
             return new Contracts.Employee()
@@ -57,6 +74,28 @@ namespace IMS.Core.Translators
             }
             return loginResponse;
 
+        }
+        private static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> entityVendors)
+        {
+            List<Contracts.Vendor> contractVendors = new List<Contracts.Vendor>();
+            foreach (Entities.Vendor vendor in entityVendors)
+            {
+                contractVendors.Add(ToDataContractsObject(vendor));
+            }
+            return contractVendors;
+        }
+        private static Contracts.Vendor ToDataContractsObject(Entities.Vendor entityVendor)
+        {
+            return new Contracts.Vendor()
+            {
+                Id = entityVendor.Id,
+                Name = entityVendor.Name,
+                ContactNumber = entityVendor.ContactNumber,
+                PAN = entityVendor.PAN,
+                CompanyIdentificationNumber = entityVendor.CompanyIdentificationNumber,
+                GST = entityVendor.GST,
+                Address = entityVendor.Address
+            };
         }
 
 
