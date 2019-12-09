@@ -19,11 +19,11 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public async Task<List<Entities.ItemQuantityMapping>> GetShelfItemsByShelfCode(int shelfId)
+        public async Task<List<Entities.ItemQuantityMapping>> GetShelfItemsByShelfId(int shelfId)
         {
             DbDataReader reader = null;
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
-            List<ItemQuantityMapping> itemQuantityMappingList = new List<ItemQuantityMapping>();
+            List<ItemQuantityMapping> itemQuantityMappings = new List<ItemQuantityMapping>();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -36,7 +36,7 @@ namespace IMS.DataLayer.Db
                     reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        itemQuantityMappingList.Add(new ItemQuantityMapping()
+                        itemQuantityMappings.Add(new ItemQuantityMapping()
                         {
                             Item = new Item()
                             {
@@ -48,7 +48,7 @@ namespace IMS.DataLayer.Db
                             Quantity = Convert.ToInt32(reader["ItemQuantityAtShelf"])
                         });
                     }
-                    shelfItemsResponse.ItemQuantityMappings = itemQuantityMappingList;
+                    shelfItemsResponse.ItemQuantityMappings = itemQuantityMappings;
                 }
                 catch (Exception ex)
                 {

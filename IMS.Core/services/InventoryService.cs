@@ -44,7 +44,7 @@ namespace IMS.Core.services
                         if (shelfResponse.Shelves != null)
                         {
                             shelfItemsResponse.Shelf = shelfResponse.Shelves[0];
-                            shelfItemsResponse.ItemQuantityMappings = await _inventoryDbContext.GetShelfItemsByShelfCode(shelfResponse.Shelves[0].Id);
+                            shelfItemsResponse.ItemQuantityMappings = await _inventoryDbContext.GetShelfItemsByShelfId(shelfResponse.Shelves[0].Id);
                             if (shelfItemsResponse.ItemQuantityMappings.Count > 0)
                             {
                                 shelfItemsResponse.Status = Status.Success;
