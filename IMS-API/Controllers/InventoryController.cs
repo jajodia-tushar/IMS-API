@@ -28,8 +28,8 @@ namespace IMS_API.Controllers
         /// <returns>Items present in Particular Shelf</returns>
         /// <response code="200">Return Items Present in shelf along with shelf details if shelf code is valid otherwise it returns null with status failure </response>
         // GET: api/Inventory/5
-        [HttpGet("{shelfCode}", Name = "GetShelfItemsByShelfCode")]
-        public async Task<ShelfItemsResponse> GetShelfItemsByShelfCode(string shelfCode)
+        [HttpGet("{shelfCode}", Name = "Get")]
+        public async Task<ShelfItemsResponse> Get(string shelfCode)
         {
             ShelfItemsResponse shelfItemsResponse = new IMS.Contracts.ShelfItemsResponse()
             {

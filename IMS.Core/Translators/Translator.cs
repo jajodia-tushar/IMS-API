@@ -98,39 +98,39 @@ namespace IMS.Core.Translators
             };
         }
 
-        public static Contracts.ShelfItemsResponse ToDataContractsObject(Entities.ShelfItemsResponse shelfItemsResponseEntity)
+        public static Contracts.ShelfItemsResponse ToDataContractsObject(Entities.ShelfItemsResponse doShelfItemsResponse)
         {
-            Contracts.ShelfItemsResponse shelfItemsResponseContract = new Contracts.ShelfItemsResponse();
-            shelfItemsResponseContract.Status = Contracts.Status.Failure;
-            if (shelfItemsResponseEntity.Error != null)
-                shelfItemsResponseContract.Error = ToDataContractsObject(shelfItemsResponseEntity.Error);
-            if (shelfItemsResponseEntity.Status == Entities.Status.Success)
+            Contracts.ShelfItemsResponse dtoShelfItemsResponse = new Contracts.ShelfItemsResponse();
+            dtoShelfItemsResponse.Status = Contracts.Status.Failure;
+            if (doShelfItemsResponse.Error != null)
+                dtoShelfItemsResponse.Error = ToDataContractsObject(doShelfItemsResponse.Error);
+            if (doShelfItemsResponse.Status == Entities.Status.Success)
             {
-                shelfItemsResponseContract.Status = Contracts.Status.Success;
-                shelfItemsResponseContract.Error = null;
-                shelfItemsResponseContract.itemQuantityMappings = ToDataContractObject(shelfItemsResponseEntity.ItemQuantityMappings);
+                dtoShelfItemsResponse.Status = Contracts.Status.Success;
+                dtoShelfItemsResponse.Error = null;
+                dtoShelfItemsResponse.itemQuantityMappings = ToDataContractObject(doShelfItemsResponse.ItemQuantityMappings);
             }
-            if (shelfItemsResponseEntity.Shelf != null)
-                shelfItemsResponseContract.shelf = ToDataContractsObject(shelfItemsResponseEntity.Shelf);
-            return shelfItemsResponseContract;
+            if (doShelfItemsResponse.Shelf != null)
+                dtoShelfItemsResponse.shelf = ToDataContractsObject(doShelfItemsResponse.Shelf);
+            return dtoShelfItemsResponse;
         }
 
-        private static Contracts.Shelf ToDataContractsObject(Entities.Shelf shelfEntity)
+        private static Contracts.Shelf ToDataContractsObject(Entities.Shelf doShelf)
         {
-            IMS.Contracts.Shelf shelfContract = new Contracts.Shelf();
-            shelfContract.Id = shelfEntity.Id;
-            shelfContract.Name = shelfEntity.Name;
-            shelfContract.IsActive = shelfEntity.IsActive;
-            shelfContract.Code = shelfEntity.Code;
-            return shelfContract;
+            IMS.Contracts.Shelf dtoShelf = new Contracts.Shelf();
+            dtoShelf.Id = doShelf.Id;
+            dtoShelf.Name = doShelf.Name;
+            dtoShelf.IsActive = doShelf.IsActive;
+            dtoShelf.Code = doShelf.Code;
+            return dtoShelf;
         }
 
-        private static List<Contracts.ItemQuantityMapping> ToDataContractObject(List<Entities.ItemQuantityMapping> itemQuantityMappingsEntity)
+        private static List<Contracts.ItemQuantityMapping> ToDataContractObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)
         {
-            List<Contracts.ItemQuantityMapping> itemQuantityMappingListContract = new List<Contracts.ItemQuantityMapping>();
-            foreach (Entities.ItemQuantityMapping itemQuantityMapping in itemQuantityMappingsEntity)
+            List<Contracts.ItemQuantityMapping> dtoItemQuantityMappingList = new List<Contracts.ItemQuantityMapping>();
+            foreach (Entities.ItemQuantityMapping itemQuantityMapping in doItemQuantityMappings)
             {
-                IMS.Contracts.ItemQuantityMapping itemQuantityMappingContract = new IMS.Contracts.ItemQuantityMapping()
+                IMS.Contracts.ItemQuantityMapping dtoitemQuantityMapping = new IMS.Contracts.ItemQuantityMapping()
                 {
                     Item = new IMS.Contracts.Item()
                     {
@@ -141,9 +141,9 @@ namespace IMS.Core.Translators
                     },
                     Quantity = itemQuantityMapping.Quantity
                 };
-                itemQuantityMappingListContract.Add(itemQuantityMappingContract);
+                dtoItemQuantityMappingList.Add(dtoitemQuantityMapping);
             }
-            return itemQuantityMappingListContract;
+            return dtoItemQuantityMappingList;
         }
 
 
