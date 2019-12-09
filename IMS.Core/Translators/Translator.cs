@@ -26,20 +26,20 @@ namespace IMS.Core.Translators
             return employeeValidationResponse;
         }
 
-        public static Contracts.VendorResponse ToDataContractsObject(Entities.VendorResponse getVendorResponseEntity)
+        public static Contracts.VendorResponse ToDataContractsObject(Entities.VendorResponse entityVendorResponse)
         {
-            Contracts.VendorResponse getVendorResponseContract = new Contracts.VendorResponse();
-            if (getVendorResponseEntity.Status == Entities.Status.Success)
+            Contracts.VendorResponse contractVendorResponse = new Contracts.VendorResponse();
+            if (entityVendorResponse.Status == Entities.Status.Success)
             {
-                getVendorResponseContract.Status = Contracts.Status.Success;
-                getVendorResponseContract.Vendors = ToDataContractsObject(getVendorResponseEntity.Vendors);
+                contractVendorResponse.Status = Contracts.Status.Success;
+                contractVendorResponse.Vendors = ToDataContractsObject(entityVendorResponse.Vendors);
             }
             else
             {
-                getVendorResponseContract.Status = Contracts.Status.Failure;
-                getVendorResponseContract.Error = ToDataContractsObject(getVendorResponseEntity.Error);
+                contractVendorResponse.Status = Contracts.Status.Failure;
+                contractVendorResponse.Error = ToDataContractsObject(entityVendorResponse.Error);
             }
-            return getVendorResponseContract;
+            return contractVendorResponse;
         }
 
 
@@ -75,26 +75,26 @@ namespace IMS.Core.Translators
             return loginResponse;
 
         }
-        private static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> vendors)
+        private static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> entityVendors)
         {
-            List<Contracts.Vendor> vendorsContract = new List<Contracts.Vendor>();
-            foreach (Entities.Vendor vendorInstance in vendors)
+            List<Contracts.Vendor> contractVendors = new List<Contracts.Vendor>();
+            foreach (Entities.Vendor vendor in entityVendors)
             {
-                vendorsContract.Add(ToDataContractsObject(vendorInstance));
+                contractVendors.Add(ToDataContractsObject(vendor));
             }
-            return vendorsContract;
+            return contractVendors;
         }
-        private static Contracts.Vendor ToDataContractsObject(Entities.Vendor vendor)
+        private static Contracts.Vendor ToDataContractsObject(Entities.Vendor entityVendor)
         {
             return new Contracts.Vendor()
             {
-                Id = vendor.Id,
-                Name = vendor.Name,
-                ContactNumber = vendor.ContactNumber,
-                PAN = vendor.PAN,
-                CompanyIdentificationNumber = vendor.CompanyIdentificationNumber,
-                GST = vendor.GST,
-                Address = vendor.Address
+                Id = entityVendor.Id,
+                Name = entityVendor.Name,
+                ContactNumber = entityVendor.ContactNumber,
+                PAN = entityVendor.PAN,
+                CompanyIdentificationNumber = entityVendor.CompanyIdentificationNumber,
+                GST = entityVendor.GST,
+                Address = entityVendor.Address
             };
         }
 
