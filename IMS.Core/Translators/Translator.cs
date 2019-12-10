@@ -94,6 +94,7 @@ namespace IMS.Core.Translators
                 PAN = entityVendor.PAN,
                 CompanyIdentificationNumber = entityVendor.CompanyIdentificationNumber,
                 GST = entityVendor.GST,
+                Title=entityVendor.Title,
                 Address = entityVendor.Address
             };
         }
