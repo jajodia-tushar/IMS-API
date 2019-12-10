@@ -144,18 +144,7 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if (string.IsNullOrEmpty(item.Name))
-                        {
-                            itemResponse.Status = Status.Failure;
-                            itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidItemsDetails);
-                            return itemResponse;
-                        }
-                        if (await IsItemAlreadyExists(item.Name))
-                        {
-                            itemResponse.Status = Status.Failure;
-                            itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.AlreadyPresent);
-                            return itemResponse;
-                        }
+                        itemResponse = await ValidateItem(item.Name);
                         int latestAddedItemId = await _itemDbContext.AddItem(item);
                         Item createdItem = await _itemDbContext.GetItemById(latestAddedItemId);
                         if (createdItem.Name.Equals(item.Name))
@@ -311,6 +300,22 @@ namespace IMS.Core.services
                     severity = Severity.High;
 
                 new Task(() => { _logger.Log(item, itemResponse, "UpdateItem", itemResponse.Status, severity, userId); }).Start();
+            }
+            return itemResponse;
+        }
+
+        private async Task<ItemResponse> ValidateItem(string itemName)
+        {
+            ItemResponse itemResponse = new ItemResponse();
+            if (string.IsNullOrEmpty(itemName))
+            {
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidItemsDetails);
+            }
+            if (await IsItemAlreadyExists(itemName))
+            {
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.AlreadyPresent);
             }
             return itemResponse;
         }
