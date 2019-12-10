@@ -63,6 +63,12 @@ namespace IMS.Core
             public const string InvalidDate = "Date Is Invalid";
         }
 
+            public const string InvalidToken = "Token is invalid";
+            public const string NotDeleted = "Item Not Deleted";
+
+
+        }
+
         public static class ErrorCodes
         {
             public const int BadRequest = 400;
