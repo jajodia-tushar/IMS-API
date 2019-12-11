@@ -225,6 +225,14 @@
             <returns>Response</returns>
             <response code="200">Returns Success if order is Updated To Warehouse Successfully otherwise returns Status Failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.TransferController.TransferToWarehouse(System.Int32)">
+            <summary>
+            Transfer items to warehouse after Admin approval
+            </summary>
+            <param name="orderId">Here OrderId represents Id of that particular Order</param>
+            <returns>Response</returns>
+            <response code="200">Returns Success if order is Updated To Warehouse Successfully otherwise returns Status Failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.UserController.GetUsersByRoleName(System.String)">
             <summary>
             returns all users based on the role name
