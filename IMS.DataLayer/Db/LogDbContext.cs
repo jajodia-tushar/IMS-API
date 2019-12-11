@@ -50,5 +50,32 @@ namespace IMS.DataLayer.Db
             }
             
         }
+
+        public void LogException(string exceptionMessage, string exceptionType, string exceptionSource, string request, string response)
+        {
+
+            try
+            {
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.LOGGING))
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddExceptionLog";
+                    command.Parameters.AddWithValue("@exceptionMessage",exceptionMessage);
+                    command.Parameters.AddWithValue("@exceptionType",exceptionType);
+                    command.Parameters.AddWithValue("@exceptionSource", exceptionSource);
+                    command.Parameters.AddWithValue("@request", request);
+                    command.Parameters.AddWithValue("@response", response);
+                    command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

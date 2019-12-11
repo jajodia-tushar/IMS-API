@@ -10,6 +10,6 @@ namespace IMS.Logging
     public interface ILogManager
     {
         void Log(Object request, Object response, string callType,Status status,Severity severity,int userId);
-
+        void LogException(Exception exception, object request, object response);
     }
 }

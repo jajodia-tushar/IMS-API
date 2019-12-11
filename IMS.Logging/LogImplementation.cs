@@ -78,6 +78,12 @@ namespace IMS.Logging
             return null;
         }
 
-       
+        public void LogException(Exception exception, object request, object response)
+        {
+            string exceptionMessage = exception.Message.ToString();
+            string exceptionType = exception.GetType().Name.ToString();
+            string exceptionSource = exception.StackTrace.ToString();
+            _logDbContext.LogException(exceptionMessage, exceptionType, exceptionSource,ConvertToString(request), ConvertToString(response));
+        }
     }
 }
