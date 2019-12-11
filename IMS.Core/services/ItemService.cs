@@ -145,18 +145,26 @@ namespace IMS.Core.services
                     try
                     {
                         itemResponse = await ValidateItem(item.Name);
-                        int latestAddedItemId = await _itemDbContext.AddItem(item);
-                        Item createdItem = await _itemDbContext.GetItemById(latestAddedItemId);
-                        if (createdItem.Name.Equals(item.Name))
+                        if (itemResponse.Error == null)
                         {
-                            itemResponse.Status = Status.Success;
-                            itemResponse.Items = await _itemDbContext.GetAllItems();
+                            int latestAddedItemId = await _itemDbContext.AddItem(item);
+                            Item createdItem = await _itemDbContext.GetItemById(latestAddedItemId);
+                            if (createdItem.Name.Equals(item.Name))
+                            {
+                                itemResponse.Status = Status.Success;
+                                itemResponse.Items = await _itemDbContext.GetAllItems();
+                            }
+                            else
+                            {
+                                itemResponse.Status = Status.Failure;
+                                itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.Conflict);
+                            }
                         }
                         else
                         {
-                            itemResponse.Status = Status.Failure;
-                            itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.Conflict);
+                            return itemResponse;
                         }
+                        
                     }
                     catch (Exception ex)
                     {

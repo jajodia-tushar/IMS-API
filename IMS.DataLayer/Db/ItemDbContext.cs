@@ -94,6 +94,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@MaxLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", 1);
                     command.Parameters.AddWithValue("@ImageUrl", itemRequest.ImageUrl);
+                    command.Parameters.AddWithValue("@Ranking", 1);
                     reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                         latestAddedItemId = (int)reader["Id"];
