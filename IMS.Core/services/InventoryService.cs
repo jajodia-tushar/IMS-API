@@ -40,7 +40,6 @@ namespace IMS.Core.services
                 {
                     try
                     {
-                        int x = Convert.ToInt32("Rajat");
                         ShelfResponse shelfResponse = await _shelfService.GetShelfByShelfCode(shelfCode);
                         if (shelfResponse.Shelves != null)
                         {
@@ -66,10 +65,11 @@ namespace IMS.Core.services
                 }
                 return shelfItemsResponse;
             }
-            catch
+            catch(Exception exception)
             {
                 shelfItemsResponse.Status = Status.Failure;
                 shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                _logger.LogException(exception, shelfCode, shelfItemsResponse);
             }
             finally
             {

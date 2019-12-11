@@ -29,8 +29,9 @@ namespace IMS.Logging
                 string responseJson = ConvertToString(response);
                 _logDbContext.Log(userId,status.ToString(), callType, severity.ToString(), requestJson, responseJson);
             }
-            catch(Exception e)
+            catch(Exception exception)
             {
+                LogException(exception, null, null);
             }
         }
 

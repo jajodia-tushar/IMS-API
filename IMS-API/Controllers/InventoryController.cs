@@ -8,6 +8,7 @@ using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using IMS.Core;
+using IMS.Logging;
 
 namespace IMS_API.Controllers
 {
@@ -16,9 +17,11 @@ namespace IMS_API.Controllers
     public class InventoryController : ControllerBase
     {
         private IInventoryService _inventoryService;
-        public InventoryController(IInventoryService inventoryService)
+        private ILogManager _logger;
+        public InventoryController(IInventoryService inventoryService,ILogManager logManager)
         {
             this._inventoryService = inventoryService;
+            this._logger = logManager;
         }
 
         /// <summary>
@@ -45,6 +48,7 @@ namespace IMS_API.Controllers
             {
                 try
                 {
+                    int x = Convert.ToInt32("Rajat");
                     IMS.Entities.ShelfItemsResponse shelfItemsResponseEntity = await _inventoryService.GetShelfItemsByShelfCode(shelfCode);
                     return Translator.ToDataContractsObject(shelfItemsResponseEntity);
                 }
@@ -52,6 +56,7 @@ namespace IMS_API.Controllers
                 {
                     shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.ServerError;
                     shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ServerError;
+                    _logger.LogException(exception, shelfCode, shelfItemsResponse);
                 }
             }
             return shelfItemsResponse;
