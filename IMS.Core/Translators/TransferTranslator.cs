@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using IMS.Contracts;
@@ -8,24 +8,36 @@ namespace IMS.Core.Translators
 {
     public class TransferTranslator
     {
-        public static Entities.TransferToShelvesRequest ToEntitiesObject(Contracts.TransferToShelvesRequest transferToShelvesRequest)
+        public static Entities.TransferToShelvesRequest ToEntitiesObject(Contracts.TransferToShelvesRequest transferRequest)
         {
-            Entities.TransferToShelvesRequest contractTransferToShelvesRequest = new Entities.TransferToShelvesRequest();
-            contractTransferToShelvesRequest.ShelvesItemsQuantityList = new List<Entities.TransferToShelfRequest>();
-            foreach(Contracts.TransferToShelfRequest transferToShelfRequest in transferToShelvesRequest.ShelvesItemsQuantityList)
+            Entities.TransferToShelvesRequest contractTransferRequest = new Entities.TransferToShelvesRequest();
+            contractTransferRequest.ShelvesItemsQuantityList = new List<Entities.TransferToShelfRequest>();
+            if (transferRequest == null || transferRequest.ShelvesItemsQuantityList == null || transferRequest.ShelvesItemsQuantityList.Count > 0)
             {
-                contractTransferToShelvesRequest.ShelvesItemsQuantityList.Add(ToEntitiesObject(transferToShelfRequest));
+                foreach (Contracts.TransferToShelfRequest transferRequestIterator in transferRequest.ShelvesItemsQuantityList)
+                {
+
+                    if (transferRequestIterator != null)
+                    {
+                        contractTransferRequest.ShelvesItemsQuantityList.Add(ToEntitiesObject(transferRequestIterator));
+                    }
+                }
             }
-            return contractTransferToShelvesRequest;
+            return contractTransferRequest;
         }
 
         private static Entities.TransferToShelfRequest ToEntitiesObject(Contracts.TransferToShelfRequest transferToShelfRequest)
         {
-            return new Entities.TransferToShelfRequest()
+            Entities.TransferToShelfRequest transferRequestEntity = new Entities.TransferToShelfRequest();
+            if (transferToShelfRequest.ItemQuantityMapping != null && transferToShelfRequest.ItemQuantityMapping.Count > 0)
             {
-                Shelf = Translator.ToEntitiesObject(transferToShelfRequest.Shelf),
-                ItemQuantityMapping = Translator.ToEntitiesObject(transferToShelfRequest.ItemQuantityMapping)
-            };
+                transferRequestEntity.ItemQuantityMapping = ShelfItemsTranslator.ToEntitiesObject(transferToShelfRequest.ItemQuantityMapping);
+            }
+            if (transferToShelfRequest.Shelf != null)
+            {
+                transferRequestEntity.Shelf = ShelfTranslator.ToEntitiesObject(transferToShelfRequest.Shelf);
+            }
+            return transferRequestEntity;
         }
     }
 }
