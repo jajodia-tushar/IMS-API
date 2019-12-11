@@ -12,6 +12,7 @@ namespace IMS.Entities.Interfaces
         string GenerateToken(User user, DateTime expirationTime);
         Task<bool> IsValidToken(string token);
         Task<bool> StoreToken(string token,DateTime expirationTime);
-       
+
+        Task<bool> DeleteToken(string token);
     }
 }

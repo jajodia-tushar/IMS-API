@@ -102,8 +102,23 @@ namespace IMS.TokenManagement
 
             return Convert.ToBase64String(Encoding.Unicode.GetBytes(returnValue));
         }
-       
 
-       
+        public async Task<bool> DeleteToken(string token)
+        {
+            try
+            {
+
+                string hashToken = GetAccessTokenHashValue(token);
+                bool isTokenDeleted = await _tokenDbContext.DeleteToken(hashToken);
+                if (!isTokenDeleted)
+                    throw new Exception("Token Not Deleted");
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+        }
     }
 }

@@ -17,6 +17,32 @@ namespace IMS.DataLayer.Db
             _dbProvider = dbConnectionProvider;
         }
 
+        public async Task<bool> DeleteToken(string hashToken)
+        {
+           
+
+
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spDeleteToken";
+                    command.Parameters.AddWithValue("@hashtoken", hashToken);
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                catch (Exception ex)
+                {
+                    return false;
+                }
+
+            }
+            return true;
+        }
+
         public async Task<bool> IsValidToken(string hashToken)
         {
             bool isValid = false;
