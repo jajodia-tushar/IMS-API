@@ -48,7 +48,6 @@ namespace IMS_API.Controllers
             {
                 try
                 {
-                    int x = Convert.ToInt32("Rajat");
                     IMS.Entities.ShelfItemsResponse shelfItemsResponseEntity = await _inventoryService.GetShelfItemsByShelfCode(shelfCode);
                     return Translator.ToDataContractsObject(shelfItemsResponseEntity);
                 }
