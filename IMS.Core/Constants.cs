@@ -60,6 +60,7 @@ namespace IMS.Core
             public const string InvalidRequest = "Invalid Request";
             public const string InvalidOrder = "Invalid Order";
             public const string NoToken = "Token Required";
+            public const string TranferFailure = "The items transfer failed";
         }
 
         public static class ErrorCodes
