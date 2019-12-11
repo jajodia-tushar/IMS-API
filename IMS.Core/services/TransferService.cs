@@ -28,10 +28,27 @@ namespace IMS.Core.services
         {
             throw new NotImplementedException();
         }
-
         public async Task<Response> TransferToWarehouse(int OrderId)
         {
-            throw new NotImplementedException();
+            Response response = new Response();
+            try
+            {
+                bool isTransferred = await _transferDbContext.TransferToWarehouse(OrderId);
+                if (isTransferred)
+                {
+                    response.Status = Status.Success;
+                }
+                else
+                {
+                    response.Status = Status.Failure;
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return response;
         }
     }
 }

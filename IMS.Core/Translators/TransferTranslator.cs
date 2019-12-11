@@ -16,11 +16,26 @@ namespace IMS.Core.Translators
             };
         }
 
-        public static Contracts.Response ToDataContractsObject(Entities.Response entityTransferToShelfResponse)
+        public static Contracts.Response ToDataContractsObject(Entities.Response doEntityTransferResponse)
         {
-            return new Contracts.Response()
+            Contracts.Response dtoContractTransferResponse = new Contracts.Response();
+            if(doEntityTransferResponse.Status == Entities.Status.Success)
             {
-
+                dtoContractTransferResponse.Status = Contracts.Status.Success;
+            }
+            else
+            {
+                dtoContractTransferResponse.Status = Contracts.Status.Failure;
+                dtoContractTransferResponse.Error = ToDataContractsObject(doEntityTransferResponse.Error);
+            }
+            return dtoContractTransferResponse;
+        }
+        public static Contracts.Error ToDataContractsObject(Entities.Error error)
+        {
+            return new Contracts.Error()
+            {
+                ErrorCode = error.ErrorCode,
+                ErrorMessage = error.ErrorMessage
             };
         }
     }

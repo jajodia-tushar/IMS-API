@@ -39,7 +39,7 @@ namespace IMS_API.Controllers
             }
             catch
             {
-                transferToShelfResponse = new IMS.Contracts.GetEmployeeResponse()
+                transferToShelfResponse = new IMS.Contracts.Response()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -52,7 +52,36 @@ namespace IMS_API.Controllers
             return transferToShelfResponse;
         }
 
+        /// <summary>
+        /// Transfer items to warehouse after Admin approval
+        /// </summary>
+        /// <param name="orderId">Here OrderId represents Id of that particular Order</param>
+        /// <returns>Response</returns>
+        /// <response code="200">Returns Success if order is Updated To Warehouse Successfully otherwise returns Status Failure</response>
         // Patch: api/TransferToWarehouse
+        [HttpPatch("{orderId}",Name ="TransferToWarehouse")]
+        public async Task<Response> TransferToWarehouse( int orderId)
+        {
+            Response transferToWarehouseResponse = null;
+            try
+            {
+                IMS.Entities.Response entityTransferWarehouseResponse = await _transferService.TransferToWarehouse(orderId);
+                transferToWarehouseResponse = TransferTranslator.ToDataContractsObject(entityTransferWarehouseResponse);
+            }
+            catch
+            {
+                transferToWarehouseResponse = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+            }
+            return transferToWarehouseResponse;
+        }
    
     }
 }

@@ -8,7 +8,7 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface ITransferDbContext
     {
-        Task<Status> TransferToWarehouse(int OrderId);
+        Task<bool> TransferToWarehouse(int OrderId);
         Task<Status> TransferToShelves(TransferToShelvesRequest transferToShelvesRequest);
     }
 }
