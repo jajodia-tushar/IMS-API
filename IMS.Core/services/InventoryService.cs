@@ -59,7 +59,7 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        _logger.LogException(exception,shelfCode,shelfItemsResponse);
+                        new Task(() => { _logger.LogException(exception, shelfCode, shelfItemsResponse); }).Start();
                         shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                 }
