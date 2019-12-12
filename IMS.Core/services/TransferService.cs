@@ -27,23 +27,42 @@ namespace IMS.Core.services
         public async Task<Response> TransferToShelves(TransferToShelvesRequest transferToShelvesRequest)
         {
             Response transferToShelvesResponse = new Response();
+            int userId = -1;
             try
             {
-                if (checkIfAnyValueIsNull(transferToShelvesRequest))
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    transferToShelvesResponse.Status = Status.Failure;
-                    transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.MissingValues);
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        if (checkIfAnyValueIsNull(transferToShelvesRequest))
+                        {
+                            transferToShelvesResponse.Status = Status.Failure;
+                            transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.MissingValues);
+                            return transferToShelvesResponse;
+                        }
+                        Status responseStatus = await _transferDbContext.TransferToShelves(transferToShelvesRequest);
+                        if (responseStatus == Status.Success)
+                        {
+                            transferToShelvesResponse.Status = Status.Success;
+                        }
+                        else
+                        {
+                            transferToShelvesResponse.Status = Status.Failure;
+                            transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        throw e;
+                    }
                     return transferToShelvesResponse;
-                }
-                Status responseStatus =await _transferDbContext.TransferToShelves(transferToShelvesRequest);
-                if (responseStatus == Status.Success)
-                {
-                    transferToShelvesResponse.Status = Status.Success;
                 }
                 else
                 {
-                    transferToShelvesResponse.Status = Status.Failure;
-                    transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
+
                 }
             }
             catch (Exception ex)
