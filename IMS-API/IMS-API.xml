@@ -131,6 +131,13 @@
             <response code="200">Returns remaining shelves List </response>
             <response code="400">If shelf is Already Deleted or Not Present in Shelf Table </response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.GetAllAdmins">
+            <summary>
+            returns all admins
+            </summary>
+            <returns>all admins along with status</returns>
+            <response code="200">Returns all Admins</response>
+        </member>
         <member name="M:IMS_API.Controllers.VendorController.GetVendorById(System.Int32)">
             <summary>
             returns vendor object if id is present, otherwise failure

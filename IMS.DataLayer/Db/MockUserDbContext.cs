@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using IMS.DataLayer.Interfaces;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Dal
 {
@@ -55,7 +56,13 @@ namespace IMS.DataLayer.Dal
                }
 
             };
-    public User GetUserByCredintials(string username, string password)
+
+        public Task<List<User>> GetAllAdmins()
+        {
+            throw new NotImplementedException();
+        }
+
+        public User GetUserByCredintials(string username, string password)
         {
             return _users.Find
                    (

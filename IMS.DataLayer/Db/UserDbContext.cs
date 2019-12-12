@@ -7,6 +7,7 @@ using IMS.DataLayer.Interfaces;
 using MySql.Data.MySqlClient;
 using System.Data;
 using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Dal
 {
@@ -18,16 +19,50 @@ namespace IMS.DataLayer.Dal
         {
             _dbProvider = dbConnectionProvider;
         }
+
+        public async Task<List<User>> GetAllAdmins()
+        {
+            List<User> admins = new List<User>();
+            MySqlDataReader reader = null;
+
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetAllAdmins";
+                    reader = command.ExecuteReader();
+                    User admin = null;
+                    while (reader.Read())
+                    {
+                        admin = Extract(reader);
+                        admins.Add(admin);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return admins;
+        }
+
+
         public User GetUserByCredintials(string username, string password)
         {
             User user = null;
             MySqlDataReader reader = null;
-           
-            using ( var connection = _dbProvider.GetConnection(Databases.IMS))
+
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
-                    
+
                     connection.Open();
 
                     var command = connection.CreateCommand();
@@ -45,18 +80,18 @@ namespace IMS.DataLayer.Dal
                         user = Extract(reader);
 
                     }
-                    
-                  
+
+
 
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-               
+
             }
 
-               
+
             return user;
         }
 
@@ -64,16 +99,16 @@ namespace IMS.DataLayer.Dal
         {
             return new User()
             {
-                Id=(int)reader["userid"],
-                Username=(string)reader["username"],
-                Password=(string)reader["password"],
-                Firstname=(string)reader["firstname"],
-                Lastname=(string)reader["lastname"],
-                Email=(string)reader["email"],
-                Role=new Role()
+                Id = (int)reader["userid"],
+                Username = (string)reader["username"],
+                Password = (string)reader["password"],
+                Firstname = (string)reader["firstname"],
+                Lastname = (string)reader["lastname"],
+                Email = (string)reader["email"],
+                Role = new Role()
                 {
-                    Id=(int)reader["roleid"],
-                    Name=(string)reader["rolename"]
+                    Id = (int)reader["roleid"],
+                    Name = (string)reader["rolename"]
                 }
             };
         }
