@@ -6,6 +6,6 @@ namespace IMS.Contracts
 {
     public class TransferToShelvesRequest
     {
-        List<TransferToShelfRequest> ShelvesItemsQuantityList { get; set; }
+        public List<TransferToShelfRequest> ShelvesItemsQuantityList { get; set; }
     }
 }

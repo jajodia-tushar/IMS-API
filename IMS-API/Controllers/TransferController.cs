@@ -37,7 +37,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.Response entityTransferToShelfResponse = await _transferService.TransferToShelves(entityTransferToShelvesRequest);
                 transferToShelfResponse = TransferTranslator.ToDataContractsObject(entityTransferToShelfResponse);
             }
-            catch
+            catch (Exception e)
             {
                 transferToShelfResponse = new IMS.Contracts.Response()
                 {

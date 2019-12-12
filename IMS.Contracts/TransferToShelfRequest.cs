@@ -7,7 +7,7 @@ namespace IMS.Contracts
     public class TransferToShelfRequest
     {
         public Shelf Shelf { get; set; }
-        public ItemQuantityMapping ItemQuantityMapping { get; set; }
+        public List<ItemQuantityMapping> ItemQuantityMapping { get; set; }
     }
 }
 

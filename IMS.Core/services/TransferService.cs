@@ -26,7 +26,66 @@ namespace IMS.Core.services
         }
         public async Task<Response> TransferToShelves(TransferToShelvesRequest transferToShelvesRequest)
         {
-            throw new NotImplementedException();
+            Response transferToShelvesResponse = new Response();
+            try
+            {
+                if (checkIfAnyValueIsNull(transferToShelvesRequest))
+                {
+                    transferToShelvesResponse.Status = Status.Failure;
+                    transferToShelvesResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.BadRequest,
+                        ErrorMessage = Constants.ErrorMessages.MissingValues
+                    };
+                    return transferToShelvesResponse;
+                }
+                Status responseStatus =await _transferDbContext.TransferToShelves(transferToShelvesRequest);
+                if (responseStatus == Status.Success)
+                {
+                    transferToShelvesResponse.Status = Status.Success;
+                }
+                else
+                {
+                    transferToShelvesResponse.Status = Status.Failure;
+                    transferToShelvesResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.BadRequest,
+                        ErrorMessage = Constants.ErrorMessages.TranferFailure
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (transferToShelvesResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(transferToShelvesRequest, transferToShelvesResponse, "Transfer to shelf", transferToShelvesResponse.Status, severity, -1); }).Start();
+            }
+            return transferToShelvesResponse;
+        }
+
+        private bool checkIfAnyValueIsNull(TransferToShelvesRequest transferToShelvesRequest)
+        {
+            foreach(TransferToShelfRequest transferToShelfRequest in transferToShelvesRequest.ShelvesItemsQuantityList)
+            {
+                if(transferToShelfRequest.Shelf.Id==0)
+                {
+                    return true;
+                }
+                foreach(ItemQuantityMapping itemQuantityMapping in transferToShelfRequest.ItemQuantityMapping)
+                {
+                    if(itemQuantityMapping.Item.Id==0)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
         }
         public async Task<Response> TransferToWarehouse(int OrderId)
         {

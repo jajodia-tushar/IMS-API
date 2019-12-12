@@ -10,16 +10,28 @@ namespace IMS.Core.Translators
     {
         public static Entities.TransferToShelvesRequest ToEntitiesObject(Contracts.TransferToShelvesRequest transferToShelvesRequest)
         {
-            return new Entities.TransferToShelvesRequest()
+            Entities.TransferToShelvesRequest contractTransferToShelvesRequest = new Entities.TransferToShelvesRequest();
+            contractTransferToShelvesRequest.ShelvesItemsQuantityList = new List<Entities.TransferToShelfRequest>();
+            foreach(Contracts.TransferToShelfRequest transferToShelfRequest in transferToShelvesRequest.ShelvesItemsQuantityList)
             {
+                contractTransferToShelvesRequest.ShelvesItemsQuantityList.Add(ToEntitiesObject(transferToShelfRequest));
+            }
+            return contractTransferToShelvesRequest;
+        }
 
+        private static Entities.TransferToShelfRequest ToEntitiesObject(Contracts.TransferToShelfRequest transferToShelfRequest)
+        {
+            return new Entities.TransferToShelfRequest()
+            {
+                Shelf = Translator.ToEntitiesObject(transferToShelfRequest.Shelf),
+                ItemQuantityMapping = Translator.ToEntitiesObject(transferToShelfRequest.ItemQuantityMapping)
             };
         }
 
         public static Contracts.Response ToDataContractsObject(Entities.Response doEntityTransferResponse)
         {
             Contracts.Response dtoContractTransferResponse = new Contracts.Response();
-            if(doEntityTransferResponse.Status == Entities.Status.Success)
+            if (doEntityTransferResponse.Status == Entities.Status.Success)
             {
                 dtoContractTransferResponse.Status = Contracts.Status.Success;
             }
