@@ -78,8 +78,13 @@ namespace IMS.DataLayer.Db
             return item;
         }
 
-        public async Task<int> AddItem(Item itemRequest)
+        public async Task<int> AddItem(ItemRequest itemRequest)
         {
+            string itemMinimumLimitAtShelves = "";
+            foreach (ShelfMinimumLimitMapping shelfMinimumLimitMapping in itemRequest.ShelfMinimumLimit)
+            {
+                itemMinimumLimitAtShelves = itemMinimumLimitAtShelves + shelfMinimumLimitMapping.ShelfId + "," + shelfMinimumLimitMapping.ShelfMinimumLimt+";";
+            }
             int latestAddedItemId = 0;
             DbDataReader reader = null;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
@@ -91,12 +96,14 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spAddItem";
                     command.Parameters.AddWithValue("@Id", 0);
-                    command.Parameters.AddWithValue("@Name", itemRequest.Name);
-                    command.Parameters.AddWithValue("@MaxLimit", itemRequest.MaxLimit);
+                    command.Parameters.AddWithValue("@Name", itemRequest.item.Name);
+                    command.Parameters.AddWithValue("@MaxLimit", itemRequest.item.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", 1);
-                    command.Parameters.AddWithValue("@ImageUrl", itemRequest.ImageUrl);
+                    command.Parameters.AddWithValue("@ImageUrl", itemRequest.item.ImageUrl);
                     command.Parameters.AddWithValue("@Ranking", 1);
-                    command.Parameters.AddWithValue("@Rate", itemRequest.Rate);
+                    command.Parameters.AddWithValue("@Rate", itemRequest.item.Rate);
+                    command.Parameters.AddWithValue("@Threshold", itemRequest.WarehouseMinimumLimit);
+                    command.Parameters.AddWithValue("@ShelfMinimumLimit", itemMinimumLimitAtShelves);
                     reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                         latestAddedItemId = (int)reader["Id"];
@@ -138,8 +145,13 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<Item> UpdateItem(Item itemRequest)
+        public async Task<Item> UpdateItem(ItemRequest updatedItem)
         {
+            string itemMinimumLimitAtShelves = "";
+            foreach (ShelfMinimumLimitMapping shelfMinimumLimitMapping in updatedItem.ShelfMinimumLimit)
+            {
+                itemMinimumLimitAtShelves = itemMinimumLimitAtShelves + shelfMinimumLimitMapping.ShelfId + "," + shelfMinimumLimitMapping.ShelfMinimumLimt + ";";
+            }
             DbDataReader reader = null;
             Item item = new Item();
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
@@ -150,12 +162,14 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spUpdateItem";
-                    command.Parameters.AddWithValue("@Id", itemRequest.Id);
-                    command.Parameters.AddWithValue("@Name", itemRequest.Name);
-                    command.Parameters.AddWithValue("@MaximumLimit", itemRequest.MaxLimit);
-                    command.Parameters.AddWithValue("@IsActive", itemRequest.IsActive);
-                    command.Parameters.AddWithValue("@ImageUrl", itemRequest.ImageUrl);
-                    command.Parameters.AddWithValue("@Rate", itemRequest.Rate);
+                    command.Parameters.AddWithValue("@Id", updatedItem.item.Id);
+                    command.Parameters.AddWithValue("@Name", updatedItem.item.Name);
+                    command.Parameters.AddWithValue("@MaximumLimit", updatedItem.item.MaxLimit);
+                    command.Parameters.AddWithValue("@IsActive", updatedItem.item.IsActive);
+                    command.Parameters.AddWithValue("@ImageUrl", updatedItem.item.ImageUrl);
+                    command.Parameters.AddWithValue("@Rate", updatedItem.item.Rate);
+                    command.Parameters.AddWithValue("@Threshold", updatedItem.WarehouseMinimumLimit);
+                    command.Parameters.AddWithValue("@ShelfMinimumLimit", itemMinimumLimitAtShelves);
                     reader = await command.ExecuteReaderAsync();
                     item = ReadValuesFromDatabase(reader);
                 }

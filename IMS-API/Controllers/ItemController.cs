@@ -36,7 +36,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.GetAllItems();
-                contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
+                contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
             catch
             {
@@ -68,7 +68,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.GetItemById(id);
-                contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
+                contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
             catch
             {
@@ -89,19 +89,19 @@ namespace IMS_API.Controllers
         /// <summary>
         /// Creates A New Item
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="itemRequest"></param>
         /// <returns>Return All Items Along With Newly Created Item </returns>
         /// <response code="200">Returns Items List along with newly created Item if Item is added successfully otherwise it returns null with status failure</response>
         // POST: api/Item
         [HttpPost]
-        public async Task<ItemResponse> AddItem([FromBody]  Item item)
+        public async Task<ItemResponse> AddItem([FromBody]  ItemRequest itemRequest)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.Item entityItemRequest = Translator.ToEntitiesObject(item);
+                IMS.Entities.ItemRequest entityItemRequest = ItemTranslator.ToEntitiesObject(itemRequest);
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.AddItem(entityItemRequest);
-                contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
+                contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
             catch
             {
@@ -127,14 +127,14 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         // PATCH: api/Item
         [HttpPatch]
-        public async Task<ItemResponse> UpdateItem([FromBody] Item updatedItem)
+        public async Task<ItemResponse> UpdateItem([FromBody] ItemRequest updatedItem)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.Item entityItemRequest = Translator.ToEntitiesObject(updatedItem);
+                IMS.Entities.ItemRequest entityItemRequest = ItemTranslator.ToEntitiesObject(updatedItem);
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.UpdateItem(entityItemRequest);
-                contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
+                contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
             catch
             {
@@ -165,7 +165,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.Delete(id);
-                contractItemsResponse = Translator.ToDataContractsObject(entityItemResponse);
+                contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
             catch
             {

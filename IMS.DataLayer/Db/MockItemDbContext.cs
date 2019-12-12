@@ -45,13 +45,13 @@ namespace IMS.DataLayer.Db
             return null;
         }
 
-        public async Task<int> AddItem(Item itemRequest)
+        public async Task<int> AddItem(ItemRequest itemRequest)
         {
             Item item = new Item();
             var latestAddedItemId = _items.Count + 1;
             item.Id = latestAddedItemId;
-            item.Name = itemRequest.Name;
-            item.MaxLimit = itemRequest.MaxLimit;
+            item.Name = itemRequest.item.Name;
+            item.MaxLimit = itemRequest.item.MaxLimit;
             item.IsActive = true;
             _items.Add(item);
             return latestAddedItemId;
@@ -70,16 +70,16 @@ namespace IMS.DataLayer.Db
             return false;
         }
 
-        public async Task<Item> UpdateItem(Item itemRequest)
+        public async Task<Item> UpdateItem(ItemRequest itemRequest)
         {
             foreach (var item in _items)
             {
-                if (item.Id.Equals(itemRequest.Id))
+                if (item.Id.Equals(item.Id))
                 {
-                    item.Id = itemRequest.Id;
-                    item.Name = itemRequest.Name;
-                    item.MaxLimit = itemRequest.MaxLimit;
-                    item.IsActive = itemRequest.IsActive;
+                    item.Id = itemRequest.item.Id;
+                    item.Name = itemRequest.item.Name;
+                    item.MaxLimit = itemRequest.item.MaxLimit;
+                    item.IsActive = itemRequest.item.IsActive;
                     return item;
                 }
             }

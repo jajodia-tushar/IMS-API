@@ -9,8 +9,8 @@ namespace IMS.Entities.Interfaces
     {
         Task<ItemResponse> GetAllItems();
         Task<ItemResponse> GetItemById(int id);
-        Task<ItemResponse> AddItem(Item itemRequest);
+        Task<ItemResponse> AddItem(ItemRequest itemRequest);
         Task<ItemResponse> Delete(int id);
-        Task<ItemResponse> UpdateItem(Item itemRequest);
+        Task<ItemResponse> UpdateItem(ItemRequest itemRequest);
     }
 }

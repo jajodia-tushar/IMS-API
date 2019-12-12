@@ -35,15 +35,15 @@
             <returns>Details of Item</returns>
             <response code="200">Returns Item Details if Item Id is valid otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.AddItem(IMS.Contracts.Item)">
+        <member name="M:IMS_API.Controllers.ItemController.AddItem(IMS.Contracts.ItemRequest)">
             <summary>
             Creates A New Item
             </summary>
-            <param name="item"></param>
+            <param name="itemRequest"></param>
             <returns>Return All Items Along With Newly Created Item </returns>
             <response code="200">Returns Items List along with newly created Item if Item is added successfully otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.UpdateItem(IMS.Contracts.Item)">
+        <member name="M:IMS_API.Controllers.ItemController.UpdateItem(IMS.Contracts.ItemRequest)">
             <summary>
             Update the Specific Item
             </summary>
