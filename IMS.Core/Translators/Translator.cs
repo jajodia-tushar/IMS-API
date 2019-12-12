@@ -75,6 +75,16 @@ namespace IMS.Core.Translators
             return loginResponse;
 
         }
+
+        public static Contracts.Response ToDataContractsObject(IMS.Entities.Response entitiesReponse)
+        {
+            return new Contracts.Response
+            {
+                Status = entitiesReponse.Status == Entities.Status.Success ? Contracts.Status.Success : Contracts.Status.Failure,
+                Error = ToDataContractsObject(entitiesReponse.Error)
+            };
+        }
+
         private static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> entityVendors)
         {
             List<Contracts.Vendor> contractVendors = new List<Contracts.Vendor>();
@@ -198,11 +208,15 @@ namespace IMS.Core.Translators
 
         public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
-            return new Contracts.Error()
-            {
-                ErrorCode = error.ErrorCode,
-                ErrorMessage = error.ErrorMessage
-            };
+
+            if (error != null)
+                return new Contracts.Error()
+                {
+                    ErrorCode = error.ErrorCode,
+                    ErrorMessage = error.ErrorMessage
+                };
+            else
+                return null;
         }
 
         public static Contracts.User ToDataContractsObject(Entities.User user)

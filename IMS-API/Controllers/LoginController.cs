@@ -57,6 +57,30 @@ namespace IMS_API.Controllers
 
         }
 
+        [HttpDelete("Logout")]
+        public async Task<Response> Logout()
+        {
+            IMS.Contracts.Response contractsResponse = null;
+            try
+            {
+                IMS.Entities.Response response = await _loginService.Logout();
+                contractsResponse = Translator.ToDataContractsObject(response);
+               
+            }
+            catch
+            {
+               contractsResponse= new IMS.Contracts.LoginResponse()
+               {
+                   Status = Status.Failure,
+                   Error = new Error()
+                   {
+                       ErrorCode = Constants.ErrorCodes.ServerError,
+                       ErrorMessage = Constants.ErrorMessages.LogoutFailed
+                   }
+               };
+            }
+            return contractsResponse;
+        }
         
        
     }

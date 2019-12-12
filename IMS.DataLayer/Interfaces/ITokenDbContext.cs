@@ -9,5 +9,6 @@ namespace IMS.DataLayer.Interfaces
     {
         Task<bool> StoreToken(string accessToken, string hashToken, DateTime expirationTime);
         Task<bool> IsValidToken(string hashToken);
+        Task<bool> DeleteToken(string hashToken);
     }
 }

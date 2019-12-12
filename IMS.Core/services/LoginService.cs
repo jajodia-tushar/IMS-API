@@ -97,6 +97,31 @@ namespace IMS.Core.services
             return loginResponse;
 
         }
+
+        public async Task<Response> Logout()
+        {
+            Response response = new Response();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                User user = Utility.GetUserFromToken(token);
+                userId = user.Id;
+                bool isTokenDeleted = await _tokenProvider.DeleteToken(token);
+                if (isTokenDeleted)
+                    response.Status = Status.Success;
+               
+
+            }
+            catch (Exception e)
+            {
+                response.Status = Status.Success;
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+
+            }
+            return response;
+        }
+
         private DateTime GetExpirationTime(string role)
         {
             string rolename = role.ToLower();
