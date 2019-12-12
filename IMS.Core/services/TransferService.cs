@@ -22,7 +22,7 @@ namespace IMS.Core.services
         {
             this._transferDbContext = transferDbContext;
             this._logger = logger;
-            this._tokenProvider = tokenProvider; 
+            this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
         public async Task<Response> TransferToShelves(TransferToShelvesRequest transferToShelvesRequest)
