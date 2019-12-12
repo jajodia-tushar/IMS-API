@@ -36,7 +36,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(employeeId);
-                contractsEmployeeValidationResponse = Translator.ToDataContractsObject(entityEmployeeValidationResponse);
+                contractsEmployeeValidationResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
             catch
             {

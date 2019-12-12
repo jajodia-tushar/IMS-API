@@ -37,9 +37,9 @@ namespace IMS_API.Controllers
             LoginResponse contractsLoginResponse = null;
             try
             {
-                IMS.Entities.LoginRequest entityLoginRequest = Translator.ToEntitiesObject(login);
+                IMS.Entities.LoginRequest entityLoginRequest = LoginTranslator.ToEntitiesObject(login);
                 IMS.Entities.LoginResponse entityLoginResponse = await _loginService.Login(entityLoginRequest);
-                contractsLoginResponse = Translator.ToDataContractsObject(entityLoginResponse);
+                contractsLoginResponse = LoginTranslator.ToDataContractsObject(entityLoginResponse);
             }
             catch
             {

@@ -13,7 +13,7 @@ namespace IMS.UnitTest.CoreTests
         public void Converting_Contract_Type_Object_To_Entitiy_Type_Object_Successfully()
         {
             Entities.LoginRequest expected = new Entities.LoginRequest() { Username = "admin", Password = "admin123" };
-            Entities.LoginRequest resultant = Translator.ToEntitiesObject(new Contracts.LoginRequest() { Username = "admin", Password = "admin123" });
+            Entities.LoginRequest resultant = LoginTranslator.ToEntitiesObject(new Contracts.LoginRequest() { Username = "admin", Password = "admin123" });
             Assert.Equal(expected.Username, resultant.Username);
             Assert.Equal(expected.Password, resultant.Password);
         }
@@ -21,7 +21,7 @@ namespace IMS.UnitTest.CoreTests
         public void Converting_Entity_Type_Role_To_Contract_Type_Role_Successfully()
         {
             Contracts.Role expected = new Contracts.Role() { Id = 1, Name = "admin" };
-            Contracts.Role resultant = Translator.ToDataContractsObject(new Entities.Role() { Id = 1, Name = "admin" });
+            Contracts.Role resultant = RoleTranslator.ToDataContractsObject(new Entities.Role() { Id = 1, Name = "admin" });
             Assert.Equal(expected.Id, resultant.Id);
             Assert.Equal(expected.Name, resultant.Name);
         }
@@ -29,7 +29,7 @@ namespace IMS.UnitTest.CoreTests
         public void Converting_Entity_Type_User_To_Contract_Type_User_Successfully()
         {
             Contracts.User expected = GetUserDetailsFromContractType();
-            Contracts.User resultant = Translator.ToDataContractsObject(GetUserDetailsFromEntityType());
+            Contracts.User resultant = UserTranslator.ToDataContractsObject(GetUserDetailsFromEntityType());
             Assert.Equal(expected.Id, resultant.Id);
             Assert.Equal(expected.Username, resultant.Username);
             Assert.Equal(expected.Password, resultant.Password);
@@ -51,7 +51,7 @@ namespace IMS.UnitTest.CoreTests
                 AccessToken = "abcdefghijklmnopqrstuvwxyz",
                 User = GetUserDetailsFromContractType()
             };
-            Contracts.LoginResponse resultant = Translator.ToDataContractsObject(new Entities.LoginResponse()
+            Contracts.LoginResponse resultant = LoginTranslator.ToDataContractsObject(new Entities.LoginResponse()
             {
                 Status = Entities.Status.Success,
                 AccessToken = "abcdefghijklmnopqrstuvwxyz",
