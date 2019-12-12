@@ -78,25 +78,52 @@ namespace IMS.Core.services
             }
             return false;
         }
-        public async Task<Response> TransferToWarehouse(int OrderId)
+        public async Task<Response> TransferToWarehouse(int orderId)
         {
             Response response = new Response();
+            int userId = -1;
             try
             {
-                bool isTransferred = await _transferDbContext.TransferToWarehouse(OrderId);
-                if (isTransferred)
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    response.Status = Status.Success;
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        bool isTransferred = await _transferDbContext.TransferToWarehouse(orderId);
+                        if (isTransferred)
+                            response.Status = Status.Success;
+                        else
+                        {
+                            response.Status = Status.Failure;
+                            response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                    return response;
                 }
                 else
                 {
                     response.Status = Status.Failure;
-                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                response.Status = Status.Failure;
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.High;
+
+                new Task(() => { _logger.Log(orderId, response, "TransferToWarehouse", response.Status, severity, userId); }).Start();
             }
             return response;
         }
