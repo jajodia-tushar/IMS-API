@@ -7,6 +7,6 @@ namespace IMS.Entities.Interfaces
 {
     public interface IUserService
     {
-        Task<UsersResponse> GetAllAdmins();
+        Task<UsersResponse> GetUsersByRole(int RoleId);
     }
 }

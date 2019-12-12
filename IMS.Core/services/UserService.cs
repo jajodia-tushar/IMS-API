@@ -5,7 +5,6 @@ using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IMS.Core.services
@@ -24,9 +23,9 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-        public async Task<UsersResponse> GetAllAdmins()
+        public async Task<UsersResponse> GetUsersByRole(int RoleId)
         {
-            UsersResponse getAllAdminsResponse = new UsersResponse();
+            UsersResponse getUsersResponse = new UsersResponse();
             int userId = -1;
             try
             {
@@ -37,15 +36,15 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        getAllAdminsResponse.Status = Status.Failure;
-                        getAllAdminsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
-                        List<User> adminsList = await _userDbContext.GetAllAdmins();
+                        getUsersResponse.Status = Status.Failure;
+                        getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
+                        List<User> adminsList = await _userDbContext.GetUsersByRole(RoleId);
                         if (adminsList != null)
                         {
-                            getAllAdminsResponse.Status = Status.Success;
-                            getAllAdminsResponse.Users = adminsList;
+                            getUsersResponse.Status = Status.Success;
+                            getUsersResponse.Users = adminsList;
                         }
-                        return getAllAdminsResponse;
+                        return getUsersResponse;
                     }
                     catch (Exception e)
                     {
@@ -54,23 +53,23 @@ namespace IMS.Core.services
                 }
                 else
                 {
-                    getAllAdminsResponse.Status = Status.Failure;
-                    getAllAdminsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    getUsersResponse.Status = Status.Failure;
+                    getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception ex)
             {
-                getAllAdminsResponse.Status = Status.Failure;
-                getAllAdminsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                getUsersResponse.Status = Status.Failure;
+                getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (getAllAdminsResponse.Status == Status.Failure)
+                if (getUsersResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log("Get All Admins", getAllAdminsResponse, "Get All Admins", getAllAdminsResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(RoleId, getUsersResponse, "Get Users By Id", getUsersResponse.Status, severity, -1); }).Start();
             }
-            return getAllAdminsResponse;
+            return getUsersResponse;
         }
     }
 }

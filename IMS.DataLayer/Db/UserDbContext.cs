@@ -20,9 +20,9 @@ namespace IMS.DataLayer.Dal
             _dbProvider = dbConnectionProvider;
         }
 
-        public async Task<List<User>> GetAllAdmins()
+        public async Task<List<User>> GetUsersByRole(int RoleId)
         {
-            List<User> admins = new List<User>();
+            List<User> users = new List<User>();
             MySqlDataReader reader = null;
 
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
@@ -34,13 +34,14 @@ namespace IMS.DataLayer.Dal
 
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllAdmins";
+                    command.CommandText = "spGetUsersByRole";
+                    command.Parameters.AddWithValue("@RoleId", RoleId);
                     reader = command.ExecuteReader();
-                    User admin = null;
+                    User user = null;
                     while (reader.Read())
                     {
-                        admin = Extract(reader);
-                        admins.Add(admin);
+                        user = Extract(reader);
+                        users.Add(user);
                     }
                 }
                 catch (Exception ex)
@@ -49,7 +50,7 @@ namespace IMS.DataLayer.Dal
                 }
 
             }
-            return admins;
+            return users;
         }
 
 

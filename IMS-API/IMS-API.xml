@@ -131,7 +131,7 @@
             <response code="200">Returns remaining shelves List </response>
             <response code="400">If shelf is Already Deleted or Not Present in Shelf Table </response>
         </member>
-        <member name="M:IMS_API.Controllers.UserController.GetAllAdmins">
+        <member name="M:IMS_API.Controllers.UserController.GetAllAdmins(System.Int32)">
             <summary>
             returns all admins
             </summary>

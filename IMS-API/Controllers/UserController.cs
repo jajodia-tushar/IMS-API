@@ -26,18 +26,18 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <returns>all admins along with status</returns>
         /// <response code="200">Returns all Admins</response>
-        [HttpGet("GetAdmins",Name = "GetAdmins()")]
-        public async Task<UsersResponse> GetAllAdmins()
+        [HttpGet("GetUsers/{RoleId}",Name = "Get(int RoleId)")]
+        public async Task<UsersResponse> GetUsersByRoleId(int RoleId)
         {
-            UsersResponse contractsAdmins = null;
+            UsersResponse contractUsers = null;
             try
             {
-                IMS.Entities.UsersResponse entityAdmins = await _userService.GetAllAdmins();
-                contractsAdmins = UserTranslator.ToDataContractsObject(entityAdmins);
+                IMS.Entities.UsersResponse entityUsers = await _userService.GetUsersByRole(RoleId);
+                contractUsers = UserTranslator.ToDataContractsObject(entityUsers);
             }
             catch
             {
-                contractsAdmins = new IMS.Contracts.UsersResponse()
+                contractUsers = new IMS.Contracts.UsersResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -47,7 +47,7 @@ namespace IMS_API.Controllers
                     }
                 };
             }
-            return contractsAdmins;
+            return contractUsers;
         }
     }
 }

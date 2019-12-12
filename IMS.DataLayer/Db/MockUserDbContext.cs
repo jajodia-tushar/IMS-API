@@ -57,11 +57,6 @@ namespace IMS.DataLayer.Dal
 
             };
 
-        public Task<List<User>> GetAllAdmins()
-        {
-            throw new NotImplementedException();
-        }
-
         public User GetUserByCredintials(string username, string password)
         {
             return _users.Find
@@ -71,6 +66,11 @@ namespace IMS.DataLayer.Dal
                            return u.Username.Equals(username) && u.Password.Equals(password);
                         }
                    );
-        }   
+        }
+
+        public Task<List<User>> GetUsersByRole(int RoleId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
