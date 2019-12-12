@@ -62,7 +62,8 @@ namespace IMS.Core.services
                 }
                 else
                 {
-
+                    response.Status = Status.Failure;
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception ex)
