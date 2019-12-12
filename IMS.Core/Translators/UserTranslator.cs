@@ -18,8 +18,7 @@ namespace IMS.Core.Translators
                 Firstname = user.Firstname,
                 Lastname = user.Lastname,
                 Email = user.Email,
-                Role =RoleTranslator.ToDataContractsObject(user.Role)
-
+                Role = RoleTranslator.ToDataContractsObject(user.Role)
             };
         }
 
