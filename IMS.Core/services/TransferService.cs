@@ -1,84 +1,54 @@
-using IMS.Core.Validators;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
-using IMS.Entities.Interfaces;
-using IMS.Logging;
-using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 
-namespace IMS.Core.services
+namespace IMS.DataLayer.Db
 {
-    public class TransferService : ITransferService
+    public class TransferDbContext : ITransferDbContext
     {
-        private ITransferDbContext _transferDbContext;
-        private ILogManager _logger;
-        private IHttpContextAccessor _httpContextAccessor;
-        private ITokenProvider _tokenProvider;
-
-        public TransferService(ITransferDbContext transferDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
+        private IDbConnectionProvider _dbConnectionProvider;
+        public TransferDbContext(IDbConnectionProvider dbConnectionProvider)
         {
-            this._transferDbContext = transferDbContext;
-            this._logger = logger;
-            this._tokenProvider = tokenProvider;
-            this._httpContextAccessor = httpContextAccessor;
+            _dbConnectionProvider = dbConnectionProvider;
         }
-        public async Task<Response> TransferToShelves(TransferToShelvesRequest transferToShelvesRequest)
+        public async Task<bool> TransferToShelves(TransferToShelvesRequest transferRequest)
         {
-            Response transferToShelvesResponse = new Response();
-            int userId = -1;
-            try
+            bool transferToShelfStatus = false;
+
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                try
                 {
-                    User user = Utility.GetUserFromToken(token);
-                    userId = user.Id;
-                    try
-                    {
-                        if (TransferValidator.ValidateTransferToShelvesRequest(transferToShelvesRequest) == false)
-                        {
-                            transferToShelvesResponse.Status = Status.Failure;
-                            transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.MissingValues);
-                            return transferToShelvesResponse;
-                        }
-                        bool responseStatus = await _transferDbContext.TransferToShelves(transferToShelvesRequest);
-                        if (responseStatus == true)
-                        {
-                            transferToShelvesResponse.Status = Status.Success;
-                        }
-                        else
-                        {
-                            transferToShelvesResponse.Status = Status.Failure;
-                            transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        new Task(() => { _logger.LogException(exception, "Transfer to shelves", IMS.Entities.Severity.Critical, transferToShelvesRequest, transferToShelvesResponse); }).Start();
-                    }
-                    return transferToShelvesResponse;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spTransferFromWarehouseToShelf";
+                    command.Parameters.AddWithValue("@shelfItemQuantity", StringifyShelfItemQuantityList(transferRequest));
+                    int rowsAffected = command.ExecuteNonQuery();
+                    transferToShelfStatus = true;
                 }
-                else
+                catch (Exception ex)
                 {
-                    transferToShelvesResponse.Status = Status.Failure;
-                    transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    return false;
+                }
+                return transferToShelfStatus;
+            }
+        }
+
+        private object StringifyShelfItemQuantityList(TransferToShelvesRequest transferToShelvesRequest)
+        {
+            string shelfItemQuantityList = "";
+            foreach (TransferToShelfRequest transferToShelfRequest in transferToShelvesRequest.ShelvesItemsQuantityList)
+            {
+                foreach (ItemQuantityMapping itemQuantityMapping in transferToShelfRequest.ItemQuantityMapping)
+                {
+                    shelfItemQuantityList = shelfItemQuantityList + transferToShelfRequest.Shelf.Id.ToString() + ',' + itemQuantityMapping.Item.Id.ToString() + ',' + itemQuantityMapping.Quantity + ';';
                 }
             }
-            catch (Exception exception)
-            {
-                new Task(() => { _logger.LogException(exception, "Transfer to shelves", IMS.Entities.Severity.Critical, transferToShelvesRequest, transferToShelvesResponse); }).Start();
-            }
-            finally
-            {
-                Severity severity = Severity.No;
-                if (transferToShelvesResponse.Status == Status.Failure)
-                    severity = Severity.Critical;
-                new Task(() => { _logger.Log(transferToShelvesRequest, transferToShelvesResponse, "Transfer to shelf", transferToShelvesResponse.Status, severity, userId); }).Start();
-            }
-            return transferToShelvesResponse;
+            return shelfItemQuantityList;
         }
     }
 }
