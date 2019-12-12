@@ -41,7 +41,8 @@ namespace IMS.DataLayer.Db
                             Name = (string)reader["Name"],
                             MaxLimit = (int)reader["MaximumLimit"],
                             IsActive = (bool)reader["IsActive"],
-                            ImageUrl = (string)reader["ImageUrl"]
+                            ImageUrl = (string)reader["ImageUrl"],
+                            Rate = (double)reader["Rate"]
                         });
                     }
                 }
@@ -95,6 +96,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@IsActive", 1);
                     command.Parameters.AddWithValue("@ImageUrl", itemRequest.ImageUrl);
                     command.Parameters.AddWithValue("@Ranking", 1);
+                    command.Parameters.AddWithValue("@Rate", itemRequest.Rate);
                     reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                         latestAddedItemId = (int)reader["Id"];
@@ -153,6 +155,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@MaximumLimit", itemRequest.MaxLimit);
                     command.Parameters.AddWithValue("@IsActive", itemRequest.IsActive);
                     command.Parameters.AddWithValue("@ImageUrl", itemRequest.ImageUrl);
+                    command.Parameters.AddWithValue("@Rate", itemRequest.Rate);
                     reader = await command.ExecuteReaderAsync();
                     item = ReadValuesFromDatabase(reader);
                 }
@@ -173,6 +176,7 @@ namespace IMS.DataLayer.Db
                 item.MaxLimit = (int)reader["MaximumLimit"];
                 item.IsActive = (bool)reader["IsActive"];
                 item.ImageUrl = (string)reader["ImageUrl"];
+                item.Rate = (double)reader["Rate"];
             }
             return item;
         }
