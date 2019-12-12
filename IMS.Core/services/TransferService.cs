@@ -1,54 +1,59 @@
-using IMS.DataLayer.Interfaces;
-using IMS.Entities;
 using System;
-using System.Data;
-using System.Data.Common;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using IMS.Contracts;
+using IMS.Core;
+using IMS.Core.Translators;
+using IMS.Entities.Interfaces;
+using IMS.Logging;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace IMS.DataLayer.Db
+namespace IMS_API.Controllers
 {
-    public class TransferDbContext : ITransferDbContext
+    [Route("api/[controller]")]
+    [ApiController]
+    public class TransferController : ControllerBase
     {
-        private IDbConnectionProvider _dbConnectionProvider;
-        public TransferDbContext(IDbConnectionProvider dbConnectionProvider)
+        private ITransferService _transferService;
+        private ILogManager _logger;
+        public TransferController(ITransferService transferService, ILogManager logManager)
         {
-            _dbConnectionProvider = dbConnectionProvider;
+            this._transferService = transferService;
+            this._logger = logManager;
         }
-        public async Task<bool> TransferToShelves(TransferToShelvesRequest transferRequest)
+        /// <summary>
+        /// Transfer items from warehouse to shelf
+        /// </summary>
+        /// <param name="transferRequest">The list of items and shelves to which transfer has to be made</param>
+        /// <returns>Status</returns>
+        /// <response code="200">Returns Success if transfer is successfull else returns status failure</response>
+        // Patch: api/TransferToShelves
+        [HttpPatch("TransferToShelves")]
+        public async Task<Response> TransferToShelf([FromBody] TransferToShelvesRequest transferRequest)
         {
-            bool transferToShelfStatus = false;
-
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            Response transferResponse = null;
+            try
             {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spTransferFromWarehouseToShelf";
-                    command.Parameters.AddWithValue("@shelfItemQuantity", StringifyShelfItemQuantityList(transferRequest));
-                    int rowsAffected = command.ExecuteNonQuery();
-                    transferToShelfStatus = true;
-                }
-                catch (Exception ex)
-                {
-                    return false;
-                }
-                return transferToShelfStatus;
+                IMS.Entities.TransferToShelvesRequest entityTransferRequest = TransferTranslator.ToEntitiesObject(transferRequest);
+                IMS.Entities.Response entityTransferResponse = await _transferService.TransferToShelves(entityTransferRequest);
+                transferResponse = Translator.ToDataContractsObject(entityTransferResponse);
             }
-        }
-
-        private object StringifyShelfItemQuantityList(TransferToShelvesRequest transferToShelvesRequest)
-        {
-            string shelfItemQuantityList = "";
-            foreach (TransferToShelfRequest transferToShelfRequest in transferToShelvesRequest.ShelvesItemsQuantityList)
+            catch (Exception exception)
             {
-                foreach (ItemQuantityMapping itemQuantityMapping in transferToShelfRequest.ItemQuantityMapping)
+                transferResponse = new IMS.Contracts.Response()
                 {
-                    shelfItemQuantityList = shelfItemQuantityList + transferToShelfRequest.Shelf.Id.ToString() + ',' + itemQuantityMapping.Item.Id.ToString() + ',' + itemQuantityMapping.Quantity + ';';
-                }
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Transfer to shelves", IMS.Entities.Severity.Critical, transferRequest, transferResponse); }).Start();
             }
-            return shelfItemQuantityList;
+            return transferResponse;
         }
     }
 }
