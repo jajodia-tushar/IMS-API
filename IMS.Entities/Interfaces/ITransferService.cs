@@ -7,7 +7,6 @@ namespace IMS.Entities.Interfaces
 {
     public interface ITransferService
     {
-        Task<Response> TransferToWarehouse(int OrderId);
         Task<Response> TransferToShelves(TransferToShelvesRequest transferToShelvesRequest);
     }
 }

@@ -1,59 +1,84 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IMS.Contracts;
-using IMS.Core;
-using IMS.Core.Translators;
+using IMS.Core.Validators;
+using IMS.DataLayer.Interfaces;
+using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace IMS_API.Controllers
+namespace IMS.Core.services
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TransferController : ControllerBase
+    public class TransferService : ITransferService
     {
-        private ITransferService _transferService;
+        private ITransferDbContext _transferDbContext;
         private ILogManager _logger;
-        public TransferController(ITransferService transferService, ILogManager logManager)
+        private IHttpContextAccessor _httpContextAccessor;
+        private ITokenProvider _tokenProvider;
+
+        public TransferService(ITransferDbContext transferDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
         {
-            this._transferService = transferService;
-            this._logger = logManager;
+            this._transferDbContext = transferDbContext;
+            this._logger = logger;
+            this._tokenProvider = tokenProvider;
+            this._httpContextAccessor = httpContextAccessor;
         }
-        /// <summary>
-        /// Transfer items from warehouse to shelf
-        /// </summary>
-        /// <param name="transferRequest">The list of items and shelves to which transfer has to be made</param>
-        /// <returns>Status</returns>
-        /// <response code="200">Returns Success if transfer is successfull else returns status failure</response>
-        // Patch: api/TransferToShelves
-        [HttpPatch("TransferToShelves")]
-        public async Task<Response> TransferToShelf([FromBody] TransferToShelvesRequest transferRequest)
+        public async Task<Response> TransferToShelves(TransferToShelvesRequest transferToShelvesRequest)
         {
-            Response transferResponse = null;
+            Response transferToShelvesResponse = new Response();
+            int userId = -1;
             try
             {
-                IMS.Entities.TransferToShelvesRequest entityTransferRequest = TransferTranslator.ToEntitiesObject(transferRequest);
-                IMS.Entities.Response entityTransferResponse = await _transferService.TransferToShelves(entityTransferRequest);
-                transferResponse = Translator.ToDataContractsObject(entityTransferResponse);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        if (TransferValidator.ValidateTransferToShelvesRequest(transferToShelvesRequest) == false)
+                        {
+                            transferToShelvesResponse.Status = Status.Failure;
+                            transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.MissingValues);
+                            return transferToShelvesResponse;
+                        }
+                        bool responseStatus = await _transferDbContext.TransferToShelves(transferToShelvesRequest);
+                        if (responseStatus == true)
+                        {
+                            transferToShelvesResponse.Status = Status.Success;
+                        }
+                        else
+                        {
+                            transferToShelvesResponse.Status = Status.Failure;
+                            transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        new Task(() => { _logger.LogException(exception, "Transfer to shelves", IMS.Entities.Severity.Critical, transferToShelvesRequest, transferToShelvesResponse); }).Start();
+                    }
+                    return transferToShelvesResponse;
+                }
+                else
+                {
+                    transferToShelvesResponse.Status = Status.Failure;
+                    transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
             }
             catch (Exception exception)
             {
-                transferResponse = new IMS.Contracts.Response()
-                {
-                    Status = Status.Failure,
-                    Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.ServerError,
-                        ErrorMessage = Constants.ErrorMessages.ServerError
-                    }
-                };
-                new Task(() => { _logger.LogException(exception, "Transfer to shelves", IMS.Entities.Severity.Critical, transferRequest, transferResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "Transfer to shelves", IMS.Entities.Severity.Critical, transferToShelvesRequest, transferToShelvesResponse); }).Start();
             }
-            return transferResponse;
+            finally
+            {
+                Severity severity = Severity.No;
+                if (transferToShelvesResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(transferToShelvesRequest, transferToShelvesResponse, "Transfer to shelf", transferToShelvesResponse.Status, severity, userId); }).Start();
+            }
+            return transferToShelvesResponse;
         }
     }
 }
