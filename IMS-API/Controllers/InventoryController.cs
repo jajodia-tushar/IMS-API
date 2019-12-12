@@ -46,7 +46,7 @@ namespace IMS_API.Controllers
                 try
                 {
                     IMS.Entities.ShelfItemsResponse shelfItemsResponseEntity = await _inventoryService.GetShelfItemsByShelfCode(shelfCode);
-                    return Translator.ToDataContractsObject(shelfItemsResponseEntity);
+                    return ShelfItemsTranslator.ToDataContractsObject(shelfItemsResponseEntity);
                 }
                 catch (Exception exception)
                 {
