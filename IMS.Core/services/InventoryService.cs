@@ -69,7 +69,7 @@ namespace IMS.Core.services
             {
                 shelfItemsResponse.Status = Status.Failure;
                 shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                _logger.LogException(exception, shelfCode, shelfItemsResponse);
+                new Task(() => { _logger.LogException(exception, shelfCode, shelfItemsResponse); }).Start();
             }
             finally
             {
