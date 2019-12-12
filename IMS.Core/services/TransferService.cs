@@ -32,11 +32,7 @@ namespace IMS.Core.services
                 if (checkIfAnyValueIsNull(transferToShelvesRequest))
                 {
                     transferToShelvesResponse.Status = Status.Failure;
-                    transferToShelvesResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.BadRequest,
-                        ErrorMessage = Constants.ErrorMessages.MissingValues
-                    };
+                    transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.MissingValues);
                     return transferToShelvesResponse;
                 }
                 Status responseStatus =await _transferDbContext.TransferToShelves(transferToShelvesRequest);
@@ -47,12 +43,7 @@ namespace IMS.Core.services
                 else
                 {
                     transferToShelvesResponse.Status = Status.Failure;
-                    transferToShelvesResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.BadRequest,
-                        ErrorMessage = Constants.ErrorMessages.TranferFailure
-                    };
-
+                    transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
                 }
             }
             catch (Exception ex)
@@ -81,7 +72,7 @@ namespace IMS.Core.services
                 {
                     if(itemQuantityMapping.Item.Id==0)
                     {
-                        return false;
+                        return true;
                     }
                 }
             }
