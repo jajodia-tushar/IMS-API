@@ -22,7 +22,7 @@ namespace IMS.Core.Translators
             return contractVendorResponse;
         }
         
-        private static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> entityVendors)
+        public static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> entityVendors)
         {
             List<Contracts.Vendor> contractVendors = new List<Contracts.Vendor>();
             foreach (Entities.Vendor vendor in entityVendors)
@@ -32,7 +32,7 @@ namespace IMS.Core.Translators
             return contractVendors;
         }
 
-        private static Contracts.Vendor ToDataContractsObject(Entities.Vendor entityVendor)
+        public static Contracts.Vendor ToDataContractsObject(Entities.Vendor entityVendor)
         {
             return new Contracts.Vendor()
             {

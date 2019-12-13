@@ -35,7 +35,7 @@ namespace IMS.Core.Translators
             };
         }
 
-        private static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)
+        public static List<Contracts.Shelf> ToDataContractsObject(List<Entities.Shelf> shelfs)
         {
             var dtoShelves = new List<Contracts.Shelf>();
             foreach (var shelf in shelfs)
