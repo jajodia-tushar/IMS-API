@@ -6,6 +6,7 @@ using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,16 +22,15 @@ namespace IMS_API.Controllers
             _itemService = itemService;
         }
 
-
-
         /// <summary>
         /// Return All The Items Present In Inventory
         /// </summary>
         /// <returns>Details of All Items</returns>
         /// <response code="200">Returns All The Items From Inventory</response>
         // GET: api/Item
+        [Authorize(Roles = Constants.Roles.SuperAdmin)]
         [HttpGet]
-        public async Task<ItemResponse> GetAllItems()
+        public async Task<ItemResponse> Get()
         {
             ItemResponse contractItemsResponse = null;
             try
@@ -52,8 +52,7 @@ namespace IMS_API.Controllers
             }
             return contractItemsResponse;
         }
-
-
+        
         /// <summary>
         /// Retrieve The Item By Their ID
         /// </summary>
@@ -84,22 +83,21 @@ namespace IMS_API.Controllers
             }
             return contractItemsResponse;
         }
-
-
+        
         /// <summary>
         /// Creates A New Item
         /// </summary>
-        /// <param name="itemRequest"></param>
+        /// <param name="item"></param>
         /// <returns>Return All Items Along With Newly Created Item </returns>
         /// <response code="200">Returns Items List along with newly created Item if Item is added successfully otherwise it returns null with status failure</response>
         // POST: api/Item
         [HttpPost]
-        public async Task<ItemResponse> AddItem([FromBody]  ItemRequest itemRequest)
+        public async Task<ItemResponse> Add([FromBody]  Item item)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemRequest entityItemRequest = ItemTranslator.ToEntitiesObject(itemRequest);
+                IMS.Entities.Item entityItemRequest = ItemTranslator.ToEntitiesObject(item);
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.AddItem(entityItemRequest);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
@@ -117,8 +115,7 @@ namespace IMS_API.Controllers
             }
             return contractItemsResponse;
         }
-
-
+        
         /// <summary>
         /// Update the Specific Item
         /// </summary>
@@ -127,12 +124,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         // PATCH: api/Item
         [HttpPatch]
-        public async Task<ItemResponse> UpdateItem([FromBody] ItemRequest updatedItem)
+        public async Task<ItemResponse> Update([FromBody] Item updatedItem)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemRequest entityItemRequest = ItemTranslator.ToEntitiesObject(updatedItem);
+                IMS.Entities.Item entityItemRequest = ItemTranslator.ToEntitiesObject(updatedItem);
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.UpdateItem(entityItemRequest);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
@@ -150,8 +147,7 @@ namespace IMS_API.Controllers
             }
             return contractItemsResponse;
         }
-
-
+        
         /// <summary>
         /// Deactivate the specific Item
         /// </summary>
@@ -159,7 +155,7 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Item List along with Deactivated Item if that Item is softdeleted successfully otherwise it returns null with status failure</response>
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public async Task<ItemResponse> DeleteItems(int id)
+        public async Task<ItemResponse> Delete(int id)
         {
             ItemResponse contractItemsResponse = null;
             try

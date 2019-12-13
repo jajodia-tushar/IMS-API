@@ -20,7 +20,7 @@
             <returns>Items present in Particular Shelf</returns>
             <response code="200">Return Items Present in shelf along with shelf details if shelf code is valid otherwise it returns null with status failure </response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.GetAllItems">
+        <member name="M:IMS_API.Controllers.ItemController.Get">
             <summary>
             Return All The Items Present In Inventory
             </summary>
@@ -35,15 +35,15 @@
             <returns>Details of Item</returns>
             <response code="200">Returns Item Details if Item Id is valid otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.AddItem(IMS.Contracts.ItemRequest)">
+        <member name="M:IMS_API.Controllers.ItemController.Add(IMS.Contracts.Item)">
             <summary>
             Creates A New Item
             </summary>
-            <param name="itemRequest"></param>
+            <param name="item"></param>
             <returns>Return All Items Along With Newly Created Item </returns>
             <response code="200">Returns Items List along with newly created Item if Item is added successfully otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.UpdateItem(IMS.Contracts.ItemRequest)">
+        <member name="M:IMS_API.Controllers.ItemController.Update(IMS.Contracts.Item)">
             <summary>
             Update the Specific Item
             </summary>
@@ -51,7 +51,7 @@
             <returns>Returns Item List along with updtaed Item</returns>
             <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.DeleteItems(System.Int32)">
+        <member name="M:IMS_API.Controllers.ItemController.Delete(System.Int32)">
             <summary>
             Deactivate the specific Item
             </summary>

@@ -131,7 +131,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public async Task<ItemResponse> AddItem(ItemRequest itemRequest)
+        public async Task<ItemResponse> AddItem(Item item)
         {
             ItemResponse itemResponse = new ItemResponse();
             int userId = -1;
@@ -144,12 +144,12 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        itemResponse = await ValidateItem(itemRequest.item.Name);
+                        itemResponse = await ValidateItem(item.Name);
                         if (itemResponse.Error == null)
                         {
-                            int latestAddedItemId = await _itemDbContext.AddItem(itemRequest);
+                            int latestAddedItemId = await _itemDbContext.AddItem(item);
                             Item createdItem = await _itemDbContext.GetItemById(latestAddedItemId);
-                            if (createdItem.Name.Equals(itemRequest.item.Name))
+                            if (createdItem.Name.Equals(item.Name))
                             {
                                 itemResponse.Status = Status.Success;
                                 itemResponse.Items = await _itemDbContext.GetAllItems();
@@ -189,7 +189,7 @@ namespace IMS.Core.services
                 if (itemResponse.Status == Status.Failure)
                     severity = Severity.High;
 
-                new Task(() => { _logger.Log(itemRequest, itemResponse, "AddItem", itemResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(item, itemResponse, "AddItem", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }
@@ -253,7 +253,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public async Task<ItemResponse> UpdateItem(ItemRequest itemRequest)
+        public async Task<ItemResponse> UpdateItem(Item item)
         {
             ItemResponse itemResponse = new ItemResponse();
             int userId = -1;
@@ -266,14 +266,14 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if (string.IsNullOrEmpty(itemRequest.item.Name))
+                        if (string.IsNullOrEmpty(item.Name))
                         {
                             itemResponse.Status = Status.Failure;
                             itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidItemsDetails);
                             return itemResponse;
                         }
-                        Item updatedItem = await _itemDbContext.UpdateItem(itemRequest);
-                        if (updatedItem.Id.Equals(itemRequest.item.Id) && updatedItem.Name.Equals(itemRequest.item.Name) && updatedItem.MaxLimit.Equals(itemRequest.item.MaxLimit))
+                        Item updatedItem = await _itemDbContext.UpdateItem(item);
+                        if (updatedItem.Id.Equals(item.Id) && updatedItem.Name.Equals(item.Name) && updatedItem.MaxLimit.Equals(item.MaxLimit))
                         {
                             itemResponse.Status = Status.Success;
                             itemResponse.Items = await _itemDbContext.GetAllItems();
@@ -307,7 +307,7 @@ namespace IMS.Core.services
                 if (itemResponse.Status == Status.Failure)
                     severity = Severity.High;
 
-                new Task(() => { _logger.Log(itemRequest, itemResponse, "UpdateItem", itemResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(item, itemResponse, "UpdateItem", itemResponse.Status, severity, userId); }).Start();
             }
             return itemResponse;
         }

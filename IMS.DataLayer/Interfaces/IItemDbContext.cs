@@ -10,8 +10,8 @@ namespace IMS.DataLayer.Interfaces
     {
         Task<List<Item>> GetAllItems();
         Task<Item> GetItemById(int id);
-        Task<int> AddItem(ItemRequest itemRequest);
+        Task<int> AddItem(Item item);
         Task<bool> Delete(int id);
-        Task<Item> UpdateItem(ItemRequest itemRequest);
+        Task<Item> UpdateItem(Item item);
     }
 }

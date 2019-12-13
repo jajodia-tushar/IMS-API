@@ -51,30 +51,6 @@ namespace IMS.Core.Translators
             };
         }
 
-        public static Entities.ItemRequest ToEntitiesObject(Contracts.ItemRequest dtoItemRequest)
-        {
-            return new Entities.ItemRequest()
-            {
-                item = ToEntitiesObject(dtoItemRequest.item),
-                ShelfMinimumLimit = ToEntitiesObject(dtoItemRequest.ShelfMinimumLimit),
-                WarehouseMinimumLimit = dtoItemRequest.WarehouseMinimumLimit
-            };
-        }
-
-        private static List<Entities.ShelfMinimumLimitMapping> ToEntitiesObject(List<Contracts.ShelfMinimumLimitMapping> dtoShelfMinimumLimit)
-        {
-            List<Entities.ShelfMinimumLimitMapping> shelfMinimumLimitMappings = new List<Entities.ShelfMinimumLimitMapping>();
-            foreach (var shelfMinimum in dtoShelfMinimumLimit)
-            {
-                shelfMinimumLimitMappings.Add(new Entities.ShelfMinimumLimitMapping()
-                {
-                    ShelfId = shelfMinimum.ShelfId,
-                    ShelfMinimumLimt = shelfMinimum.ShelfMinimumLimit
-                });
-            }
-            return shelfMinimumLimitMappings;
-        }
-
         public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
             return new Contracts.Error()

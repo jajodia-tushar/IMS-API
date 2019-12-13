@@ -33,7 +33,7 @@ namespace IMS.UnitTesting.ControllerTests
             };
             _moqItemService.Setup(m => m.GetAllItems()).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.GetAllItems();
+            IMS.Contracts.ItemResponse actualResult = await itemController.Get();
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
@@ -72,7 +72,7 @@ namespace IMS.UnitTesting.ControllerTests
             };
             _moqItemService.Setup(m => m.AddItem(It.Is<Entities.Item>(r => r.Name.Equals("Bottle") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.AddItem(new Item { Name = "Bottle", MaxLimit = 5 });
+            IMS.Contracts.ItemResponse actualResult = await itemController.Add(new Item { Name = "Bottle", MaxLimit = 5 });
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
@@ -92,7 +92,7 @@ namespace IMS.UnitTesting.ControllerTests
             };
             _moqItemService.Setup(m => m.UpdateItem(It.Is<Entities.Item>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.UpdateItem(new Item { Id = 3, Name = "Bag1", MaxLimit = 5 });
+            IMS.Contracts.ItemResponse actualResult = await itemController.Update(new Item { Id = 3, Name = "Bag1", MaxLimit = 5 });
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
@@ -111,7 +111,7 @@ namespace IMS.UnitTesting.ControllerTests
             };
             _moqItemService.Setup(m => m.Delete(2)).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.DeleteItems(2);
+            IMS.Contracts.ItemResponse actualResult = await itemController.Delete(2);
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
