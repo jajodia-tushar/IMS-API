@@ -62,8 +62,8 @@ namespace IMS.Core.services
                 }
                 else
                 {
-                    response.Status = Status.Failure;
-                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    transferToShelvesResponse.Status = Status.Failure;
+                    transferToShelvesResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception ex)
@@ -100,7 +100,7 @@ namespace IMS.Core.services
         }
         public async Task<Response> TransferToWarehouse(int orderId)
         {
-            Response response = new Response();
+            Response transferToWarehouseResponse = new Response();
             int userId = -1;
             try
             {
@@ -111,41 +111,49 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        bool isTransferred = await _transferDbContext.TransferToWarehouse(orderId);
-                        if (isTransferred)
-                            response.Status = Status.Success;
+                        if(orderId == 0)
+                        {
+                            transferToWarehouseResponse.Status = Status.Failure;
+                            transferToWarehouseResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrderId);
+                        }
                         else
                         {
-                            response.Status = Status.Failure;
-                            response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
-                        }
+                            bool isTransferred = await _transferDbContext.TransferToWarehouse(orderId);
+                            if (isTransferred)
+                                transferToWarehouseResponse.Status = Status.Success;
+                            else
+                            {
+                                transferToWarehouseResponse.Status = Status.Failure;
+                                transferToWarehouseResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.TranferFailure);
+                            }
+                        } 
                     }
                     catch (Exception ex)
                     {
                         throw ex;
                     }
-                    return response;
+                    return transferToWarehouseResponse;
                 }
                 else
                 {
-                    response.Status = Status.Failure;
-                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    transferToWarehouseResponse.Status = Status.Failure;
+                    transferToWarehouseResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch
             {
-                response.Status = Status.Failure;
-                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                transferToWarehouseResponse.Status = Status.Failure;
+                transferToWarehouseResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (response.Status == Status.Failure)
+                if (transferToWarehouseResponse.Status == Status.Failure)
                     severity = Severity.High;
 
-                new Task(() => { _logger.Log(orderId, response, "TransferToWarehouse", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(orderId, transferToWarehouseResponse, "TransferToWarehouse", transferToWarehouseResponse.Status, severity, userId); }).Start();
             }
-            return response;
+            return transferToWarehouseResponse;
         }
     }
 }
