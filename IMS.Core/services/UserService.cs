@@ -39,10 +39,14 @@ namespace IMS.Core.services
                         getUsersResponse.Status = Status.Failure;
                         getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
 <<<<<<< HEAD
+<<<<<<< HEAD
                         List<User> adminsList = await _userDbContext.GetUsersByRole(RoleName);
 =======
                         List<User> adminsList = await _userDbContext.GetUsersByRole(RoleId);
 >>>>>>> Bugs fixed to return proper message on no users condition.
+=======
+                        List<User> adminsList = await _userDbContext.GetUsersByRole(RoleName);
+>>>>>>> Changed from taking role id to role name
                         if (adminsList.Count!=0)
                         {
                             getUsersResponse.Status = Status.Success;
