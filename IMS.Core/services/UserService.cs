@@ -23,7 +23,6 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-
         public async Task<UsersResponse> GetUsersByRole(string RoleName)
         {
             UsersResponse getUsersResponse = new UsersResponse();
