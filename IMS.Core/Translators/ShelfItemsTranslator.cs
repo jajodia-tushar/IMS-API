@@ -25,7 +25,7 @@ namespace IMS.Core.Translators
             return dtoShelfItemsResponse;
         }
 
-        private static List<Contracts.ItemQuantityMapping> ToDataContractsObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)
+        public static List<Contracts.ItemQuantityMapping> ToDataContractsObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)
         {
             var dtoItemQuantityMappingList = new List<Contracts.ItemQuantityMapping>();
             foreach (var itemQuantityMapping in doItemQuantityMappings)
