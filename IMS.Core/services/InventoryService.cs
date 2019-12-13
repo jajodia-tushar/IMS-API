@@ -59,15 +59,17 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        throw exception;
+                        new Task(() => { _logger.LogException(exception, "GetShelfItemsByShelfCode", Severity.Critical, shelfCode, shelfItemsResponse); }).Start();
+                        shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                 }
                 return shelfItemsResponse;
             }
-            catch
+            catch(Exception exception)
             {
                 shelfItemsResponse.Status = Status.Failure;
                 shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetShelfItemsByShelfCode", Severity.Critical, shelfCode, shelfItemsResponse); }).Start();
             }
             finally
             {

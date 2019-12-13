@@ -50,5 +50,36 @@ namespace IMS.DataLayer.Db
             }
             
         }
+
+        public void LogException(string callType, string request, string response, string stackTrace, string exceptionMessage, string innerException, string targetSite, string exceptionType, string severity)
+        {
+
+            try
+            {
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.LOGGING))
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddExceptionLog";
+                    command.Parameters.AddWithValue("@callType", callType);
+                    command.Parameters.AddWithValue("@request", request);
+                    command.Parameters.AddWithValue("@response", response);
+                    command.Parameters.AddWithValue("@stackTrace", stackTrace);
+                    command.Parameters.AddWithValue("@exceptionMessage", exceptionMessage);
+                    command.Parameters.AddWithValue("@innerException", innerException);
+                    command.Parameters.AddWithValue("@targetSite",targetSite);
+                    command.Parameters.AddWithValue("@exceptionType", exceptionType);
+                    command.Parameters.AddWithValue("@severity",severity);
+                    command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

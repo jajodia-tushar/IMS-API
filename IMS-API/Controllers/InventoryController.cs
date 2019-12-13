@@ -8,6 +8,7 @@ using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using IMS.Core;
+using IMS.Logging;
 
 namespace IMS_API.Controllers
 {
@@ -16,9 +17,11 @@ namespace IMS_API.Controllers
     public class InventoryController : ControllerBase
     {
         private IInventoryService _inventoryService;
-        public InventoryController(IInventoryService inventoryService)
+        private ILogManager _logger;
+        public InventoryController(IInventoryService inventoryService,ILogManager logManager)
         {
             this._inventoryService = inventoryService;
+            this._logger = logManager;
         }
 
         /// <summary>

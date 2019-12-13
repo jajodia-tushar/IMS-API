@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
@@ -22,30 +23,14 @@ namespace IMS.Logging
         {
             try
             {  
-
-              
-               
                 string requestJson = ConvertToString(request);
                 string responseJson = ConvertToString(response);
                 _logDbContext.Log(userId,status.ToString(), callType, severity.ToString(), requestJson, responseJson);
             }
-            catch(Exception e)
+            catch(Exception exception)
             {
+                throw exception;
             }
-        }
-
-        private string GetSeverity(Response response,string callType)
-        {
-            string severity = LogConstants.Severity.Critical;
-            if (response!=null)
-            {
-                if (response.Status == Status.Failure)
-                    severity = LogConstants.CallTypes.SeverityMapping[callType];
-                else
-                    severity = LogConstants.Severity.No;
-            }
-
-                return severity;
         }
 
         private string GetStatus(Response response)
@@ -78,6 +63,14 @@ namespace IMS.Logging
             return null;
         }
 
-       
+        public void LogException(Exception exception, string callType, Severity severity, object request, object response)
+        {
+            string exceptionMessage = exception.Message.ToString();
+            string exceptionType = exception.GetType().Name.ToString();
+            string stackTrace = exception.StackTrace.ToString();
+            string targetSite = exception.TargetSite == null ? null : exception.TargetSite.Name;
+            string innerException = exception.InnerException == null ? null : exception.InnerException.Message;
+            _logDbContext.LogException(callType,ConvertToString(request),ConvertToString(response),stackTrace,exceptionMessage,innerException,targetSite,exceptionType, severity.ToString());
+        }
     }
 }
