@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IMS_API.Controllers
 {
-    [Route("api/[controller]")]
+    
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -30,6 +30,7 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns user details and access token if username and password is valid otherwise it returns null and status failure</response>
 
         // POST: api/Login
+        [Route("api/[action]")]
         [HttpPost]
         public async Task<LoginResponse> Login([FromBody] LoginRequest login)
         {
@@ -57,7 +58,8 @@ namespace IMS_API.Controllers
 
         }
 
-        [HttpDelete("Logout")]
+        [Route("api/[action]")]
+        [HttpDelete]
         public async Task<Response> Logout()
         {
             IMS.Contracts.Response contractsResponse = null;
