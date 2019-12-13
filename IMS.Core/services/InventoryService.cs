@@ -59,7 +59,7 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, shelfCode, shelfItemsResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "GetShelfItemsByShelfCode", Severity.Critical, shelfCode, shelfItemsResponse); }).Start();
                         shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                 }
@@ -69,7 +69,7 @@ namespace IMS.Core.services
             {
                 shelfItemsResponse.Status = Status.Failure;
                 shelfItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, shelfCode, shelfItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetShelfItemsByShelfCode", Severity.Critical, shelfCode, shelfItemsResponse); }).Start();
             }
             finally
             {

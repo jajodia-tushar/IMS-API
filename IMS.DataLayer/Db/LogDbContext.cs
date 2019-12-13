@@ -51,7 +51,7 @@ namespace IMS.DataLayer.Db
             
         }
 
-        public void LogException(string exceptionMessage, string exceptionType, string exceptionSource, string request, string response)
+        public void LogException(string callType, string request, string response, string stackTrace, string exceptionMessage, string innerException, string targetSite, string exceptionType, string severity)
         {
 
             try
@@ -64,11 +64,15 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spAddExceptionLog";
-                    command.Parameters.AddWithValue("@exceptionMessage",exceptionMessage);
-                    command.Parameters.AddWithValue("@exceptionType",exceptionType);
-                    command.Parameters.AddWithValue("@exceptionSource", exceptionSource);
+                    command.Parameters.AddWithValue("@callType", callType);
                     command.Parameters.AddWithValue("@request", request);
                     command.Parameters.AddWithValue("@response", response);
+                    command.Parameters.AddWithValue("@stackTrace", stackTrace);
+                    command.Parameters.AddWithValue("@exceptionMessage", exceptionMessage);
+                    command.Parameters.AddWithValue("@innerException", innerException);
+                    command.Parameters.AddWithValue("@targetSite",targetSite);
+                    command.Parameters.AddWithValue("@exceptionType", exceptionType);
+                    command.Parameters.AddWithValue("@severity",severity);
                     command.ExecuteNonQueryAsync();
                 }
             }

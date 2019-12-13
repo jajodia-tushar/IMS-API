@@ -49,13 +49,12 @@ namespace IMS_API.Controllers
                 try
                 {
                     IMS.Entities.ShelfItemsResponse shelfItemsResponseEntity = await _inventoryService.GetShelfItemsByShelfCode(shelfCode);
-                    return Translator.ToDataContractsObject(shelfItemsResponseEntity);
+                    return ShelfItemsTranslator.ToDataContractsObject(shelfItemsResponseEntity);
                 }
                 catch (Exception exception)
                 {
                     shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.ServerError;
                     shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ServerError;
-                    new Task(() => { _logger.LogException(exception, shelfCode, shelfItemsResponse); }).Start();
                 }
             }
             return shelfItemsResponse;
