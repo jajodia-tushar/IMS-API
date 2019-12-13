@@ -14,6 +14,7 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class ItemController : ControllerBase
     {
         private IItemService _itemService;
@@ -28,7 +29,6 @@ namespace IMS_API.Controllers
         /// <returns>Details of All Items</returns>
         /// <response code="200">Returns All The Items From Inventory</response>
         // GET: api/Item
-        [Authorize(Roles = Constants.Roles.SuperAdmin)]
         [HttpGet]
         public async Task<ItemResponse> Get()
         {
