@@ -34,6 +34,7 @@ namespace IMS.Core
             public const string NoVendorsYet = "No Vendors To Display";
 
             public const string InvalidToken = "Token is invalid";
+            public const string LogoutFailed = "Logout Failed";
         }
 
         public static class ErrorCodes

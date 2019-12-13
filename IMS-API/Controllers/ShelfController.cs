@@ -43,7 +43,7 @@ namespace IMS_API.Controllers
         {
             IMS.Contracts.ShelfResponse dtoShelfResponse;
             IMS.Entities.ShelfResponse doShelfResponse = await _shelfService.GetShelfList();
-            dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
+            dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
             return dtoShelfResponse;
         }
         /// <summary>
@@ -67,7 +67,7 @@ namespace IMS_API.Controllers
         {
             IMS.Contracts.ShelfResponse dtoShelfResponse;
             IMS.Entities.ShelfResponse doShelfResponse =await _shelfService.GetShelfByShelfCode(shelfCode);
-            dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
+            dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
             return dtoShelfResponse;
             
         }
@@ -99,9 +99,9 @@ namespace IMS_API.Controllers
            ShelfResponse dtoShelfResponse = null;
             try
             {
-                IMS.Entities.Shelf doShelf = Translator.ToEntitiesObject(shelf);
+                IMS.Entities.Shelf doShelf = ShelfTranslator.ToEntitiesObject(shelf);
                 IMS.Entities.ShelfResponse doShelfResponse =await _shelfService.AddShelf(doShelf);
-                dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
+                dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
             }
             catch
             {
@@ -151,7 +151,7 @@ namespace IMS_API.Controllers
             {
 
                 IMS.Entities.ShelfResponse doShelfResponse = await _shelfService.Delete(shelfCode);
-                dtoShelfResponse = Translator.ToDataContractsObject(doShelfResponse);
+                dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
 
             }
             catch

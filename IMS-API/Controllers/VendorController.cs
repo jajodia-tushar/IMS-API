@@ -35,7 +35,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetVendorById(id);
-                contractsVendorValidationResponse = Translator.ToDataContractsObject(entityVendorValidationResponse);
+                contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch
             {
@@ -64,7 +64,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetAllVendors();
-                contractsVendorValidationResponse = Translator.ToDataContractsObject(entityVendorValidationResponse);
+                contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch
             {

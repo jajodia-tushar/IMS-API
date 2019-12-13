@@ -37,9 +37,9 @@ namespace IMS_API.Controllers
             LoginResponse contractsLoginResponse = null;
             try
             {
-                IMS.Entities.LoginRequest entityLoginRequest = Translator.ToEntitiesObject(login);
+                IMS.Entities.LoginRequest entityLoginRequest = LoginTranslator.ToEntitiesObject(login);
                 IMS.Entities.LoginResponse entityLoginResponse = await _loginService.Login(entityLoginRequest);
-                contractsLoginResponse = Translator.ToDataContractsObject(entityLoginResponse);
+                contractsLoginResponse = LoginTranslator.ToDataContractsObject(entityLoginResponse);
             }
             catch
             {
@@ -57,6 +57,30 @@ namespace IMS_API.Controllers
 
         }
 
+        [HttpDelete("Logout")]
+        public async Task<Response> Logout()
+        {
+            IMS.Contracts.Response contractsResponse = null;
+            try
+            {
+                IMS.Entities.Response response = await _loginService.Logout();
+                contractsResponse = Translator.ToDataContractsObject(response);
+               
+            }
+            catch
+            {
+               contractsResponse= new IMS.Contracts.LoginResponse()
+               {
+                   Status = Status.Failure,
+                   Error = new Error()
+                   {
+                       ErrorCode = Constants.ErrorCodes.ServerError,
+                       ErrorMessage = Constants.ErrorMessages.LogoutFailed
+                   }
+               };
+            }
+            return contractsResponse;
+        }
         
        
     }
