@@ -26,7 +26,7 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <returns>all admins along with status</returns>
         /// <response code="200">Returns all Admins</response>
-        [HttpGet("GetUsers/{RoleId}",Name = "Get(int RoleId)")]
+        [HttpGet("Role/{RoleId}",Name = "Get(int RoleId)")]
         public async Task<UsersResponse> GetUsersByRoleId(int RoleId)
         {
             UsersResponse contractUsers = null;

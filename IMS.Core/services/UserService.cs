@@ -39,7 +39,7 @@ namespace IMS.Core.services
                         getUsersResponse.Status = Status.Failure;
                         getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
                         List<User> adminsList = await _userDbContext.GetUsersByRole(RoleId);
-                        if (adminsList != null)
+                        if (adminsList.Count!=0)
                         {
                             getUsersResponse.Status = Status.Success;
                             getUsersResponse.Users = adminsList;
