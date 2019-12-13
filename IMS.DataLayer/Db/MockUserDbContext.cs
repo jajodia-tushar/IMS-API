@@ -68,7 +68,7 @@ namespace IMS.DataLayer.Dal
                    );
         }
 
-        public Task<List<User>> GetUsersByRole(int RoleId)
+        public Task<List<User>> GetUsersByRole(string RoleName)
         {
             throw new NotImplementedException();
         }

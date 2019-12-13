@@ -20,7 +20,7 @@ namespace IMS.DataLayer.Dal
             _dbProvider = dbConnectionProvider;
         }
 
-        public async Task<List<User>> GetUsersByRole(int RoleId)
+        public async Task<List<User>> GetUsersByRole(string RoleName)
         {
             List<User> users = new List<User>();
             MySqlDataReader reader = null;
@@ -35,7 +35,7 @@ namespace IMS.DataLayer.Dal
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetUsersByRole";
-                    command.Parameters.AddWithValue("@RoleId", RoleId);
+                    command.Parameters.AddWithValue("@RoleName", RoleName);
                     reader = command.ExecuteReader();
                     User user = null;
                     while (reader.Read())

@@ -10,6 +10,6 @@ namespace IMS.DataLayer.Interfaces
     public interface IUserDbContext
     {
         User GetUserByCredintials(string username, string password);
-        Task<List<User>> GetUsersByRole(int RoleId);
+        Task<List<User>> GetUsersByRole(string RoleName);
     }
 }

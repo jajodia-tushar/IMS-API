@@ -22,17 +22,18 @@ namespace IMS_API.Controllers
         }
         // GET: api/
         /// <summary>
-        /// returns all admins
+        /// returns all users based on the role name
         /// </summary>
-        /// <returns>all admins along with status</returns>
-        /// <response code="200">Returns all Admins</response>
-        [HttpGet("Role/{RoleId}",Name = "Get(int RoleId)")]
-        public async Task<UsersResponse> GetUsersByRoleId(int RoleId)
+        /// <param name="RoleName">Takes the name of the role corresponding to whihc we need users</param>
+        /// <returns>all users of the role name along with status</returns>
+        /// <response code="200">Returns users with status</response>
+        [HttpGet("Role/{RoleName}",Name = "Get(string RoleName)")]
+        public async Task<UsersResponse> GetUsersByRoleId(string RoleName)
         {
             UsersResponse contractUsers = null;
             try
             {
-                IMS.Entities.UsersResponse entityUsers = await _userService.GetUsersByRole(RoleId);
+                IMS.Entities.UsersResponse entityUsers = await _userService.GetUsersByRole(RoleName);
                 contractUsers = UserTranslator.ToDataContractsObject(entityUsers);
             }
             catch

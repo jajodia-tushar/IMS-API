@@ -23,7 +23,7 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-        public async Task<UsersResponse> GetUsersByRole(int RoleId)
+        public async Task<UsersResponse> GetUsersByRole(string RoleName)
         {
             UsersResponse getUsersResponse = new UsersResponse();
             int userId = -1;
@@ -38,7 +38,7 @@ namespace IMS.Core.services
                     {
                         getUsersResponse.Status = Status.Failure;
                         getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
-                        List<User> adminsList = await _userDbContext.GetUsersByRole(RoleId);
+                        List<User> adminsList = await _userDbContext.GetUsersByRole(RoleName);
                         if (adminsList.Count!=0)
                         {
                             getUsersResponse.Status = Status.Success;
@@ -67,7 +67,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (getUsersResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(RoleId, getUsersResponse, "Get Users By Id", getUsersResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(RoleName, getUsersResponse, "Get Users By Id", getUsersResponse.Status, severity, -1); }).Start();
             }
             return getUsersResponse;
         }
