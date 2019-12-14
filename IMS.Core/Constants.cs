@@ -42,14 +42,7 @@ namespace IMS.Core
             public const string NoVendorsYet = "No Vendors To Display";
 
             public const string InvalidToken = "Token is invalid";
-            public const string UnprocessableEntity = "Data is not valid";
-            public const string Conflict = "Item not added";
-            public const string InvalidItemsDetails = "Invalid Item Details";
-            public const string resourceNotFound = "Items Not Found";
-
-            public const string NotUpdated = "Items Not Updated";
-            public const string AlreadyPresent = "Item Already Added";
-            public const string AlreadyDeleted = "Item Already Deleted";
+            
             public const string LogoutFailed = "Logout Failed";
             public const string LogoutFailed = "Logout Failed";
             public const string OrderNotDeleted = "Vendor Order Not Deleted";

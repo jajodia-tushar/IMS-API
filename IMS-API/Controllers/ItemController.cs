@@ -6,6 +6,7 @@ using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +19,12 @@ namespace IMS_API.Controllers
     public class ItemController : ControllerBase
     {
         private IItemService _itemService;
-        public ItemController(IItemService itemService)
+        private ILogManager _logger;
+
+        public ItemController(IItemService itemService, ILogManager logManager)
         {
             _itemService = itemService;
+            this._logger = logManager;
         }
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.GetAllItems();
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 contractItemsResponse = new IMS.Contracts.ItemResponse()
                 {
@@ -49,6 +53,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "Get", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
@@ -69,7 +74,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.GetItemById(id);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
-            catch
+            catch (Exception exception)
             {
                 contractItemsResponse = new IMS.Contracts.ItemResponse()
                 {
@@ -80,6 +85,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "GetItemById", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
@@ -101,7 +107,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.AddItem(entityItemRequest);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 contractItemsResponse = new IMS.Contracts.ItemResponse()
                 {
@@ -112,6 +118,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "Add", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
@@ -133,7 +140,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.UpdateItem(entityItemRequest);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 contractItemsResponse = new IMS.Contracts.ItemResponse()
                 {
@@ -144,6 +151,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
@@ -163,7 +171,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.Delete(id);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 contractItemsResponse = new IMS.Contracts.ItemResponse()
                 {
@@ -174,6 +182,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "Delete", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }

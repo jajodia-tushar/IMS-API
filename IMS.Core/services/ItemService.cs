@@ -51,9 +51,10 @@ namespace IMS.Core.services
                             itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.resourceNotFound);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception exception)
                     {
-                        throw ex;
+                        new Task(() => { _logger.LogException(exception, "GetAllItems", Severity.Critical, null, itemResponse); }).Start();
+                        itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                 }
                 else
@@ -62,10 +63,11 @@ namespace IMS.Core.services
                     itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch
+            catch(Exception exception)
             {
                 itemResponse.Status = Status.Failure;
                 itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetAllItems", Severity.Critical, null, itemResponse); }).Start();
             }
             finally
             {
@@ -104,9 +106,10 @@ namespace IMS.Core.services
                             itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnprocessableEntity,Constants.ErrorMessages.resourceNotFound);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception exception)
                     {
-                        throw ex;
+                        new Task(() => { _logger.LogException(exception, "GetItemById", Severity.Critical, id, itemResponse); }).Start();
+                        itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                     return itemResponse;
                 }
@@ -116,10 +119,11 @@ namespace IMS.Core.services
                     itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch
+            catch(Exception exception)
             {
                 itemResponse.Status = Status.Failure;
                 itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetItemById", Severity.Critical, id, itemResponse); }).Start();
             }
             finally
             {
@@ -164,11 +168,11 @@ namespace IMS.Core.services
                         {
                             return itemResponse;
                         }
-                        
                     }
-                    catch (Exception ex)
+                    catch (Exception exception)
                     {
-                        throw ex;
+                        new Task(() => { _logger.LogException(exception, "AddItem", Severity.Critical, item, itemResponse); }).Start();
+                        itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                     return itemResponse;
                 }
@@ -178,10 +182,11 @@ namespace IMS.Core.services
                     itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch
+            catch(Exception exception)
             {
                 itemResponse.Status = Status.Failure;
                 itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "AddItem", Severity.Critical, item, itemResponse); }).Start();
             }
             finally
             {
@@ -225,9 +230,10 @@ namespace IMS.Core.services
                             itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NotDeleted);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception exception)
                     {
-                        throw ex;
+                        new Task(() => { _logger.LogException(exception, "Delete", Severity.Critical, id, itemResponse); }).Start();
+                        itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                     return itemResponse;
                 }
@@ -237,10 +243,11 @@ namespace IMS.Core.services
                     itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch
+            catch(Exception exception)
             {
                 itemResponse.Status = Status.Failure;
                 itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Delete", Severity.Critical, id, itemResponse); }).Start();
             }
             finally
             {
@@ -284,9 +291,10 @@ namespace IMS.Core.services
                             itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.NotUpdated);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception exception)
                     {
-                        throw ex;
+                        new Task(() => { _logger.LogException(exception, "UpdateItem", Severity.Critical, item, itemResponse); }).Start();
+                        itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                     }
                     return itemResponse;
                 }
@@ -296,10 +304,11 @@ namespace IMS.Core.services
                     itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch
+            catch(Exception exception)
             {
                 itemResponse.Status = Status.Failure;
                 itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "UpdateItem", Severity.Critical, item, itemResponse); }).Start();
             }
             finally
             {
