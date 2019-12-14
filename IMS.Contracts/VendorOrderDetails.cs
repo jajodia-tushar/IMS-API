@@ -6,7 +6,7 @@ namespace IMS.Contracts
 {
     public class VendorOrderDetails
     {
-        public int Orderid { get; set; }
+        public int OrderId { get; set; }
         public bool IsApproved { get; set; }
         public string RecievedBy { get; set; }
         public string SubmittedTo { get; set; }
@@ -15,6 +15,6 @@ namespace IMS.Contracts
         public string InvoiceNumber { get; set; }
         public string InvoiceImageUrl { get; set; }
         public DateTime Date { get; set; }
-        public List<ItemQuantityPriceMapping> VendorItemsQuantityPriceList { get; set; }
+        public List<ItemQuantityPriceMapping> OrderItemDetails { get; set; }
     }
 }
