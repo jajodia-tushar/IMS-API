@@ -15,7 +15,7 @@ namespace IMS.Entities
                 double totalPrice = 0;
                 if (this.Item != null)
                     totalPrice = this.Item.Rate * this.Quantity;
-                return Math.Round(totalPrice, 4);
+                return Math.Round(totalPrice, 2);
             }
         }
     }
