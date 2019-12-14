@@ -21,7 +21,7 @@ namespace IMS.Contracts
             get
             {
                 double totalAmount = 0;
-                if (this.OrderItemDetails != null && this.OrderItemDetails.Count != 0)
+                if (this.OrderItemDetails != null && this.OrderItemDetails.Count > 0)
                 {
                     foreach (ItemQuantityPriceMapping itemQtyPrice in this.OrderItemDetails)
                         totalAmount += itemQtyPrice.TotalPrice;
