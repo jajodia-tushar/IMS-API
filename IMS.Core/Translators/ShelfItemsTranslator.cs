@@ -45,7 +45,7 @@ namespace IMS.Core.Translators
             }
             return dtoItemQuantityMappingList;
         }
-        
+
         public static List<Entities.ItemQuantityMapping> ToEntitiesObject(List<Contracts.ItemQuantityMapping> contractItemsQuantityList)
         {
             List<Entities.ItemQuantityMapping> entityItemQuantityList = new List<Entities.ItemQuantityMapping>();
