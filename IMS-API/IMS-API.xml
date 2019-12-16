@@ -213,9 +213,9 @@
             <summary>
             Transfer items from warehouse to shelf
             </summary>
-            <param name="transferToShelvesRequest">The list of items and shelves to which transfer has to be made</param>
+            <param name="transferRequest">The list of items and shelves to which transfer has to be made</param>
             <returns>Status</returns>
-            <response code="200">Returns Success if tranfser is successfull else returns status failure</response>
+            <response code="200">Returns Success if transfer is successfull else returns status failure</response>
         </member>
         <member name="M:IMS_API.Controllers.TransferController.TransferToWarehouse(System.Int32)">
             <summary>
