@@ -38,18 +38,18 @@ namespace IMS.Core.services
                     {
                         getUsersResponse.Status = Status.Failure;
                         getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
-                        List<User> adminsList = await _userDbContext.GetUsersByRole(RoleName);
+                        List<User> userList = await _userDbContext.GetUsersByRole(RoleName);
 
-                        if (adminsList.Count!=0)
+                        if (userList.Count!=0)
                         {
                             getUsersResponse.Status = Status.Success;
-                            getUsersResponse.Users = adminsList;
+                            getUsersResponse.Users = userList;
                         }
                         return getUsersResponse;
                     }
-                    catch (Exception e)
+                    catch (Exception exception)
                     {
-                        throw e;
+                        new Task(() => { _logger.LogException(exception, "GetUserRoleById", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
                     }
                 }
                 else
@@ -58,10 +58,12 @@ namespace IMS.Core.services
                     getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 getUsersResponse.Status = Status.Failure;
                 getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetUserRoleById", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
+
             }
             finally
             {
