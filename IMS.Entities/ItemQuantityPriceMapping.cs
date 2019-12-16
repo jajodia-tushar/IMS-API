@@ -8,15 +8,6 @@ namespace IMS.Entities
     {
         public Item Item { get; set; }
         public int Quantity { get; set; }
-        public double TotalPrice
-        {
-            get
-            {
-                double totalPrice = 0;
-                if (this.Item != null)
-                    totalPrice = this.Item.Rate * this.Quantity;
-                return Math.Round(totalPrice, 2);
-            }
-        }
+        public double TotalPrice{ get;set; }
     }
 }

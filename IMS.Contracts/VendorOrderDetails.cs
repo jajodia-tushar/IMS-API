@@ -14,6 +14,8 @@ namespace IMS.Contracts
         public double TaxableAmount { get; set; }
         public string InvoiceNumber { get; set; }
         public string InvoiceImageUrl { get; set; }
+        public string ChallanNumber { get; set; }
+        public string ChallanImageUrl { get; set; }
         public DateTime Date { get; set; }
         public List<ItemQuantityPriceMapping> OrderItemDetails { get; set; }
         public double FinalAmount
