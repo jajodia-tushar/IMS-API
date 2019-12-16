@@ -9,7 +9,6 @@ namespace IMS.Entities
 {
     public class ColourCountMapping
     {
-        [JsonConverter(typeof(StringEnumConverter))]
         public Colour Colour;
         public int Count;
     }
