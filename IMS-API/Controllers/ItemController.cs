@@ -85,7 +85,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetItemById", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetItemById", IMS.Entities.Severity.Critical, id, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
@@ -118,7 +118,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Add", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "Add", IMS.Entities.Severity.Critical, item, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
@@ -151,7 +151,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.Critical, updatedItem, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
@@ -182,7 +182,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Delete", IMS.Entities.Severity.Critical, null, contractItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "Delete", IMS.Entities.Severity.Critical, id, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
