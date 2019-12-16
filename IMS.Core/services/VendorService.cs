@@ -93,14 +93,8 @@ namespace IMS.Core.services
                 if (await _tokenProvider.IsValidToken(token))
                 {
                     User user = Utility.GetUserFromToken(token);
-                    userId = user.Id;
-                    getVendorResponse.Status = Status.Failure;
                     getVendorResponse.Vendors = new List<Vendor>();
-                    getVendorResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.NotFound,
-                        ErrorMessage = Constants.ErrorMessages.InValidId
-                    };
+                    userId = user.Id;
                     try
                     {
                         if (vendorId > 0)
@@ -114,7 +108,15 @@ namespace IMS.Core.services
                             }
                             return getVendorResponse;
                         }
-
+                        else
+                        {
+                            getVendorResponse.Status = Status.Failure;
+                            getVendorResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.InValidId
+                            };
+                        }
                     }
                     catch (Exception exception)
                     {
