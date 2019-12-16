@@ -6,6 +6,6 @@ namespace IMS.Contracts
 {
     public class RAGStatusResponse : Response
     {
-        public Dictionary<string, List<ColourCountMapping>> RAGStatus = new Dictionary<string, List<ColourCountMapping>>();
+        public Dictionary<string, List<ColourCountMapping>> RAGStatus;
     }
 }
