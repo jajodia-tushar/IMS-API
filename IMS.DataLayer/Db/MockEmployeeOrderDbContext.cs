@@ -72,14 +72,5 @@ namespace IMS.DataLayer.Db
                 }
             };
         }
-        public Task<EmployeeOrder> AddEmployeeOrder(EmployeeOrder employeeOrder)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
