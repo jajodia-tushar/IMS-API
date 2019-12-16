@@ -6,7 +6,7 @@ namespace IMS.Entities
 {
     public class ColourCountMapping
     {
-        public Colour colour;
+        public string colour;
         public int Count;
     }
 }
