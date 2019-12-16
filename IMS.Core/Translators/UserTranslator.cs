@@ -43,7 +43,10 @@ namespace IMS.Core.Translators
             List<Contracts.User> contractUsers = new List<Contracts.User>();
             foreach(Entities.User user in entityUsers)
             {
-                contractUsers.Add(ToDataContractsObject(user));
+                if(user != null)
+                {
+                    contractUsers.Add(ToDataContractsObject(user));
+                }
             }
             return contractUsers;
         }

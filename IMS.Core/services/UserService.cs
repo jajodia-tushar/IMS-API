@@ -49,7 +49,7 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, "GetUserRoleById", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "GetUserRoleByName", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
                     }
                 }
                 else
@@ -62,7 +62,7 @@ namespace IMS.Core.services
             {
                 getUsersResponse.Status = Status.Failure;
                 getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetUserRoleById", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetUserRoleByName", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
 
             }
             finally
@@ -70,7 +70,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (getUsersResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(RoleName, getUsersResponse, "Get Users By Id", getUsersResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(RoleName, getUsersResponse, "Get Users By Role Name", getUsersResponse.Status, severity, -1); }).Start();
             }
             return getUsersResponse;
         }
