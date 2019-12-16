@@ -35,7 +35,7 @@ namespace IMS_API.Controllers
             {
                 IMS.Entities.TransferToShelvesRequest entityTransferToShelvesRequest = TransferTranslator.ToEntitiesObject(transferToShelvesRequest);
                 IMS.Entities.Response entityTransferToShelfResponse = await _transferService.TransferToShelves(entityTransferToShelvesRequest);
-                transferToShelfResponse = TransferTranslator.ToDataContractsObject(entityTransferToShelfResponse);
+                transferToShelfResponse = Translator.ToDataContractsObject(entityTransferToShelfResponse);
             }
             catch
             {
@@ -66,7 +66,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.Response entityTransferWarehouseResponse = await _transferService.TransferToWarehouse(orderId);
-                transferToWarehouseResponse = TransferTranslator.ToDataContractsObject(entityTransferWarehouseResponse);
+                transferToWarehouseResponse = Translator.ToDataContractsObject(entityTransferWarehouseResponse);
             }
             catch
             {
