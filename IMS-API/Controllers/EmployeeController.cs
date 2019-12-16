@@ -6,6 +6,7 @@ using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +18,11 @@ namespace IMS_API.Controllers
     public class EmployeeController : ControllerBase
     {
         private IEmployeeService employeeService;
-        public EmployeeController(IEmployeeService employeeService)
+        private ILogManager _logger;
+        public EmployeeController(IEmployeeService employeeService, ILogManager logManager)
         {
             this.employeeService = employeeService;
+            this._logger = logManager;
         }
 
         /// <summary>
@@ -38,7 +41,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(employeeId);
                 contractsEmployeeValidationResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 contractsEmployeeValidationResponse = new IMS.Contracts.GetEmployeeResponse()
                 {
@@ -49,6 +52,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "GetEmployeeById", IMS.Entities.Severity.Critical, employeeId, contractsEmployeeValidationResponse); }).Start();
             }
             return contractsEmployeeValidationResponse;
         }

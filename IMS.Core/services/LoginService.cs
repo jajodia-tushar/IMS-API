@@ -75,7 +75,7 @@ namespace IMS.Core.services
 
                 }
             }
-            catch(Exception e)
+            catch(Exception exception)
             {
                 loginResponse.Status = Status.Failure;
                 loginResponse.Error = new Error()
@@ -83,7 +83,7 @@ namespace IMS.Core.services
                     ErrorCode = Constants.ErrorCodes.ServerError,
                     ErrorMessage = Constants.ErrorMessages.ServerError
                 };
-
+                new Task(() => { _logger.LogException(exception, "Login", Severity.Critical, loginRequest, loginResponse); }).Start();
             }
             finally
             {
@@ -113,10 +113,11 @@ namespace IMS.Core.services
                
 
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                response.Status = Status.Success;
+                response.Status = Status.Failure;
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                new Task(() => { _logger.LogException(exception, "Logout", Severity.Critical, null, response); }).Start();
 
             }
             return response;

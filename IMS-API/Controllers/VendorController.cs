@@ -6,6 +6,7 @@ using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,9 +17,11 @@ namespace IMS_API.Controllers
     public class VendorController : ControllerBase
     {
         private IVendorService _vendorService;
-        public VendorController(IVendorService vendorService)
+        private ILogManager _logger;
+        public VendorController(IVendorService vendorService, ILogManager logManager)
         {
             this._vendorService = vendorService;
+            this._logger = logManager;
         }
 
         // GET: api/Default/5
@@ -37,7 +40,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetVendorById(id);
                 contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
                 {
@@ -48,6 +51,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "GetVendorById", IMS.Entities.Severity.Medium, id, contractsVendorValidationResponse); }).Start();
             }
             return contractsVendorValidationResponse;
         }
@@ -66,7 +70,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetAllVendors();
                 contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
                 {
@@ -77,6 +81,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "GetAllVendors", IMS.Entities.Severity.High, null, contractsVendorValidationResponse); }).Start();
             }
             return contractsVendorValidationResponse;
         }

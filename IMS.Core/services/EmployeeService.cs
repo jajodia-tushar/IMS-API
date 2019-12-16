@@ -51,9 +51,11 @@ namespace IMS.Core.services
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                throw ex;
+                employeeValidationResponse.Status = Status.Failure;
+                employeeValidationResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "ValidateEmployee", Severity.Critical, employeeId, employeeValidationResponse); }).Start();
             }
             finally
             {

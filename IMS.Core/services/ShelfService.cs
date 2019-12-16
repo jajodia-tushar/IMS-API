@@ -5,16 +5,19 @@ using System.Threading.Tasks;
 using IMS.DataLayer;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 
 namespace IMS.Core.services
 {
     public class ShelfService : IShelfService
     {
         private IShelfDbContext _shelfDbContext;
+        private ILogManager _logger;
 
-        public ShelfService(IShelfDbContext shelfDbContext)
+        public ShelfService(IShelfDbContext shelfDbContext, ILogManager logger)
         {
             _shelfDbContext = shelfDbContext;
+            _logger = logger;
         }
         public async Task<ShelfResponse> GetShelfList()
         {
@@ -41,9 +44,9 @@ namespace IMS.Core.services
             }
             catch(Exception exception)
             {
-
-                throw exception;
-
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetShelfList", Severity.Critical, null, shelfResponse); }).Start();
             }
           
             return shelfResponse;
@@ -74,9 +77,9 @@ namespace IMS.Core.services
             }
             catch (Exception exception)
             {
-
-                throw exception;
-
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetShelfByShelfCode", Severity.Critical, shelfCode, shelfResponse); }).Start();
             }
 
             return shelfResponse;
@@ -108,13 +111,12 @@ namespace IMS.Core.services
             }
             catch (Exception exception)
             {
-
-                throw exception;
-
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "AddShelf", Severity.High, shelf, shelfResponse); }).Start();
             }
             return shelfResponse;
-
-
+            
         }
 
         public async Task<ShelfResponse> Delete(string shelfCode)
@@ -144,13 +146,11 @@ namespace IMS.Core.services
             }
             catch (Exception exception)
             {
-
-                throw exception;
-
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Delete", Severity.High, shelfCode, shelfResponse); }).Start();
             }
-
             return shelfResponse;
-
         }
     }
 }

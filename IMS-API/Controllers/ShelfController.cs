@@ -7,6 +7,7 @@ using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,10 +19,12 @@ namespace IMS_API.Controllers
     {
 
         private IShelfService _shelfService;
+        private ILogManager _logger;
 
-        public ShelfController(IShelfService shelfService)
+        public ShelfController(IShelfService shelfService, ILogManager logManager)
         {
             _shelfService = shelfService;
+            this._logger = logManager;
         }
         /// <summary>
         /// Getting all Shelf List 
@@ -103,7 +106,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.ShelfResponse doShelfResponse =await _shelfService.AddShelf(doShelf);
                 dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
             }
-            catch
+            catch(Exception exception)
             {
                 dtoShelfResponse = new IMS.Contracts.ShelfResponse()
                 {
@@ -114,6 +117,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "Post", IMS.Entities.Severity.High, shelf, dtoShelfResponse); }).Start();
             }
             return dtoShelfResponse;
         }
@@ -154,7 +158,7 @@ namespace IMS_API.Controllers
                 dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
 
             }
-            catch
+            catch(Exception exception)
             {
                 dtoShelfResponse = new IMS.Contracts.ShelfResponse()
                 {
@@ -165,6 +169,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(exception, "DeleteShelfByShelfCode", IMS.Entities.Severity.High, shelfCode, dtoShelfResponse); }).Start();
             }
             return dtoShelfResponse;
         }
