@@ -29,5 +29,16 @@ namespace IMS.Core.Translators
             else
                 return null;
         }
+        public static Entities.Item ToEntitiesObject(Contracts.Item item)
+        {
+            return new Entities.Item()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                IsActive = item.IsActive,
+                MaxLimit = item.MaxLimit,
+                Rate = item.Rate
+            };
+        }
     }
 }

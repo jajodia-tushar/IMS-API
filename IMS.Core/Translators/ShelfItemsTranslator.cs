@@ -45,5 +45,20 @@ namespace IMS.Core.Translators
             }
             return dtoItemQuantityMappingList;
         }
+        
+        public static List<Entities.ItemQuantityMapping> ToEntitiesObject(List<Contracts.ItemQuantityMapping> contractItemsQuantityList)
+        {
+            List<Entities.ItemQuantityMapping> entityItemQuantityList = new List<Entities.ItemQuantityMapping>();
+            foreach (Contracts.ItemQuantityMapping itemQuantityMapping in contractItemsQuantityList)
+            {
+                IMS.Entities.ItemQuantityMapping entityItemQuantityMapping = new IMS.Entities.ItemQuantityMapping()
+                {
+                    Item = Translator.ToEntitiesObject(itemQuantityMapping.Item),
+                    Quantity = itemQuantityMapping.Quantity
+                };
+                entityItemQuantityList.Add(entityItemQuantityMapping);
+            }
+            return entityItemQuantityList;
+        }
     }
 }
