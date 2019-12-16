@@ -55,6 +55,7 @@ namespace IMS_API.Controllers
                 {
                     shelfItemsResponse.Error.ErrorCode = Constants.ErrorCodes.ServerError;
                     shelfItemsResponse.Error.ErrorMessage = Constants.ErrorMessages.ServerError;
+                    new Task(() => { _logger.LogException(exception, "Get", IMS.Entities.Severity.Critical, shelfCode, shelfItemsResponse); }).Start();
                 }
             }
             return shelfItemsResponse;

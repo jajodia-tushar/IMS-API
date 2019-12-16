@@ -40,9 +40,11 @@ namespace IMS.Core.services
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                throw ex;
+                getAllVendorsResponse.Status = Status.Failure;
+                getAllVendorsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, getAllVendorsResponse); }).Start();
             }
             finally
             {
@@ -79,9 +81,11 @@ namespace IMS.Core.services
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                throw ex;
+                getVendorResponse.Status = Status.Failure;
+                getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                new Task(() => { _logger.LogException(exception, "GetVendorById", Severity.High, vendorId, getVendorResponse); }).Start();
             }
             finally
             {
