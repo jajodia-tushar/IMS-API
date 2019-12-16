@@ -6,6 +6,6 @@ namespace IMS.Entities
 {
     public class RAGStatusResponse : Response
     {
-        public Dictionary<string, ColourCountMapping> RAGStatus;
+        public Dictionary<string, List<ColourCountMapping>> RAGStatus;
     }
 }

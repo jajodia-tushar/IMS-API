@@ -12,10 +12,22 @@ namespace IMS_API.Controllers
     [ApiController]
     public class ReportsController : ControllerBase
     {
-        [Route("GetRAGStatus")]
+        [Route("GetRAGStatus}")]
         [HttpGet]
         public async Task<RAGStatusResponse> GetRAGStatus()
         {
+            /*
+            RAGStatusResponse rAGStatusResponse = new RAGStatusResponse();
+            List<ColourCountMapping> c = new List<ColourCountMapping>();
+            rAGStatusResponse.Error = null;
+            rAGStatusResponse.Status = Status.Success;
+            c.Add(new ColourCountMapping() {Colour=Colour.Red,Count=9 });
+            c.Add(new ColourCountMapping() { Colour = Colour.Amber,Count = 10 });
+            c.Add(new ColourCountMapping() { Colour = Colour.Green, Count = 13 });
+            rAGStatusResponse.RAGStatus = new Dictionary<string, List<ColourCountMapping>>();
+            rAGStatusResponse.RAGStatus.Add("floor-1;A", c);
+            rAGStatusResponse.RAGStatus.Add("floor-2;B",c);
+            return rAGStatusResponse;*/
             throw new NotImplementedException();
         }
     }
