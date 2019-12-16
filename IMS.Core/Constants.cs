@@ -35,6 +35,8 @@ namespace IMS.Core
 
             public const string InvalidToken = "Token is invalid";
             public const string LogoutFailed = "Logout Failed";
+            public const string OrderNotDeleted = "Vendor Order Not Deleted";
+            public const string InvalidOrderId = "Order Id is not Valid";
         }
 
         public static class ErrorCodes
