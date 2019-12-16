@@ -73,7 +73,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (getAllVendorsResponse.Status == Status.Failure)
                     severity = Severity.Medium;
-                new Task(() => { _logger.Log("AllVendors", getAllVendorsResponse, "Getting all vendors", getAllVendorsResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log("AllVendors", getAllVendorsResponse, "Getting all vendors", getAllVendorsResponse.Status, severity, userId); }).Start();
             }
             return getAllVendorsResponse;
         }
@@ -132,7 +132,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (getVendorResponse.Status == Status.Failure)
                     severity = Severity.Medium;
-                new Task(() => { _logger.Log(vendorId, getVendorResponse, "Getting Vendor", getVendorResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(vendorId, getVendorResponse, "Getting Vendor", getVendorResponse.Status, severity, userId); }).Start();
             }
             return getVendorResponse;
         }
