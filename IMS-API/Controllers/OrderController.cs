@@ -30,7 +30,8 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <param name="orderId">'Order Id of that Particular Order</param>
         /// <response code="200">Returns status success if order is successfully deleted otherwise returns failure if order is not deleted</response>
-        [HttpDelete("{orderId}")]
+        [Route("VendorOrder/{orderId}")]
+        [HttpDelete]
         public async Task<Response> Delete(int orderId)
         {
             Response deleteVendorOrderResponse = null;
