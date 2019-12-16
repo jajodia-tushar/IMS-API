@@ -36,21 +36,23 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    getAllVendorsResponse.Status = Status.Failure;
-                    getAllVendorsResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.NotFound,
-                        ErrorMessage = Constants.ErrorMessages.NoVendorsYet
-                    };
                     try
                     {
                         List<Vendor> vendors = await _vendorDbContext.GetAllVendors();
-                        if (vendors != null)
+                        if (vendors.Count != 0)
                         {
                             getAllVendorsResponse.Status = Status.Success;
                             getAllVendorsResponse.Vendors = vendors;
                         }
-
+                        else
+                        {
+                            getAllVendorsResponse.Status = Status.Failure;
+                            getAllVendorsResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.NoVendorsYet
+                            };
+                        }
                     }
                     catch (Exception exception)
                     {
