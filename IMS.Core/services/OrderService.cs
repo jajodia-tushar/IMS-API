@@ -32,6 +32,7 @@ namespace IMS.Core.services
             _employeeService = employeeService;
             _vendorService = vendorService;
         }
+<<<<<<< HEAD
         public async Task<Response> Delete(int orderId)
         {
             Response deleteVendorOrderResponse = new Response();
@@ -98,6 +99,12 @@ namespace IMS.Core.services
                 deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidOrderId);
             }
             return deleteVendorOrderResponse;
+=======
+
+        public Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+>>>>>>> Added Controller
         }
     }
 }
