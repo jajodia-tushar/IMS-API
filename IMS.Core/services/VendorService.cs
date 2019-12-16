@@ -2,6 +2,7 @@
 using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,36 +14,59 @@ namespace IMS.Core.services
     {
         private IVendorDbContext _vendorDbContext;
         private ILogManager _logger;
+        private IHttpContextAccessor _httpContextAccessor;
+        private ITokenProvider _tokenProvider;
 
-        public VendorService(IVendorDbContext vendorDbContext, ILogManager logger)
+        public VendorService(IVendorDbContext vendorDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
         {
             this._vendorDbContext = vendorDbContext;
             this._logger = logger;
-
+            this._tokenProvider = tokenProvider;
+            this._httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<VendorResponse> GetAllVendors()
         {
             VendorResponse getAllVendorsResponse = new VendorResponse();
-            getAllVendorsResponse.Status = Status.Failure;
-            getAllVendorsResponse.Error = new Error()
-            {
-                ErrorCode = Constants.ErrorCodes.NotFound,
-                ErrorMessage = Constants.ErrorMessages.NoVendorsYet
-            };
+            int userId = -1;
             try
             {
-                List<Vendor> vendors = await _vendorDbContext.GetAllVendors();
-                if (vendors != null)
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    getAllVendorsResponse.Status = Status.Success;
-                    getAllVendorsResponse.Vendors = vendors;
-                }
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    getAllVendorsResponse.Status = Status.Failure;
+                    getAllVendorsResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.NotFound,
+                        ErrorMessage = Constants.ErrorMessages.NoVendorsYet
+                    };
+                    try
+                    {
+                        List<Vendor> vendors = await _vendorDbContext.GetAllVendors();
+                        if (vendors != null)
+                        {
+                            getAllVendorsResponse.Status = Status.Success;
+                            getAllVendorsResponse.Vendors = vendors;
+                        }
 
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                else
+                {
+                    getAllVendorsResponse.Status = Status.Failure;
+                    getAllVendorsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                getAllVendorsResponse.Status = Status.Failure;
+                getAllVendorsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
             }
             finally
             {
@@ -57,31 +81,51 @@ namespace IMS.Core.services
         public async Task<VendorResponse> GetVendorById(int vendorId)
         {
             VendorResponse getVendorResponse = new VendorResponse();
-            getVendorResponse.Status = Status.Failure;
-            getVendorResponse.Vendors = new List<Vendor>();
-            getVendorResponse.Error = new Error()
-            {
-                ErrorCode = Constants.ErrorCodes.NotFound,
-                ErrorMessage = Constants.ErrorMessages.InValidId
-            };
+            int userId = -1;
             try
             {
-                if (vendorId > 0)
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    Vendor vendor = await _vendorDbContext.GetVendorById(vendorId);
-                    if (vendor != null)
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    getVendorResponse.Status = Status.Failure;
+                    getVendorResponse.Vendors = new List<Vendor>();
+                    getVendorResponse.Error = new Error()
                     {
-                        getVendorResponse.Status = Status.Success;
-                        getVendorResponse.Vendors.Add(vendor);
+                        ErrorCode = Constants.ErrorCodes.NotFound,
+                        ErrorMessage = Constants.ErrorMessages.InValidId
+                    };
+                    try
+                    {
+                        if (vendorId > 0)
+                        {
+                            Vendor vendor = await _vendorDbContext.GetVendorById(vendorId);
+                            if (vendor != null)
+                            {
+                                getVendorResponse.Status = Status.Success;
+                                getVendorResponse.Vendors.Add(vendor);
+
+                            }
+                            return getVendorResponse;
+                        }
 
                     }
-                    return getVendorResponse;
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
                 }
-
+                else
+                {
+                    getVendorResponse.Status = Status.Failure;
+                    getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                getVendorResponse.Status = Status.Failure;
+                getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
             }
             finally
             {
