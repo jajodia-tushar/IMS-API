@@ -77,6 +77,7 @@ namespace IMS_API
             services.AddTransient<IInventoryDbContext, InventoryDbContext>();
             services.AddTransient<IVendorService, VendorService>();
             services.AddTransient<IVendorDbContext, VendorDbContext>();
+            services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
             services.AddTransient<IOrderService,OrderService>();
             services.AddTransient<IEmployeeOrderDbContext, EmployeeOrderDbContext>();
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();

@@ -11,6 +11,7 @@ using IMS.Logging;
 =======
 using IMS.Contracts;
 using IMS.Core;
+using IMS.Core.services;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Authorization;
