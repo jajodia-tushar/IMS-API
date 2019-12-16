@@ -123,18 +123,11 @@ namespace IMS.Core.services
                     getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-<<<<<<< HEAD
             catch (Exception exception)
             {
                 getVendorResponse.Status = Status.Failure;
                 getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
                 new Task(() => { _logger.LogException(exception, "GetVendorById", Severity.High, vendorId, getVendorResponse); }).Start();
-=======
-            catch
-            {
-                getVendorResponse.Status = Status.Failure;
-                getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
->>>>>>> Added token validation in vendor services.
             }
             finally
             {
