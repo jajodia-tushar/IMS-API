@@ -27,7 +27,7 @@ namespace IMS.Core.services
 
         public async Task<VendorResponse> GetAllVendors()
         {
-            VendorResponse getAllVendorsResponse = new VendorResponse();
+            VendorResponse vendorResponse = new VendorResponse();
             int userId = -1;
             try
             {
@@ -41,13 +41,13 @@ namespace IMS.Core.services
                         List<Vendor> vendors = await _vendorDbContext.GetAllVendors();
                         if (vendors.Count != 0)
                         {
-                            getAllVendorsResponse.Status = Status.Success;
-                            getAllVendorsResponse.Vendors = vendors;
+                            vendorResponse.Status = Status.Success;
+                            vendorResponse.Vendors = vendors;
                         }
                         else
                         {
-                            getAllVendorsResponse.Status = Status.Failure;
-                            getAllVendorsResponse.Error = new Error()
+                            vendorResponse.Status = Status.Failure;
+                            vendorResponse.Error = new Error()
                             {
                                 ErrorCode = Constants.ErrorCodes.NotFound,
                                 ErrorMessage = Constants.ErrorMessages.NoVendorsYet
@@ -56,36 +56,36 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        getAllVendorsResponse.Status = Status.Failure;
-                        getAllVendorsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
-                        new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, getAllVendorsResponse); }).Start();
+                        vendorResponse.Status = Status.Failure;
+                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                        new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, vendorResponse); }).Start();
                     }
                 }
                 else
                 {
-                    getAllVendorsResponse.Status = Status.Failure;
-                    getAllVendorsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    vendorResponse.Status = Status.Failure;
+                    vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception exception)
             {
-                getAllVendorsResponse.Status = Status.Failure;
-                getAllVendorsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
-                new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, getAllVendorsResponse); }).Start();
+                vendorResponse.Status = Status.Failure;
+                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, vendorResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (getAllVendorsResponse.Status == Status.Failure)
+                if (vendorResponse.Status == Status.Failure)
                     severity = Severity.Medium;
-                new Task(() => { _logger.Log("AllVendors", getAllVendorsResponse, "Getting all vendors", getAllVendorsResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log("AllVendors", vendorResponse, "Getting all vendors", vendorResponse.Status, severity, userId); }).Start();
             }
-            return getAllVendorsResponse;
+            return vendorResponse;
         }
 
         public async Task<VendorResponse> GetVendorById(int vendorId)
         {
-            VendorResponse getVendorResponse = new VendorResponse();
+            VendorResponse vendorResponse = new VendorResponse();
             int userId = -1;
             try
             {
@@ -93,7 +93,7 @@ namespace IMS.Core.services
                 if (await _tokenProvider.IsValidToken(token))
                 {
                     User user = Utility.GetUserFromToken(token);
-                    getVendorResponse.Vendors = new List<Vendor>();
+                    vendorResponse.Vendors = new List<Vendor>();
                     userId = user.Id;
                     try
                     {
@@ -102,16 +102,16 @@ namespace IMS.Core.services
                             Vendor vendor = await _vendorDbContext.GetVendorById(vendorId);
                             if (vendor != null)
                             {
-                                getVendorResponse.Status = Status.Success;
-                                getVendorResponse.Vendors.Add(vendor);
+                                vendorResponse.Status = Status.Success;
+                                vendorResponse.Vendors.Add(vendor);
 
                             }
-                            return getVendorResponse;
+                            return vendorResponse;
                         }
                         else
                         {
-                            getVendorResponse.Status = Status.Failure;
-                            getVendorResponse.Error = new Error()
+                            vendorResponse.Status = Status.Failure;
+                            vendorResponse.Error = new Error()
                             {
                                 ErrorCode = Constants.ErrorCodes.NotFound,
                                 ErrorMessage = Constants.ErrorMessages.InValidId
@@ -120,31 +120,31 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        getVendorResponse.Status = Status.Failure;
-                        getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
-                        new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, getVendorResponse); }).Start();
+                        vendorResponse.Status = Status.Failure;
+                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                        new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, vendorResponse); }).Start();
                     }
                 }
                 else
                 {
-                    getVendorResponse.Status = Status.Failure;
-                    getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    vendorResponse.Status = Status.Failure;
+                    vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception exception)
             {
-                getVendorResponse.Status = Status.Failure;
-                getVendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
-                new Task(() => { _logger.LogException(exception, "GetVendorById", Severity.High, vendorId, getVendorResponse); }).Start();
+                vendorResponse.Status = Status.Failure;
+                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                new Task(() => { _logger.LogException(exception, "GetVendorById", Severity.High, vendorId, vendorResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (getVendorResponse.Status == Status.Failure)
+                if (vendorResponse.Status == Status.Failure)
                     severity = Severity.Medium;
-                new Task(() => { _logger.Log(vendorId, getVendorResponse, "Getting Vendor", getVendorResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(vendorId, vendorResponse, "Getting Vendor", vendorResponse.Status, severity, userId); }).Start();
             }
-            return getVendorResponse;
+            return vendorResponse;
         }
     }
 }
