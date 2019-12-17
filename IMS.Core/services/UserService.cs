@@ -23,9 +23,14 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-        public async Task<UsersResponse> GetUsersByRole(string RoleName)
-        {
-            UsersResponse getUsersResponse = new UsersResponse();
+        public async Task<UsersResponse> GetUsersByRole(string roleName)
+        { 
+            UsersResponse usersResponse = new UsersResponse();
+            if (String.IsNullOrEmpty(roleName))
+            {
+                usersResponse.Status = Status.Failure;
+                usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.MissingValues);
+            }
             int userId = -1;
             try
             {
@@ -36,43 +41,43 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        getUsersResponse.Status = Status.Failure;
-                        getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
-                        List<User> userList = await _userDbContext.GetUsersByRole(RoleName);
+                        usersResponse.Status = Status.Failure;
+                        usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
+                        List<User> userList = await _userDbContext.GetUsersByRole(roleName);
 
                         if (userList.Count!=0)
                         {
-                            getUsersResponse.Status = Status.Success;
-                            getUsersResponse.Users = userList;
+                            usersResponse.Status = Status.Success;
+                            usersResponse.Users = userList;
                         }
-                        return getUsersResponse;
+                        return usersResponse;
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, "GetUserRoleByName", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "GetUserRoleByName", IMS.Entities.Severity.Medium, "Get Request", usersResponse); }).Start();
                     }
                 }
                 else
                 {
-                    getUsersResponse.Status = Status.Failure;
-                    getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    usersResponse.Status = Status.Failure;
+                    usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception exception)
             {
-                getUsersResponse.Status = Status.Failure;
-                getUsersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetUserRoleByName", IMS.Entities.Severity.Medium, "Get Request", getUsersResponse); }).Start();
+                usersResponse.Status = Status.Failure;
+                usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetUserRoleByName", IMS.Entities.Severity.Medium, "Get Request", usersResponse); }).Start();
 
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (getUsersResponse.Status == Status.Failure)
+                if (usersResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(RoleName, getUsersResponse, "Get Users By Role Name", getUsersResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(roleName, usersResponse, "Get Users By Role Name", usersResponse.Status, severity, -1); }).Start();
             }
-            return getUsersResponse;
+            return usersResponse;
         }
     }
 }

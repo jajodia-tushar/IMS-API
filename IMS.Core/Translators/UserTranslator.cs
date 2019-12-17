@@ -28,7 +28,10 @@ namespace IMS.Core.Translators
             if (entityUsersResponse.Status == Entities.Status.Success)
             {
                 contractsUsersResponse.Status = Contracts.Status.Success;
-                contractsUsersResponse.Users = ToDataContractsObject(entityUsersResponse.Users);
+                if(entityUsersResponse.Users!=null && entityUsersResponse.Users.Count > 0)
+                {
+                    contractsUsersResponse.Users = ToDataContractsObject(entityUsersResponse.Users);
+                }
             }
             else
             {
