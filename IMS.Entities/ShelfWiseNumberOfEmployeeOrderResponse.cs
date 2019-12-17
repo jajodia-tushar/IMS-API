@@ -6,6 +6,6 @@ namespace IMS.Entities
 {
    public class ShelfWiseNumberOfEmployeeOrderResponse:Response
    {
-        public Dictionary<string, List<ShelfEmployeeOrderCountMapping>> ShelfWiseEmployeeOrderOfEachDay;
+        public Dictionary<DateTime, List<ShelfEmployeeOrderCountMapping>> ShelfWiseEmployeeOrderOfEachDay;
    }
 }
