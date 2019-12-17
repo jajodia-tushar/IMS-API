@@ -10,16 +10,20 @@ namespace IMS.Core.Translators
     {
         public static Contracts.User ToDataContractsObject(Entities.User user)
         {
-            return new Contracts.User()
+            if(user!=null)
             {
-                Id = user.Id,
-                Username = user.Username,
-                Password = null,
-                Firstname = user.Firstname,
-                Lastname = user.Lastname,
-                Email = user.Email,
-                Role = RoleTranslator.ToDataContractsObject(user.Role)
-            };
+                return new Contracts.User()
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Password = null,
+                    Firstname = user.Firstname,
+                    Lastname = user.Lastname,
+                    Email = user.Email,
+                    Role = RoleTranslator.ToDataContractsObject(user.Role)
+                };
+            }
+            return null;
         }
 
         public static Contracts.UsersResponse ToDataContractsObject(Entities.UsersResponse entityUsersResponse)
