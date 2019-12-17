@@ -44,9 +44,10 @@ namespace IMS_API.Controllers
             MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
             return mostConsumedItemsResponse;
         }
-        [Route("GetShelfWiseOrderCount")]
+
+        [Route("GetShelfWiseOrder")]
         [HttpGet]
-        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseNumberOfEmployeeOrder(string FromDate,string ToDate)
+        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrder(string FromDate,string ToDate)
         {
             throw new NotImplementedException();
         }
