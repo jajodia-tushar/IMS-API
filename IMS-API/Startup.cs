@@ -79,6 +79,7 @@ namespace IMS_API
             services.AddTransient<IVendorDbContext, VendorDbContext>();
             services.AddTransient<IOrderService,OrderService>();
             services.AddTransient<IEmployeeOrderDbContext, EmployeeOrderDbContext>();
+            services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
 
         }
         public TokenValidationParameters CreateTokenValidationParameters()
