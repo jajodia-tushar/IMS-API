@@ -44,7 +44,6 @@ namespace IMS.Core
             public const string InvalidToken = "Token is invalid";
             
             public const string LogoutFailed = "Logout Failed";
-            public const string LogoutFailed = "Logout Failed";
             public const string OrderNotDeleted = "Vendor Order Not Deleted";
             public const string InvalidOrderId = "Order Id is not Valid";           
             public const string UnableToShowRecentEntries = "Unable to show Entries";
@@ -58,8 +57,6 @@ namespace IMS.Core
 
             public const string InvalidToken = "Token is invalid";
             public const string NotDeleted = "Item Not Deleted";
-
-
         }
 
         public static class ErrorCodes
