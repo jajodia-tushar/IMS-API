@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IMS.Contracts;
+using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,13 @@ namespace IMS_API.Controllers
     [ApiController]
     public class ReportsController : ControllerBase
     {
-        [Route("GetRAGStatus}")]
+        private IReportsService _reportsService;
+        ReportsController(IReportsService reportsService)
+        {
+            _reportsService = reportsService;
+        }
+
+        [Route("GetRAGStatus")]
         [HttpGet]
         public async Task<RAGStatusResponse> GetRAGStatus()
         {
