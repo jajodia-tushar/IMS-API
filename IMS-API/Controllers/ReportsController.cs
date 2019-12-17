@@ -37,5 +37,12 @@ namespace IMS_API.Controllers
             return rAGStatusResponse;*/
             throw new NotImplementedException();
         }
+
+        [HttpGet]
+        public MostConsumedItemsResponse Get(string StartDate, string EndDate, int ItemsCount)
+        {
+            MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
+            return mostConsumedItemsResponse;
+        }
     }
 }
