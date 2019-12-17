@@ -6,6 +6,6 @@ namespace IMS.Contracts
 {
     public class MostConsumedItemsResponse : Response
     {
-        public List<ItemQuantityMapping> itemQuantityMapping;
+        public List<ItemQuantityMapping> ItemQuantityMapping;
     }
 }

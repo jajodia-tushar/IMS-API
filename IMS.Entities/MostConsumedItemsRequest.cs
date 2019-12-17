@@ -4,7 +4,10 @@ using System.Text;
 
 namespace IMS.Entities
 {
-    class MostConsumedItemsRequest
+    public class MostConsumedItemsRequest
     {
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+        public int ItemsCount { get; set; }
     }
 }
