@@ -4,9 +4,9 @@ using System.Text;
 
 namespace IMS.Contracts
 {
-    public class ShelfEmployeeOrderCountMapping
+    public class ShelfOrderCountMapping
     {
         string ShelfName { get; set; }
-        int TotalNumberOfEmpOrder { get; set; }
+        int TotalNumberOfOrder { get; set; }
     }
 }
