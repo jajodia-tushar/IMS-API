@@ -7,6 +7,10 @@ namespace IMS.Entities.Interfaces
 {
     public interface IOrderService
     {
+
         Task<Response> Delete(int orderId);
+
+        Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize);
+
     }
 }

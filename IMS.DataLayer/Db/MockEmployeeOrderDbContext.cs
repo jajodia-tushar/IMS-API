@@ -72,5 +72,10 @@ namespace IMS.DataLayer.Db
                 }
             };
         }
+
+        public Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace IMS.Core.Translators
             else
             {
                 employeeValidationResponse.Status = Contracts.Status.Failure;
-                employeeValidationResponse.Error =Translator.ToDataContractsObject(entityresponse.Error);
+                employeeValidationResponse.Error = Translator.ToDataContractsObject(entityresponse.Error);
             }
             return employeeValidationResponse;
         }
@@ -32,6 +32,20 @@ namespace IMS.Core.Translators
                 ContactNumber = null,
                 TemporaryCardNumber = null,
                 AccessCardNumber = null,
+                IsActive = employee.IsActive
+            };
+        }
+        public static Entities.Employee ToEntitiesObject(Contracts.Employee employee)
+        {
+            return new Entities.Employee()
+            {
+                Id = employee.Id,
+                Firstname = employee.Firstname,
+                Lastname = employee.Lastname,
+                Email = employee.Email,
+                ContactNumber = employee.ContactNumber,
+                TemporaryCardNumber = employee.TemporaryCardNumber,
+                AccessCardNumber = employee.AccessCardNumber,
                 IsActive = employee.IsActive
             };
         }

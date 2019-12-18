@@ -12,7 +12,7 @@ namespace IMS.Core.services
 {
     public class OrderService : IOrderService
     {
-
+        
         private IVendorOrderDbContext _vendorOrderDbContext;
         private IEmployeeOrderDbContext _employeeOrderDbContext;
         private ITokenProvider _tokenProvider;
@@ -32,6 +32,7 @@ namespace IMS.Core.services
             _employeeService = employeeService;
             _vendorService = vendorService;
         }
+
         public async Task<Response> Delete(int orderId)
         {
             Response deleteVendorOrderResponse = new Response();
@@ -98,6 +99,66 @@ namespace IMS.Core.services
                 deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidOrderId);
             }
             return deleteVendorOrderResponse;
+        }
+
+        public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
+        {
+            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
+            int userId = -1;
+            employeeRecentOrderResponse.Status = Status.Failure;
+            employeeRecentOrderResponse.Error = new Error() { };
+            try
+            {
+                pageSize = (pageSize == 0) ? 10 :(pageSize<0) ? throw new Exception() : pageSize;
+                pageNumber = (pageNumber == 0) ? 1 : (pageNumber < 0) ? throw new Exception() : pageNumber;
+            
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageNumber, pageSize);
+                    if (employeeRecentOrders == null || employeeRecentOrders.Count==0)
+                    {
+                        employeeRecentOrderResponse.Status = Status.Failure;
+                        employeeRecentOrderResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.EmptyRecentEmployeeOrderList
+                        };
+                    }
+                    else
+                    {
+                        employeeRecentOrderResponse.Status = Status.Success;
+                        employeeRecentOrderResponse.EmployeeRecentOrders = employeeRecentOrders;
+                    }
+                }
+                else
+                {
+                    employeeRecentOrderResponse.Status = Status.Failure;
+                    employeeRecentOrderResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
+                    };
+                }
+            }
+            catch (Exception exception)
+            {
+                employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
+                employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.UnableToShowRecentEntries;
+                return employeeRecentOrderResponse;
+
+            }
+            finally
+            {
+                Severity severity = Severity.Medium;
+                if (employeeRecentOrderResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(new String("GET Method"), employeeRecentOrderResponse, "Employee Recent Order Entries", employeeRecentOrderResponse.Status, severity, -1); }).Start();
+            } 
+            return employeeRecentOrderResponse;
+
         }
     }
 }
