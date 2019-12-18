@@ -28,6 +28,21 @@
             <returns>User Details and Access Token</returns>
             <response code="200">Returns user details and access token if username and password is valid otherwise it returns null and status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.OrderController.GetOrdersByEmployeeId(System.String)">
+            <summary>
+            Returns orders placed by an employee, returns null if no orders and if wrong employee id, returns failure
+            </summary>
+            <param name="employeeId">Here employee id is used to identify the employee</param>
+            <returns>entire list of employee orders along with the employee details and status</returns>
+            <response code="200">Returns list of employee orders along with the employee details if employee id is valid otherwise it returns null and status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.PlaceEmployeeOrder(IMS.Contracts.EmployeeOrder)">
+            <summary>
+            Returns order placed by the employee with date and order id set
+            </summary>
+            <returns>entire employee order along with the status</returns>
+            <response code="200">Returns the employee order along with status success if it is placed, or failure incase it is not placed</response>
+        </member>
         <member name="M:IMS_API.Controllers.OrderController.GetEmployeeRecentOrderDetails(System.Nullable{System.Int32},System.Nullable{System.Int32})">
             <summary>
             Returns recent order placed by the employee with employee and employee order details

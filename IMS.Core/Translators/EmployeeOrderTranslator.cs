@@ -23,7 +23,6 @@ namespace IMS.Core.Translators
                 dtoEmployeeRecentOrderResponse.Status = Contracts.Status.Failure;
                 dtoEmployeeRecentOrderResponse.Error = Translator.ToDataContractsObject(doEmployeeRecentOrderResponse.Error);
             }
-
             return dtoEmployeeRecentOrderResponse;
         }
 
@@ -56,7 +55,6 @@ namespace IMS.Core.Translators
                 EmployeeItemsQuantityList = ShelfItemsTranslator.ToEntitiesObject(employeeOrder.EmployeeItemsQuantityList)
             };
         }
-
         public static Contracts.EmployeeOrderResponse ToDataContractsObject(Entities.EmployeeOrderResponse placeEmployeeOrderResponseEntity)
         {
             Contracts.EmployeeOrderResponse contractPlaceEmployeeOrderResponse = new Contracts.EmployeeOrderResponse();
@@ -73,13 +71,18 @@ namespace IMS.Core.Translators
 
         private static Contracts.EmployeeOrder ToDataContractsObject(Entities.EmployeeOrder employeeOrderEntity)
         {
-            return new Contracts.EmployeeOrder()
-            {
-                Employee = EmployeeTranslator.ToDataContractsObject(employeeOrderEntity.Employee),
-                EmployeeOrderDetails = ToDataContractsObject(employeeOrderEntity.EmployeeOrderDetails)
-            };
-        }
 
+            Contracts.EmployeeOrder contractEmployeeOrder = new Contracts.EmployeeOrder();
+            if (employeeOrderEntity.Employee != null)
+            {
+                contractEmployeeOrder.Employee = EmployeeTranslator.ToDataContractsObject(employeeOrderEntity.Employee);
+            }
+            if (employeeOrderEntity.EmployeeOrderDetails != null)
+            {
+                contractEmployeeOrder.EmployeeOrderDetails = ToDataContractsObject(employeeOrderEntity.EmployeeOrderDetails);
+            }
+            return contractEmployeeOrder;
+        }
         public static Contracts.OrdersByEmployeeIdResponse ToDataContractsObject(Entities.OrdersByEmployeeIdResponse entityEmployeeOrderResponse)
         {
             Contracts.OrdersByEmployeeIdResponse employeeOrderResponse = new Contracts.OrdersByEmployeeIdResponse();
@@ -89,41 +92,58 @@ namespace IMS.Core.Translators
             {
                 employeeOrderResponse.Status = Contracts.Status.Success;
                 employeeOrderResponse.Error = null;
+                if (employeeOrderResponse.EmployeeOrders != null && employeeOrderResponse.EmployeeOrders.Count > 0)
+                {
+                    employeeOrderResponse.EmployeeOrders = ToDataContractsObject(entityEmployeeOrderResponse.EmployeeOrders);
+                }
                 employeeOrderResponse.EmployeeOrders = ToDataContractsObject(entityEmployeeOrderResponse.EmployeeOrders);
             }
             if (entityEmployeeOrderResponse.Employee != null)
                 employeeOrderResponse.Employee = EmployeeTranslator.ToDataContractsObject(entityEmployeeOrderResponse.Employee);
             return employeeOrderResponse;
         }
-        public static List<Contracts.EmployeeOrderDetails> ToDataContractsObject(List<Entities.EmployeeOrderDetails> employeOrders)
+        public static List<Contracts.EmployeeOrderDetails> ToDataContractsObject(List<Entities.EmployeeOrderDetails> employeeOrders)
         {
             List<Contracts.EmployeeOrderDetails> orders = new List<Contracts.EmployeeOrderDetails>();
-            foreach (var contractOrderInstance in employeOrders)
+            foreach (var contractOrderInstance in employeeOrders)
             {
-                orders.Add(ToDataContractsObject(contractOrderInstance));
+                if (contractOrderInstance != null)
+                {
+                    orders.Add(ToDataContractsObject(contractOrderInstance));
+                }
             }
             return orders;
         }
-
-
         public static Contracts.EmployeeOrderDetails ToDataContractsObject(Entities.EmployeeOrderDetails entityEmployeeOrderInstance)
         {
-            return new IMS.Contracts.EmployeeOrderDetails()
+            Contracts.EmployeeOrderDetails contractEmployeeOrderDetails = new Contracts.EmployeeOrderDetails();
+            contractEmployeeOrderDetails.Date = entityEmployeeOrderInstance.Date;
+            contractEmployeeOrderDetails.OrderId = entityEmployeeOrderInstance.OrderId;
+            if (entityEmployeeOrderInstance.Shelf != null)
             {
-                Date = entityEmployeeOrderInstance.Date,
-                OrderId = entityEmployeeOrderInstance.OrderId,
-                Shelf = ShelfTranslator.ToDataContractsObject(entityEmployeeOrderInstance.Shelf),
-                EmployeeItemsQuantityList = ShelfItemsTranslator.ToDataContractsObject(entityEmployeeOrderInstance.EmployeeItemsQuantityList)
-            };
+                contractEmployeeOrderDetails.Shelf = ShelfTranslator.ToDataContractsObject(entityEmployeeOrderInstance.Shelf);
+            }
+            if (entityEmployeeOrderInstance.EmployeeItemsQuantityList != null)
+            {
+                contractEmployeeOrderDetails.EmployeeItemsQuantityList = ShelfItemsTranslator.ToDataContractsObject(entityEmployeeOrderInstance.EmployeeItemsQuantityList);
+            }
+            return contractEmployeeOrderDetails;
         }
-
         public static Entities.EmployeeOrder ToEntitiesObject(Contracts.EmployeeOrder employeeOrder)
         {
-            return new Entities.EmployeeOrder()
+            Entities.EmployeeOrder entityEmployeeOrder = new Entities.EmployeeOrder();
+            if (employeeOrder != null)
             {
-                Employee = EmployeeTranslator.ToEntitiesObject(employeeOrder.Employee),
-                EmployeeOrderDetails = ToEntitiesObject(employeeOrder.EmployeeOrderDetails)
-            };
+                if (employeeOrder.Employee != null)
+                {
+                    entityEmployeeOrder.Employee = EmployeeTranslator.ToEntitiesObject(employeeOrder.Employee);
+                }
+                if (employeeOrder.EmployeeOrderDetails != null)
+                {
+                    entityEmployeeOrder.EmployeeOrderDetails = ToEntitiesObject(employeeOrder.EmployeeOrderDetails);
+                }
+            }
+            return entityEmployeeOrder;
         }
     }
 }
