@@ -434,7 +434,10 @@ namespace IMS.Core.services
             List<Shelf> shelves = await _shelfDbContext.GetAllShelves();
             foreach(Shelf shelf in shelves)
             {
-                storeNames.Add(shelf.Name);
+                if(shelf.IsActive==true)
+                {
+                    storeNames.Add(shelf.Name);
+                }
             }
             storeNames.Add("Warehouse");
             return storeNames;
