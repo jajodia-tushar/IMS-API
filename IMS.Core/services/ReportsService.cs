@@ -432,16 +432,19 @@ namespace IMS.Core.services
 >>>>>>> completed stock status functionality
         {
             List<StockStatusList> stockStatusList = new List<StockStatusList>();
-            StockStatusList stockStatusInstance = new StockStatusList();
-            stockStatusInstance.Item = new Item();
-            stockStatusInstance.StockStatus = new List<StoreColourQuantity>();
             foreach(int id in stockStatusDict.Keys)
             {
+                StockStatusList stockStatusInstance = new StockStatusList();
+                stockStatusInstance.Item = new Item();
+                stockStatusInstance.StockStatus = new List<StoreColourQuantity>();
                 stockStatusInstance.Item =await _temporaryItemDbContext.GetItemById(id);
-                foreach(StoreColourQuantity listOfStockIterator in stockStatusDict[id])
+                List<StoreColourQuantity> storeColourQuantities = new List<StoreColourQuantity>();
+                storeColourQuantities = stockStatusDict[id];
+                foreach(StoreColourQuantity listOfStockIterator in storeColourQuantities)
                 {
                     stockStatusInstance.StockStatus.Add(listOfStockIterator);
                 }
+                stockStatusList.Add(stockStatusInstance);
             }
             return stockStatusList;
         }

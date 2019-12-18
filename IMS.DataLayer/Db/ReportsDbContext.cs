@@ -247,7 +247,7 @@ namespace IMS.DataLayer.Db
                     {
                         itemId = (int)reader["ItemId"];
                         ragColor = (string)reader["WarehouseRAG"];
-                        quantity = (int)reader["Quantity"];
+                        quantity = Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.ContainsKey(itemId))
                         {
                             stockStatus[itemId].Add(new StoreColourQuantity() { StoreName = "Warehouse", Colour = ReturnAccurateColourEnum(ragColor),Quantity=quantity});
@@ -262,7 +262,7 @@ namespace IMS.DataLayer.Db
                         itemId = (int)reader["ItemId"];
                         ragColor = (string)reader["ShelvesRAG"];
                         shelfName = (string)reader["ShelfName"];
-                        quantity = (int)reader["Quantity"];
+                        quantity = (int)Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.ContainsKey(itemId))
                         {
                             stockStatus[itemId].Add(new StoreColourQuantity() { StoreName = shelfName, Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });

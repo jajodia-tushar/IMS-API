@@ -27,12 +27,13 @@ namespace IMS.Core.Translators
         public static List<Contracts.StockStatusList> ToDataContractsObject(List<Entities.StockStatusList> stockStatus)
         {
             List<Contracts.StockStatusList> contractStockStatusList = new List<Contracts.StockStatusList>();
-            Contracts.StockStatusList contractStockStatus = new Contracts.StockStatusList();
-            if(contractStockStatusList!=null && contractStockStatusList.Count>0 )
+            if(stockStatus!=null && stockStatus.Count>0 )
             {
                 foreach(Entities.StockStatusList stockStatusList in stockStatus )
                 {
-                    if(stockStatusList.Item!=null)
+                    Contracts.StockStatusList contractStockStatus = new Contracts.StockStatusList();
+
+                    if (stockStatusList.Item!=null)
                     {
                         contractStockStatus.Item = Translator.ToDataContractsObject(stockStatusList.Item);
                     }
