@@ -2,8 +2,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
 WORKDIR /app
 COPY . /app
 
-RUN dotnet restore IMS-API.sln --source 
-https://api.nuget.org/v3/index.json && \
+RUN dotnet restore IMS-API.sln --source https://api.nuget.org/v3/index.json && \
     dotnet build IMS-API.sln -c Release && \
     dotnet publish IMS-API/IMS-API.csproj -c Release -o /app/publish
 
