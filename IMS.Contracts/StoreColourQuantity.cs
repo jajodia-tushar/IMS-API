@@ -5,8 +5,8 @@ namespace IMS.Contracts
 {
     public class StoreColourQuantity
     {
-        string StoreName { get; set; }
-        Colour Colour { get; set; }
-        int Quantity { get; set; }
+        public string StoreName { get; set; }
+        public Colour Colour { get; set; }
+        public int Quantity { get; set; }
     }
 }

@@ -43,5 +43,17 @@ namespace IMS.Core.Translators
                 Rate = contractsItem.Rate
             };
         }
+
+        public static Contracts.Item ToDataContractsObject(Entities.Item item)
+        {
+            return new Contracts.Item()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                IsActive = item.IsActive,
+                MaxLimit = item.MaxLimit,
+                Rate = item.Rate
+            };
+        }
     }
 }

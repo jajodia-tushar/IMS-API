@@ -11,5 +11,6 @@ namespace IMS.Entities.Interfaces
         Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate,string toDate);
         Task<MostConsumedItemsResponse> GetMostConsumedItems(string StartDate,string EndDate,int ItemsCount);
         Task<ItemsConsumptionReport> GetItemConsumptionStats(string startDate, string endDate);
+        Task<StockStatusResponse> GetStockStatus();
     }
 }

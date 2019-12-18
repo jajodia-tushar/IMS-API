@@ -288,7 +288,6 @@ namespace IMS.Core.services
                 { new ColourCountMapping() { Colour = Colour.Green, Count = 0 } }
             };
         }
-
         public async Task<ItemsConsumptionReport> GetItemConsumptionStats(string startDate, string endDate)
         {
             ItemsConsumptionReport itemConsumptionReport = new ItemsConsumptionReport();
@@ -366,6 +365,63 @@ namespace IMS.Core.services
             List<DateItemConsumption> sortedDateItemConsumptionList = dateItemConsumptionList.OrderBy(o => o.Date).ToList();
             return sortedDateItemConsumptionList;
         }
-
+        public async Task<StockStatusResponse> GetStockStatus()
+        {
+            StockStatusResponse stockStatusResponse = new StockStatusResponse();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        Dictionary<Item,List<StoreColourQuantity>> stockStatus = await _reportsDbContext.GetStockStatus();
+                        if (stockStatus!=null && stockStatus.Count != 0)
+                        {
+                            stockStatusResponse.Status = Status.Success;
+                            stockStatusResponse.StockStatus = stockStatus;
+                        }
+                        else
+                        {
+                            stockStatusResponse.Status = Status.Failure;
+                            stockStatusResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.NoItemsInStore
+                            };
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        stockStatusResponse.Status = Status.Failure;
+                        stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToShowStockStatus);
+                        new Task(() => { _logger.LogException(exception, "Get Stock Status", Severity.Medium, null, stockStatusResponse); }).Start();
+                    }
+                }
+                else
+                {
+                    stockStatusResponse.Status = Status.Failure;
+                    stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                stockStatusResponse.Status = Status.Failure;
+                stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToShowStockStatus);
+                new Task(() => { _logger.LogException(exception, "Get Stock Status", Severity.Medium, null, stockStatusResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (stockStatusResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log("Stock Status", stockStatusResponse, "Get Stock Status", stockStatusResponse.Status, severity, userId); }).Start();
+            }
+            return stockStatusResponse;
+        }
+>>>>>>> Completed service and controller layers.
     }
 }
