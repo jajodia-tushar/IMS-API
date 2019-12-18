@@ -9,5 +9,6 @@ namespace IMS.Entities.Interfaces
     {
         Task<RAGStatusResponse> GetRAGStatus();
         Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate,string ToDate);
+        Task<MostConsumedItemsResponse> GetMostConsumedItems(string StartDate,string EndDate,int ItemsCount);
     }
 }

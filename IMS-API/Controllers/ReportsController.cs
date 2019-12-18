@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IMS.Contracts;
+using IMS.Core;
+using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,9 +17,11 @@ namespace IMS_API.Controllers
     public class ReportsController : ControllerBase
     {
         private IReportsService _reportsService;
-        public ReportsController(IReportsService reportsService)
+        private ILogManager _logger;
+        ReportsController(IReportsService reportsService, ILogManager logManager)
         {
             _reportsService = reportsService;
+            this._logger = logManager;
         }
 
         [Route("GetRAGStatus")]
@@ -51,53 +56,28 @@ namespace IMS_API.Controllers
 
         [Route("GetMostConsumedItems/{StartDate}/{EndDate}/{ItemsCount}")]
         [HttpGet]
-        public MostConsumedItemsResponse Get(string StartDate, string EndDate, int ItemsCount)
+        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string StartDate, string EndDate, int ItemsCount)
         {
-            MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
-            List<ItemQuantityMapping> itemQuantityMappings = new List<ItemQuantityMapping>();
-            mostConsumedItemsResponse.Error = null;
-            mostConsumedItemsResponse.Status = Status.Success;
-            itemQuantityMappings.Add(new ItemQuantityMapping()
+            MostConsumedItemsResponse contractMostConsumedItemsResponse = null;
+            try
             {
-                Item = new Item()
-                {
-                    Id = 1,
-                    Name = "Pen",
-                    MaxLimit = 5,
-                    IsActive = true,
-                    ImageUrl = "abcdef",
-                    Rate = 5
-                },
-                Quantity = 5
-            });
-            itemQuantityMappings.Add(new ItemQuantityMapping()
+                IMS.Entities.MostConsumedItemsResponse entityMostConsumedItemsResponse = await _reportsService.GetMostConsumedItems(StartDate,EndDate,ItemsCount);
+                contractMostConsumedItemsResponse = ReportsTranslator.ToDataContractsObject(entityMostConsumedItemsResponse);
+            }
+            catch (Exception exception)
             {
-                Item = new Item()
+                contractMostConsumedItemsResponse = new IMS.Contracts.MostConsumedItemsResponse()
                 {
-                    Id = 2,
-                    Name = "Pencil",
-                    MaxLimit = 5,
-                    IsActive = true,
-                    ImageUrl = "abcdefghij",
-                    Rate = 2
-                },
-                Quantity = 15
-            });
-            itemQuantityMappings.Add(new ItemQuantityMapping()
-            {
-                Item = new Item()
-                {
-                    Id = 3,
-                    Name = "Marker",
-                    MaxLimit = 5,
-                    IsActive = true,
-                    ImageUrl = "abcdefghijklmn",
-                    Rate = 15
-                },
-                Quantity = 10
-            });
-            mostConsumedItemsResponse.ItemQuantityMapping = itemQuantityMappings;
-            return mostConsumedItemsResponse;
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", IMS.Entities.Severity.High, StartDate+";"+EndDate+";"+ItemsCount, contractMostConsumedItemsResponse); }).Start();
+            }
+            return contractMostConsumedItemsResponse;
         }
 
         [Route("GetShelfWiseOrderCount")]
