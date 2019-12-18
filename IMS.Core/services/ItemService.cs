@@ -53,8 +53,9 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, "GetAllItems", Severity.Critical, null, itemResponse); }).Start();
+                        itemResponse.Status = Status.Failure;
                         itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "GetAllItems", Severity.Critical, null, itemResponse); }).Start();
                     }
                 }
                 else
@@ -93,23 +94,30 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        Item item = await _itemDbContext.GetItemById(id);
-                        if (item.Id.Equals(id))
+                        itemResponse = ValidateItemId(id);
+                        if(itemResponse.Error == null)
                         {
-                            itemResponse.Status = Status.Success;
-                            itemList.Add(item);
-                            itemResponse.Items = itemList;
+                            Item item = await _itemDbContext.GetItemById(id);
+                            if (item.Id.Equals(id))
+                            {
+                                itemResponse.Status = Status.Success;
+                                itemList.Add(item);
+                                itemResponse.Items = itemList;
+                            }
+                            else
+                            {
+                                itemResponse.Status = Status.Failure;
+                                itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnprocessableEntity, Constants.ErrorMessages.resourceNotFound);
+                            }
+                            return itemResponse;
                         }
-                        else
-                        {
-                            itemResponse.Status = Status.Failure;
-                            itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnprocessableEntity,Constants.ErrorMessages.resourceNotFound);
-                        }
+                        return itemResponse;
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, "GetItemById", Severity.Critical, id, itemResponse); }).Start();
+                        itemResponse.Status = Status.Failure;
                         itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "GetItemById", Severity.Critical, id, itemResponse); }).Start();
                     }
                     return itemResponse;
                 }
@@ -163,16 +171,15 @@ namespace IMS.Core.services
                                 itemResponse.Status = Status.Failure;
                                 itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.Conflict);
                             }
-                        }
-                        else
-                        {
                             return itemResponse;
                         }
+                        return itemResponse;
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, "AddItem", Severity.Critical, item, itemResponse); }).Start();
+                        itemResponse.Status = Status.Failure;
                         itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "AddItem", Severity.Critical, item, itemResponse); }).Start();
                     }
                     return itemResponse;
                 }
@@ -232,8 +239,9 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, "Delete", Severity.Critical, id, itemResponse); }).Start();
+                        itemResponse.Status = Status.Failure;
                         itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "Delete", Severity.Critical, id, itemResponse); }).Start();
                     }
                     return itemResponse;
                 }
@@ -293,8 +301,9 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        new Task(() => { _logger.LogException(exception, "UpdateItem", Severity.Critical, item, itemResponse); }).Start();
+                        itemResponse.Status = Status.Failure;
                         itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "UpdateItem", Severity.Critical, item, itemResponse); }).Start();
                     }
                     return itemResponse;
                 }
@@ -361,6 +370,15 @@ namespace IMS.Core.services
             }
             return false;
         }
-        
+        private ItemResponse ValidateItemId(int id)
+        {
+            ItemResponse itemResponse = new ItemResponse();
+            if (id <= 0)
+            {
+                itemResponse.Status = Status.Failure;
+                itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidItemId);
+            }
+            return itemResponse;
+        }
     }
 }

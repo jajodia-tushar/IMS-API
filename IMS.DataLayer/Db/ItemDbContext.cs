@@ -42,13 +42,17 @@ namespace IMS.DataLayer.Db
                             MaxLimit = (int)reader["MaximumLimit"],
                             IsActive = (bool)reader["IsActive"],
                             ImageUrl = (string)reader["ImageUrl"],
-                            Rate = (double)reader["Rate"]
+                            Rate = (double)reader["Rate"],
+                            ShelvesRedLimit = (int)reader["ShelvesRedLimit"],
+                            ShelvesAmberLimit = (int)reader["ShelvesAmberLimit"],
+                            WarehouseRedLimit = (int)reader["WarehouseRedLimit"],
+                            WarehouseAmberLimit = (int)reader["WarehouseAmberLimit"]
                         });
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    throw ex;
+                    throw exception;
                 }
             }
             return items;
@@ -70,9 +74,9 @@ namespace IMS.DataLayer.Db
                     reader = await command.ExecuteReaderAsync();
                     item = ReadValuesFromDatabase(reader);
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    throw ex;
+                    throw exception;
                 }
             }
             return item;
@@ -97,13 +101,17 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@ImageUrl", item.ImageUrl);
                     command.Parameters.AddWithValue("@Ranking", 1);
                     command.Parameters.AddWithValue("@Rate", item.Rate);
+                    command.Parameters.AddWithValue("@ShelvesRedLimit", item.ShelvesRedLimit);
+                    command.Parameters.AddWithValue("@ShelvesAmberLimit", item.ShelvesAmberLimit);
+                    command.Parameters.AddWithValue("@WarehouseRedLimit", item.WarehouseRedLimit);
+                    command.Parameters.AddWithValue("@WarehouseAmberLimit", item.WarehouseAmberLimit);
                     reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                         latestAddedItemId = (int)reader["Id"];
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    throw ex;
+                    throw exception;
                 }
             }
             return latestAddedItemId;
@@ -130,9 +138,9 @@ namespace IMS.DataLayer.Db
                             isDeleted = true;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    throw ex;
+                    throw exception;
                 }
                 return isDeleted;
             }
@@ -157,6 +165,10 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@IsActive", updatedItem.IsActive);
                     command.Parameters.AddWithValue("@ImageUrl", updatedItem.ImageUrl);
                     command.Parameters.AddWithValue("@Rate", updatedItem.Rate);
+                    command.Parameters.AddWithValue("@ShelvesRedLimit", updatedItem.ShelvesRedLimit);
+                    command.Parameters.AddWithValue("@ShelvesAmberLimit", updatedItem.ShelvesAmberLimit);
+                    command.Parameters.AddWithValue("@WarehouseRedLimit", updatedItem.WarehouseRedLimit);
+                    command.Parameters.AddWithValue("@WarehouseAmberLimit", updatedItem.WarehouseAmberLimit);
                     reader = await command.ExecuteReaderAsync();
                     item = ReadValuesFromDatabase(reader);
                 }
@@ -178,6 +190,10 @@ namespace IMS.DataLayer.Db
                 item.IsActive = (bool)reader["IsActive"];
                 item.ImageUrl = (string)reader["ImageUrl"];
                 item.Rate = (double)reader["Rate"];
+                item.ShelvesRedLimit = (int)reader["ShelvesRedLimit"];
+                item.ShelvesAmberLimit = (int)reader["ShelvesAmberLimit"];
+                item.WarehouseRedLimit = (int)reader["WarehouseRedLimit"];
+                item.WarehouseAmberLimit = (int)reader["WarehouseAmberLimit"];
             }
             return item;
         }

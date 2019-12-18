@@ -34,6 +34,10 @@ namespace IMS.Core.Translators
                 item.IsActive = entityItem.IsActive;
                 item.ImageUrl = entityItem.ImageUrl;
                 item.Rate = entityItem.Rate;
+                item.ShelvesRedLimit = entityItem.ShelvesRedLimit;
+                item.ShelvesAmberLimit = entityItem.ShelvesAmberLimit;
+                item.WarehouseRedLimit = entityItem.WarehouseRedLimit;
+                item.WarehouseAmberLimit = entityItem.WarehouseAmberLimit;
                 dtoContractsItemList.Add(item);
             }
             return dtoContractsItemList;
@@ -47,7 +51,11 @@ namespace IMS.Core.Translators
                 MaxLimit = contractsItemRequest.MaxLimit,
                 IsActive = contractsItemRequest.IsActive,
                 ImageUrl = contractsItemRequest.ImageUrl,
-                Rate = contractsItemRequest.Rate
+                Rate = contractsItemRequest.Rate,
+                ShelvesRedLimit = contractsItemRequest.ShelvesRedLimit,
+                ShelvesAmberLimit = contractsItemRequest.ShelvesAmberLimit,
+                WarehouseRedLimit = contractsItemRequest.WarehouseRedLimit,
+                WarehouseAmberLimit = contractsItemRequest.WarehouseAmberLimit
             };
         }
 

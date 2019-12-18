@@ -57,6 +57,7 @@ namespace IMS.Core
 
             public const string InvalidToken = "Token is invalid";
             public const string NotDeleted = "Item Not Deleted";
+            public const string InvalidItemId = "Item Id is not valid";
         }
 
         public static class ErrorCodes
