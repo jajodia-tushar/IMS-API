@@ -8,6 +8,62 @@ namespace IMS.Core.Translators
 {
     public class ReportsTranslator
     {
+        public static Contracts.ShelfWiseOrderCountResponse ToDataContractsObject(Entities.ShelfWiseOrderCountResponse doShelfWiseOrderCountResponse)
+        {
+            Contracts.ShelfWiseOrderCountResponse dtoShelfWiseOrderCountResponse =
+                new Contracts.ShelfWiseOrderCountResponse();
+            if(doShelfWiseOrderCountResponse.Status ==Entities.Status.Success)
+            {
+                dtoShelfWiseOrderCountResponse.Status = Contracts.Status.Success;
+                dtoShelfWiseOrderCountResponse.DateWiseShelfOrderCount =
+               ToDataContractsObject(doShelfWiseOrderCountResponse.DateWiseShelfOrderCount);
+            }
+            else
+            {
+                dtoShelfWiseOrderCountResponse.Status = Contracts.Status.Failure;
+                dtoShelfWiseOrderCountResponse.Error = Translator.ToDataContractsObject(doShelfWiseOrderCountResponse.Error);
+            }
+            return dtoShelfWiseOrderCountResponse;
+        }
+
+        private static List<Contracts.DateShelfOrderMapping> ToDataContractsObject(List<Entities.DateShelfOrderMapping> doDateWiseShelfOrderCount)
+        {
+            List<Contracts.DateShelfOrderMapping> dtoDateShelfOrderMappings = new List<Contracts.DateShelfOrderMapping>();
+            foreach (var dateShelfOrder in doDateWiseShelfOrderCount )
+            {
+               dtoDateShelfOrderMappings.Add(ToDataContractsObject(dateShelfOrder));
+            }
+
+            return dtoDateShelfOrderMappings;
+        }
+
+        private static Contracts.DateShelfOrderMapping ToDataContractsObject(Entities.DateShelfOrderMapping doDateShelfOrder)
+        {
+            Contracts.DateShelfOrderMapping dtoDateShelfOrderMapping = new Contracts.DateShelfOrderMapping();
+            dtoDateShelfOrderMapping.Date = doDateShelfOrder.Date;
+            dtoDateShelfOrderMapping.ShelfOrderCountMappings = ToDataContractsObject(doDateShelfOrder.ShelfOrderCountMappings);
+            return dtoDateShelfOrderMapping;
+        }
+
+        private static List<Contracts.ShelfOrderCountMapping> ToDataContractsObject(List<Entities.ShelfOrderCountMapping> doShelfOrderCountMappings)
+        {
+            List<Contracts.ShelfOrderCountMapping> dtoShelfOrderCountMappings = new List<Contracts.ShelfOrderCountMapping>();
+            foreach(var shelfOrder in doShelfOrderCountMappings)
+            {
+                dtoShelfOrderCountMappings.Add(ToDataContractsObject(shelfOrder));
+            }
+            return dtoShelfOrderCountMappings;
+        }
+
+        private static Contracts.ShelfOrderCountMapping ToDataContractsObject(Entities.ShelfOrderCountMapping doShelfOrder)
+        {
+            Contracts.ShelfOrderCountMapping dtoShelfOrder = new Contracts.ShelfOrderCountMapping();
+            dtoShelfOrder.ShelfName = doShelfOrder.ShelfName;
+            dtoShelfOrder.TotalNumberOfOrder = doShelfOrder.TotalNumberOfOrder;
+            return dtoShelfOrder;
+        }
+    }
+}
         public static Contracts.MostConsumedItemsResponse ToDataContractsObject(Entities.MostConsumedItemsResponse doMostConsumedItemsResponse)
         {
             var dtoMostConsumedItemsResponse = new Contracts.MostConsumedItemsResponse();

@@ -23,7 +23,8 @@ namespace IMS_API.Controllers
         public ReportsController(IReportsService reportsService, ILogManager logManager)
         {
             _reportsService = reportsService;
-            this._logger = logManager;
+            _logger = logManager;
+
         }
 
         /// <summary>
@@ -89,12 +90,32 @@ namespace IMS_API.Controllers
             return mostConsumedItemsResponse;
         }
 
+        //http://localhost:55462/api/Reports/GetShelfWiseOrderCount?FromDate=10/12/2019&ToDate=19/12/2019
         [Route("GetShelfWiseOrderCount")]
         [HttpGet]
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate,string ToDate)
         {
-           
-            throw new NotImplementedException();
+            ShelfWiseOrderCountResponse dtoShelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
+            try
+            {
+                IMS.Entities.ShelfWiseOrderCountResponse doShelfWiseOrderCountResponse =
+                await _reportsService.GetShelfWiseOrderCountAsync(FromDate, ToDate);
+                dtoShelfWiseOrderCountResponse = ReportsTranslator.ToDataContractsObject(doShelfWiseOrderCountResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoShelfWiseOrderCountResponse = new IMS.Contracts.ShelfWiseOrderCountResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetAllVendors", IMS.Entities.Severity.High, null, dtoShelfWiseOrderCountResponse); }).Start();
+            }
+            return dtoShelfWiseOrderCountResponse;
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ namespace IMS.Entities
 {
     public class ShelfOrderCountMapping
     {
-        string ShelfName { get; set; } 
-        int TotalNumberOfOrder { get; set; }
+        public string ShelfName;
+        public int TotalNumberOfOrder;
     }
 }

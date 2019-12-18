@@ -1,5 +1,7 @@
-﻿using IMS.DataLayer.Interfaces;
+﻿using IMS.DataLayer.Dto;
+using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -89,6 +91,94 @@ namespace IMS.DataLayer.Db
                 }
                 return mostConsumedItemsResponse.ItemQuantityMapping;
             }
+        }
+
+        public async Task<List<DateShelfOrderMapping>> GetShelfWiseOrderCountByDate(DateTime StartDate, DateTime ToDate)
+        {
+            MySqlDataReader reader1 = null;
+            List<DateShelfOrderMapping> dateShelfOrderMappings = PopulateListWithZeroValues(StartDate,ToDate); 
+
+            
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    DateTime NewToDate = new DateTime(ToDate.Year, ToDate.Month, ToDate.Day + 1);
+              
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetOrderCountByDate";
+                    command.Parameters.AddWithValue("@FromDate", StartDate);
+                    command.Parameters.AddWithValue("@ToDate", NewToDate); 
+                    reader1 = command.ExecuteReader();
+                    while (reader1.Read())
+                    {
+
+                        DateTime date = (DateTime)reader1["OrderDate"];
+                        string ShelfName = (string)reader1["FloorName"];
+                        int TotalNumberOfOrder = Convert.ToInt32(reader1["TotalNumberOfEntries"]);
+                        var list = dateShelfOrderMappings.FindAll(obj => obj.Date.Date.Equals(date.Date));
+                        list.ForEach(obj =>
+                        {
+                            var ShelfOrderCountMappings = obj.ShelfOrderCountMappings;
+                            var internalList = ShelfOrderCountMappings.FindAll(innerObj => innerObj.ShelfName.Equals(ShelfName));
+                            internalList.ForEach(o =>
+                            {
+                                o.TotalNumberOfOrder = TotalNumberOfOrder;
+                            });
+                        });
+
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return dateShelfOrderMappings; 
+        }
+
+        private List<DateShelfOrderMapping> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
+        {
+
+            
+            List<DateShelfOrderMapping> dateShelfOrderMappings = new List<DateShelfOrderMapping>();
+            foreach (DateTime day in EachDay(startDate, toDate))
+            {
+                dateShelfOrderMappings.Add(
+                    new DateShelfOrderMapping()
+                    {
+                        Date = day,
+                        ShelfOrderCountMappings = GetList()
+                    }
+                );
+            }
+
+            return dateShelfOrderMappings;
+        }
+
+        private List<ShelfOrderCountMapping> GetList()
+        {
+            var list = new List<ShelfOrderCountMapping>();
+            list.Add(new ShelfOrderCountMapping()
+            {
+                ShelfName = "First Floor",
+                TotalNumberOfOrder = 0
+            });
+            list.Add(new ShelfOrderCountMapping()
+            {
+                ShelfName = "Sixth Floor",
+                TotalNumberOfOrder = 0
+            });
+            return list;
+        }
+        private IEnumerable<DateTime> EachDay(DateTime startDate, DateTime endDate)
+        {
+            for (var date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1)) yield
+            return date;
         }
 
         public async Task<Dictionary<string, List<ColourCountMapping>>> GetShelfRAGStatus()

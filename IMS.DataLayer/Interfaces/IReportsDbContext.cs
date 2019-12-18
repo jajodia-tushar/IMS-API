@@ -12,5 +12,7 @@ namespace IMS.DataLayer.Interfaces
         Task<Dictionary<string, List<ColourCountMapping>>> GetShelfRAGStatus();
         Task<List<ColourCountMapping>> GetWarehouseRAGStatus();
         Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate,string endDate);
+        Task<List<DateShelfOrderMapping>> GetShelfWiseOrderCountByDate(DateTime StartDate,DateTime ToDate );
     }
+
 }
