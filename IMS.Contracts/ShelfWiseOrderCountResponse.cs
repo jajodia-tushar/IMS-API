@@ -6,6 +6,6 @@ namespace IMS.Contracts
 {
     public class ShelfWiseOrderCountResponse:Response
     {
-        public Dictionary<DateTime, List<ShelfOrderCountMapping>> DateWiseShelfOrderCount;
+        public List<DateShelfOrderMapping> DateWiseShelfOrderCount;
     }
 }

@@ -14,7 +14,7 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        public Task<ShelfWiseOrderCountResponse> GetWiseNumberOfEmployeeOrder(string FromDate, string ToDate)
+        public Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate, string ToDate)
         {
             throw new NotImplementedException();
         }
