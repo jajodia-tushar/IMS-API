@@ -18,7 +18,7 @@ namespace IMS_API.Controllers
     {
         private IReportsService _reportsService;
         private ILogManager _logger;
-        ReportsController(IReportsService reportsService, ILogManager logManager)
+        public ReportsController(IReportsService reportsService, ILogManager logManager)
         {
             _reportsService = reportsService;
             this._logger = logManager;
