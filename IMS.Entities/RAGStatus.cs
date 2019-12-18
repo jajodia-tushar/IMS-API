@@ -4,7 +4,9 @@ using System.Text;
 
 namespace IMS.Entities
 {
-    class RAGStatus
+    public class RAGStatus
     {
+        public string LocationDetail;
+        public List<ColourCountMapping> ColourCountMappings;
     }
 }

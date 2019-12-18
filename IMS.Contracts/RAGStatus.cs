@@ -4,7 +4,9 @@ using System.Text;
 
 namespace IMS.Contracts
 {
-    class RAGStatus
+    public class RAGStatus
     {
+        public string LocationDetail;
+        public List<ColourCountMapping> ColourCountMappings;
     }
 }
