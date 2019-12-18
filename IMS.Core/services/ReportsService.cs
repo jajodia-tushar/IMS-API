@@ -28,9 +28,8 @@ namespace IMS.Core.services
             this._reportsDbContext = reportsDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
-            this._httpContextAccessor = httpContextAccessor;
             _shelfService = shelfService;
-=           this._temporaryItemDbContext = temporaryItemDbContext;
+            this._temporaryItemDbContext = temporaryItemDbContext;
         }
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
         {
@@ -384,6 +383,7 @@ namespace IMS.Core.services
                         if (stockStatus!=null && stockStatus.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
+                            stockStatusResponse.NamesOfAllStores = await GetStoreNames();
                             stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
                         }
                         else
@@ -427,6 +427,18 @@ namespace IMS.Core.services
 <<<<<<< HEAD
         private List<StockStatusList> ToListFromDictionary(Dictionary<Item, List<StoreColourQuantity>> stockStatus)
 =======
+
+        private async Task<List<string>> GetStoreNames()
+        {
+            List<string> storeNames = new List<string>();
+            List<Shelf> shelves = await _shelfDbContext.GetAllShelves();
+            foreach(Shelf shelf in shelves)
+            {
+                storeNames.Add(shelf.Name);
+            }
+            storeNames.Add("Warehouse");
+            return storeNames;
+        }
 
         public async Task<List<StockStatusList>> ToListFromDictionary(Dictionary<int, List<StoreColourQuantity>> stockStatusDict)
 >>>>>>> completed stock status functionality

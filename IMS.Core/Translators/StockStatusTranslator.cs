@@ -14,6 +14,7 @@ namespace IMS.Core.Translators
             if(entityStockStatusResponse.Status==Entities.Status.Success)
             {
                 contractStockStatusResponse.Status = Contracts.Status.Success;
+                contractStockStatusResponse.NamesOfAllStores = entityStockStatusResponse.NamesOfAllStores;
                 contractStockStatusResponse.StockStatusList = ToDataContractsObject(entityStockStatusResponse.StockStatusList);
             }
             else

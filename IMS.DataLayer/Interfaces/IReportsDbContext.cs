@@ -11,8 +11,12 @@ namespace IMS.DataLayer.Interfaces
         Task<List<ItemQuantityMapping>> GetMostConsumedItemsByDate(string startDate, string endDate, int itemsCount);
         Task<Dictionary<string, List<ColourCountMapping>>> GetShelfRAGStatus();
         Task<List<ColourCountMapping>> GetWarehouseRAGStatus();
+<<<<<<< HEAD
         Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate,string endDate);
         void GetShelfWiseOrderCountByDate(DateTime startDate,DateTime toDate, List<ShelfOrderStats> shelfOrderStats );
+=======
+        Task<Dictionary<int, List<StoreColourQuantity>>> GetStockStatus();
+>>>>>>> Added functionality of sending total names of stores in the response
     }
 
 }
