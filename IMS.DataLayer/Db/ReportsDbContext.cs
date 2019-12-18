@@ -218,6 +218,76 @@ namespace IMS.DataLayer.Db
             }
             return Colour.Green;
         }
+  
+        public async Task<Dictionary<int, List<StoreColourQuantity>>> GetStockStatus()
+        {
+            Dictionary<int, List<StoreColourQuantity>> stockStatus = new Dictionary<int, List<StoreColourQuantity>>();
+            /*MySqlDataReader reader = null;
+
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    List<Item> itemsList = await _temporaryItemDbContext.GetAllItems();
+                    foreach (Item item in itemsList )
+                    {
+                        stockStatus.Add(item.Id,new List<StoreColourQuantity>());
+                    }
+                    command.CommandText = "getRAGStatusOfItemsInWarehouse";
+                    reader = command.ExecuteReader();
+                    int itemId;
+                    string ragColor;
+                    int quantity;
+                    while (reader.Read())
+                    {
+                        itemId = (int)reader["ItemId"];
+                        ragColor = (string)reader["WarehouseRAG"];
+                        quantity = (int)reader["Quantity"];
+                        if (stockStatus.ContainsKey(itemId))
+                        {
+                            stockStatus[itemId].Add(new StoreColourQuantity() { StoreName = "Warehouse", Colour = ReturnAccurateColourEnum(ragColor),Quantity=quantity});
+                        }
+                    }
+                    reader.Close();
+                    command.CommandText = "getRAGStatusOfItemsInShelves";
+                    reader = command.ExecuteReader();
+                    string shelfName;
+                    while (reader.Read())
+                    {
+                        itemId = (int)reader["ItemId"];
+                        ragColor = (string)reader["ShelvesRAG"];
+                        shelfName = (string)reader["ShelfName"];
+                        quantity = (int)reader["Quantity"];
+                        if (stockStatus.ContainsKey(itemId))
+                        {
+                            stockStatus[itemId].Add(new StoreColourQuantity() { StoreName = shelfName, Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
+                        }
+                    }
+                    reader.Close();
+
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+
+            }*/
+            return stockStatus;
+        }
+
+        private Colour ReturnAccurateColourEnum(string RAGColour)
+        {
+            switch (RAGColour)
+            {
+                case "Red": return Colour.Red;
+                case "Amber": return Colour.Amber;
+            }
+            return Colour.Green;
+        }
     }
 }
-

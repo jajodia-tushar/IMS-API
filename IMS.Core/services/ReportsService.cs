@@ -22,13 +22,15 @@ namespace IMS.Core.services
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenProvider _tokenProvider;
         private IShelfService _shelfService;
-        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService)
+        private ITemporaryItemDbContext _temporaryItemDbContext;
+        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService, ITemporaryItemDbContext temporaryItemDbContext)
         {
             this._reportsDbContext = reportsDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
             _shelfService = shelfService;
+=           this._temporaryItemDbContext = temporaryItemDbContext;
         }
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
         {
@@ -378,11 +380,11 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        Dictionary<Item,List<StoreColourQuantity>> stockStatus = await _reportsDbContext.GetStockStatus();
+                        Dictionary<int,List<StoreColourQuantity>> stockStatus = await _reportsDbContext.GetStockStatus();
                         if (stockStatus!=null && stockStatus.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
-                            stockStatusResponse.StockStatusList = ToListFromDictionary(stockStatus);
+                            stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
                         }
                         else
                         {
@@ -422,9 +424,26 @@ namespace IMS.Core.services
             }
             return stockStatusResponse;
         }
+<<<<<<< HEAD
         private List<StockStatusList> ToListFromDictionary(Dictionary<Item, List<StoreColourQuantity>> stockStatus)
+=======
+
+        public async Task<List<StockStatusList>> ToListFromDictionary(Dictionary<int, List<StoreColourQuantity>> stockStatusDict)
+>>>>>>> completed stock status functionality
         {
-            throw new NotImplementedException();
+            List<StockStatusList> stockStatusList = new List<StockStatusList>();
+            StockStatusList stockStatusInstance = new StockStatusList();
+            stockStatusInstance.Item = new Item();
+            stockStatusInstance.StockStatus = new List<StoreColourQuantity>();
+            foreach(int id in stockStatusDict.Keys)
+            {
+                stockStatusInstance.Item =await _temporaryItemDbContext.GetItemById(id);
+                foreach(StoreColourQuantity listOfStockIterator in stockStatusDict[id])
+                {
+                    stockStatusInstance.StockStatus.Add(listOfStockIterator);
+                }
+            }
+            return stockStatusList;
         }
     }
 }
