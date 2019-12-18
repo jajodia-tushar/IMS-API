@@ -73,6 +73,16 @@ namespace IMS.DataLayer.Db
             };
         }
 
+        public Task<EmployeeOrder> AddEmployeeOrder(EmployeeOrder employeeOrder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string employeeId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(int pageNumber, int pageSize)
         {
             throw new NotImplementedException();

@@ -1,3 +1,4 @@
+using IMS.Core.Validators;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
@@ -12,7 +13,7 @@ namespace IMS.Core.services
 {
     public class OrderService : IOrderService
     {
-        
+
         private IVendorOrderDbContext _vendorOrderDbContext;
         private IEmployeeOrderDbContext _employeeOrderDbContext;
         private ITokenProvider _tokenProvider;
@@ -32,7 +33,6 @@ namespace IMS.Core.services
             _employeeService = employeeService;
             _vendorService = vendorService;
         }
-
         public async Task<Response> Delete(int orderId)
         {
             Response deleteVendorOrderResponse = new Response();
@@ -47,7 +47,7 @@ namespace IMS.Core.services
                     try
                     {
                         deleteVendorOrderResponse = ValidateOrderId(orderId);
-                        if(deleteVendorOrderResponse.Error == null)
+                        if (deleteVendorOrderResponse.Error == null)
                         {
                             bool isDeleted = await _vendorOrderDbContext.Delete(orderId);
                             if (isDeleted)
@@ -100,6 +100,90 @@ namespace IMS.Core.services
             }
             return deleteVendorOrderResponse;
         }
+        public async Task<OrdersByEmployeeIdResponse> GetEmployeeOrders(string employeeId)
+        {
+            OrdersByEmployeeIdResponse employeeOrdersResponse = new OrdersByEmployeeIdResponse();
+            employeeOrdersResponse.Error = new Error() { };
+            employeeOrdersResponse.Status = Status.Failure;
+            try
+            {
+                GetEmployeeResponse employeeResponse = _employeeService.ValidateEmployee(employeeId);
+                employeeOrdersResponse.Employee = employeeResponse.Employee;
+
+                if (employeeOrdersResponse.Employee != null)
+                {
+                    List<EmployeeOrderDetails> orders = await _employeeOrderDbContext.GetOrdersByEmployeeId(employeeId);
+                    if (orders.Count > 0)
+                    {
+                        employeeOrdersResponse.Status = Status.Success;
+                        employeeOrdersResponse.EmployeeOrders = orders;
+                        return employeeOrdersResponse;
+                    }
+                    employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoOrdersYet);
+
+                    return employeeOrdersResponse;
+                }
+                employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InValidId);
+            }
+            catch (Exception exception)
+            {
+                new Task(() => { _logger.LogException(exception, "Retrieving orders by employee id", IMS.Entities.Severity.Critical, employeeId, employeeOrdersResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (employeeOrdersResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(employeeId, employeeOrdersResponse, "Retrieving orders by employee id", employeeOrdersResponse.Status, severity, -1); }).Start();
+            }
+            return employeeOrdersResponse;
+        }
+
+
+        public async Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder)
+        {
+            EmployeeOrderResponse placeEmployeeOrderResponse = new EmployeeOrderResponse();
+            placeEmployeeOrderResponse.Error = new Error() { };
+            placeEmployeeOrderResponse.Status = Status.Failure;
+            if (EmployeeOrderValidator.ValidateEmployeeOrder(employeeOrder) == false)
+            {
+                placeEmployeeOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.MissingValues);
+                placeEmployeeOrderResponse.EmployeeOrder = null;
+                return placeEmployeeOrderResponse;
+            }
+            try
+            {
+                GetEmployeeResponse employeeResponse = _employeeService.ValidateEmployee(employeeOrder.Employee.Id);
+                if (employeeResponse.Employee != null && employeeResponse.Employee.IsActive != false)
+                {
+                    placeEmployeeOrderResponse.EmployeeOrder = await _employeeOrderDbContext.AddEmployeeOrder(employeeOrder);
+                    if (placeEmployeeOrderResponse.EmployeeOrder != null)
+                    {
+                        placeEmployeeOrderResponse.Status = Status.Success;
+                        return placeEmployeeOrderResponse;
+                    }
+                    placeEmployeeOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.UnableToPlaceOrder);
+
+                    return placeEmployeeOrderResponse;
+                }
+                placeEmployeeOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InValidId);
+
+            }
+            catch (Exception exception)
+            {
+                placeEmployeeOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.UnableToPlaceOrder);
+                new Task(() => { _logger.LogException(exception, "Place employee order", IMS.Entities.Severity.Critical, employeeOrder, placeEmployeeOrderResponse); }).Start();
+                return placeEmployeeOrderResponse;
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (placeEmployeeOrderResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(employeeOrder, placeEmployeeOrderResponse, "Place employee order", placeEmployeeOrderResponse.Status, severity, -1); }).Start();
+            }
+            return placeEmployeeOrderResponse;
+        }
 
         public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
         {
@@ -109,16 +193,16 @@ namespace IMS.Core.services
             employeeRecentOrderResponse.Error = new Error() { };
             try
             {
-                pageSize = (pageSize == 0) ? 10 :(pageSize<0) ? throw new Exception() : pageSize;
+                pageSize = (pageSize == 0) ? 10 : (pageSize < 0) ? throw new Exception() : pageSize;
                 pageNumber = (pageNumber == 0) ? 1 : (pageNumber < 0) ? throw new Exception() : pageNumber;
-            
+
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 if (await _tokenProvider.IsValidToken(token))
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
                     List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageNumber, pageSize);
-                    if (employeeRecentOrders == null || employeeRecentOrders.Count==0)
+                    if (employeeRecentOrders == null || employeeRecentOrders.Count == 0)
                     {
                         employeeRecentOrderResponse.Status = Status.Failure;
                         employeeRecentOrderResponse.Error = new Error()
@@ -156,7 +240,7 @@ namespace IMS.Core.services
                 if (employeeRecentOrderResponse.Status == Status.Failure)
                     severity = Severity.Critical;
                 new Task(() => { _logger.Log(new String("GET Method"), employeeRecentOrderResponse, "Employee Recent Order Entries", employeeRecentOrderResponse.Status, severity, -1); }).Start();
-            } 
+            }
             return employeeRecentOrderResponse;
 
         }

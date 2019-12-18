@@ -8,6 +8,7 @@ using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Authorization;
+using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,12 +20,77 @@ namespace IMS_API.Controllers
     {
         private IOrderService _orderService;
         private ILogManager _logger;
-        public OrderController(IOrderService orderService, ILogManager logManager)
+        public OrderController(IOrderService orderService, ILogManager logger)
         {
             _orderService = orderService;
-            _logger = logManager;
+            _logger = logger;
         }
 
+
+
+
+        /// <summary>
+        /// Returns orders placed by an employee, returns null if no orders and if wrong employee id, returns failure
+        /// </summary>
+        /// <param name="employeeId">Here employee id is used to identify the employee</param>
+        /// <returns>entire list of employee orders along with the employee details and status</returns>
+        /// <response code="200">Returns list of employee orders along with the employee details if employee id is valid otherwise it returns null and status failure</response>
+        // GET: api/Orders/EmployeOrders/1126
+        [HttpGet("EmployeeOrders/{EmployeeId}", Name = "GetEmployeeOrderById")]
+        public async Task<OrdersByEmployeeIdResponse> GetOrdersByEmployeeId(string employeeId)
+        {
+            OrdersByEmployeeIdResponse emloyeeOrderResponse = null;
+            try
+            {
+                IMS.Entities.OrdersByEmployeeIdResponse employeeOrderResponseEntity = await _orderService.GetEmployeeOrders(employeeId);
+                emloyeeOrderResponse = EmployeeOrderTranslator.ToDataContractsObject(employeeOrderResponseEntity);
+            }
+            catch (Exception ex)
+            {
+                emloyeeOrderResponse = new IMS.Contracts.OrdersByEmployeeIdResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+            }
+            return emloyeeOrderResponse;
+        }
+
+
+        /// <summary>
+        /// Returns order placed by the employee with date and order id set
+        /// </summary>
+        /// <returns>entire employee order along with the status</returns>
+        /// <response code="200">Returns the employee order along with status success if it is placed, or failure incase it is not placed</response>
+        //POST: api/Orders/EmployeOrders/
+        [HttpPost("EmployeeOrders", Name = "PlaceEmployeeOrder")]
+        public async Task<EmployeeOrderResponse> PlaceEmployeeOrder([FromBody] EmployeeOrder employeeOrder)
+        {
+            EmployeeOrderResponse employeeOrderResposne = null;
+            try
+            {
+                IMS.Entities.EmployeeOrder employeeOrderEntity = EmployeeOrderTranslator.ToEntitiesObject(employeeOrder);
+                IMS.Entities.EmployeeOrderResponse employeeOrderResponseEntity = await _orderService.PlaceEmployeeOrder(employeeOrderEntity);
+                employeeOrderResposne = EmployeeOrderTranslator.ToDataContractsObject(employeeOrderResponseEntity);
+            }
+            catch (Exception ex)
+            {
+                employeeOrderResposne = new IMS.Contracts.EmployeeOrderResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+            }
+            return employeeOrderResposne;
+        }
         /// <summary>
         /// Returns recent order placed by the employee with employee and employee order details
         /// </summary>
@@ -62,8 +128,6 @@ namespace IMS_API.Controllers
             }
             return dtoEmployeeRecentOrderResponse;
         }
-
-
         /// <summary>
         /// Deletes the Vendor Order By OrderId
         /// </summary>
@@ -79,7 +143,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.Response entityDeleteVendorOrderResponse = await _orderService.Delete(orderId);
                 deleteVendorOrderResponse = Translator.ToDataContractsObject(entityDeleteVendorOrderResponse);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 deleteVendorOrderResponse = new IMS.Contracts.Response()
                 {

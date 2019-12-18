@@ -18,16 +18,115 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
+        public async Task<EmployeeOrder> AddEmployeeOrder(EmployeeOrder employeeOrder)
+        {
+            MySqlDataReader reader = null;
 
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddEmployeeOrder";
+                    command.Parameters.AddWithValue("@EmployeeId", employeeOrder.Employee.Id);
+                    command.Parameters.AddWithValue("@ShelfId", employeeOrder.EmployeeOrderDetails.Shelf.Id);
+                    command.Parameters.AddWithValue("@OrderDate", DateTime.Now);
+                    command.Parameters.AddWithValue("@itemswithqty", ConvertToString(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList));
+                    reader = command.ExecuteReader();
+                    employeeOrder.EmployeeOrderDetails.Date = DateTime.Now;
+
+                    int generatedOrderId = 0;
+                    while (reader.Read())
+                    {
+                        generatedOrderId = Convert.ToInt32(reader["generatedorderid"]);
+
+                    }
+                    reader.Close();
+                    employeeOrder.EmployeeOrderDetails.OrderId = generatedOrderId;
+                }
+                catch (Exception ex)
+                {
+                    employeeOrder = null;
+                }
+            }
+            return employeeOrder;
+        }
+        public async Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string id)
+        {
+            MySqlDataReader reader1 = null;
+            List<EmployeeOrderDetails> employeeOrders = new List<EmployeeOrderDetails>();
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetEmployeeOrdersByEmployeeId";
+                    command.Parameters.AddWithValue("@Id", id);
+                    reader1 = command.ExecuteReader();
+                    while (reader1.Read())
+                    {
+                        employeeOrders.Add(new EmployeeOrderDetails()
+                        {
+                            OrderId = (int)reader1["Id"],
+                            Date = (DateTime)reader1["Date"],
+                            Shelf = new Shelf()
+                            {
+                                Id = (Int32)reader1["ShelfId"],
+                                Name = (string)reader1["ShelfName"],
+                                Code = (string)reader1["ShelfCode"],
+                                IsActive = (bool)reader1["ShelfStatus"]
+                            }
+                        });
+                    }
+                    reader1.Close();
+                    foreach (EmployeeOrderDetails currentOrder in employeeOrders)
+                    {
+                        currentOrder.EmployeeItemsQuantityList = new List<ItemQuantityMapping>();
+                        var command2 = connection.CreateCommand();
+                        command2.CommandType = CommandType.StoredProcedure;
+                        command2.CommandText = "spGetEmployeeOrderDetailsByOrderId";
+                        command2.Parameters.AddWithValue("@Id", currentOrder.OrderId);
+                        reader1 = command2.ExecuteReader();
+                        while (reader1.Read())
+                        {
+                            currentOrder.EmployeeItemsQuantityList.Add(new ItemQuantityMapping
+                            {
+                                Item = new Item()
+                                {
+                                    Name = (string)reader1["Name"],
+                                    Id = (int)reader1["ItemId"],
+                                    IsActive = (bool)reader1["ItemStatus"],
+                                    MaxLimit = (int)reader1["ItemMaximumLimit"]
+                                },
+                                Quantity = (int)reader1["Quantity"]
+                            });
+                        }
+                        reader1.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
+            return employeeOrders;
+        }
+        private string ConvertToString(List<ItemQuantityMapping> ItemsQuantityList)
+        {
+            string itemqty = string.Join(";", ItemsQuantityList.Select(p => p.Item.Id + "," + p.Quantity));
+            return itemqty;
+        }
         public async Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(int pageNumber, int pageSize)
         {
             MySqlDataReader reader1 = null;
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
             List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
             int limit = pageSize;
-
             int offset = (pageNumber - 1) * pageSize;
-
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -160,6 +259,37 @@ namespace IMS.DataLayer.Db
             {
                 return null;
             }
+        }
+        private static ItemQuantityMapping ExtractItemQuantityList(MySqlDataReader reader)
+        {
+            return new ItemQuantityMapping()
+            {
+                Item = new Item()
+                {
+                    Name = reader["Name"]?.ToString(),
+                    Id = (int)reader["ItemId"],
+                    IsActive = (bool)reader["ItemStatus"],
+                    MaxLimit = (int)reader["ItemMaximumLimit"],
+                    ImageUrl = reader["ImageUrl"]?.ToString(),
+                    Rate = (double)reader["Rate"]
+                },
+                Quantity = (int)reader["Quantity"]
+            };
+        }
+        private static EmployeeOrderDetails ExtractEmployeeOrderDetails(MySqlDataReader reader)
+        {
+            return new EmployeeOrderDetails()
+            {
+                OrderId = (int)reader["Id"],
+                Date = (DateTime)reader["Date"],
+                Shelf = new Shelf()
+                {
+                    Id = (Int32)reader["ShelfId"],
+                    Name = reader["ShelfName"]?.ToString(),
+                    Code = reader["ShelfCode"]?.ToString(),
+                    IsActive = (bool)reader["ShelfStatus"]
+                }
+            };
         }
     }
 }
