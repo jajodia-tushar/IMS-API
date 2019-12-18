@@ -46,5 +46,21 @@ namespace IMS.Core.Translators
                 Address = entityVendor.Address
             };
         }
+        public static Entities.Vendor ToEntitiesObject(Contracts.Vendor entityVendor)
+        {
+            if (entityVendor != null)
+                return new Entities.Vendor()
+                {
+                    Id = entityVendor.Id,
+                    Name = entityVendor.Name,
+                    ContactNumber = entityVendor.ContactNumber,
+                    PAN = entityVendor.PAN,
+                    CompanyIdentificationNumber = entityVendor.CompanyIdentificationNumber,
+                    GST = entityVendor.GST,
+                    Title = entityVendor.Title,
+                    Address = entityVendor.Address
+                };
+            return null;
+        }
     }
 }

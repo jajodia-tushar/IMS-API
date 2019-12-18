@@ -1,6 +1,7 @@
 using IMS.Core.Validators;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
@@ -242,6 +243,174 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(new String("GET Method"), employeeRecentOrderResponse, "Employee Recent Order Entries", employeeRecentOrderResponse.Status, severity, -1); }).Start();
             }
             return employeeRecentOrderResponse;
+
+        }
+        //vendororders
+
+        public async Task<VendorOrderResponse> SaveVendorOrder(VendorOrder vendorOrder)
+        {
+            VendorOrderResponse response = new VendorOrderResponse
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            try
+            {
+
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException();
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException();
+                User user = Utility.GetUserFromToken(token);
+                userId = user.Id;
+                if (VendorOrderValidator.ValidatePlacedOrder(vendorOrder))
+                {
+                    SetTotalPriceOfItemList(vendorOrder.VendorOrderDetails.OrderItemDetails);
+                    bool isOrderSaved = await _vendorOrderDbContext.Save(vendorOrder);
+                    if (isOrderSaved)
+                    {
+                        response.Status = Status.Success;
+                        response.VendorOrder = vendorOrder;
+                    }
+                    else
+                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+                }
+                else
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+            }
+            catch (InvalidTokenException e)
+            {
+
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "PlaceVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "PlaceVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(vendorOrder, response, "placing vendor order", response.Status, severity, userId); }).Start();
+            }
+            return response;
+
+        }
+
+        public async Task<GetListOfVendorOrdersResponse> GetAllVendorOrderPendingApprovals(int pageNumber, int pageSize)
+        {
+            GetListOfVendorOrdersResponse response = new GetListOfVendorOrdersResponse
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            try
+            {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException();
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException();
+                User user = Utility.GetUserFromToken(token);
+                userId = user.Id;
+                response.ListOfVendorOrders = await _vendorOrderDbContext.GetAllPendingApprovals(pageNumber, pageSize);
+                response.Status = Status.Success;
+            }
+            catch (InvalidTokenException e)
+            {
+
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "GetAllVendorPendingApprovals", Severity.Critical, null, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "GetAllVendorPendingApprovals", Severity.Critical, null, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(null, response, "Get All VendorOrder Pending Approvals", response.Status, severity, userId); }).Start();
+            }
+            return response;
+
+        }
+
+
+        private void SetTotalPriceOfItemList(List<ItemQuantityPriceMapping> orderItemDetails)
+        {
+            foreach (var itemQtyPrice in orderItemDetails)
+                itemQtyPrice.TotalPrice = Math.Round(itemQtyPrice.Item.Rate * itemQtyPrice.Quantity, 2);
+        }
+
+        public async Task<Response> ApproveVendorOrder(VendorOrder vendorOrder)
+        {
+            Response response = new Response
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            try
+            {
+
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException();
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException();
+                User user = Utility.GetUserFromToken(token);
+                userId = user.Id;
+                if (VendorOrderValidator.ValidateApproveRequest(vendorOrder))
+                {
+
+                    bool isOrderApproved = await _vendorOrderDbContext.ApproveOrder(vendorOrder);
+                    if (isOrderApproved)
+                    {
+                        response.Status = Status.Success;
+
+                    }
+                    else
+                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+                }
+                else
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+            }
+            catch(OrderAlreadyApprovedException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+            }
+            catch (InvalidTokenException e)
+            {
+
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(vendorOrder, response, "Approving vendor order", response.Status, severity, userId); }).Start();
+            }
+            return response;
 
         }
     }

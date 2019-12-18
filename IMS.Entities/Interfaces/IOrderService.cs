@@ -12,5 +12,8 @@ namespace IMS.Entities.Interfaces
         Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize);
         Task<OrdersByEmployeeIdResponse> GetEmployeeOrders(string employeeId);
         Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder);
+        Task<VendorOrderResponse> SaveVendorOrder(VendorOrder vendorOrder);
+        Task<GetListOfVendorOrdersResponse> GetAllVendorOrderPendingApprovals(int pageNumber, int pageSize);
+        Task<Response> ApproveVendorOrder(VendorOrder vendorOrder);
     }
 }

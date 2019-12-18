@@ -114,6 +114,28 @@
             <param name="itemsCount"></param>
             <returns>Most frequently used "n" items with their quantity</returns>
             <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
+        <member name="M:IMS_API.Controllers.OrderController.PlaceVendorOrder(IMS.Contracts.VendorOrder)">
+            <summary>
+            places the vendororder.returns entire object if order stores successfully otherwise failure
+            </summary>
+            <param name="vendorOrder">Here vendorOrder contains two objects named vendor and vendororderdetails</param>
+            <returns>entire vendorOrder object along with status</returns>
+            <response code="200">Returns VendorOrder object  if Vendororder is valid otherwise it returns null and status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.GetAllPendingApprovals(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            retrieves the List of vendororders.
+            </summary>
+            <returns>entire List of vendorOrder object along with status</returns>
+            <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.ApproveVendorOrder(IMS.Contracts.VendorOrder)">
+            <summary>
+            vendororder is updated and approved along this data transfer from vendororder to warehouse
+            </summary>
+            <param name="vendorOrder">Here vendorOrder contains two objects named vendor and vendororderdetails</param>
+            <returns>Response</returns>
+            <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
         </member>
         <member name="M:IMS_API.Controllers.ShelfController.Get">
             <summary>

@@ -158,5 +158,123 @@ namespace IMS_API.Controllers
             }
             return deleteVendorOrderResponse;
         }
+
+        //vendororders
+        /// <summary>
+        /// places the vendororder.returns entire object if order stores successfully otherwise failure
+        /// </summary>
+        /// <param name="vendorOrder">Here vendorOrder contains two objects named vendor and vendororderdetails</param>
+        /// <returns>entire vendorOrder object along with status</returns>
+        /// <response code="200">Returns VendorOrder object  if Vendororder is valid otherwise it returns null and status failure</response>
+
+        // POST: api/order/VendorOrders
+        [HttpPost("VendorOrders", Name = "PlaceVendorOrder")]
+        public async Task<VendorOrderResponse> PlaceVendorOrder([FromBody] VendorOrder vendorOrder)
+        {
+            VendorOrderResponse contractsVendorOrderResponse = null;
+            try
+            {
+                IMS.Entities.VendorOrder entitiesVendorOrderResponse = VendorOrderTranslator.ToEntitiesObject(vendorOrder);
+                IMS.Entities.VendorOrderResponse entitiesResponse = await _orderService.SaveVendorOrder(entitiesVendorOrderResponse);
+                contractsVendorOrderResponse = VendorOrderTranslator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception e)
+            {
+
+                contractsVendorOrderResponse = new VendorOrderResponse
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "PlaceVendorOrder", IMS.Entities.Severity.Critical, vendorOrder, contractsVendorOrderResponse); }).Start();
+            }
+
+            return contractsVendorOrderResponse;
+        }
+        /// <summary>
+        /// retrieves the List of vendororders.
+        /// </summary>
+        /// <returns>entire List of vendorOrder object along with status</returns>
+        /// <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
+        // GET: api/order/VendorOrders/PendingApprovals
+        [HttpGet("VendorOrders/PendingApprovals", Name = "GetAllPendingApprovals")]
+        public async Task<GetListOfVendorOrdersResponse> GetAllPendingApprovals(int? pageNumber, int? pageSize)
+        {
+            GetListOfVendorOrdersResponse contractsGetListOfVendorOrdersResponse = null;
+            try
+            {
+                int currentPageNumber = pageNumber ?? 1;
+                int currentPageSize = pageSize ?? 10;
+                if (currentPageNumber <= 0 || currentPageSize <= 0)
+                {
+                    return new GetListOfVendorOrdersResponse
+                    {
+                        Status = Status.Failure,
+                        Error = new Error
+                        {
+                            ErrorCode = Constants.ErrorCodes.BadRequest,
+                            ErrorMessage = Constants.ErrorMessages.InvalidRequest
+                        }
+                    };
+                }
+                IMS.Entities.GetListOfVendorOrdersResponse entitiesResponse = await _orderService.GetAllVendorOrderPendingApprovals(currentPageNumber, currentPageSize);
+                contractsGetListOfVendorOrdersResponse = VendorOrderTranslator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception e)
+            {
+                contractsGetListOfVendorOrdersResponse = new GetListOfVendorOrdersResponse
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "GetAllPendingApprovals", IMS.Entities.Severity.Critical, null, contractsGetListOfVendorOrdersResponse); }).Start();
+            }
+
+            return contractsGetListOfVendorOrdersResponse;
+        }
+        /// <summary>
+        /// vendororder is updated and approved along this data transfer from vendororder to warehouse
+        /// </summary>
+        /// <param name="vendorOrder">Here vendorOrder contains two objects named vendor and vendororderdetails</param>
+        /// <returns>Response</returns>
+        /// <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
+
+        // PUT: api/order/VendorOrders/PendingApprovals
+        [HttpPut("VendorOrders/PendingApprovals", Name = "ApproveVendorOrder")]
+        public async Task<Response> ApproveVendorOrder([FromBody] VendorOrder vendorOrder)
+        {
+            Response contractsResponse = null;
+            try
+            {
+                IMS.Entities.VendorOrder entitiesVendorOrder = VendorOrderTranslator.ToEntitiesObject(vendorOrder);
+                IMS.Entities.Response entitiesResponse = await _orderService.ApproveVendorOrder(entitiesVendorOrder);
+                contractsResponse = Translator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception e)
+            {
+                contractsResponse = new Response
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", IMS.Entities.Severity.Critical, vendorOrder, contractsResponse); }).Start();
+
+            }
+
+            return contractsResponse;
+
+        }
     }
 }
