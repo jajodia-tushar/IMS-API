@@ -6,7 +6,8 @@ namespace IMS.Entities
 {
     public class RAGStatus
     {
-        public string LocationDetail;
+        public string Name;
+        public string Code;
         public List<ColourCountMapping> ColourCountMappings;
     }
 }

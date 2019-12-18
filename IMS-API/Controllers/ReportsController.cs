@@ -35,13 +35,15 @@ namespace IMS_API.Controllers
             rAGStatusResponse.RAGStatusList.Add(
                 new RAGStatus()
                 {
-                    LocationDetail = "floor-1;A",
+                    Name = "floor-1",
+                    Code = "A",
                     ColourCountMappings = c
                 });
             rAGStatusResponse.RAGStatusList.Add(
                new RAGStatus()
                {
-                   LocationDetail = "floor-2;B",
+                   Name = "floor-2",
+                   Code = "B",
                    ColourCountMappings = c
                });
             return rAGStatusResponse;
