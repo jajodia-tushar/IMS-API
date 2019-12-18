@@ -382,7 +382,7 @@ namespace IMS.Core.services
                         if (stockStatus!=null && stockStatus.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
-                            stockStatusResponse.StockStatus = stockStatus;
+                            stockStatusResponse.StockStatusList = ToListFromDictionary(stockStatus);
                         }
                         else
                         {
@@ -422,6 +422,9 @@ namespace IMS.Core.services
             }
             return stockStatusResponse;
         }
->>>>>>> Completed service and controller layers.
+        private List<StockStatusList> ToListFromDictionary(Dictionary<Item, List<StoreColourQuantity>> stockStatus)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
