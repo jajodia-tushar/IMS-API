@@ -32,7 +32,7 @@ namespace IMS.Core.services
             _employeeService = employeeService;
             _vendorService = vendorService;
         }
-<<<<<<< HEAD
+
         public async Task<Response> Delete(int orderId)
         {
             Response deleteVendorOrderResponse = new Response();
@@ -99,14 +99,10 @@ namespace IMS.Core.services
                 deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidOrderId);
             }
             return deleteVendorOrderResponse;
-=======
+        }
 
         public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
         {
-<<<<<<< HEAD
-            throw new NotImplementedException();
->>>>>>> Added Controller
-=======
             EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
             int userId = -1;
             employeeRecentOrderResponse.Status = Status.Failure;
@@ -163,7 +159,6 @@ namespace IMS.Core.services
             } 
             return employeeRecentOrderResponse;
 
->>>>>>> Implemented service and made translators
         }
     }
 }

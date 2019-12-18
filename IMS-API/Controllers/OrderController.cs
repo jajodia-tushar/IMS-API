@@ -2,20 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-<<<<<<< HEAD
 using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
-=======
-using IMS.Contracts;
-using IMS.Core;
-using IMS.Core.services;
-using IMS.Core.Translators;
-using IMS.Entities.Interfaces;
 using Microsoft.AspNetCore.Authorization;
->>>>>>> Added Controller
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,18 +16,14 @@ namespace IMS_API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
-<<<<<<< HEAD
     {
         private IOrderService _orderService;
         private ILogManager _logger;
-=======
-    {
-        private IOrderService _orderService;
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService, ILogManager logManager)
         {
             _orderService = orderService;
+            _logger = logManager;
         }
-
 
         /// <summary>
         /// Returns recent order placed by the employee with employee and employee order details
@@ -74,13 +62,7 @@ namespace IMS_API.Controllers
             }
             return dtoEmployeeRecentOrderResponse;
         }
->>>>>>> Added Controller
 
-        public OrderController(IOrderService orderService, ILogManager logManager)
-        {
-            _orderService = orderService;
-            _logger = logManager;
-        }
 
         /// <summary>
         /// Deletes the Vendor Order By OrderId
