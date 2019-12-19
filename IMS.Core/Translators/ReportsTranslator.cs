@@ -8,20 +8,20 @@ namespace IMS.Core.Translators
 {
     public class ReportsTranslator
     {
-        public static Contracts.MostConsumedItemsResponse ToDataContractsObject(Entities.MostConsumedItemsResponse dtoMostConsumedItemsResponse)
+        public static Contracts.MostConsumedItemsResponse ToDataContractsObject(Entities.MostConsumedItemsResponse doMostConsumedItemsResponse)
         {
-            var doShelfItemsResponse = new Contracts.MostConsumedItemsResponse();
-            if(dtoMostConsumedItemsResponse.Status == Entities.Status.Success)
+            var dtoMostConsumedItemsResponse = new Contracts.MostConsumedItemsResponse();
+            if(doMostConsumedItemsResponse.Status == Entities.Status.Success)
             {
-                doShelfItemsResponse.Status = Contracts.Status.Success;
-                doShelfItemsResponse.ItemQuantityMapping = ToDataContractsObject(dtoMostConsumedItemsResponse.ItemQuantityMapping);
+                dtoMostConsumedItemsResponse.Status = Contracts.Status.Success;
+                dtoMostConsumedItemsResponse.ItemQuantityMapping = ToDataContractsObject(doMostConsumedItemsResponse.ItemQuantityMapping);
             }
             else
             {
-                doShelfItemsResponse.Status = Contracts.Status.Failure;
-                doShelfItemsResponse.Error = Translator.ToDataContractsObject(dtoMostConsumedItemsResponse.Error);
+                dtoMostConsumedItemsResponse.Status = Contracts.Status.Failure;
+                dtoMostConsumedItemsResponse.Error = Translator.ToDataContractsObject(doMostConsumedItemsResponse.Error);
             }
-            return doShelfItemsResponse;
+            return dtoMostConsumedItemsResponse;
         }
         
         private static List<Contracts.ItemQuantityMapping> ToDataContractsObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)

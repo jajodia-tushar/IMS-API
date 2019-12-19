@@ -54,19 +54,27 @@ namespace IMS_API.Controllers
             return rAGStatusResponse;
         }
 
+        /// <summary>
+        /// Retrieve Frequently used "n" items in given date range 
+        /// </summary>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <param name="ItemsCount"></param>
+        /// <returns>Most frequently used "n" items with their quantity</returns>
+        /// <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
         [Route("GetMostConsumedItems/{StartDate}/{EndDate}/{ItemsCount}")]
         [HttpGet]
         public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string StartDate, string EndDate, int ItemsCount)
         {
-            MostConsumedItemsResponse contractMostConsumedItemsResponse = null;
+            MostConsumedItemsResponse mostConsumedItemsResponse = null;
             try
             {
-                IMS.Entities.MostConsumedItemsResponse entityMostConsumedItemsResponse = await _reportsService.GetMostConsumedItems(StartDate,EndDate,ItemsCount);
-                contractMostConsumedItemsResponse = ReportsTranslator.ToDataContractsObject(entityMostConsumedItemsResponse);
+                IMS.Entities.MostConsumedItemsResponse mostConsumedItemsResponseEntity = await _reportsService.GetMostConsumedItems(StartDate,EndDate,ItemsCount);
+                mostConsumedItemsResponse = ReportsTranslator.ToDataContractsObject(mostConsumedItemsResponseEntity);
             }
             catch (Exception exception)
             {
-                contractMostConsumedItemsResponse = new IMS.Contracts.MostConsumedItemsResponse()
+                mostConsumedItemsResponse = new IMS.Contracts.MostConsumedItemsResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -75,9 +83,9 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", IMS.Entities.Severity.High, StartDate+";"+EndDate+";"+ItemsCount, contractMostConsumedItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", IMS.Entities.Severity.High, StartDate+";"+EndDate+";"+ItemsCount, mostConsumedItemsResponse); }).Start();
             }
-            return contractMostConsumedItemsResponse;
+            return mostConsumedItemsResponse;
         }
 
         [Route("GetShelfWiseOrderCount")]
