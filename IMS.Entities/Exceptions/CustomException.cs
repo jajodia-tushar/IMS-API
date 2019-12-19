@@ -6,7 +6,7 @@ namespace IMS.Entities.Exceptions
 {
     public class CustomException:Exception
     {
-        public int ErrorCode = 400;
+        public int ErrorCode=400;
         public string ErrorMessage = "Invalid Request";
     }
 }

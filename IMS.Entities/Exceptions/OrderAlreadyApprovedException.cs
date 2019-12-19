@@ -6,7 +6,11 @@ namespace IMS.Entities.Exceptions
 {
     public class OrderAlreadyApprovedException : CustomException
     {
-        public int ErrorCode = 400;
-        public string ErrorMessage = "Order is Already Approved";
+        
+        public OrderAlreadyApprovedException()
+        {
+            ErrorCode = 400;
+            ErrorMessage = "Order is Already Approved";
+        }
     }
 }

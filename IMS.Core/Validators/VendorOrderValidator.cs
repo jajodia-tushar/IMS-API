@@ -15,11 +15,11 @@ namespace IMS.Core.Validators
             if (vendor == null || vendor.Id <= 0)
                 return false;
             VendorOrderDetails vendorOrderDetails = vendorOrder.VendorOrderDetails;
-            if (vendorOrderDetails == null || vendorOrderDetails.RecievedBy == null || vendorOrderDetails.SubmittedTo == null ||
+            if (vendorOrderDetails == null || string.IsNullOrEmpty(vendorOrderDetails.RecievedBy) || string.IsNullOrEmpty(vendorOrderDetails.SubmittedTo ) ||
                  vendorOrderDetails.TaxableAmount < 0)
                 return false;
             List<ItemQuantityPriceMapping> orderItemDetails = vendorOrderDetails.OrderItemDetails;
-            if (orderItemDetails == null || orderItemDetails.Count <= 0)
+            if (orderItemDetails == null || orderItemDetails.Count == 0)
                 return false;
             foreach (var itemQtyPrice in orderItemDetails)
             {

@@ -6,7 +6,11 @@ namespace IMS.Entities.Exceptions
 {
     public class InvalidTokenException:CustomException
     {
-        public int ErrorCode = 400;
-        public string ErrorMessage = "Invalid Token";
+       
+        public InvalidTokenException()
+        {
+            ErrorCode = 400;
+            ErrorMessage = "Invalid Token";
+        }
     }
 }
