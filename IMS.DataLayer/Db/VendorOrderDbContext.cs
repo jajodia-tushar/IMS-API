@@ -83,7 +83,7 @@ namespace IMS.DataLayer.Db
                 }
                 catch (MySqlException e)
                 {
-                    if (e.Number == (int)MySqlErrorCode.NoReferencedRow2 || e.Number == (int)MySqlErrorCode.DuplicateKeyEntry)
+                    if (e.Number == (int)MySqlErrorCode.NoReferencedRow2)
                         return false;
                     throw e;
                 }
@@ -148,8 +148,8 @@ namespace IMS.DataLayer.Db
 
                     if (e is MySqlException)
                     {
-                        MySqlException mySql = (MySqlException)e;
-                        if (mySql.Number == (int)MySqlErrorCode.NoReferencedRow2 || mySql.Number == (int)MySqlErrorCode.DuplicateKeyEntry)
+                        MySqlException mySqlException = (MySqlException)e;
+                        if (mySqlException.Number == (int)MySqlErrorCode.NoReferencedRow2 )
                             return false;
                     }
                     throw e;
