@@ -281,7 +281,7 @@ namespace IMS.Core.services
                 else
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
             }
-            catch (InvalidTokenException e)
+            catch (CustomException e)
             {
 
                 response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
@@ -324,7 +324,7 @@ namespace IMS.Core.services
                 response.ListOfVendorOrders = await _vendorOrderDbContext.GetAllPendingApprovals(pageNumber, pageSize);
                 response.Status = Status.Success;
             }
-            catch (InvalidTokenException e)
+            catch (CustomException e)
             {
 
                 response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
@@ -387,12 +387,8 @@ namespace IMS.Core.services
                 else
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
             }
-            catch(OrderAlreadyApprovedException e)
-            {
-                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
-            }
-            catch (InvalidTokenException e)
+           
+            catch (CustomException e)
             {
 
                 response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);

@@ -4,9 +4,9 @@ using System.Text;
 
 namespace IMS.Entities.Exceptions
 {
-    public class InvalidOrderException : CustomException
+    public class CustomException:Exception
     {
         public int ErrorCode = 400;
-        public string ErrorMessage = "Invalid Order";
+        public string ErrorMessage = "Invalid Request";
     }
 }
