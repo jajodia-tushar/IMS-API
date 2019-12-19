@@ -95,9 +95,7 @@ namespace IMS.DataLayer.Db
         public async Task<List<DateShelfOrderMapping>> GetShelfWiseOrderCountByDate(DateTime StartDate, DateTime ToDate)
         {
             MySqlDataReader reader1 = null;
-            List<DateShelfOrderMapping> dateShelfOrderMappings = PopulateListWithZeroValues(StartDate,ToDate); 
-
-            
+            List<DateShelfOrderMapping> dateShelfOrderMappings = await PopulateListWithZeroValues(StartDate,ToDate);
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -127,23 +125,18 @@ namespace IMS.DataLayer.Db
                                 o.TotalNumberOfOrder = TotalNumberOfOrder;
                             });
                         });
-
                     }
-                    
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-
             }
             return dateShelfOrderMappings; 
         }
 
-        private List<DateShelfOrderMapping> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
+        private async Task<List<DateShelfOrderMapping>> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
         {
-
-            
             List<DateShelfOrderMapping> dateShelfOrderMappings = new List<DateShelfOrderMapping>();
             foreach (DateTime day in EachDay(startDate, toDate))
             {
@@ -151,15 +144,14 @@ namespace IMS.DataLayer.Db
                     new DateShelfOrderMapping()
                     {
                         Date = day,
-                        ShelfOrderCountMappings = GetList()
+                        ShelfOrderCountMappings =await GetList()
                     }
                 );
             }
-
             return dateShelfOrderMappings;
         }
 
-        private List<ShelfOrderCountMapping> GetList()
+        private async Task<List<ShelfOrderCountMapping>> GetList()
         {
             var list = new List<ShelfOrderCountMapping>();
             list.Add(new ShelfOrderCountMapping()
