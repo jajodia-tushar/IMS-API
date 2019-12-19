@@ -27,6 +27,128 @@ namespace IMS.Core.services
             this._httpContextAccessor = httpContextAccessor;
         }
 
+        public Task<RAGStatusResponse> GetRAGStatus()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCountAsync(string fromDate, string toDate)
+        {
+            
+            ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
+            try
+            {
+                DateTime startDate = new DateTime();
+                DateTime endDate = new DateTime();
+                if (IsDateValid(fromDate, toDate, out startDate, out endDate))
+                {
+                    List<DateShelfOrderMapping> dateShelfOrderMappings =
+                    await _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate);
+
+                    if (dateShelfOrderMappings == null || dateShelfOrderMappings.Count == 0)
+                    {
+                        shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                        shelfWiseOrderCountResponse.Error =
+                        Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoShelfWiseOrderCount);
+
+                    }
+                    else
+                    {
+                        shelfWiseOrderCountResponse.Status = Entities.Status.Success;
+                        shelfWiseOrderCountResponse.DateWiseShelfOrderCount = dateShelfOrderMappings;
+                    }
+                }
+                else
+                {
+                    shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                    shelfWiseOrderCountResponse.Error =
+                    Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateRangeIsInvalid);
+                }
+            }
+            catch(Exception exception)
+            {
+                shelfWiseOrderCountResponse.Status = Status.Failure;
+                shelfWiseOrderCountResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Getting Shelf Wise Order Count", Severity.High, null, shelfWiseOrderCountResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (shelfWiseOrderCountResponse.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log("ShelfWiseOrderCount",shelfWiseOrderCountResponse, "Getting Shelf Wise Order Count", shelfWiseOrderCountResponse.Status, severity, -1); }).Start();
+            }
+            return shelfWiseOrderCountResponse;
+        }
+
+        private bool IsDateValid(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
+        {
+            
+            Regex regex = new Regex(@"^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$");
+            
+            if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate))
+            {
+                Match match = regex.Match(fromDate);
+                Match match1 = regex.Match(toDate);
+                if (match.Success && match1.Success)
+                {
+                    fromDate = fromDate.Substring(6, 2) + "/" + fromDate.Substring(4, 2) + "/" + fromDate.Substring(0, 4);
+                    toDate = toDate.Substring(6, 2) + "/" + toDate.Substring(4, 2) + "/" + toDate.Substring(0, 4);
+                    startDate = ConvertStringDateToDateTimeObject(fromDate);
+                    endDate = ConvertStringDateToDateTimeObject(toDate);
+                    if (IsDateRangeIsValid(startDate, endDate))
+                    {
+                        return true;
+                    }
+                }  
+            }
+            startDate = DateTime.Now;
+            endDate = DateTime.Now;
+            return false;
+        }
+
+        private bool IsDateRangeIsValid(DateTime startDate, DateTime endDate)
+        {
+            int value = DateTime.Compare(startDate, endDate);
+            if (startDate > DateTime.Now || endDate > DateTime.Now)
+            {
+                return false;
+            }
+            else if (value < 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private DateTime ConvertStringDateToDateTimeObject(string date)
+        {
+            DateTime Date;
+            int day = Convert.ToInt32(date.Split('/')[0]);
+            int month = Convert.ToInt32(date.Split('/')[1]);
+            int year = Convert.ToInt32(date.Split('/')[2]);
+            if (ValidateDate(day, month, year) == true)
+            {
+                Date = new DateTime(year, month, day);
+                return Date;
+            }
+            return new DateTime();
+        }
+
+        private bool ValidateDate(int day, int month, int year)
+        {
+            int numberOfDaysInMonth = DateTime.DaysInMonth(year, month);
+            if (month > 0 && month <= 12)
+            {
+                if (day > 0 && day <= numberOfDaysInMonth)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+}
         public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate,int itemsCount)
         {
             MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();

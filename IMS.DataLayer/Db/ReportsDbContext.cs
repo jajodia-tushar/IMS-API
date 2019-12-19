@@ -1,5 +1,4 @@
-﻿using IMS.DataLayer.Dto;
-using IMS.DataLayer.Interfaces;
+﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using MySql.Data.MySqlClient;
 using System;

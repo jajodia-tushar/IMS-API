@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using IMS.Contracts;
 using IMS.Core;
@@ -90,11 +91,13 @@ namespace IMS_API.Controllers
             return mostConsumedItemsResponse;
         }
 
-        //http://localhost:55462/api/Reports/GetShelfWiseOrderCount?FromDate=10/12/2019&ToDate=19/12/2019
+        //http://localhost:55462/api/Reports/GetShelfWiseOrderCount?FromDate=20191210&ToDate=20191219
+        //yyyymmdd
         [Route("GetShelfWiseOrderCount")]
         [HttpGet]
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate,string ToDate)
         {
+            
             ShelfWiseOrderCountResponse dtoShelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
             try
             {
