@@ -7,6 +7,7 @@ using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class ReportsController : ControllerBase
     {
         private IReportsService _reportsService;
@@ -57,19 +59,19 @@ namespace IMS_API.Controllers
         /// <summary>
         /// Retrieve Frequently used "n" items in given date range 
         /// </summary>
-        /// <param name="StartDate"></param>
-        /// <param name="EndDate"></param>
-        /// <param name="ItemsCount"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="itemsCount"></param>
         /// <returns>Most frequently used "n" items with their quantity</returns>
         /// <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
-        [Route("GetMostConsumedItems/{StartDate}/{EndDate}/{ItemsCount}")]
+        [Route("GetMostConsumedItems")]
         [HttpGet]
-        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string StartDate, string EndDate, int ItemsCount)
+        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate, int itemsCount)
         {
             MostConsumedItemsResponse mostConsumedItemsResponse = null;
             try
             {
-                IMS.Entities.MostConsumedItemsResponse mostConsumedItemsResponseEntity = await _reportsService.GetMostConsumedItems(StartDate,EndDate,ItemsCount);
+                IMS.Entities.MostConsumedItemsResponse mostConsumedItemsResponseEntity = await _reportsService.GetMostConsumedItems(startDate,endDate,itemsCount);
                 mostConsumedItemsResponse = ReportsTranslator.ToDataContractsObject(mostConsumedItemsResponseEntity);
             }
             catch (Exception exception)
@@ -83,7 +85,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", IMS.Entities.Severity.High, StartDate+";"+EndDate+";"+ItemsCount, mostConsumedItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", IMS.Entities.Severity.High, startDate+";"+endDate+";"+itemsCount, mostConsumedItemsResponse); }).Start();
             }
             return mostConsumedItemsResponse;
         }

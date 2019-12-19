@@ -1,4 +1,5 @@
-﻿using IMS.DataLayer.Interfaces;
+﻿using IMS.Core.Validators;
+using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
@@ -39,7 +40,7 @@ namespace IMS.Core.services
                     List<ItemQuantityMapping> itemQuantityMappings;
                     try
                     {
-                        mostConsumedItemsResponse = ValidateDateAndItemsCount(startDate,endDate,itemsCount);
+                        mostConsumedItemsResponse = ReportsValidator.ValidateDateAndItemsCount(startDate,endDate,itemsCount);
                         if (mostConsumedItemsResponse.Error == null)
                         {
                             itemQuantityMappings = await _reportsDbContext.GetMostConsumedItemsByDate(startDate,endDate,itemsCount);
@@ -97,20 +98,6 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        private MostConsumedItemsResponse ValidateDateAndItemsCount(string startDate,string endDate,int itemsCount)
-        {
-            MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
-            if(string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate) || itemsCount <= 0)
-            {
-                mostConsumedItemsResponse.Status = Status.Failure;
-                mostConsumedItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidInput);
-            }
-            else if (String.Compare(startDate, endDate) > 0)
-            {
-                mostConsumedItemsResponse.Status = Status.Failure;
-                mostConsumedItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDates);
-            }
-            return mostConsumedItemsResponse;
-        }
+        
     }
 }

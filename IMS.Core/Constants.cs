@@ -44,6 +44,7 @@ namespace IMS.Core
             public const string InvalidInput = "Input details are not valid";
             public const string InvalidDates = "StartDate should be less than EndDate";
             public const string RecordNotFound = "Record Not Found";
+            public const string InvalidDate = "Date Is Invalid";
         }
 
         public static class ErrorCodes
