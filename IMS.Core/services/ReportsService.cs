@@ -32,7 +32,7 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCountAsync(string fromDate, string toDate)
+        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
         {
             
             ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();

@@ -102,7 +102,7 @@ namespace IMS_API.Controllers
             try
             {
                 IMS.Entities.ShelfWiseOrderCountResponse doShelfWiseOrderCountResponse =
-                await _reportsService.GetShelfWiseOrderCountAsync(FromDate, ToDate);
+                await _reportsService.GetShelfWiseOrderCount(FromDate, ToDate);
                 dtoShelfWiseOrderCountResponse = ReportsTranslator.ToDataContractsObject(doShelfWiseOrderCountResponse);
             }
             catch (Exception exception)
