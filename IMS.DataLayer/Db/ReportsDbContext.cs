@@ -97,7 +97,7 @@ namespace IMS.DataLayer.Db
 
         public async Task<List<ShelfOrderStats>> GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate)
         {
-            MySqlDataReader reader1 = null;
+            MySqlDataReader reader = null;
             List<ShelfOrderStats> dateShelfOrderMappings = await PopulateListWithZeroValues(startDate,toDate);
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
@@ -111,13 +111,13 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetOrderCountByDate";
                     command.Parameters.AddWithValue("@FromDate", startDate);
                     command.Parameters.AddWithValue("@ToDate", newToDate); 
-                    reader1 = command.ExecuteReader();
-                    while (reader1.Read())
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
 
-                        DateTime date = (DateTime)reader1["OrderDate"];
-                        string shelfName = (string)reader1["FloorName"];
-                        int orderCount = Convert.ToInt32(reader1["TotalNumberOfEntries"]);
+                        DateTime date = (DateTime)reader["OrderDate"];
+                        string shelfName = (string)reader["FloorName"];
+                        int orderCount = Convert.ToInt32(reader["TotalNumberOfEntries"]);
                         var list = dateShelfOrderMappings.FindAll(obj => obj.Date.Date.Equals(date.Date));
                         list.ForEach(obj =>
                         {
