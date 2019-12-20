@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IMS.Contracts;
+using IMS.Core;
+using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,12 +15,15 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class ReportsController : ControllerBase
     {
         private IReportsService _reportsService;
-        public ReportsController(IReportsService reportsService)
+        private ILogManager _logger;
+        public ReportsController(IReportsService reportsService, ILogManager logManager)
         {
             _reportsService = reportsService;
+            this._logger = logManager;
         }
 
         [Route("GetRAGStatus")]
@@ -49,54 +56,37 @@ namespace IMS_API.Controllers
             return rAGStatusResponse;
         }
 
-        [Route("GetMostConsumedItems/{StartDate}/{EndDate}/{ItemsCount}")]
+        /// <summary>
+        /// Retrieve Frequently used "n" items in given date range 
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="itemsCount"></param>
+        /// <returns>Most frequently used "n" items with their quantity</returns>
+        /// <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
+        [Route("GetMostConsumedItems")]
         [HttpGet]
-        public MostConsumedItemsResponse Get(string StartDate, string EndDate, int ItemsCount)
+        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate, int itemsCount)
         {
-            MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
-            List<ItemQuantityMapping> itemQuantityMappings = new List<ItemQuantityMapping>();
-            mostConsumedItemsResponse.Error = null;
-            mostConsumedItemsResponse.Status = Status.Success;
-            itemQuantityMappings.Add(new ItemQuantityMapping()
+            MostConsumedItemsResponse mostConsumedItemsResponse = null;
+            try
             {
-                Item = new Item()
-                {
-                    Id = 1,
-                    Name = "Pen",
-                    MaxLimit = 5,
-                    IsActive = true,
-                    ImageUrl = "abcdef",
-                    Rate = 5
-                },
-                Quantity = 5
-            });
-            itemQuantityMappings.Add(new ItemQuantityMapping()
+                IMS.Entities.MostConsumedItemsResponse mostConsumedItemsResponseEntity = await _reportsService.GetMostConsumedItems(startDate,endDate,itemsCount);
+                mostConsumedItemsResponse = ReportsTranslator.ToDataContractsObject(mostConsumedItemsResponseEntity);
+            }
+            catch (Exception exception)
             {
-                Item = new Item()
+                mostConsumedItemsResponse = new IMS.Contracts.MostConsumedItemsResponse()
                 {
-                    Id = 2,
-                    Name = "Pencil",
-                    MaxLimit = 5,
-                    IsActive = true,
-                    ImageUrl = "abcdefghij",
-                    Rate = 2
-                },
-                Quantity = 15
-            });
-            itemQuantityMappings.Add(new ItemQuantityMapping()
-            {
-                Item = new Item()
-                {
-                    Id = 3,
-                    Name = "Marker",
-                    MaxLimit = 5,
-                    IsActive = true,
-                    ImageUrl = "abcdefghijklmn",
-                    Rate = 15
-                },
-                Quantity = 10
-            });
-            mostConsumedItemsResponse.ItemQuantityMapping = itemQuantityMappings;
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", IMS.Entities.Severity.High, startDate+";"+endDate+";"+itemsCount, mostConsumedItemsResponse); }).Start();
+            }
             return mostConsumedItemsResponse;
         }
 
