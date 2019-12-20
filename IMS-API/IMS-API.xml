@@ -47,7 +47,7 @@
             <summary>
             Update the Specific Item
             </summary>
-            <param name="updatedItem"></param>
+            <param name="item"></param>
             <returns>Returns Item List along with updtaed Item</returns>
             <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         </member>

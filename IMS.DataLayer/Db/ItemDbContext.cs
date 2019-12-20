@@ -35,19 +35,7 @@ namespace IMS.DataLayer.Db
                     reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        items.Add(new Item()
-                        {
-                            Id = (int)reader["Id"],
-                            Name = (string)reader["Name"],
-                            MaxLimit = (int)reader["MaximumLimit"],
-                            IsActive = (bool)reader["IsActive"],
-                            ImageUrl = (string)reader["ImageUrl"],
-                            Rate = (double)reader["Rate"],
-                            ShelvesRedLimit = (int)reader["ShelvesRedLimit"],
-                            ShelvesAmberLimit = (int)reader["ShelvesAmberLimit"],
-                            WarehouseRedLimit = (int)reader["WarehouseRedLimit"],
-                            WarehouseAmberLimit = (int)reader["WarehouseAmberLimit"]
-                        });
+                        items.Add(ReadValuesFromDatabase(reader));
                     }
                 }
                 catch (Exception exception)
@@ -72,7 +60,10 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetItemById";
                     command.Parameters.AddWithValue("@Id", id);
                     reader = await command.ExecuteReaderAsync();
-                    item = ReadValuesFromDatabase(reader);
+                    while (reader.Read())
+                    {
+                        item=ReadValuesFromDatabase(reader);
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -170,11 +161,14 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@WarehouseRedLimit", updatedItem.WarehouseRedLimit);
                     command.Parameters.AddWithValue("@WarehouseAmberLimit", updatedItem.WarehouseAmberLimit);
                     reader = await command.ExecuteReaderAsync();
-                    item = ReadValuesFromDatabase(reader);
+                    while (reader.Read())
+                    {
+                        item = ReadValuesFromDatabase(reader);
+                    }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    throw ex;
+                    throw exception;
                 }
                 return item;
             }
@@ -182,19 +176,16 @@ namespace IMS.DataLayer.Db
         public Item ReadValuesFromDatabase(DbDataReader reader )
         {
             Item item = new Item();
-            while (reader.Read())
-            {
-                item.Id = (int)reader["Id"];
-                item.Name = (string)reader["Name"];
-                item.MaxLimit = (int)reader["MaximumLimit"];
-                item.IsActive = (bool)reader["IsActive"];
-                item.ImageUrl = (string)reader["ImageUrl"];
-                item.Rate = (double)reader["Rate"];
-                item.ShelvesRedLimit = (int)reader["ShelvesRedLimit"];
-                item.ShelvesAmberLimit = (int)reader["ShelvesAmberLimit"];
-                item.WarehouseRedLimit = (int)reader["WarehouseRedLimit"];
-                item.WarehouseAmberLimit = (int)reader["WarehouseAmberLimit"];
-            }
+            item.Id = (int)reader["Id"];
+            item.Name = (string)reader["Name"];
+            item.MaxLimit = (int)reader["MaximumLimit"];
+            item.IsActive = (bool)reader["IsActive"];
+            item.ImageUrl = (string)reader["ImageUrl"];
+            item.Rate = (double)reader["Rate"];
+            item.ShelvesRedLimit = (int)reader["ShelvesRedLimit"];
+            item.ShelvesAmberLimit = (int)reader["ShelvesAmberLimit"];
+            item.WarehouseRedLimit = (int)reader["WarehouseRedLimit"];
+            item.WarehouseAmberLimit = (int)reader["WarehouseAmberLimit"];
             return item;
         }
     }

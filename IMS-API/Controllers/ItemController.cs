@@ -15,7 +15,7 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Clerk")]
     public class ItemController : ControllerBase
     {
         private IItemService _itemService;
@@ -126,17 +126,17 @@ namespace IMS_API.Controllers
         /// <summary>
         /// Update the Specific Item
         /// </summary>
-        /// <param name="updatedItem"></param>
+        /// <param name="item"></param>
         /// <returns>Returns Item List along with updtaed Item</returns>
         /// <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         // PATCH: api/Item
         [HttpPatch]
-        public async Task<ItemResponse> Update([FromBody] Item updatedItem)
+        public async Task<ItemResponse> Update([FromBody] Item item)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.Item entityItemRequest = ItemTranslator.ToEntitiesObject(updatedItem);
+                IMS.Entities.Item entityItemRequest = ItemTranslator.ToEntitiesObject(item);
                 IMS.Entities.ItemResponse entityItemResponse = await _itemService.UpdateItem(entityItemRequest);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
@@ -151,7 +151,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.Critical, updatedItem, contractItemsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.Critical, item, contractItemsResponse); }).Start();
             }
             return contractItemsResponse;
         }
