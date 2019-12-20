@@ -6,10 +6,10 @@ namespace IMS.Entities.Exceptions
 {
     public class InvalidOrderException : CustomException
     {
-        public InvalidOrderException()
+        public InvalidOrderException(string errorMessage= "Invalid Order")
         {
            ErrorCode = 400;
-           ErrorMessage = "Invalid Order";
+           ErrorMessage =errorMessage;
         }
     }
 }

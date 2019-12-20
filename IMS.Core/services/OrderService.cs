@@ -259,11 +259,11 @@ namespace IMS.Core.services
 
                 bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
                 if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException();
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (!isValidToken)
-                    throw new InvalidTokenException();
+                    throw new InvalidTokenException(Constants.ErrorMessages.TokenExpired);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
                 if (VendorOrderValidator.ValidatePlacedOrder(vendorOrder))
@@ -314,11 +314,11 @@ namespace IMS.Core.services
             {
                 bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
                 if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException();
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (!isValidToken)
-                    throw new InvalidTokenException();
+                    throw new InvalidTokenException(Constants.ErrorMessages.TokenExpired);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
                 response.ListOfVendorOrders = await _vendorOrderDbContext.GetAllPendingApprovals(pageNumber, pageSize);
@@ -365,11 +365,11 @@ namespace IMS.Core.services
 
                 bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
                 if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException();
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (!isValidToken)
-                    throw new InvalidTokenException();
+                    throw new InvalidTokenException(Constants.ErrorMessages.TokenExpired);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
                 if (VendorOrderValidator.ValidateApproveRequest(vendorOrder))
