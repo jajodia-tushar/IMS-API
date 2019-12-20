@@ -6,66 +6,70 @@ namespace IMS.Core.Translators
 {
     public static class ItemTranslator
     {
-        public static Contracts.ItemResponse ToDataContractsObject(Entities.ItemResponse entityItemResponse)
+        public static Contracts.ItemResponse ToDataContractsObject(Entities.ItemResponse doItemResponse)
         {
-            Contracts.ItemResponse itemResponse = new Contracts.ItemResponse();
-            if (entityItemResponse.Status == Entities.Status.Success)
+            Contracts.ItemResponse dtoItemResponse = new Contracts.ItemResponse();
+            if (doItemResponse.Status == Entities.Status.Success)
             {
-                itemResponse.Status = Contracts.Status.Success;
-                itemResponse.Items = ToDataContractsObject(entityItemResponse.Items);
+                dtoItemResponse.Status = Contracts.Status.Success;
+                dtoItemResponse.Items = ToDataContractsObject(doItemResponse.Items);
             }
             else
             {
-                itemResponse.Status = Contracts.Status.Failure;
-                itemResponse.Error = ToDataContractsObject(entityItemResponse.Error);
+                dtoItemResponse.Status = Contracts.Status.Failure;
+                dtoItemResponse.Error = Translator.ToDataContractsObject(doItemResponse.Error);
             }
-            return itemResponse;
+            return dtoItemResponse;
 
         }
-        public static List<Contracts.Item> ToDataContractsObject(List<Entities.Item> doEntityItemResponseList)
+        public static List<Contracts.Item> ToDataContractsObject(List<Entities.Item> doItemList)
         {
-            var dtoContractsItemList = new List<Contracts.Item>();
-            foreach (var entityItem in doEntityItemResponseList)
+            var dtoItemList = new List<Contracts.Item>();
+            if (doItemList != null)
             {
-                Contracts.Item item = new Contracts.Item();
-                item.Id = entityItem.Id;
-                item.Name = entityItem.Name;
-                item.MaxLimit = entityItem.MaxLimit;
-                item.IsActive = entityItem.IsActive;
-                item.ImageUrl = entityItem.ImageUrl;
-                item.Rate = entityItem.Rate;
-                item.ShelvesRedLimit = entityItem.ShelvesRedLimit;
-                item.ShelvesAmberLimit = entityItem.ShelvesAmberLimit;
-                item.WarehouseRedLimit = entityItem.WarehouseRedLimit;
-                item.WarehouseAmberLimit = entityItem.WarehouseAmberLimit;
-                dtoContractsItemList.Add(item);
+                foreach (var doItem in doItemList)
+                {
+                    Contracts.Item dtoItem = ToDataContractsObject(doItem);
+                    dtoItemList.Add(dtoItem);
+                }
             }
-            return dtoContractsItemList;
+            return dtoItemList;
         }
-        public static Entities.Item ToEntitiesObject(Contracts.Item contractsItemRequest)
+        public static Contracts.Item ToDataContractsObject(Entities.Item doItem)
         {
-            return new Entities.Item()
+            Contracts.Item dtoItem = new Contracts.Item();
+            if (doItem != null)
             {
-                Id = contractsItemRequest.Id,
-                Name = contractsItemRequest.Name,
-                MaxLimit = contractsItemRequest.MaxLimit,
-                IsActive = contractsItemRequest.IsActive,
-                ImageUrl = contractsItemRequest.ImageUrl,
-                Rate = contractsItemRequest.Rate,
-                ShelvesRedLimit = contractsItemRequest.ShelvesRedLimit,
-                ShelvesAmberLimit = contractsItemRequest.ShelvesAmberLimit,
-                WarehouseRedLimit = contractsItemRequest.WarehouseRedLimit,
-                WarehouseAmberLimit = contractsItemRequest.WarehouseAmberLimit
-            };
+                dtoItem.Id = doItem.Id;
+                dtoItem.Name = doItem.Name;
+                dtoItem.MaxLimit = doItem.MaxLimit;
+                dtoItem.IsActive = doItem.IsActive;
+                dtoItem.ImageUrl = doItem.ImageUrl;
+                dtoItem.Rate = doItem.Rate;
+                dtoItem.ShelvesRedLimit = doItem.ShelvesRedLimit;
+                dtoItem.ShelvesAmberLimit = doItem.ShelvesAmberLimit;
+                dtoItem.WarehouseRedLimit = doItem.WarehouseRedLimit;
+                dtoItem.WarehouseAmberLimit = doItem.WarehouseAmberLimit;
+            }
+            return dtoItem;
         }
-
-        public static Contracts.Error ToDataContractsObject(Entities.Error error)
+        public static Entities.Item ToEntitiesObject(Contracts.Item dtoItemRequest)
         {
-            return new Contracts.Error()
+            Entities.Item doItem = new Entities.Item();
+            if (doItem != null)
             {
-                ErrorCode = error.ErrorCode,
-                ErrorMessage = error.ErrorMessage
-            };
+                doItem.Id = dtoItemRequest.Id;
+                doItem.Name = dtoItemRequest.Name;
+                doItem.MaxLimit = dtoItemRequest.MaxLimit;
+                doItem.IsActive = dtoItemRequest.IsActive;
+                doItem.ImageUrl = dtoItemRequest.ImageUrl;
+                doItem.Rate = dtoItemRequest.Rate;
+                doItem.ShelvesRedLimit = dtoItemRequest.ShelvesRedLimit;
+                doItem.ShelvesAmberLimit = dtoItemRequest.ShelvesAmberLimit;
+                doItem.WarehouseRedLimit = dtoItemRequest.WarehouseRedLimit;
+                doItem.WarehouseAmberLimit = dtoItemRequest.WarehouseAmberLimit;
+            }
+            return doItem;
         }
     }
 }

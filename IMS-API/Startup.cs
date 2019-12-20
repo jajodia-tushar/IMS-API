@@ -85,11 +85,10 @@ namespace IMS_API
             services.AddTransient<IReportsService, ReportsService>();
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
             services.AddTransient<IUserService, UserService>();
-        }
-
             services.AddTransient<IItemService, ItemService>();
             services.AddTransient<IItemDbContext, ItemDbContext>();
         }
+
         public TokenValidationParameters CreateTokenValidationParameters()
         {
             var result = new TokenValidationParameters
