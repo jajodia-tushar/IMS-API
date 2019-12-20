@@ -7,6 +7,6 @@ namespace IMS.Contracts
     public class DateItemConsumption
     {
         public string Date { get; set; }
-        public int CountOfItems { get; set; }
+        public int ItemsConsumptionCount { get; set; }
     }
 }
