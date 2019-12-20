@@ -53,9 +53,6 @@ namespace IMS.Core
             public const string InvalidDates = "StartDate should be less than EndDate";
             public const string RecordNotFound = "Record Not Found";
             public const string InvalidDate = "Date Is Invalid";
-        }
-
-            public const string InvalidToken = "Token is invalid";
             public const string NotDeleted = "Item Not Deleted";
             public const string InvalidItemId = "Item Id is not valid";
         }
