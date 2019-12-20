@@ -6,6 +6,6 @@ namespace IMS.Contracts
 {
     public class ItemsConsumptionReport:Response
     {
-        public List<DateItemConsumption> DateItemConsumptionList { get; set; }
+        public List<DateItemConsumption> ItemConsumptions { get; set; }
     }
 }
