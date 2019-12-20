@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using MySql.Data.MySqlClient;
@@ -223,92 +222,6 @@ namespace IMS.DataLayer.Db
         public async Task<Dictionary<int, List<StoreColourQuantity>>> GetStockStatus()
         {
             Dictionary<int, List<StoreColourQuantity>> stockStatus = new Dictionary<int, List<StoreColourQuantity>>();
-            /*MySqlDataReader reader = null;
-=======
-﻿using IMS.DataLayer.Dto;
-using IMS.DataLayer.Interfaces;
-using IMS.Entities;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IMS.DataLayer.Db
-{
-    public class ReportsDbContext : IReportsDbContext
-    {
-        private IDbConnectionProvider _dbConnectionProvider;
-        private ITemporaryItemDbContext _temporaryItemDbContext;
-        public ReportsDbContext(IDbConnectionProvider dbConnectionProvider , ITemporaryItemDbContext  temporaryItemDbContext)
-        {
-            _dbConnectionProvider = dbConnectionProvider;
-            _temporaryItemDbContext = temporaryItemDbContext;
-        }
-
-        public async Task<StockStatusDataLayerTransfer> GetStockStatus()
-        {
-            StockStatusDataLayerTransfer stockStatus = new StockStatusDataLayerTransfer();
-            stockStatus.StockStatusDict= new Dictionary<int, List<StoreColourQuantity>>();
-            stockStatus.ItemList = new List<Item>();
-            MySqlDataReader reader = null;
->>>>>>> Refactored the code by avoiding multiple calls to the databse to get item by id.
-
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-
-                    connection.Open();
-
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    List<Item> itemsList = await _temporaryItemDbContext.GetAllItems();
-                    foreach (Item item in itemsList )
-                    {
-                        stockStatus.ItemList.Add(item);
-                        stockStatus.StockStatusDict.Add(item.Id,new List<StoreColourQuantity>());
-                    }
-                    command.CommandText = "getRAGStatusOfItemsInWarehouse";
-                    reader = command.ExecuteReader();
-                    int itemId;
-                    string ragColor;
-                    int quantity;
-                    while (reader.Read())
-                    {
-                        itemId = (int)reader["ItemId"];
-                        ragColor = (string)reader["WarehouseRAG"];
-                        quantity = Convert.ToInt32(reader["Quantity"]);
-                        if (stockStatus.StockStatusDict.ContainsKey(itemId))
-                        {
-                            stockStatus.StockStatusDict[itemId].Add(new StoreColourQuantity() { StoreName = "Warehouse", Colour = ReturnAccurateColourEnum(ragColor),Quantity=quantity});
-                        }
-                    }
-                    reader.Close();
-                    command.CommandText = "getRAGStatusOfItemsInShelves";
-                    reader = command.ExecuteReader();
-                    string shelfName;
-                    while (reader.Read())
-                    {
-                        itemId = (int)reader["ItemId"];
-                        ragColor = (string)reader["ShelvesRAG"];
-                        shelfName = (string)reader["ShelfName"];
-                        quantity = (int)Convert.ToInt32(reader["Quantity"]);
-                        if (stockStatus.StockStatusDict.ContainsKey(itemId))
-                        {
-                            stockStatus.StockStatusDict[itemId].Add(new StoreColourQuantity() { StoreName = shelfName, Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
-                        }
-                    }
-                    reader.Close();
-
-                }
-                catch (Exception ex)
-                {
-                    return null;
-                }
-
-            }*/
             return stockStatus;
         }
 

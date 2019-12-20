@@ -24,18 +24,17 @@ namespace IMS.Core.services
         private ITokenProvider _tokenProvider;
         private IShelfService _shelfService;
         private ITemporaryItemDbContext _temporaryItemDbContext;
-        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService, ITemporaryItemDbContext temporaryItemDbContext)
+        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService)
         {
             this._reportsDbContext = reportsDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
             _shelfService = shelfService;
             this._httpContextAccessor = httpContextAccessor;
-            this._temporaryItemDbContext = temporaryItemDbContext;
         }
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
         {
-            
+
             ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
             int userId = -1;
             try
@@ -51,9 +50,9 @@ namespace IMS.Core.services
                     {
                         if (ReportsValidator.IsDateValid(fromDate, toDate, out startDate, out endDate))
                         {
-                            
+
                             List<ShelfOrderStats> dateShelfOrderMappings = await PopulateListWithZeroValues(startDate, endDate);
-                             _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate,dateShelfOrderMappings);
+                            _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate, dateShelfOrderMappings);
 
                             if (dateShelfOrderMappings == null || dateShelfOrderMappings.Count == 0)
                             {
@@ -75,7 +74,7 @@ namespace IMS.Core.services
                             Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateRangeIsInvalid);
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
                         shelfWiseOrderCountResponse.Error =
@@ -88,12 +87,12 @@ namespace IMS.Core.services
                 else
                 {
                     shelfWiseOrderCountResponse.Status = Status.Failure;
-                    shelfWiseOrderCountResponse.Error = 
-                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, 
+                    shelfWiseOrderCountResponse.Error =
+                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
                         Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 shelfWiseOrderCountResponse.Status = Status.Failure;
                 shelfWiseOrderCountResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
@@ -144,7 +143,7 @@ namespace IMS.Core.services
             }
             return list;
         }
-        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate,int itemsCount)
+        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate, int itemsCount)
         {
             MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
             int userId = -1;
@@ -158,10 +157,10 @@ namespace IMS.Core.services
                     List<ItemQuantityMapping> itemQuantityMappings;
                     try
                     {
-                        mostConsumedItemsResponse = ReportsValidator.ValidateDateAndItemsCount(startDate,endDate,itemsCount);
+                        mostConsumedItemsResponse = ReportsValidator.ValidateDateAndItemsCount(startDate, endDate, itemsCount);
                         if (mostConsumedItemsResponse.Error == null)
                         {
-                            itemQuantityMappings = await _reportsDbContext.GetMostConsumedItemsByDate(startDate,endDate,itemsCount);
+                            itemQuantityMappings = await _reportsDbContext.GetMostConsumedItemsByDate(startDate, endDate, itemsCount);
                             if (itemQuantityMappings.Count != 0)
                             {
                                 mostConsumedItemsResponse.Status = Status.Success;
@@ -180,7 +179,7 @@ namespace IMS.Core.services
                     {
                         mostConsumedItemsResponse.Status = Status.Failure;
                         mostConsumedItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", Severity.High, startDate+";"+endDate+";"+itemsCount, mostConsumedItemsResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", Severity.High, startDate + ";" + endDate + ";" + itemsCount, mostConsumedItemsResponse); }).Start();
                     }
                     return mostConsumedItemsResponse;
                 }
@@ -344,7 +343,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.High;
                 if (itemConsumptionReport.Status == Status.Failure)
                     severity = Severity.High;
-                new Task(() => { _logger.Log(startDate + ";" + endDate , itemConsumptionReport, "GetMostConsumedItems", itemConsumptionReport.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(startDate + ";" + endDate, itemConsumptionReport, "GetMostConsumedItems", itemConsumptionReport.Status, severity, userId); }).Start();
             }
             return itemConsumptionReport;
         }
@@ -363,7 +362,7 @@ namespace IMS.Core.services
                 string dateString = date.ToString("yyyy/MM/dd");
                 if (!datesWithOrders.Contains(dateString))
                 {
-                    dateItemConsumptionList.Add(new DateItemConsumption() { Date = dateString, ItemsConsumptionCount=0});
+                    dateItemConsumptionList.Add(new DateItemConsumption() { Date = dateString, ItemsConsumptionCount = 0 });
                 }
             }
             List<DateItemConsumption> sortedDateItemConsumptionList = dateItemConsumptionList.OrderBy(o => o.Date).ToList();
