@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using IMS.Entities;
 using System;
 using System.Collections.Generic;
@@ -20,3 +21,19 @@ namespace IMS.DataLayer.Interfaces
     }
 
 }
+=======
+﻿using IMS.DataLayer.Dto;
+using IMS.Entities;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace IMS.DataLayer.Interfaces
+{
+    public interface IReportsDbContext
+    {
+        Task<StockStatusDataLayerTransfer> GetStockStatus();
+    }
+}
+>>>>>>> Refactored the code by avoiding multiple calls to the databse to get item by id.

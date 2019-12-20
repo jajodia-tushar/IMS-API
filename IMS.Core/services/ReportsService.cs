@@ -1,5 +1,6 @@
-﻿using IMS.Core;
+using IMS.Core;
 using IMS.Core.Validators;
+using IMS.DataLayer.Dto;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
@@ -29,6 +30,7 @@ namespace IMS.Core.services
             this._logger = logger;
             this._tokenProvider = tokenProvider;
             _shelfService = shelfService;
+            this._httpContextAccessor = httpContextAccessor;
             this._temporaryItemDbContext = temporaryItemDbContext;
         }
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
@@ -289,6 +291,7 @@ namespace IMS.Core.services
                 { new ColourCountMapping() { Colour = Colour.Green, Count = 0 } }
             };
         }
+
         public async Task<ItemsConsumptionReport> GetItemConsumptionStats(string startDate, string endDate)
         {
             ItemsConsumptionReport itemConsumptionReport = new ItemsConsumptionReport();
@@ -379,8 +382,8 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        Dictionary<int,List<StoreColourQuantity>> stockStatus = await _reportsDbContext.GetStockStatus();
-                        if (stockStatus!=null && stockStatus.Count != 0)
+                        StockStatusDataLayerTransfer stockStatus = await _reportsDbContext.GetStockStatus();
+                        if (stockStatus!=null && stockStatus.StockStatusDict.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
                             stockStatusResponse.NamesOfAllStores = await GetStoreNames();
@@ -424,10 +427,6 @@ namespace IMS.Core.services
             }
             return stockStatusResponse;
         }
-<<<<<<< HEAD
-        private List<StockStatusList> ToListFromDictionary(Dictionary<Item, List<StoreColourQuantity>> stockStatus)
-=======
-
         private async Task<List<string>> GetStoreNames()
         {
             List<string> storeNames = new List<string>();
@@ -443,21 +442,22 @@ namespace IMS.Core.services
             return storeNames;
         }
 
-        public async Task<List<StockStatusList>> ToListFromDictionary(Dictionary<int, List<StoreColourQuantity>> stockStatusDict)
->>>>>>> completed stock status functionality
+        public async Task<List<StockStatusList>> ToListFromDictionary(StockStatusDataLayerTransfer stockStatus)
         {
             List<StockStatusList> stockStatusList = new List<StockStatusList>();
-            foreach(int id in stockStatusDict.Keys)
+            foreach(Item item in stockStatus.ItemList)
             {
                 StockStatusList stockStatusInstance = new StockStatusList();
-                stockStatusInstance.Item = new Item();
+                stockStatusInstance.Item = item;
                 stockStatusInstance.StockStatus = new List<StoreColourQuantity>();
-                stockStatusInstance.Item =await _temporaryItemDbContext.GetItemById(id);
                 List<StoreColourQuantity> storeColourQuantities = new List<StoreColourQuantity>();
-                storeColourQuantities = stockStatusDict[id];
-                foreach(StoreColourQuantity listOfStockIterator in storeColourQuantities)
+                if(stockStatus.StockStatusDict.ContainsKey(item.Id))
                 {
-                    stockStatusInstance.StockStatus.Add(listOfStockIterator);
+                    storeColourQuantities = stockStatus.StockStatusDict[item.Id];
+                    foreach (StoreColourQuantity listOfStockIterator in storeColourQuantities)
+                    {
+                        stockStatusInstance.StockStatus.Add(listOfStockIterator);
+                    }
                 }
                 stockStatusList.Add(stockStatusInstance);
             }

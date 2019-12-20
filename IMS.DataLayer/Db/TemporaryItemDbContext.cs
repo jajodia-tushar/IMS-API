@@ -52,30 +52,6 @@ namespace IMS.DataLayer.Db
             }
             return items;
         }
-
-        public async Task<Item> GetItemById(int id)
-        {
-            DbDataReader reader = null;
-            Item item = new Item();
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetItemById";
-                    command.Parameters.AddWithValue("@Id", id);
-                    reader = await command.ExecuteReaderAsync();
-                    item = ReadValuesFromDatabase(reader);
-                }
-                catch (Exception exception)
-                {
-                    throw exception;
-                }
-            }
-            return item;
-        }
         public Item ReadValuesFromDatabase(DbDataReader reader)
         {
             Item item = new Item();

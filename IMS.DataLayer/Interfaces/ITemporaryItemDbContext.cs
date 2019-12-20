@@ -9,6 +9,5 @@ namespace IMS.DataLayer.Interfaces
     public interface ITemporaryItemDbContext
     {
         Task<List<Item>> GetAllItems();
-        Task<Item> GetItemById(int id);
     }
 }
