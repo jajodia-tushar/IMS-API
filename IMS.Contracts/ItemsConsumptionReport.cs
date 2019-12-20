@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Entities
+namespace IMS.Contracts
 {
-    public class ItemsConsumptionCountResponse:Response
+    public class ItemsConsumptionReport:Response
     {
         public List<DateItemConsumption> DateItemConsumptionList { get; set; }
     }
