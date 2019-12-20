@@ -101,7 +101,7 @@ namespace IMS_API.Controllers
         /// <response code="404">If Shelf Wise Order Count is not Available </response>
         /// <response code="401">If token is Invalid</response>
         /// <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
-        /// <response code="400">Given Date Range Is Invalid</response>
+        /// <response code="400">Given Date Range Is Invalid or Given Date Format is Invalid</response>
         [Route("GetShelfWiseOrderCount")]
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]

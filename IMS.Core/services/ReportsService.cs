@@ -38,31 +38,56 @@ namespace IMS.Core.services
             ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
             try
             {
-                DateTime startDate = new DateTime();
-                DateTime endDate = new DateTime();
-                if (IsDateValid(fromDate, toDate, out startDate, out endDate))
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    List<DateShelfOrderMapping> dateShelfOrderMappings =
-                    await _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate);
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    DateTime startDate = new DateTime();
+                    DateTime endDate = new DateTime();
+                    try
+                    {
+                        if (IsDateValid(fromDate, toDate, out startDate, out endDate))
+                        {
+                            List<ShelfOrderStats> dateShelfOrderMappings =
+                            await _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate);
 
-                    if (dateShelfOrderMappings == null || dateShelfOrderMappings.Count == 0)
+                            if (dateShelfOrderMappings == null || dateShelfOrderMappings.Count == 0)
+                            {
+                                shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                                shelfWiseOrderCountResponse.Error =
+                                Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoShelfWiseOrderCount);
+
+                            }
+                            else
+                            {
+                                shelfWiseOrderCountResponse.Status = Entities.Status.Success;
+                                shelfWiseOrderCountResponse.DateWiseShelfOrderCount = dateShelfOrderMappings;
+                            }
+                        }
+                        else
+                        {
+                            shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                            shelfWiseOrderCountResponse.Error =
+                            Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateRangeIsInvalid);
+                        }
+                    }
+                    catch(Exception exception)
                     {
                         shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
                         shelfWiseOrderCountResponse.Error =
-                        Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoShelfWiseOrderCount);
-
-                    }
-                    else
-                    {
-                        shelfWiseOrderCountResponse.Status = Entities.Status.Success;
-                        shelfWiseOrderCountResponse.DateWiseShelfOrderCount = dateShelfOrderMappings;
+                        Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateFormatInvalid);
+                        new Task(() => {_logger.LogException(exception,"Getting Shelf Wise Order Count", Severity.High, null,
+                        shelfWiseOrderCountResponse);
+                        }).Start();
                     }
                 }
                 else
                 {
-                    shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
-                    shelfWiseOrderCountResponse.Error =
-                    Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateRangeIsInvalid);
+                    shelfWiseOrderCountResponse.Status = Status.Failure;
+                    shelfWiseOrderCountResponse.Error = 
+                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, 
+                        Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch(Exception exception)
@@ -83,67 +108,21 @@ namespace IMS.Core.services
 
         private bool IsDateValid(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
         {
-            
-            Regex regex = new Regex(@"^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$");
-            
-            if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate))
-            {
-                Match match = regex.Match(fromDate);
-                Match match1 = regex.Match(toDate);
-                if (match.Success && match1.Success)
-                {
-                    fromDate = fromDate.Substring(6, 2) + "/" + fromDate.Substring(4, 2) + "/" + fromDate.Substring(0, 4);
-                    toDate = toDate.Substring(6, 2) + "/" + toDate.Substring(4, 2) + "/" + toDate.Substring(0, 4);
-                    startDate = ConvertStringDateToDateTimeObject(fromDate);
-                    endDate = ConvertStringDateToDateTimeObject(toDate);
-                    if (IsDateRangeIsValid(startDate, endDate))
-                    {
-                        return true;
-                    }
-                }  
-            }
-            startDate = DateTime.Now;
-            endDate = DateTime.Now;
-            return false;
+            startDate = DateTime.ParseExact(fromDate, "yyyyMMdd", CultureInfo.InvariantCulture);
+            endDate = DateTime.ParseExact(toDate, "yyyyMMdd", CultureInfo.InvariantCulture);
+            return IsDateRangeIsValid(startDate,endDate) ? true : false;
         }
 
         private bool IsDateRangeIsValid(DateTime startDate, DateTime endDate)
         {
             int value = DateTime.Compare(startDate, endDate);
-            if (startDate > DateTime.Now || endDate > DateTime.Now)
+            if (startDate > DateTime.Now || endDate >= DateTime.Now)
             {
                 return false;
             }
             else if (value < 0)
             {
                 return true;
-            }
-            return false;
-        }
-
-        private DateTime ConvertStringDateToDateTimeObject(string date)
-        {
-            DateTime Date;
-            int day = Convert.ToInt32(date.Split('/')[0]);
-            int month = Convert.ToInt32(date.Split('/')[1]);
-            int year = Convert.ToInt32(date.Split('/')[2]);
-            if (ValidateDate(day, month, year) == true)
-            {
-                Date = new DateTime(year, month, day);
-                return Date;
-            }
-            return new DateTime();
-        }
-
-        private bool ValidateDate(int day, int month, int year)
-        {
-            int numberOfDaysInMonth = DateTime.DaysInMonth(year, month);
-            if (month > 0 && month <= 12)
-            {
-                if (day > 0 && day <= numberOfDaysInMonth)
-                {
-                    return true;
-                }
             }
             return false;
         }

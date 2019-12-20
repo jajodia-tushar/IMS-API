@@ -63,6 +63,7 @@ namespace IMS.Core
             public const string InvalidOrder = "Invalid Order";
             public const string NoToken = "Token Required";
             public const string TranferFailure = "The items transfer failed";
+            public const string DateFormatInvalid = "Given Date Format is Invalid";
         }
 
         public static class ErrorCodes

@@ -26,9 +26,9 @@ namespace IMS.Core.Translators
             return dtoShelfWiseOrderCountResponse;
         }
 
-        private static List<Contracts.DateShelfOrderMapping> ToDataContractsObject(List<Entities.DateShelfOrderMapping> doDateWiseShelfOrderCount)
+        private static List<Contracts.ShelfOrderStats> ToDataContractsObject(List<Entities.ShelfOrderStats> doDateWiseShelfOrderCount)
         {
-            List<Contracts.DateShelfOrderMapping> dtoDateShelfOrderMappings = new List<Contracts.DateShelfOrderMapping>();
+            List<Contracts.ShelfOrderStats> dtoDateShelfOrderMappings = new List<Contracts.ShelfOrderStats>();
             foreach (var dateShelfOrder in doDateWiseShelfOrderCount )
             {
                dtoDateShelfOrderMappings.Add(ToDataContractsObject(dateShelfOrder));
@@ -37,9 +37,9 @@ namespace IMS.Core.Translators
             return dtoDateShelfOrderMappings;
         }
 
-        private static Contracts.DateShelfOrderMapping ToDataContractsObject(Entities.DateShelfOrderMapping doDateShelfOrder)
+        private static Contracts.ShelfOrderStats ToDataContractsObject(Entities.ShelfOrderStats doDateShelfOrder)
         {
-            Contracts.DateShelfOrderMapping dtoDateShelfOrderMapping = new Contracts.DateShelfOrderMapping();
+            Contracts.ShelfOrderStats dtoDateShelfOrderMapping = new Contracts.ShelfOrderStats();
             dtoDateShelfOrderMapping.Date = doDateShelfOrder.Date;
             dtoDateShelfOrderMapping.ShelfOrderCountMappings = ToDataContractsObject(doDateShelfOrder.ShelfOrderCountMappings);
             return dtoDateShelfOrderMapping;
@@ -59,7 +59,7 @@ namespace IMS.Core.Translators
         {
             Contracts.ShelfOrderCountMapping dtoShelfOrder = new Contracts.ShelfOrderCountMapping();
             dtoShelfOrder.ShelfName = doShelfOrder.ShelfName;
-            dtoShelfOrder.TotalNumberOfOrder = doShelfOrder.TotalNumberOfOrder;
+            dtoShelfOrder.OrderCount = doShelfOrder.OrderCount;
             return dtoShelfOrder;
         }
     }

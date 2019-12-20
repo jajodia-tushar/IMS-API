@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using IMS.Entities.Interfaces;
 using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,9 +14,11 @@ namespace IMS.DataLayer.Db
     public class ReportsDbContext : IReportsDbContext
     {
         private IDbConnectionProvider _dbConnectionProvider;
-        public ReportsDbContext(IDbConnectionProvider dbConnectionProvider)
+        private IShelfService _shelfService;
+        public ReportsDbContext(IDbConnectionProvider dbConnectionProvider,IShelfService shelfService)
         {
             _dbConnectionProvider = dbConnectionProvider;
+            _shelfService = shelfService;
         }
 
         public async Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate, string endDate)
@@ -92,37 +95,37 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<List<DateShelfOrderMapping>> GetShelfWiseOrderCountByDate(DateTime StartDate, DateTime ToDate)
+        public async Task<List<ShelfOrderStats>> GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate)
         {
             MySqlDataReader reader1 = null;
-            List<DateShelfOrderMapping> dateShelfOrderMappings = await PopulateListWithZeroValues(StartDate,ToDate);
+            List<ShelfOrderStats> dateShelfOrderMappings = await PopulateListWithZeroValues(startDate,toDate);
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
-                    DateTime NewToDate = new DateTime(ToDate.Year, ToDate.Month, ToDate.Day + 1);
+                    DateTime newToDate = new DateTime(toDate.Year, toDate.Month, toDate.Day + 1);
               
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetOrderCountByDate";
-                    command.Parameters.AddWithValue("@FromDate", StartDate);
-                    command.Parameters.AddWithValue("@ToDate", NewToDate); 
+                    command.Parameters.AddWithValue("@FromDate", startDate);
+                    command.Parameters.AddWithValue("@ToDate", newToDate); 
                     reader1 = command.ExecuteReader();
                     while (reader1.Read())
                     {
 
                         DateTime date = (DateTime)reader1["OrderDate"];
-                        string ShelfName = (string)reader1["FloorName"];
-                        int TotalNumberOfOrder = Convert.ToInt32(reader1["TotalNumberOfEntries"]);
+                        string shelfName = (string)reader1["FloorName"];
+                        int orderCount = Convert.ToInt32(reader1["TotalNumberOfEntries"]);
                         var list = dateShelfOrderMappings.FindAll(obj => obj.Date.Date.Equals(date.Date));
                         list.ForEach(obj =>
                         {
-                            var ShelfOrderCountMappings = obj.ShelfOrderCountMappings;
-                            var internalList = ShelfOrderCountMappings.FindAll(innerObj => innerObj.ShelfName.Equals(ShelfName));
+                            var shelfOrderCountMappings = obj.ShelfOrderCountMappings;
+                            var internalList = shelfOrderCountMappings.FindAll(innerObj => innerObj.ShelfName.Equals(shelfName));
                             internalList.ForEach(o =>
                             {
-                                o.TotalNumberOfOrder = TotalNumberOfOrder;
+                                o.OrderCount = orderCount;
                             });
                         });
                     }
@@ -135,35 +138,35 @@ namespace IMS.DataLayer.Db
             return dateShelfOrderMappings; 
         }
 
-        private async Task<List<DateShelfOrderMapping>> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
+        private async Task<List<ShelfOrderStats>> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
         {
-            List<DateShelfOrderMapping> dateShelfOrderMappings = new List<DateShelfOrderMapping>();
+            List<ShelfOrderStats> dateShelfOrderMappings = new List<ShelfOrderStats>();
             foreach (DateTime day in EachDay(startDate, toDate))
             {
                 dateShelfOrderMappings.Add(
-                    new DateShelfOrderMapping()
+                    new ShelfOrderStats()
                     {
                         Date = day,
-                        ShelfOrderCountMappings =await GetList()
+                        ShelfOrderCountMappings =await GetShelvesListWithOrderCountAsZero()
                     }
                 );
             }
             return dateShelfOrderMappings;
         }
 
-        private async Task<List<ShelfOrderCountMapping>> GetList()
+        private async Task<List<ShelfOrderCountMapping>> GetShelvesListWithOrderCountAsZero()
         {
             var list = new List<ShelfOrderCountMapping>();
-            list.Add(new ShelfOrderCountMapping()
-            {
-                ShelfName = "First Floor",
-                TotalNumberOfOrder = 0
-            });
-            list.Add(new ShelfOrderCountMapping()
-            {
-                ShelfName = "Sixth Floor",
-                TotalNumberOfOrder = 0
-            });
+            ShelfResponse shelfResponse = new ShelfResponse();
+            shelfResponse = await _shelfService.GetShelfList();
+           foreach(var shelf in shelfResponse.Shelves)
+           {
+                list.Add(new ShelfOrderCountMapping()
+                {
+                    ShelfName = shelf.Name,
+                    OrderCount = 0
+                });
+           }
             return list;
         }
         private IEnumerable<DateTime> EachDay(DateTime startDate, DateTime endDate)
