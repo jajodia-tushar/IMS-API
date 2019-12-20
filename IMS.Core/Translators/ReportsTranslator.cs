@@ -18,7 +18,7 @@ namespace IMS.Core.Translators
                     Contracts.Status.Failure,
                     Error = doShelfWiseOrderCountResponse.Error == null ? null :
                     Translator.ToDataContractsObject(doShelfWiseOrderCountResponse.Error),
-                    DateWiseShelfOrderCount = doShelfWiseOrderCountResponse.DateWiseShelfOrderCount == null ?: ToDataContractsObject(doShelfWiseOrderCountResponse.DateWiseShelfOrderCount)
+                    DateWiseShelfOrderCount = doShelfWiseOrderCountResponse.DateWiseShelfOrderCount == null ?null: ToDataContractsObject(doShelfWiseOrderCountResponse.DateWiseShelfOrderCount)
                 };
             }
             return null;
