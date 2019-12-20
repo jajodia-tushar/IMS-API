@@ -64,9 +64,9 @@
             <summary>
             Retrieve Frequently used "n" items in given date range 
             </summary>
-            <param name="StartDate"></param>
-            <param name="EndDate"></param>
-            <param name="ItemsCount"></param>
+            <param name="startDate"></param>
+            <param name="endDate"></param>
+            <param name="itemsCount"></param>
             <returns>Most frequently used "n" items with their quantity</returns>
             <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
         </member>

@@ -24,27 +24,36 @@ namespace IMS.Core.Translators
             return dtoMostConsumedItemsResponse;
         }
         
-        private static List<Contracts.ItemQuantityMapping> ToDataContractsObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)
+        public static List<Contracts.ItemQuantityMapping> ToDataContractsObject(List<Entities.ItemQuantityMapping> doItemQuantityMappings)
         {
             var dtoItemQuantityMappingList = new List<Contracts.ItemQuantityMapping>();
-            foreach (var itemQuantityMapping in doItemQuantityMappings)
+            if (doItemQuantityMappings != null)
             {
-                IMS.Contracts.ItemQuantityMapping doitemQuantityMapping = new IMS.Contracts.ItemQuantityMapping()
+                foreach (var itemQuantityMapping in doItemQuantityMappings)
                 {
-                    Item = new IMS.Contracts.Item()
+                    IMS.Contracts.ItemQuantityMapping doitemQuantityMapping = new IMS.Contracts.ItemQuantityMapping()
                     {
-                        Id = itemQuantityMapping.Item.Id,
-                        Name = itemQuantityMapping.Item.Name,
-                        MaxLimit = itemQuantityMapping.Item.MaxLimit,
-                        IsActive = itemQuantityMapping.Item.IsActive,
-                        ImageUrl = itemQuantityMapping.Item.ImageUrl,
-                        Rate = itemQuantityMapping.Item.Rate
-                    },
-                    Quantity = itemQuantityMapping.Quantity
-                };
-                dtoItemQuantityMappingList.Add(doitemQuantityMapping);
+                        Item = ToDataContractsObject(itemQuantityMapping.Item),
+                        Quantity = itemQuantityMapping.Quantity
+                    };
+                    dtoItemQuantityMappingList.Add(doitemQuantityMapping);
+                }
             }
             return dtoItemQuantityMappingList;
+        }
+        public static Contracts.Item ToDataContractsObject(Entities.Item doItem)
+        {
+            Contracts.Item dtoItem = new Contracts.Item();
+            if (doItem != null)
+            {
+                dtoItem.Id = doItem.Id;
+                dtoItem.Name = doItem.Name;
+                dtoItem.MaxLimit = doItem.MaxLimit;
+                dtoItem.IsActive = doItem.IsActive;
+                dtoItem.ImageUrl = doItem.ImageUrl;
+                dtoItem.Rate = doItem.Rate;
+            }
+            return dtoItem;
         }
     }
 }
