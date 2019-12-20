@@ -25,7 +25,7 @@ namespace IMS.Core.Translators
         public static List<Contracts.Item> ToDataContractsObject(List<Entities.Item> doItemList)
         {
             var dtoItemList = new List<Contracts.Item>();
-            if (doItemList != null)
+            if (doItemList != null && doItemList.Count!=0)
             {
                 foreach (var doItem in doItemList)
                 {
