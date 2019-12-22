@@ -7,6 +7,6 @@ namespace IMS.Contracts
     public class ShelfOrderCountMapping
     {
         public string ShelfName { get; set; }
-        public int ?OrderCount { get; set; }
+        public int OrderCount { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace IMS.Core.Translators
 
         public static List<Contracts.ShelfOrderStats> ToDataContractsObject(List<Entities.ShelfOrderStats> doDateWiseShelfOrderCount)
         {
-            List<Contracts.ShelfOrderStats> dtoDateShelfOrderMappings = null;
+            List<Contracts.ShelfOrderStats> dtoDateShelfOrderMappings = new List<Contracts.ShelfOrderStats>();
             if (doDateWiseShelfOrderCount != null)
             {
                 foreach (var dateShelfOrder in doDateWiseShelfOrderCount)
@@ -53,12 +53,12 @@ namespace IMS.Core.Translators
 
         public static List<Contracts.ShelfOrderCountMapping> ToDataContractsObject(List<Entities.ShelfOrderCountMapping> doShelfOrderCountMappings)
         {
-            List<Contracts.ShelfOrderCountMapping> dtoShelfOrderCountMappings = null;
+            List<Contracts.ShelfOrderCountMapping> dtoShelfOrderCountMappings = new List<Contracts.ShelfOrderCountMapping>();
             if (doShelfOrderCountMappings != null)
             {
                 foreach (var shelfOrder in doShelfOrderCountMappings)
                 {
-                    dtoShelfOrderCountMappings.Add(ToDataContractsObject(shelfOrder));
+                  dtoShelfOrderCountMappings.Add(ToDataContractsObject(shelfOrder));
                 }
                 return dtoShelfOrderCountMappings;
             }
@@ -74,8 +74,7 @@ namespace IMS.Core.Translators
             dtoShelfOrder.OrderCount = doShelfOrder.OrderCount;
             return dtoShelfOrder;
         }
-    }
-}
+
         public static Contracts.MostConsumedItemsResponse ToDataContractsObject(Entities.MostConsumedItemsResponse doMostConsumedItemsResponse)
         {
             var dtoMostConsumedItemsResponse = new Contracts.MostConsumedItemsResponse();

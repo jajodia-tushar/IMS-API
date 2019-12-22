@@ -1,4 +1,5 @@
-﻿using IMS.Core.Validators;
+﻿using IMS.Core;
+using IMS.Core.Validators;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
@@ -36,6 +37,7 @@ namespace IMS.Core.services
         {
             
             ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
+            int userId = -1;
             try
             {
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
@@ -101,7 +103,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (shelfWiseOrderCountResponse.Status == Status.Failure)
                     severity = Severity.High;
-                new Task(() => { _logger.Log("ShelfWiseOrderCount",shelfWiseOrderCountResponse, "Getting Shelf Wise Order Count", shelfWiseOrderCountResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log("ShelfWiseOrderCount",shelfWiseOrderCountResponse, "Getting Shelf Wise Order Count", shelfWiseOrderCountResponse.Status, severity, userId); }).Start();
             }
             return shelfWiseOrderCountResponse;
         }
@@ -126,8 +128,6 @@ namespace IMS.Core.services
             }
             return false;
         }
-    }
-}
         public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate,int itemsCount)
         {
             MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();

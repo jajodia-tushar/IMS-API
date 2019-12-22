@@ -105,14 +105,14 @@ namespace IMS_API.Controllers
         [Route("GetShelfWiseOrderCount")]
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
-        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate,string ToDate)
+        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate,string toDate)
         {
             
             ShelfWiseOrderCountResponse dtoShelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
             try
             {
                 IMS.Entities.ShelfWiseOrderCountResponse doShelfWiseOrderCountResponse =
-                await _reportsService.GetShelfWiseOrderCount(FromDate, ToDate);
+                await _reportsService.GetShelfWiseOrderCount(fromDate, toDate);
                 dtoShelfWiseOrderCountResponse = ReportsTranslator.ToDataContractsObject(doShelfWiseOrderCountResponse);
             }
             catch (Exception exception)
@@ -126,7 +126,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetAllVendors", IMS.Entities.Severity.High, null, dtoShelfWiseOrderCountResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "Get Shelf Wise Order Count", IMS.Entities.Severity.High, null, dtoShelfWiseOrderCountResponse); }).Start();
             }
             return dtoShelfWiseOrderCountResponse;
         }

@@ -103,8 +103,7 @@ namespace IMS.DataLayer.Db
             {
                 try
                 {
-                    DateTime newToDate = new DateTime(toDate.Year, toDate.Month, toDate.Day + 1);
-              
+                    DateTime newToDate = toDate.AddDays(1);
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
