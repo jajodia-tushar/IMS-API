@@ -9,5 +9,7 @@ namespace IMS.DataLayer.Interfaces
     public interface IReportsDbContext
     {
         Task<List<ItemQuantityMapping>> GetMostConsumedItemsByDate(string startDate, string endDate, int itemsCount);
+        Task<Dictionary<string, List<ColourCountMapping>>> GetShelfRAGStatus();
+        Task<List<ColourCountMapping>> GetWarehouseRAGStatus();
     }
 }

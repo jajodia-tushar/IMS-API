@@ -26,35 +26,34 @@ namespace IMS_API.Controllers
             this._logger = logManager;
         }
 
+        /// <summary>
+        /// Retrieve RAG(Red, Amber, Green) status of every inventory location
+        /// </summary>
+        /// <returns>RAG count of every shelf</returns>
+        /// <response code="200">Returns the RAG count of every inventory location if the system is unable to fetch any of the location then it returns failure</response>
         [Route("GetRAGStatus")]
         [HttpGet]
         public async Task<RAGStatusResponse> GetRAGStatus()
         {
-
             RAGStatusResponse rAGStatusResponse = new RAGStatusResponse();
-            List<ColourCountMapping> c = new List<ColourCountMapping>();
-            rAGStatusResponse.Error = null;
-            rAGStatusResponse.Status = Status.Success;
-            c.Add(new ColourCountMapping() { Colour = Colour.Red, Count = 9 });
-            c.Add(new ColourCountMapping() { Colour = Colour.Amber, Count = 10 });
-            c.Add(new ColourCountMapping() { Colour = Colour.Green, Count = 13 });
-            rAGStatusResponse.RAGStatusList = new List<RAGStatus>();
-            rAGStatusResponse.RAGStatusList.Add(
-                new RAGStatus()
+            try
+            {
+                IMS.Entities.RAGStatusResponse doRAGStatusResponse = await _reportsService.GetRAGStatus();
+                rAGStatusResponse = RAGStatusTranslator.ToDataContractObject(doRAGStatusResponse);
+            }
+            catch (Exception exception)
+            {
+                rAGStatusResponse.Status = Status.Failure;
+                rAGStatusResponse.Error = new Error()
                 {
-                    Name = "floor-1",
-                    Code = "A",
-                    ColourCountMappings = c
-                });
-            rAGStatusResponse.RAGStatusList.Add(
-               new RAGStatus()
-               {
-                   Name = "floor-2",
-                   Code = "B",
-                   ColourCountMappings = c
-               });
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+                new Task(() => { _logger.LogException(exception, "GetRAGStatus", IMS.Entities.Severity.Critical, "GetRAGStatus", rAGStatusResponse); }).Start();
+            }
             return rAGStatusResponse;
         }
+
 
         /// <summary>
         /// Retrieve Frequently used "n" items in given date range 

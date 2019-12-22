@@ -98,6 +98,13 @@
             <param name="orderId">'Order Id of that Particular Order</param>
             <response code="200">Returns status success if order is successfully deleted otherwise returns failure if order is not deleted</response>
         </member>
+        <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
+            <summary>
+            Retrieve RAG(Red, Amber, Green) status of every inventory location
+            </summary>
+            <returns>RAG count of every shelf</returns>
+            <response code="200">Returns the RAG count of every inventory location if the system is unable to fetch any of the location then it returns failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.ReportsController.GetMostConsumedItems(System.String,System.String,System.Int32)">
             <summary>
             Retrieve Frequently used "n" items in given date range 

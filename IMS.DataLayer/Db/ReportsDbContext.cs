@@ -58,5 +58,90 @@ namespace IMS.DataLayer.Db
                 return mostConsumedItemsResponse.ItemQuantityMapping;
             }
         }
+
+        public async Task<Dictionary<string, List<ColourCountMapping>>> GetShelfRAGStatus()
+        {
+            try
+            {
+                DbDataReader reader = null;
+                var dictionaryRAG = new Dictionary<string, List<ColourCountMapping>>();
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spRAGStatusOfShelves";
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        string locationDetail = (string)reader["ShelfCode"] + ";" + (string)reader["ShelfName"];
+                        var colourCountMapping = new ColourCountMapping()
+                        {
+                            Colour = StringToEnum((string)reader["ShelvesRAG"]),
+                            Count = Convert.ToInt32(reader["Count"])
+                        };
+                        if (dictionaryRAG.ContainsKey(locationDetail))
+                            dictionaryRAG[locationDetail].Add(colourCountMapping);
+                        else
+                        {
+                            var colourCountMappings = new List<ColourCountMapping>();
+                            colourCountMappings.Add(colourCountMapping);
+                            dictionaryRAG.Add(locationDetail, colourCountMappings);
+                        }
+                    }
+                }
+                return dictionaryRAG;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        public async Task<List<ColourCountMapping>> GetWarehouseRAGStatus()
+        {
+            try
+            {
+                DbDataReader reader = null;
+                var colourCountMappings = new List<ColourCountMapping>();
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spRAGStatusOfWarehouse";
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        colourCountMappings.Add(
+                            new ColourCountMapping()
+                            {
+                                Colour = StringToEnum((string)reader["WarehouseRAG"]),
+                                Count = Convert.ToInt32(reader["Count"])
+                            }
+                            );
+                    }
+                }
+                return colourCountMappings;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        private Colour StringToEnum(string colour)
+        {
+            switch (colour.ToUpper())
+            {
+                case "RED":
+                    return Colour.Red;
+                case "AMBER":
+                    return Colour.Amber;
+                case "GREEN":
+                    return Colour.Green;
+            }
+            return Colour.Green;
+        }
     }
 }

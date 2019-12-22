@@ -55,6 +55,7 @@ namespace IMS.Core
             public const string InvalidDate = "Date Is Invalid";
             public const string NotDeleted = "Item Not Deleted";
             public const string InvalidItemId = "Item Id is not valid";
+            public const string UnableToFetch = "unable to fetch from database";
         }
 
         public static class ErrorCodes
