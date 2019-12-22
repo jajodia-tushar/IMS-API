@@ -88,9 +88,90 @@ namespace IMS.Core.services
             return mostConsumedItemsResponse;
         }
 
-        public Task<RAGStatusResponse> GetRAGStatus()
+        public async Task<RAGStatusResponse> GetRAGStatus()
         {
-            throw new NotImplementedException();
+            var rAGStatusResponse = new RAGStatusResponse();
+            rAGStatusResponse.Status = Status.Failure;
+            int userId = -1;
+            try
+            {
+
+                var warehouseRAGStatusList = await GetWarehouseRAGStatusList();
+                var shelfRAGStatusList = await GetShelfRAGStatusList();
+                if (warehouseRAGStatusList != null && shelfRAGStatusList != null && warehouseRAGStatusList.Count > 0 && shelfRAGStatusList.Count > 0)
+                {
+                    rAGStatusResponse.RAGStatusList = warehouseRAGStatusList;
+                    rAGStatusResponse.RAGStatusList.AddRange(shelfRAGStatusList);
+                    rAGStatusResponse.Status = Status.Success;
+                    return rAGStatusResponse;
+                }
+                rAGStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToFetch);
+                return rAGStatusResponse;
+            }
+            catch (Exception exception)
+            {
+                rAGStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetRAGStatus", Severity.Critical, "GetRAGStatus", rAGStatusResponse); }).Start();
+                throw exception;
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (rAGStatusResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log("GetRAGStatus", rAGStatusResponse, "GetRAGStatus", rAGStatusResponse.Status, severity, -1); }).Start();
+            }
+        }
+
+        private async Task<List<RAGStatus>> GetWarehouseRAGStatusList()
+        {
+            try
+            {
+                var warehouseRAGStatus = new RAGStatus() { Name = "Warehouse", Code = "WH", ColourCountMappings = InitializeColourCountMapping() };
+                var ColourCountMappings = await _reportsDbContext.GetWarehouseRAGStatus();
+                foreach (var colourCountMapping in ColourCountMappings)
+                    warehouseRAGStatus.ColourCountMappings[(int)colourCountMapping.Colour].Count = colourCountMapping.Count;
+                return new List<RAGStatus>() { { warehouseRAGStatus } };
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        private async Task<List<RAGStatus>> GetShelfRAGStatusList()
+        {
+            try
+            {
+                var shelfRAGStatusList = new List<RAGStatus>();
+                var dictShelfRAG = await _reportsDbContext.GetShelfRAGStatus();
+                if (dictShelfRAG != null && dictShelfRAG.Count > 0)
+                {
+                    foreach (var keyValuePair in dictShelfRAG)
+                    {
+                        string[] locationDetail = keyValuePair.Key.Split(";");
+                        var rAGStatus = new RAGStatus() { Code = locationDetail[0], Name = locationDetail[1], ColourCountMappings = InitializeColourCountMapping() };
+                        //Modifying the Colour count if the colour exists in that location
+                        foreach (var colourCountMapping in keyValuePair.Value)
+                            rAGStatus.ColourCountMappings[(int)colourCountMapping.Colour].Count = colourCountMapping.Count;
+                        shelfRAGStatusList.Add(rAGStatus);
+                    }
+                }
+                return shelfRAGStatusList;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        private List<ColourCountMapping> InitializeColourCountMapping()
+        {
+            return new List<ColourCountMapping>() {
+                { new ColourCountMapping() {Colour = Colour.Red,Count = 0} },
+                { new ColourCountMapping() { Colour = Colour.Amber, Count = 0 } },
+                { new ColourCountMapping() { Colour = Colour.Green, Count = 0 } }
+            };
         }
 
         public Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate, string ToDate)
