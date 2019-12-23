@@ -23,13 +23,16 @@ namespace IMS.Core.services
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenProvider _tokenProvider;
         private IShelfService _shelfService;
-        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService)
+        private IItemDbContext _itemDbContext;
+
+        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService, IItemDbContext itemDbContext)
         {
             this._reportsDbContext = reportsDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
             this._shelfService = shelfService;
             this._httpContextAccessor = httpContextAccessor;
+            this._itemDbContext = itemDbContext;
         }
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
         {
@@ -381,7 +384,7 @@ namespace IMS.Core.services
                     try
                     {
                         StockStatusDataLayerTransfer stockStatus = await _reportsDbContext.GetStockStatus();
-                        if (stockStatus!=null && stockStatus.StockStatusDict.Count != 0)
+                        if (stockStatus != null && stockStatus.StockStatusDict.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
                             stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
