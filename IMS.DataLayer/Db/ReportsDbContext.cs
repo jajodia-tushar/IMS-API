@@ -14,11 +14,10 @@ namespace IMS.DataLayer.Db
     public class ReportsDbContext : IReportsDbContext
     {
         private IDbConnectionProvider _dbConnectionProvider;
-        private IShelfService _shelfService;
-        public ReportsDbContext(IDbConnectionProvider dbConnectionProvider,IShelfService shelfService)
+        public ReportsDbContext(IDbConnectionProvider dbConnectionProvider)
         {
             _dbConnectionProvider = dbConnectionProvider;
-            _shelfService = shelfService;
+            
         }
 
         public async Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate, string endDate)
@@ -95,10 +94,10 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<List<ShelfOrderStats>> GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate)
+        public void GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate,List<ShelfOrderStats> shelfOrderStats)
         {
             MySqlDataReader reader = null;
-            List<ShelfOrderStats> dateShelfOrderMappings = await PopulateListWithZeroValues(startDate,toDate);
+            List<ShelfOrderStats> dateShelfOrderMappings = shelfOrderStats;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -134,46 +133,7 @@ namespace IMS.DataLayer.Db
                     throw ex;
                 }
             }
-            return dateShelfOrderMappings; 
         }
-
-        private async Task<List<ShelfOrderStats>> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
-        {
-            List<ShelfOrderStats> dateShelfOrderMappings = new List<ShelfOrderStats>();
-            foreach (DateTime day in EachDay(startDate, toDate))
-            {
-                dateShelfOrderMappings.Add(
-                    new ShelfOrderStats()
-                    {
-                        Date = day,
-                        ShelfOrderCountMappings =await GetShelvesListWithOrderCountAsZero()
-                    }
-                );
-            }
-            return dateShelfOrderMappings;
-        }
-
-        private async Task<List<ShelfOrderCountMapping>> GetShelvesListWithOrderCountAsZero()
-        {
-            var list = new List<ShelfOrderCountMapping>();
-            ShelfResponse shelfResponse = new ShelfResponse();
-            shelfResponse = await _shelfService.GetShelfList();
-           foreach(var shelf in shelfResponse.Shelves)
-           {
-                list.Add(new ShelfOrderCountMapping()
-                {
-                    ShelfName = shelf.Name,
-                    OrderCount = 0
-                });
-           }
-            return list;
-        }
-        private IEnumerable<DateTime> EachDay(DateTime startDate, DateTime endDate)
-        {
-            for (var date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1)) yield
-            return date;
-        }
-
         public async Task<Dictionary<string, List<ColourCountMapping>>> GetShelfRAGStatus()
         {
             try

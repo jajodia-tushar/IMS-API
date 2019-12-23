@@ -15,6 +15,7 @@ namespace IMS.DataLayer.Interfaces
         Task<List<DateShelfOrderMapping>> GetShelfWiseOrderCountByDate(DateTime StartDate,DateTime ToDate );
         Task<List<ShelfOrderStats>> GetShelfWiseOrderCountByDate(DateTime StartDate,DateTime ToDate );
         Task<List<ShelfOrderStats>> GetShelfWiseOrderCountByDate(DateTime startDate,DateTime toDate );
+        void GetShelfWiseOrderCountByDate(DateTime startDate,DateTime toDate, List<ShelfOrderStats> shelfOrderStats );
     }
 
 }
