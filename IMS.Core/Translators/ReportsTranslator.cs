@@ -55,5 +55,45 @@ namespace IMS.Core.Translators
             }
             return dtoItem;
         }
+
+        public static Contracts.ItemsConsumptionReport ToDataContractsObject(Entities.ItemsConsumptionReport itemConsumptionReportEntity)
+        {
+            var contractItemConsumptionReport = new Contracts.ItemsConsumptionReport();
+            if (itemConsumptionReportEntity.Status == Entities.Status.Success)
+            {
+                contractItemConsumptionReport.Status = Contracts.Status.Success;
+                contractItemConsumptionReport.ItemConsumptions = ToDataContractsObject(itemConsumptionReportEntity.ItemConsumptions);
+            }
+            else
+            {
+                contractItemConsumptionReport.Status = Contracts.Status.Failure;
+                contractItemConsumptionReport.Error = Translator.ToDataContractsObject(itemConsumptionReportEntity.Error);
+            }
+            return contractItemConsumptionReport;
+        }
+
+        public static List<Contracts.DateItemConsumption> ToDataContractsObject(List<Entities.DateItemConsumption> itemConsumptionsEntity)
+        {
+            List<Contracts.DateItemConsumption> contractDateItemConsumptions = new List<Contracts.DateItemConsumption>();
+            if(itemConsumptionsEntity !=null && itemConsumptionsEntity.Count!=0)
+            {
+                foreach(Entities.DateItemConsumption dateItemConsumption in itemConsumptionsEntity)
+                {
+                    if(dateItemConsumption!=null)
+                    {
+                        contractDateItemConsumptions.Add(ToDataContractsObject(dateItemConsumption));
+                    }
+                }
+            }
+            return contractDateItemConsumptions;
+        }
+        public static Contracts.DateItemConsumption ToDataContractsObject(Entities.DateItemConsumption dateItemConsumptionEntity)
+        {
+            return new Contracts.DateItemConsumption()
+            {
+                Date = dateItemConsumptionEntity.Date,
+                ItemsConsumptionCount = dateItemConsumptionEntity.ItemsConsumptionCount
+            };
+        }
     }
 }

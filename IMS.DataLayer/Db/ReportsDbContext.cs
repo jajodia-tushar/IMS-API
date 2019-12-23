@@ -32,9 +32,12 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@startDate", startDate);
                     command.Parameters.AddWithValue("@endDate", endDate);
                     reader = await command.ExecuteReaderAsync();
+                    string Date = "";
                     while (reader.Read())
                     {
-                        dateItemConsumption.Add(new DateItemConsumption() { Date = reader["Date"]?.ToString(),ItemsConsumptionCount = (int)reader["ItemsCount"] });
+                        Date = reader["Date"]?.ToString().Split(" ")[0];
+                        Date = Date.Substring(6, 4) + '/' + Date.Substring(0, 2) + '/' + Date.Substring(3, 2);
+                        dateItemConsumption.Add(new DateItemConsumption() { Date = Date,ItemsConsumptionCount = Convert.ToInt32(reader["ItemsCount"] )});
                     }
                 }
                 catch (Exception exception)

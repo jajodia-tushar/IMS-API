@@ -6,6 +6,7 @@ using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -191,35 +192,26 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
                     List<DateItemConsumption> dateItemConsumption;
-                    try
+                    if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
                     {
-                        if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
+                        dateItemConsumption = await _reportsDbContext.GetItemsConsumptionReport(startDate, endDate);
+                        if (dateItemConsumption != null)
                         {
-                            dateItemConsumption = await _reportsDbContext.GetItemsConsumptionReport(startDate, endDate);
-                            if (dateItemConsumption!=null && dateItemConsumption.Count != 0)
-                            {
-                                itemConsumptionReport.Status = Status.Success;
-                                itemConsumptionReport.ItemConsumptions = dateItemConsumption;
-                            }
-                            else
-                            {
-                                itemConsumptionReport.Status = Status.Failure;
-                                itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
-                            }
-                            return itemConsumptionReport;
+                            itemConsumptionReport.Status = Status.Success;
+                            dateItemConsumption = FillDatesInTheRange(startDate, endDate, dateItemConsumption);
+                            itemConsumptionReport.ItemConsumptions = dateItemConsumption;
                         }
                         else
                         {
                             itemConsumptionReport.Status = Status.Failure;
-                            itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDates);
+                            itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
                         }
                         return itemConsumptionReport;
                     }
-                    catch (Exception exception)
+                    else
                     {
                         itemConsumptionReport.Status = Status.Failure;
-                        itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "GetItemsConsumption", Severity.High, startDate + ";" + endDate , itemConsumptionReport); }).Start();
+                        itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDate);
                     }
                     return itemConsumptionReport;
                 }
@@ -243,6 +235,26 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(startDate + ";" + endDate , itemConsumptionReport, "GetMostConsumedItems", itemConsumptionReport.Status, severity, userId); }).Start();
             }
             return itemConsumptionReport;
+        }
+
+        private List<DateItemConsumption> FillDatesInTheRange(string startDateString, string endDateString, List<DateItemConsumption> dateItemConsumptionList)
+        {
+            DateTime startDate = DateTime.ParseExact(startDateString, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+            DateTime endDate = DateTime.ParseExact(endDateString, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+            List<String> datesWithOrders = new List<String>();
+            foreach (DateItemConsumption dateItemConsumption in dateItemConsumptionList)
+            {
+                datesWithOrders.Add(dateItemConsumption.Date);
+            }
+            for (DateTime date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1))
+            {
+                string dateString = date.ToString("yyyy/MM/dd");
+                if (!datesWithOrders.Contains(dateString))
+                {
+                    dateItemConsumptionList.Add(new DateItemConsumption() { Date = dateString, ItemsConsumptionCount=0});
+                }
+            }
+            return dateItemConsumptionList;
         }
     }
 }
