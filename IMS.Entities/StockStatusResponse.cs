@@ -6,7 +6,6 @@ namespace IMS.Entities
 {
     public class StockStatusResponse :Response
     {
-        public List<string> NamesOfAllStores { get; set; }
-        public List<StockStatusList> StockStatusList { get; set; }
+       public List<StockStatusList> StockStatusList { get; set; }
     }
 }

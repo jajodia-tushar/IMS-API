@@ -23,13 +23,12 @@ namespace IMS.Core.services
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenProvider _tokenProvider;
         private IShelfService _shelfService;
-        private ITemporaryItemDbContext _temporaryItemDbContext;
         public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService)
         {
             this._reportsDbContext = reportsDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
-            _shelfService = shelfService;
+            this._shelfService = shelfService;
             this._httpContextAccessor = httpContextAccessor;
         }
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
@@ -385,7 +384,6 @@ namespace IMS.Core.services
                         if (stockStatus!=null && stockStatus.StockStatusDict.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
-                            stockStatusResponse.NamesOfAllStores = await GetStoreNames();
                             stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
                         }
                         else
@@ -426,21 +424,6 @@ namespace IMS.Core.services
             }
             return stockStatusResponse;
         }
-        private async Task<List<string>> GetStoreNames()
-        {
-            List<string> storeNames = new List<string>();
-            List<Shelf> shelves = await _shelfDbContext.GetAllShelves();
-            foreach(Shelf shelf in shelves)
-            {
-                if(shelf.IsActive==true)
-                {
-                    storeNames.Add(shelf.Name);
-                }
-            }
-            storeNames.Add("Warehouse");
-            return storeNames;
-        }
-
         public async Task<List<StockStatusList>> ToListFromDictionary(StockStatusDataLayerTransfer stockStatus)
         {
             List<StockStatusList> stockStatusList = new List<StockStatusList>();

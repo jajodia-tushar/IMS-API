@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 using IMS.DataLayer.Dto;
 using IMS.Entities;
 using System;
