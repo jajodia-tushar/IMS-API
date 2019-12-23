@@ -98,22 +98,6 @@
             <param name="orderId">'Order Id of that Particular Order</param>
             <response code="200">Returns status success if order is successfully deleted otherwise returns failure if order is not deleted</response>
         </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
-            <summary>
-            Retrieve RAG(Red, Amber, Green) status of every inventory location
-            </summary>
-            <returns>RAG count of every shelf</returns>
-            <response code="200">Returns the RAG count of every inventory location if the system is unable to fetch any of the location then it returns failure</response>
-        </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetMostConsumedItems(System.String,System.String,System.Int32)">
-            <summary>
-            Retrieve Frequently used "n" items in given date range 
-            </summary>
-            <param name="startDate"></param>
-            <param name="endDate"></param>
-            <param name="itemsCount"></param>
-            <returns>Most frequently used "n" items with their quantity</returns>
-            <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
         <member name="M:IMS_API.Controllers.OrderController.PlaceVendorOrder(IMS.Contracts.VendorOrder)">
             <summary>
             places the vendororder.returns entire object if order stores successfully otherwise failure
@@ -136,6 +120,23 @@
             <param name="vendorOrder">Here vendorOrder contains two objects named vendor and vendororderdetails</param>
             <returns>Response</returns>
             <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
+            <summary>
+            Retrieve RAG(Red, Amber, Green) status of every inventory location
+            </summary>
+            <returns>RAG count of every shelf</returns>
+            <response code="200">Returns the RAG count of every inventory location if the system is unable to fetch any of the location then it returns failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.ReportsController.GetMostConsumedItems(System.String,System.String,System.Int32)">
+            <summary>
+            Retrieve Frequently used "n" items in given date range 
+            </summary>
+            <param name="startDate"></param>
+            <param name="endDate"></param>
+            <param name="itemsCount"></param>
+            <returns>Most frequently used "n" items with their quantity</returns>
+            <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
         </member>
         <member name="M:IMS_API.Controllers.ShelfController.Get">
             <summary>

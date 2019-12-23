@@ -57,6 +57,9 @@ namespace IMS.Core
             public const string NotDeleted = "Item Not Deleted";
             public const string InvalidItemId = "Item Id is not valid";
             public const string UnableToFetch = "unable to fetch from database";
+            public const string InvalidRequest = "Invalid Request";
+            public const string InvalidOrder = "Invalid Order";
+            public const string NoToken = "Token Required";
         }
 
         public static class ErrorCodes
