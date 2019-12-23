@@ -126,7 +126,8 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Get Shelf Wise Order Count", IMS.Entities.Severity.High, null, dtoShelfWiseOrderCountResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "Get Shelf Wise Order Count", 
+                    IMS.Entities.Severity.High, null, dtoShelfWiseOrderCountResponse); }).Start();
             }
             return dtoShelfWiseOrderCountResponse;
         }

@@ -27,12 +27,6 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-
-        public Task<RAGStatusResponse> GetRAGStatus()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
         {
             
@@ -49,7 +43,7 @@ namespace IMS.Core.services
                     DateTime endDate = new DateTime();
                     try
                     {
-                        if (IsDateValid(fromDate, toDate, out startDate, out endDate))
+                        if (ReportsValidator.IsDateValid(fromDate, toDate, out startDate, out endDate))
                         {
                             List<ShelfOrderStats> dateShelfOrderMappings =
                             await _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate);
@@ -106,27 +100,6 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log("ShelfWiseOrderCount",shelfWiseOrderCountResponse, "Getting Shelf Wise Order Count", shelfWiseOrderCountResponse.Status, severity, userId); }).Start();
             }
             return shelfWiseOrderCountResponse;
-        }
-
-        private bool IsDateValid(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
-        {
-            startDate = DateTime.ParseExact(fromDate, "yyyyMMdd", CultureInfo.InvariantCulture);
-            endDate = DateTime.ParseExact(toDate, "yyyyMMdd", CultureInfo.InvariantCulture);
-            return IsDateRangeIsValid(startDate,endDate) ? true : false;
-        }
-
-        private bool IsDateRangeIsValid(DateTime startDate, DateTime endDate)
-        {
-            int value = DateTime.Compare(startDate, endDate);
-            if (startDate > DateTime.Now || endDate >= DateTime.Now)
-            {
-                return false;
-            }
-            else if (value < 0)
-            {
-                return true;
-            }
-            return false;
         }
         public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate,int itemsCount)
         {
