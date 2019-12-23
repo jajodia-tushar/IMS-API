@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using IMS.Contracts;
@@ -8,36 +7,40 @@ using IMS.Entities;
 namespace IMS.Core.Translators
 {
     public static class Translator
-    {       
-        public static Contracts.Response ToDataContractsObject(IMS.Entities.Response entitiesReponse)
+    { 
+        public static Contracts.Response ToDataContractsObject(Entities.Response doEntityTransferResponse)
         {
-            return new Contracts.Response
+            Contracts.Response dtoContractTransferResponse = new Contracts.Response();
+            if (doEntityTransferResponse.Status == Entities.Status.Success)
             {
-                Status = entitiesReponse.Status == Entities.Status.Success ? Contracts.Status.Success : Contracts.Status.Failure,
-                Error = ToDataContractsObject(entitiesReponse.Error)
-            };
+                dtoContractTransferResponse.Status = Contracts.Status.Success;
+            }
+            else
+            {
+                dtoContractTransferResponse.Status = Contracts.Status.Failure;
+                dtoContractTransferResponse.Error = ToDataContractsObject(doEntityTransferResponse.Error);
+            }
+            return dtoContractTransferResponse;
         }
         public static Contracts.Error ToDataContractsObject(Entities.Error error)
         {
-
-            if (error != null)
-                return new Contracts.Error()
-                {
-                    ErrorCode = error.ErrorCode,
-                    ErrorMessage = error.ErrorMessage
-                };
-            else
-                return null;
+            return new Contracts.Error()
+            {
+                ErrorCode = error.ErrorCode,
+                ErrorMessage = error.ErrorMessage
+            };
         }
-        public static Entities.Item ToEntitiesObject(Contracts.Item item)
+
+        public static Entities.Item ToEntitiesObject(Contracts.Item contractsItem)
         {
             return new Entities.Item()
             {
-                Id = item.Id,
-                Name = item.Name,
-                IsActive = item.IsActive,
-                MaxLimit = item.MaxLimit,
-                Rate = item.Rate
+                Id = contractsItem.Id,
+                Name = contractsItem.Name,
+                MaxLimit = contractsItem.MaxLimit,
+                ImageUrl = contractsItem.ImageUrl,
+                IsActive = contractsItem.IsActive,
+                Rate = contractsItem.Rate
             };
         }
     }

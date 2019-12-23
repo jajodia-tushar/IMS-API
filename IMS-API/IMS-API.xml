@@ -209,6 +209,14 @@
             <response code="200">Returns remaining shelves List </response>
             <response code="400">If shelf is Already Deleted or Not Present in Shelf Table </response>
         </member>
+        <member name="M:IMS_API.Controllers.TransferController.TransferToShelf(IMS.Contracts.TransferToShelvesRequest)">
+            <summary>
+            Transfer items from warehouse to shelf
+            </summary>
+            <param name="transferRequest">The list of items and shelves to which transfer has to be made</param>
+            <returns>Status</returns>
+            <response code="200">Returns Success if transfer is successfull else returns status failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.UserController.GetUsersByRoleName(System.String)">
             <summary>
             returns all users based on the role name
