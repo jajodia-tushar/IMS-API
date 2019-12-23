@@ -12,4 +12,5 @@ WORKDIR /app
 COPY --from=build /app/publish ./
 COPY --from=build /app/IMS-API/IMS-API.xml ./
 ENV ASPNETCORE_ENVIRONMENT=PRODUCTION
+ENV TZ=Asia/Kolkata
 CMD dotnet IMS-API.dll
