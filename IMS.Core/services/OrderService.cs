@@ -263,7 +263,7 @@ namespace IMS.Core.services
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (!isValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.TokenExpired);
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
                 if (VendorOrderValidator.ValidatePlacedOrder(vendorOrder))
@@ -318,7 +318,7 @@ namespace IMS.Core.services
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (!isValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.TokenExpired);
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
                 response.ListOfVendorOrders = await _vendorOrderDbContext.GetAllPendingApprovals(pageNumber, pageSize);
@@ -369,7 +369,7 @@ namespace IMS.Core.services
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (!isValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.TokenExpired);
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
                 if (VendorOrderValidator.ValidateApproveRequest(vendorOrder))

@@ -188,7 +188,7 @@ namespace IMS.DataLayer.Db
                         listOfVendorOrderDtos.Add(vendorOrderDto);
 
                     }
-                    listOfVendorOrders = convertToListOfVendorOrders(listOfVendorOrderDtos);
+                    listOfVendorOrders = ConvertToListOfVendorOrders(listOfVendorOrderDtos);
 
 
                 }
@@ -239,7 +239,7 @@ namespace IMS.DataLayer.Db
         /* 
          * Dto To Model Translation
          */
-        private List<VendorOrder> convertToListOfVendorOrders(List<VendorOrderDto> listOfVendorOrderDtos)
+        private List<VendorOrder> ConvertToListOfVendorOrders(List<VendorOrderDto> listOfVendorOrderDtos)
         {
             List<VendorOrder> listOfVendorOrders = null;
             Dictionary<int, VendorOrder> mapping = new Dictionary<int, VendorOrder>();
