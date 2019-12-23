@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using IMS.Contracts;
 using IMS.Core;
@@ -23,7 +24,8 @@ namespace IMS_API.Controllers
         public ReportsController(IReportsService reportsService, ILogManager logManager)
         {
             _reportsService = reportsService;
-            this._logger = logManager;
+            _logger = logManager;
+
         }
 
         /// <summary>
@@ -89,12 +91,45 @@ namespace IMS_API.Controllers
             return mostConsumedItemsResponse;
         }
 
+        //http://localhost:55462/api/Reports/GetShelfWiseOrderCount?FromDate=20191210&ToDate=20191219
+        //yyyymmdd
+        /// <summary>
+        /// Returns shelf wise order count by date
+        /// </summary>
+        /// <returns>List of date with shelf wise order count</returns>
+        /// <response code="200">Returns the shelf wise order count along with status success </response>
+        /// <response code="404">If Shelf Wise Order Count is not Available </response>
+        /// <response code="401">If token is Invalid</response>
+        /// <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
+        /// <response code="400">Given Date Range Is Invalid or Given Date Format is Invalid</response>
         [Route("GetShelfWiseOrderCount")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
-        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate,string ToDate)
+        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate,string toDate)
         {
-           
-            throw new NotImplementedException();
+            
+            ShelfWiseOrderCountResponse dtoShelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
+            try
+            {
+                IMS.Entities.ShelfWiseOrderCountResponse doShelfWiseOrderCountResponse =
+                await _reportsService.GetShelfWiseOrderCount(fromDate, toDate);
+                dtoShelfWiseOrderCountResponse = ReportsTranslator.ToDataContractsObject(doShelfWiseOrderCountResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoShelfWiseOrderCountResponse = new IMS.Contracts.ShelfWiseOrderCountResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Get Shelf Wise Order Count", 
+                    IMS.Entities.Severity.High, null, dtoShelfWiseOrderCountResponse); }).Start();
+            }
+            return dtoShelfWiseOrderCountResponse;
         }
 
         /// <summary>

@@ -53,6 +53,9 @@ namespace IMS.Core
             public const string InvalidDates = "StartDate should be less than EndDate";
             public const string RecordNotFound = "Record Not Found";
             public const string InvalidDate = "Date Is Invalid";
+
+            public const string NoShelfWiseOrderCount = "No Shelf Wise Order Count is Available";
+            public const string DateRangeIsInvalid = "Given Date Range Is Invalid";
             public const string NotDeleted = "Item Not Deleted";
             public const string InvalidItemId = "Item Id is not valid";
             public const string UnableToFetch = "unable to fetch from database";
@@ -60,6 +63,7 @@ namespace IMS.Core
             public const string InvalidOrder = "Invalid Order";
             public const string NoToken = "Token Required";
             public const string TranferFailure = "The items transfer failed";
+            public const string DateFormatInvalid = "Given Date Format is Invalid";
         }
 
         public static class ErrorCodes

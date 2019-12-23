@@ -1,8 +1,10 @@
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using IMS.Entities.Interfaces;
 using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +17,7 @@ namespace IMS.DataLayer.Db
         public ReportsDbContext(IDbConnectionProvider dbConnectionProvider)
         {
             _dbConnectionProvider = dbConnectionProvider;
+            
         }
 
         public async Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate, string endDate)
@@ -91,6 +94,46 @@ namespace IMS.DataLayer.Db
             }
         }
 
+        public void GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate,List<ShelfOrderStats> shelfOrderStats)
+        {
+            MySqlDataReader reader = null;
+            List<ShelfOrderStats> dateShelfOrderMappings = shelfOrderStats;
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    DateTime newToDate = toDate.AddDays(1);
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetOrderCountByDate";
+                    command.Parameters.AddWithValue("@FromDate", startDate);
+                    command.Parameters.AddWithValue("@ToDate", newToDate); 
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+
+                        DateTime date = (DateTime)reader["OrderDate"];
+                        string shelfName = (string)reader["FloorName"];
+                        int orderCount = Convert.ToInt32(reader["TotalNumberOfEntries"]);
+                        var list = dateShelfOrderMappings.FindAll(obj => obj.Date.Date.Equals(date.Date));
+                        list.ForEach(obj =>
+                        {
+                            var shelfOrderCountMappings = obj.ShelfOrderCountMappings;
+                            var internalList = shelfOrderCountMappings.FindAll(innerObj => innerObj.ShelfName.Equals(shelfName));
+                            internalList.ForEach(o =>
+                            {
+                                o.OrderCount = orderCount;
+                            });
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+        }
         public async Task<Dictionary<string, List<ColourCountMapping>>> GetShelfRAGStatus()
         {
             try

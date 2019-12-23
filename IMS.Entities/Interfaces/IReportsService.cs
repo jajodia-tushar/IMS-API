@@ -8,7 +8,7 @@ namespace IMS.Entities.Interfaces
     public interface IReportsService
     {
         Task<RAGStatusResponse> GetRAGStatus();
-        Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate,string ToDate);
+        Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate,string toDate);
         Task<MostConsumedItemsResponse> GetMostConsumedItems(string StartDate,string EndDate,int ItemsCount);
         Task<ItemsConsumptionReport> GetItemConsumptionStats(string startDate, string endDate);
     }

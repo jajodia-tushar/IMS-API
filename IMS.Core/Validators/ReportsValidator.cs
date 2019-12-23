@@ -41,5 +41,24 @@ namespace IMS.Core.Validators
             }
             return true;
         }
+        public static bool IsDateValid(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
+        {
+            startDate = DateTime.ParseExact(fromDate, "yyyyMMdd", CultureInfo.InvariantCulture);
+            endDate = DateTime.ParseExact(toDate, "yyyyMMdd", CultureInfo.InvariantCulture);
+            return IsDateRangeIsValid(startDate, endDate) ? true : false;
+        }
+        public static bool IsDateRangeIsValid(DateTime startDate, DateTime endDate)
+        {
+            int value = DateTime.Compare(startDate, endDate);
+            if (startDate > DateTime.Now || endDate >= DateTime.Now)
+            {
+                return false;
+            }
+            else if (value <= 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

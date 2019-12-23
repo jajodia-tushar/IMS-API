@@ -1,4 +1,5 @@
-﻿using IMS.Core.Validators;
+﻿using IMS.Core;
+using IMS.Core.Validators;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace IMS.Core.services
@@ -18,15 +20,125 @@ namespace IMS.Core.services
         private ILogManager _logger;
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenProvider _tokenProvider;
-
-        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
+        private IShelfService _shelfService;
+        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService)
         {
             this._reportsDbContext = reportsDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
+            _shelfService = shelfService;
         }
+        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
+        {
+            
+            ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    DateTime startDate = new DateTime();
+                    DateTime endDate = new DateTime();
+                    try
+                    {
+                        if (ReportsValidator.IsDateValid(fromDate, toDate, out startDate, out endDate))
+                        {
+                            
+                            List<ShelfOrderStats> dateShelfOrderMappings = await PopulateListWithZeroValues(startDate, endDate);
+                             _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate,dateShelfOrderMappings);
 
+                            if (dateShelfOrderMappings == null || dateShelfOrderMappings.Count == 0)
+                            {
+                                shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                                shelfWiseOrderCountResponse.Error =
+                                Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoShelfWiseOrderCount);
+
+                            }
+                            else
+                            {
+                                shelfWiseOrderCountResponse.Status = Entities.Status.Success;
+                                shelfWiseOrderCountResponse.DateWiseShelfOrderCount = dateShelfOrderMappings;
+                            }
+                        }
+                        else
+                        {
+                            shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                            shelfWiseOrderCountResponse.Error =
+                            Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateRangeIsInvalid);
+                        }
+                    }
+                    catch(Exception exception)
+                    {
+                        shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                        shelfWiseOrderCountResponse.Error =
+                        Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateFormatInvalid);
+                        new Task(() => {_logger.LogException(exception,"Getting Shelf Wise Order Count", Severity.High, null,
+                        shelfWiseOrderCountResponse);
+                        }).Start();
+                    }
+                }
+                else
+                {
+                    shelfWiseOrderCountResponse.Status = Status.Failure;
+                    shelfWiseOrderCountResponse.Error = 
+                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, 
+                        Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch(Exception exception)
+            {
+                shelfWiseOrderCountResponse.Status = Status.Failure;
+                shelfWiseOrderCountResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Getting Shelf Wise Order Count", Severity.High, null, shelfWiseOrderCountResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (shelfWiseOrderCountResponse.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log("ShelfWiseOrderCount",shelfWiseOrderCountResponse, "Getting Shelf Wise Order Count", shelfWiseOrderCountResponse.Status, severity, userId); }).Start();
+            }
+            return shelfWiseOrderCountResponse;
+        }
+        private async Task<List<ShelfOrderStats>> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
+        {
+            List<ShelfOrderStats> dateShelfOrderMappings = new List<ShelfOrderStats>();
+            foreach (DateTime day in EachDay(startDate, toDate))
+            {
+                dateShelfOrderMappings.Add(
+                    new ShelfOrderStats()
+                    {
+                        Date = day,
+                        ShelfOrderCountMappings = await GetShelvesListWithOrderCountAsZero()
+                    }
+                );
+            }
+            return dateShelfOrderMappings;
+        }
+        private IEnumerable<DateTime> EachDay(DateTime startDate, DateTime endDate)
+        {
+            for (var date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1)) yield
+            return date;
+        }
+        private async Task<List<ShelfOrderCountMapping>> GetShelvesListWithOrderCountAsZero()
+        {
+            var list = new List<ShelfOrderCountMapping>();
+            ShelfResponse shelfResponse = new ShelfResponse();
+            shelfResponse = await _shelfService.GetShelfList();
+            foreach (var shelf in shelfResponse.Shelves)
+            {
+                list.Add(new ShelfOrderCountMapping()
+                {
+                    ShelfName = shelf.Name,
+                    OrderCount = 0
+                });
+            }
+            return list;
+        }
         public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate,int itemsCount)
         {
             MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
@@ -175,9 +287,54 @@ namespace IMS.Core.services
             };
         }
 
-        public Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string FromDate, string ToDate)
+        public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCountAsync(string FromDate, string ToDate)
         {
-            throw new NotImplementedException();
+            //      dd/mm/yyyy
+            ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
+            int dd = Convert.ToInt32(FromDate.Split('/')[0]);
+            int mm = Convert.ToInt32(FromDate.Split('/')[1]);
+            int yyyy = Convert.ToInt32(FromDate.Split('/')[2]);
+            DateTime StartDate = new DateTime(yyyy, mm, dd);
+
+            dd = Convert.ToInt32(ToDate.Split('/')[0]);
+            mm = Convert.ToInt32(ToDate.Split('/')[1]);
+            yyyy = Convert.ToInt32(ToDate.Split('/')[2]);
+
+            DateTime EndDate = new DateTime(yyyy, mm, dd);
+            try
+            {
+                List<DateShelfOrderMapping> dateShelfOrderMappings =
+              await _reportsDbContext.GetShelfWiseOrderCountByDate(StartDate, EndDate);
+                if(dateShelfOrderMappings == null || dateShelfOrderMappings.Count==0)
+                {
+                    shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
+                    shelfWiseOrderCountResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.NotFound,
+                        ErrorMessage = Constants.ErrorMessages.NoShelfWiseOrderCount
+
+                    };
+                }
+                else
+                {
+                    shelfWiseOrderCountResponse.Status = Entities.Status.Success;
+                    shelfWiseOrderCountResponse.DateWiseShelfOrderCount = dateShelfOrderMappings;
+                }
+            }
+            catch(Exception exception)
+            {
+                shelfWiseOrderCountResponse.Status = Status.Failure;
+                shelfWiseOrderCountResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Getting Shelf Wise Order Count", Severity.High, null, shelfWiseOrderCountResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (shelfWiseOrderCountResponse.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log("ShelfWiseOrderCount",shelfWiseOrderCountResponse, "Getting Shelf Wise Order Count", shelfWiseOrderCountResponse.Status, severity, -1); }).Start();
+            }
+            return shelfWiseOrderCountResponse;
         }
 
         public async Task<ItemsConsumptionReport> GetItemConsumptionStats(string startDate, string endDate)
