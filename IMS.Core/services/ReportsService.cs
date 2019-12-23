@@ -179,6 +179,70 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        
+        public async Task<ItemsConsumptionReport> GetItemConsumptionStats(string startDate, string endDate)
+        {
+            ItemsConsumptionReport itemConsumptionReport = new ItemsConsumptionReport();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    List<DateItemConsumption> dateItemConsumption;
+                    try
+                    {
+                        if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
+                        {
+                            dateItemConsumption = await _reportsDbContext.GetItemsConsumptionReport(startDate, endDate);
+                            if (dateItemConsumption!=null && dateItemConsumption.Count != 0)
+                            {
+                                itemConsumptionReport.Status = Status.Success;
+                                itemConsumptionReport.ItemConsumptions = dateItemConsumption;
+                            }
+                            else
+                            {
+                                itemConsumptionReport.Status = Status.Failure;
+                                itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                            }
+                            return itemConsumptionReport;
+                        }
+                        else
+                        {
+                            itemConsumptionReport.Status = Status.Failure;
+                            itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDates);
+                        }
+                        return itemConsumptionReport;
+                    }
+                    catch (Exception exception)
+                    {
+                        itemConsumptionReport.Status = Status.Failure;
+                        itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "GetItemsConsumption", Severity.High, startDate + ";" + endDate , itemConsumptionReport); }).Start();
+                    }
+                    return itemConsumptionReport;
+                }
+                else
+                {
+                    itemConsumptionReport.Status = Status.Failure;
+                    itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                itemConsumptionReport.Status = Status.Failure;
+                itemConsumptionReport.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetItemsConsumption", Severity.High, startDate + ";" + endDate, itemConsumptionReport); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.High;
+                if (itemConsumptionReport.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log(startDate + ";" + endDate , itemConsumptionReport, "GetMostConsumedItems", itemConsumptionReport.Status, severity, userId); }).Start();
+            }
+            return itemConsumptionReport;
+        }
     }
 }
