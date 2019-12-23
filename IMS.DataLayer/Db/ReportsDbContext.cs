@@ -16,6 +16,38 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
+
+        public async Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate, string endDate)
+        {
+            DbDataReader reader = null;
+            List<DateItemConsumption> dateItemConsumption = new List<DateItemConsumption>();
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spItemsConsumptionStats";
+                    command.Parameters.AddWithValue("@startDate", startDate);
+                    command.Parameters.AddWithValue("@endDate", endDate);
+                    reader = await command.ExecuteReaderAsync();
+                    string Date = "";
+                    while (reader.Read())
+                    {
+                        Date = reader["Date"]?.ToString().Split(" ")[0];
+                        Date = Date.Substring(6, 4) + '/' + Date.Substring(0, 2) + '/' + Date.Substring(3, 2);
+                        dateItemConsumption.Add(new DateItemConsumption() { Date = Date,ItemsConsumptionCount = Convert.ToInt32(reader["ItemsCount"] )});
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+                return dateItemConsumption;
+            }
+        }
+
         public async Task<List<ItemQuantityMapping>> GetMostConsumedItemsByDate(string startDate, string endDate, int itemsCount)
         {
             DbDataReader reader = null;

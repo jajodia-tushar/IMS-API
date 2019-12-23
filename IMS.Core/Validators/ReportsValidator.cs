@@ -29,7 +29,6 @@ namespace IMS.Core.Validators
         }
         public static bool ValidateDate(string startDate, string endDate)
         {
-            MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
             DateTime date;
             CultureInfo provider = CultureInfo.InvariantCulture;
             if (String.Compare(startDate, endDate) > 0)
