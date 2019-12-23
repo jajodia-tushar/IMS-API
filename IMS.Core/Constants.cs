@@ -48,6 +48,7 @@ namespace IMS.Core
             public const string InvalidOrderId = "Order Id is not Valid";           
             public const string UnableToShowRecentEntries = "Unable to show Entries";
             public const string EmptyRecentEmployeeOrderList = "Recent Entries made by Employee are Empty";
+
             public const string NoUsers = "No Users Available";
             public const string InvalidInput = "Input details are not valid";
             public const string InvalidDates = "StartDate should be less than EndDate";
@@ -56,6 +57,9 @@ namespace IMS.Core
             public const string NotDeleted = "Item Not Deleted";
             public const string InvalidItemId = "Item Id is not valid";
             public const string UnableToFetch = "unable to fetch from database";
+            public const string InvalidRequest = "Invalid Request";
+            public const string InvalidOrder = "Invalid Order";
+            public const string NoToken = "Token Required";
         }
 
         public static class ErrorCodes
