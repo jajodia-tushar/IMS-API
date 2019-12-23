@@ -217,6 +217,14 @@
             <returns>Status</returns>
             <response code="200">Returns Success if transfer is successfull else returns status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.GetUsersByRoleName(System.String)">
+            <summary>
+            returns all users based on the role name
+            </summary>
+            <param name="roleName">Takes the name of the role corresponding to which we need users</param>
+            <returns>all users of the role name along with status</returns>
+            <response code="200">Returns users with status</response>
+        </member>
         <member name="M:IMS_API.Controllers.VendorController.GetVendorById(System.Int32)">
             <summary>
             returns vendor object if id is present, otherwise failure
