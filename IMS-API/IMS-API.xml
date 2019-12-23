@@ -98,23 +98,6 @@
             <param name="orderId">'Order Id of that Particular Order</param>
             <response code="200">Returns status success if order is successfully deleted otherwise returns failure if order is not deleted</response>
         </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
-            <summary>
-            Retrieve RAG(Red, Amber, Green) status of every inventory location
-            </summary>
-            <returns>RAG count of every shelf</returns>
-            <response code="200">Returns the RAG count of every inventory location if the system is unable to fetch any of the location then it returns failure</response>
-        </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetMostConsumedItems(System.String,System.String,System.Int32)">
-            <summary>
-            Retrieve Frequently used "n" items in given date range 
-            </summary>
-            <param name="startDate"></param>
-            <param name="endDate"></param>
-            <param name="itemsCount"></param>
-            <returns>Most frequently used "n" items with their quantity</returns>
-            <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
-        </member>
         <member name="M:IMS_API.Controllers.OrderController.PlaceVendorOrder(IMS.Contracts.VendorOrder)">
             <summary>
             places the vendororder.returns entire object if order stores successfully otherwise failure
@@ -138,17 +121,6 @@
             <returns>Response</returns>
             <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetShelfWiseOrderCount(System.String,System.String)">
-            <summary>
-            Returns shelf wise order count by date
-            </summary>
-            <returns>List of date with shelf wise order count</returns>
-            <response code="200">Returns the shelf wise order count along with status success </response>
-            <response code="404">If Shelf Wise Order Count is not Available </response>
-            <response code="401">If token is Invalid</response>
-            <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
-            <response code="400">Given Date Range Is Invalid or Given Date Format is Invalid</response>
-        </member>
         <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
             <summary>
             Retrieve RAG(Red, Amber, Green) status of every inventory location
@@ -165,6 +137,17 @@
             <param name="itemsCount"></param>
             <returns>Most frequently used "n" items with their quantity</returns>
             <response code="200">Returns item with their quantity used if input is valid otherwise it returns status failure if input is not valid</response>
+        </member>
+        <member name="M:IMS_API.Controllers.ReportsController.GetShelfWiseOrderCount(System.String,System.String)">
+            <summary>
+            Returns shelf wise order count by date
+            </summary>
+            <returns>List of date with shelf wise order count</returns>
+            <response code="200">Returns the shelf wise order count along with status success </response>
+            <response code="404">If Shelf Wise Order Count is not Available </response>
+            <response code="401">If token is Invalid</response>
+            <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
+            <response code="400">Given Date Range Is Invalid or Given Date Format is Invalid</response>
         </member>
         <member name="M:IMS_API.Controllers.ReportsController.GetItemsConsumption(System.String,System.String)">
             <summary>
