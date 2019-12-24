@@ -35,7 +35,7 @@ namespace IMS.Core.Translators
 
                     if (stockStatusList.Item!=null)
                     {
-                        contractStockStatus.Item = Translator.ToDataContractsObject(stockStatusList.Item);
+                        contractStockStatus.Item = ItemTranslator.ToDataContractsObject(stockStatusList.Item);
                     }
                     if(stockStatusList.StockStatus!=null && stockStatusList.StockStatus.Count>0)
                     {
