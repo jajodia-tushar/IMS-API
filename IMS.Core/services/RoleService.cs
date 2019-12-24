@@ -57,7 +57,7 @@ namespace IMS.Core.services
             {
 
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(e, "GetAllRoles", IMS.Entities.Severity.Medium, "Get Request", response); }).Start();
+                new Task(() => { _logger.LogException(e, "GetAllRoles", IMS.Entities.Severity.Medium, "Roles", response); }).Start();
             }
             finally
             {

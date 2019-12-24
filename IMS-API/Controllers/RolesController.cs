@@ -36,8 +36,8 @@ namespace IMS_API.Controllers
             ListOfRolesResponse contractsRolesResponse = null;
             try
             {
-                IMS.Entities.ListOfRolesResponse entityRolessResponse = await _roleService.GetAllRoles();
-                contractsRolesResponse = RoleTranslator.ToDataContractsObject(entityRolessResponse);
+                IMS.Entities.ListOfRolesResponse entityRolesResponse = await _roleService.GetAllRoles();
+                contractsRolesResponse = RoleTranslator.ToDataContractsObject(entityRolesResponse);
             }
             catch (Exception exception)
             {
@@ -50,7 +50,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetAllRoles", IMS.Entities.Severity.Medium, "Get Request", contractsRolesResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetAllRoles", IMS.Entities.Severity.Medium, "Roles", contractsRolesResponse); }).Start();
             }
             return contractsRolesResponse;
         }
