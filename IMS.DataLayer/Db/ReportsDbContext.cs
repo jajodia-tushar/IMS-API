@@ -219,7 +219,7 @@ namespace IMS.DataLayer.Db
             return Colour.Green;
         }
 
-        public void GetStockStatus(StockStatusDataDto stockStatus)
+        public void GetStockStatus(ItemStockStatusDto stockStatus)
         {
             MySqlDataReader reader = null;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))

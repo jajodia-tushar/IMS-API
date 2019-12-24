@@ -15,6 +15,6 @@ namespace IMS.DataLayer.Interfaces
         Task<List<ColourCountMapping>> GetWarehouseRAGStatus(); 
         Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate,string endDate);
         void GetShelfWiseOrderCountByDate(DateTime startDate,DateTime toDate, List<ShelfOrderStats> shelfOrderStats );
-        void GetStockStatus(StockStatusDataDto stockStatus);
+        void GetStockStatus(ItemStockStatusDto stockStatus);
     }
 }

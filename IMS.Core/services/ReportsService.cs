@@ -383,7 +383,7 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        StockStatusDataDto stockStatus = await InitiliaseListWithItemNames();
+                        ItemStockStatusDto stockStatus = await InitiliaseListWithItemNames();
                         _reportsDbContext.GetStockStatus(stockStatus);
                         if (stockStatus != null && stockStatus.StockStatus.Count != 0)
                         {
@@ -429,9 +429,9 @@ namespace IMS.Core.services
             return stockStatusResponse;
         }
 
-        private async Task<StockStatusDataDto> InitiliaseListWithItemNames()
+        private async Task<ItemStockStatusDto> InitiliaseListWithItemNames()
         {
-            StockStatusDataDto stockStatus=new StockStatusDataDto();
+            ItemStockStatusDto stockStatus=new ItemStockStatusDto();
             stockStatus.StockStatus = new Dictionary<int, List<ItemStockStatus>>();
             stockStatus.Items = new List<Item>();
             List<Item> itemsList = await _itemDbContext.GetAllItems();
@@ -443,7 +443,7 @@ namespace IMS.Core.services
             return stockStatus;
         }
 
-        public async Task<List<StockStatus>> ToListFromDictionary(StockStatusDataDto stockStatus)
+        public async Task<List<StockStatus>> ToListFromDictionary(ItemStockStatusDto stockStatus)
         {
             List<StockStatus> stockStatusList = new List<StockStatus>();
             foreach(Item item in stockStatus.Items)
