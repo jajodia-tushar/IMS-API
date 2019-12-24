@@ -432,13 +432,13 @@ namespace IMS.Core.services
         private async Task<StockStatusDataLayerTransfer> InitiliaseListWithItemNames()
         {
             StockStatusDataLayerTransfer stockStatus=new StockStatusDataLayerTransfer();
-            stockStatus.StockStatusDict = new Dictionary<int, List<StoreColourQuantity>>();
+            stockStatus.StockStatusDict = new Dictionary<int, List<ItemStockStatus>>();
             stockStatus.ItemList = new List<Item>();
             List<Item> itemsList = await _itemDbContext.GetAllItems();
             foreach (Item item in itemsList)
             {
                 stockStatus.ItemList.Add(item);
-                stockStatus.StockStatusDict.Add(item.Id, new List<StoreColourQuantity>());
+                stockStatus.StockStatusDict.Add(item.Id, new List<ItemStockStatus>());
             }
             return stockStatus;
         }
@@ -450,12 +450,12 @@ namespace IMS.Core.services
             {
                 StockStatus stockStatusInstance = new StockStatus();
                 stockStatusInstance.Item = item;
-                stockStatusInstance.StoreStatus = new List<StoreColourQuantity>();
-                List<StoreColourQuantity> storeColourQuantities = new List<StoreColourQuantity>();
+                stockStatusInstance.StoreStatus = new List<ItemStockStatus>();
+                List<ItemStockStatus> storeColourQuantities = new List<ItemStockStatus>();
                 if(stockStatus.StockStatusDict.ContainsKey(item.Id))
                 {
                     storeColourQuantities = stockStatus.StockStatusDict[item.Id];
-                    foreach (StoreColourQuantity listOfStockIterator in storeColourQuantities)
+                    foreach (ItemStockStatus listOfStockIterator in storeColourQuantities)
                     {
                         stockStatusInstance.StoreStatus.Add(listOfStockIterator);
                     }

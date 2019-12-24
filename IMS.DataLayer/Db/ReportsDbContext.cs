@@ -241,7 +241,7 @@ namespace IMS.DataLayer.Db
                         quantity = Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.StockStatusDict.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatusDict[itemId].Add(new StoreColourQuantity() { StoreName = "Warehouse", Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
+                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = "Warehouse", Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
                         }
                     }
                     reader.Close();
@@ -256,7 +256,7 @@ namespace IMS.DataLayer.Db
                         quantity = (int)Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.StockStatusDict.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatusDict[itemId].Add(new StoreColourQuantity() { StoreName = shelfName, Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
+                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = shelfName, Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
                         }
                     }
                     reader.Close();
