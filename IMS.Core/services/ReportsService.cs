@@ -77,7 +77,7 @@ namespace IMS.Core.services
                         shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
                         shelfWiseOrderCountResponse.Error =
                         Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateFormatInvalid);
-                        new Task(() => {_logger.LogException(exception,"Getting Shelf Wise Order Count", Severity.High, null,
+                        new Task(() => {_logger.LogException(exception,"GetShelfWiseOrderCount", Severity.High, fromDate + ";" + toDate,
                         shelfWiseOrderCountResponse);
                         }).Start();
                     }
@@ -94,17 +94,18 @@ namespace IMS.Core.services
             {
                 shelfWiseOrderCountResponse.Status = Status.Failure;
                 shelfWiseOrderCountResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "Getting Shelf Wise Order Count", Severity.High, null, shelfWiseOrderCountResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetShelfWiseOrderCount", Severity.High, fromDate + ";" + toDate, shelfWiseOrderCountResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (shelfWiseOrderCountResponse.Status == Status.Failure)
                     severity = Severity.High;
-                new Task(() => { _logger.Log("ShelfWiseOrderCount",shelfWiseOrderCountResponse, "Getting Shelf Wise Order Count", shelfWiseOrderCountResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log("ShelfWiseOrderCount", shelfWiseOrderCountResponse, "GetShelfWiseOrderCount", shelfWiseOrderCountResponse.Status, severity, userId); }).Start();
             }
             return shelfWiseOrderCountResponse;
         }
+
         private async Task<List<ShelfOrderStats>> PopulateListWithZeroValues(DateTime startDate, DateTime toDate)
         {
             List<ShelfOrderStats> dateShelfOrderMappings = new List<ShelfOrderStats>();
