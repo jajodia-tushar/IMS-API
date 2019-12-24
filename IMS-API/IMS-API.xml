@@ -158,7 +158,7 @@
             <returns>Datewise item consumption count</returns>
             <response code="200">Returns datewise item consumption count if input is valid otherwise it returns status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetItemsByLocationAndColour(System.String,System.String,System.String)">
+        <member name="M:IMS_API.Controllers.ReportsController.GetItemsAvailability(System.String,System.String,System.String)">
             <summary>
             Retrieve Location and Colour based items list
             </summary>

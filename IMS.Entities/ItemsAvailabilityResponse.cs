@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IMS.Entities
 {
-    public class LocationAndColourBasedItemsResponse : Response
+    public class ItemsAvailabilityResponse : Response
     {
         public List<ItemQuantityMapping> ItemQuantityMappings;
     }
