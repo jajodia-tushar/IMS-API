@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -361,7 +362,9 @@ namespace IMS.Core.services
                     dateItemConsumptionList.Add(new DateItemConsumption() { Date = dateString, ItemsConsumptionCount=0});
                 }
             }
-            return dateItemConsumptionList;
+            List<DateItemConsumption> sortedDateItemConsumptionList = dateItemConsumptionList.OrderBy(o => o.Date).ToList();
+            return sortedDateItemConsumptionList;
         }
+
     }
 }
