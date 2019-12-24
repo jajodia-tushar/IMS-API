@@ -191,8 +191,8 @@
             </summary>
             <returns>Returns the whole items list with the stock status at any given point of time</returns>
             <response code="200">Retrieve the stock status at any given point of time</response>
-          <member name="M:IMS_API.Controllers.RolesController.GetAllRoles">
-          </member>
+        </member>
+        <member name="M:IMS_API.Controllers.RolesController.GetAllRoles">
             <summary>
             returns all roles
             </summary>     

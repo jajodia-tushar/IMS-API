@@ -1,5 +1,6 @@
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
@@ -32,13 +33,27 @@ namespace IMS.Core.services
             {
                 Status = Status.Failure
             };
-            int userId =-1;
+            int requestedUserId = -1;
             try
             {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User requestedUser = Utility.GetUserFromToken(token);
+                requestedUserId = requestedUser.Id;
                 response.Roles = await _roleDbContext.GetAllRoles();
                 response.Status = Status.Success;
             }
-            catch(Exception e)
+            catch (CustomException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "GetAllRoles", Severity.Medium, "Get Request", response); }).Start();
+            }
+            catch (Exception e)
             {
 
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
@@ -51,7 +66,7 @@ namespace IMS.Core.services
                 if (response.Status == Status.Failure)
                     severity = Severity.Medium;
 
-                new Task(() => { _logger.Log(null, response, "Delete", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(null, response, "GetAllRoles", response.Status, severity, requestedUserId); }).Start();
             }
             return response;
         }
