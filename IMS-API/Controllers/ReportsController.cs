@@ -164,5 +164,30 @@ namespace IMS_API.Controllers
             }
             return itemConsumptionReport;
         }
+
+        /// <summary>
+        /// Retrieve Location and Colour based items list
+        /// </summary>
+        /// <param name="Location Name"></param>
+        /// <param name="Location Code"></param>
+        /// <param name="Colour"></param>
+        /// <returns>Location and Colour based Items list</returns>
+        /// <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
+        [Route("GetItemsAvailability")]
+        [HttpGet]
+        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string  locationCode, string colour)
+        {
+            var itemsAvailabilityResponse = new ItemsAvailabilityResponse()
+            {
+                ItemQuantityMappings = new List<ItemQuantityMapping>()
+                {
+                   {new ItemQuantityMapping(){Item = new Item(){ Name = "Pen"},Quantity = 12} },
+                    {new ItemQuantityMapping(){Item = new Item(){ Name = "Marker"},Quantity = 10} },
+                    {new ItemQuantityMapping(){Item = new Item(){ Name = "Blue Marker"},Quantity = 23} },
+                }
+            };
+            itemsAvailabilityResponse.Status = Status.Success;
+            return itemsAvailabilityResponse;
+        }
     }
 }
