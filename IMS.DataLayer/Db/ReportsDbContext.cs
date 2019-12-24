@@ -15,11 +15,9 @@ namespace IMS.DataLayer.Db
     public class ReportsDbContext : IReportsDbContext
     {
         private IDbConnectionProvider _dbConnectionProvider;
-        private IItemDbContext _itemDbContext;
         public ReportsDbContext(IDbConnectionProvider dbConnectionProvider,IItemDbContext itemDbContext)
         {
             _dbConnectionProvider = dbConnectionProvider;
-            _itemDbContext = itemDbContext;
         }
 
         public async Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate, string endDate)
@@ -221,28 +219,16 @@ namespace IMS.DataLayer.Db
             return Colour.Green;
         }
 
-        public async Task<StockStatusDataLayerTransfer> GetStockStatus()
+        public void GetStockStatus(StockStatusDataLayerTransfer stockStatus)
         {
-            StockStatusDataLayerTransfer stockStatus = new StockStatusDataLayerTransfer();
-            stockStatus.StockStatusDict = new Dictionary<int, List<StoreColourQuantity>>();
-            stockStatus.ItemList = new List<Item>();
             MySqlDataReader reader = null;
-
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
-
                     connection.Open();
-
                     var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    List<Item> itemsList = await _itemDbContext.GetAllItems();
-                    foreach (Item item in itemsList)
-                    {
-                        stockStatus.ItemList.Add(item);
-                        stockStatus.StockStatusDict.Add(item.Id, new List<StoreColourQuantity>());
-                    }
+                    command.CommandType = CommandType.StoredProcedure;               
                     command.CommandText = "getRAGStatusOfItemsInWarehouse";
                     reader = command.ExecuteReader();
                     int itemId;
@@ -276,13 +262,12 @@ namespace IMS.DataLayer.Db
                     reader.Close();
 
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    return null;
+                    throw exception;
                 }
 
             }
-            return stockStatus;
         }
 
         private Colour ReturnAccurateColourEnum(string RAGColour)

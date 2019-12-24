@@ -383,7 +383,8 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        StockStatusDataLayerTransfer stockStatus = await _reportsDbContext.GetStockStatus();
+                        StockStatusDataLayerTransfer stockStatus = await InitiliaseListWithItemNames();
+                        _reportsDbContext.GetStockStatus(stockStatus);
                         if (stockStatus != null && stockStatus.StockStatusDict.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
@@ -427,6 +428,21 @@ namespace IMS.Core.services
             }
             return stockStatusResponse;
         }
+
+        private async Task<StockStatusDataLayerTransfer> InitiliaseListWithItemNames()
+        {
+            StockStatusDataLayerTransfer stockStatus=new StockStatusDataLayerTransfer();
+            stockStatus.StockStatusDict = new Dictionary<int, List<StoreColourQuantity>>();
+            stockStatus.ItemList = new List<Item>();
+            List<Item> itemsList = await _itemDbContext.GetAllItems();
+            foreach (Item item in itemsList)
+            {
+                stockStatus.ItemList.Add(item);
+                stockStatus.StockStatusDict.Add(item.Id, new List<StoreColourQuantity>());
+            }
+            return stockStatus;
+        }
+
         public async Task<List<StockStatusList>> ToListFromDictionary(StockStatusDataLayerTransfer stockStatus)
         {
             List<StockStatusList> stockStatusList = new List<StockStatusList>();
