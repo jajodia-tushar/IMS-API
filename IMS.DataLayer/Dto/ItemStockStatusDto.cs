@@ -7,7 +7,7 @@ namespace IMS.DataLayer.Dto
 {
     public class ItemStockStatusDto
     {
-        public Dictionary<int, List<ItemStockStatus>> StockStatus { get; set; }
+        public Dictionary<int, List<StockStatus>> StockStatus { get; set; }
         public List<Item> Items { get; set; }
     }
 }

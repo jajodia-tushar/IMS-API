@@ -241,7 +241,7 @@ namespace IMS.DataLayer.Db
                         quantity = Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.StockStatus.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatus[itemId].Add(new ItemStockStatus() { StoreName = "Warehouse", Colour = ragColor, Quantity = quantity });
+                            stockStatus.StockStatus[itemId].Add(new StockStatus() { StoreName = "Warehouse", Colour = ragColor, Quantity = quantity });
                         }
                     }
                     reader.Close();
@@ -256,7 +256,7 @@ namespace IMS.DataLayer.Db
                         quantity = (int)Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.StockStatus.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatus[itemId].Add(new ItemStockStatus() { StoreName = shelfName, Colour =ragColor, Quantity = quantity });
+                            stockStatus.StockStatus[itemId].Add(new StockStatus() { StoreName = shelfName, Colour =ragColor, Quantity = quantity });
                         }
                     }
                     reader.Close();

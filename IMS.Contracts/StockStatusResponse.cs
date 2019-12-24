@@ -6,6 +6,6 @@ namespace IMS.Contracts
 {
     public class StockStatusResponse : Response
     {
-        public List<StockStatus> StockStatusList { get; set; }
+        public List<ItemStockStatus> StockStatusList { get; set; }
     }
 }

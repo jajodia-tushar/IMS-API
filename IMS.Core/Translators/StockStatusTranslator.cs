@@ -24,14 +24,14 @@ namespace IMS.Core.Translators
             return contractStockStatusResponse;
         }
 
-        public static List<Contracts.StockStatus> ToDataContractsObject(List<Entities.StockStatus> stockStatus)
+        public static List<Contracts.ItemStockStatus> ToDataContractsObject(List<Entities.ItemStockStatus> stockStatus)
         {
-            List<Contracts.StockStatus> contractStockStatusList = new List<Contracts.StockStatus>();
+            List<Contracts.ItemStockStatus> contractStockStatusList = new List<Contracts.ItemStockStatus>();
             if(stockStatus!=null && stockStatus.Count>0 )
             {
-                foreach(Entities.StockStatus stockStatusList in stockStatus )
+                foreach(Entities.ItemStockStatus stockStatusList in stockStatus )
                 {
-                    Contracts.StockStatus contractStockStatus = new Contracts.StockStatus();
+                    Contracts.ItemStockStatus contractStockStatus = new Contracts.ItemStockStatus();
 
                     if (stockStatusList.Item!=null)
                     {
@@ -47,10 +47,10 @@ namespace IMS.Core.Translators
             return contractStockStatusList;
         }
 
-        public static List<Contracts.ItemStockStatus> ToDataContractsObject(List<Entities.ItemStockStatus> list)
+        public static List<Contracts.StockStatus> ToDataContractsObject(List<Entities.StockStatus> list)
         {
-            List<Contracts.ItemStockStatus> contractList = new List<Contracts.ItemStockStatus>();
-            foreach(Entities.ItemStockStatus itemStockStatus in list)
+            List<Contracts.StockStatus> contractList = new List<Contracts.StockStatus>();
+            foreach(Entities.StockStatus itemStockStatus in list)
             {
                 if(itemStockStatus!=null)
                 {
@@ -60,9 +60,9 @@ namespace IMS.Core.Translators
             return contractList;
         }
 
-        public static Contracts.ItemStockStatus ToDataContractsObject(Entities.ItemStockStatus storeColourQuantity)
+        public static Contracts.StockStatus ToDataContractsObject(Entities.StockStatus storeColourQuantity)
         {
-            return new Contracts.ItemStockStatus()
+            return new Contracts.StockStatus()
             {
                 Colour=ToDataContractsObject(storeColourQuantity.Colour),
                 StoreName=storeColourQuantity.StoreName,

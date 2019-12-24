@@ -432,37 +432,37 @@ namespace IMS.Core.services
         private async Task<ItemStockStatusDto> InitiliaseListWithItemNames()
         {
             ItemStockStatusDto stockStatus=new ItemStockStatusDto();
-            stockStatus.StockStatus = new Dictionary<int, List<ItemStockStatus>>();
+            stockStatus.StockStatus = new Dictionary<int, List<StockStatus>>();
             stockStatus.Items = new List<Item>();
             List<Item> itemsList = await _itemDbContext.GetAllItems();
             foreach (Item item in itemsList)
             {
                 stockStatus.Items.Add(item);
-                stockStatus.StockStatus.Add(item.Id, new List<ItemStockStatus>());
+                stockStatus.StockStatus.Add(item.Id, new List<StockStatus>());
             }
             return stockStatus;
         }
 
-        public async Task<List<StockStatus>> ToListFromDictionary(ItemStockStatusDto stockStatus)
+        public async Task<List<ItemStockStatus>> ToListFromDictionary(ItemStockStatusDto stockStatus)
         {
-            List<StockStatus> stockStatusList = new List<StockStatus>();
+            List<ItemStockStatus> itemStockStatusList = new List<ItemStockStatus>();
             foreach(Item item in stockStatus.Items)
             {
-                StockStatus stockStatusInstance = new StockStatus();
-                stockStatusInstance.Item = item;
-                stockStatusInstance.StoreStatus = new List<ItemStockStatus>();
-                List<ItemStockStatus> itemStockStatusList = new List<ItemStockStatus>();
+                ItemStockStatus itemStockStatusInstance = new ItemStockStatus();
+                itemStockStatusInstance.Item = item;
+                itemStockStatusInstance.StoreStatus = new List<StockStatus>();
+                List<StockStatus> stockStatusList = new List<StockStatus>();
                 if(stockStatus.StockStatus.ContainsKey(item.Id))
                 {
-                    itemStockStatusList = stockStatus.StockStatus[item.Id];
-                    foreach (ItemStockStatus listOfStockIterator in itemStockStatusList)
+                    stockStatusList = stockStatus.StockStatus[item.Id];
+                    foreach (StockStatus stockStatusIterator in stockStatusList)
                     {
-                        stockStatusInstance.StoreStatus.Add(listOfStockIterator);
+                        itemStockStatusInstance.StoreStatus.Add(stockStatusIterator);
                     }
                 }
-                stockStatusList.Add(stockStatusInstance);
+                itemStockStatusList.Add(itemStockStatusInstance);
             }
-            return stockStatusList;
+            return itemStockStatusList;
         }
     }
 }
