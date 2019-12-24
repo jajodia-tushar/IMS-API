@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 namespace IMS.Contracts
 {
-    public class StoreColourQuantity
+    public class ItemStockStatus
     {
         public string StoreName { get; set; }
         public Colour Colour { get; set; }
