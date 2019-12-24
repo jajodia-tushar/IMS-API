@@ -383,9 +383,9 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        StockStatusDataLayerTransfer stockStatus = await InitiliaseListWithItemNames();
+                        StockStatusDataDto stockStatus = await InitiliaseListWithItemNames();
                         _reportsDbContext.GetStockStatus(stockStatus);
-                        if (stockStatus != null && stockStatus.StockStatusDict.Count != 0)
+                        if (stockStatus != null && stockStatus.StockStatus.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
                             stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
@@ -429,32 +429,32 @@ namespace IMS.Core.services
             return stockStatusResponse;
         }
 
-        private async Task<StockStatusDataLayerTransfer> InitiliaseListWithItemNames()
+        private async Task<StockStatusDataDto> InitiliaseListWithItemNames()
         {
-            StockStatusDataLayerTransfer stockStatus=new StockStatusDataLayerTransfer();
-            stockStatus.StockStatusDict = new Dictionary<int, List<ItemStockStatus>>();
-            stockStatus.ItemList = new List<Item>();
+            StockStatusDataDto stockStatus=new StockStatusDataDto();
+            stockStatus.StockStatus = new Dictionary<int, List<ItemStockStatus>>();
+            stockStatus.Items = new List<Item>();
             List<Item> itemsList = await _itemDbContext.GetAllItems();
             foreach (Item item in itemsList)
             {
-                stockStatus.ItemList.Add(item);
-                stockStatus.StockStatusDict.Add(item.Id, new List<ItemStockStatus>());
+                stockStatus.Items.Add(item);
+                stockStatus.StockStatus.Add(item.Id, new List<ItemStockStatus>());
             }
             return stockStatus;
         }
 
-        public async Task<List<StockStatus>> ToListFromDictionary(StockStatusDataLayerTransfer stockStatus)
+        public async Task<List<StockStatus>> ToListFromDictionary(StockStatusDataDto stockStatus)
         {
             List<StockStatus> stockStatusList = new List<StockStatus>();
-            foreach(Item item in stockStatus.ItemList)
+            foreach(Item item in stockStatus.Items)
             {
                 StockStatus stockStatusInstance = new StockStatus();
                 stockStatusInstance.Item = item;
                 stockStatusInstance.StoreStatus = new List<ItemStockStatus>();
                 List<ItemStockStatus> itemStockStatusList = new List<ItemStockStatus>();
-                if(stockStatus.StockStatusDict.ContainsKey(item.Id))
+                if(stockStatus.StockStatus.ContainsKey(item.Id))
                 {
-                    itemStockStatusList = stockStatus.StockStatusDict[item.Id];
+                    itemStockStatusList = stockStatus.StockStatus[item.Id];
                     foreach (ItemStockStatus listOfStockIterator in itemStockStatusList)
                     {
                         stockStatusInstance.StoreStatus.Add(listOfStockIterator);

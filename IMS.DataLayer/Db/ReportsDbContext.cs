@@ -219,7 +219,7 @@ namespace IMS.DataLayer.Db
             return Colour.Green;
         }
 
-        public void GetStockStatus(StockStatusDataLayerTransfer stockStatus)
+        public void GetStockStatus(StockStatusDataDto stockStatus)
         {
             MySqlDataReader reader = null;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
@@ -239,9 +239,9 @@ namespace IMS.DataLayer.Db
                         itemId = (int)reader["ItemId"];
                         ragColor = StringToEnum((string)reader["WarehouseRAG"]);
                         quantity = Convert.ToInt32(reader["Quantity"]);
-                        if (stockStatus.StockStatusDict.ContainsKey(itemId))
+                        if (stockStatus.StockStatus.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = "Warehouse", Colour = ragColor, Quantity = quantity });
+                            stockStatus.StockStatus[itemId].Add(new ItemStockStatus() { StoreName = "Warehouse", Colour = ragColor, Quantity = quantity });
                         }
                     }
                     reader.Close();
@@ -254,9 +254,9 @@ namespace IMS.DataLayer.Db
                         ragColor = StringToEnum((string)reader["ShelvesRAG"]);
                         shelfName = (string)reader["ShelfName"];
                         quantity = (int)Convert.ToInt32(reader["Quantity"]);
-                        if (stockStatus.StockStatusDict.ContainsKey(itemId))
+                        if (stockStatus.StockStatus.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = shelfName, Colour =ragColor, Quantity = quantity });
+                            stockStatus.StockStatus[itemId].Add(new ItemStockStatus() { StoreName = shelfName, Colour =ragColor, Quantity = quantity });
                         }
                     }
                     reader.Close();
