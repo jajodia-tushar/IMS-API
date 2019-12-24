@@ -404,7 +404,7 @@ namespace IMS.Core.services
                     {
                         stockStatusResponse.Status = Status.Failure;
                         stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToShowStockStatus);
-                        new Task(() => { _logger.LogException(exception, "Get Stock Status", Severity.Medium, null, stockStatusResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "GetStockStatus", Severity.Medium, "GetStockStatus", stockStatusResponse); }).Start();
                     }
                 }
                 else
@@ -417,14 +417,14 @@ namespace IMS.Core.services
             {
                 stockStatusResponse.Status = Status.Failure;
                 stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToShowStockStatus);
-                new Task(() => { _logger.LogException(exception, "Get Stock Status", Severity.Medium, null, stockStatusResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetStockStatus", Severity.Medium, "GetStockStatus", stockStatusResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (stockStatusResponse.Status == Status.Failure)
                     severity = Severity.Medium;
-                new Task(() => { _logger.Log("Stock Status", stockStatusResponse, "Get Stock Status", stockStatusResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log("GetStockStatus", stockStatusResponse, "GetStockStatus", stockStatusResponse.Status, severity, userId); }).Start();
             }
             return stockStatusResponse;
         }
@@ -443,21 +443,21 @@ namespace IMS.Core.services
             return stockStatus;
         }
 
-        public async Task<List<StockStatusList>> ToListFromDictionary(StockStatusDataLayerTransfer stockStatus)
+        public async Task<List<StockStatus>> ToListFromDictionary(StockStatusDataLayerTransfer stockStatus)
         {
-            List<StockStatusList> stockStatusList = new List<StockStatusList>();
+            List<StockStatus> stockStatusList = new List<StockStatus>();
             foreach(Item item in stockStatus.ItemList)
             {
-                StockStatusList stockStatusInstance = new StockStatusList();
+                StockStatus stockStatusInstance = new StockStatus();
                 stockStatusInstance.Item = item;
-                stockStatusInstance.StockStatus = new List<StoreColourQuantity>();
+                stockStatusInstance.StoreStatus = new List<StoreColourQuantity>();
                 List<StoreColourQuantity> storeColourQuantities = new List<StoreColourQuantity>();
                 if(stockStatus.StockStatusDict.ContainsKey(item.Id))
                 {
                     storeColourQuantities = stockStatus.StockStatusDict[item.Id];
                     foreach (StoreColourQuantity listOfStockIterator in storeColourQuantities)
                     {
-                        stockStatusInstance.StockStatus.Add(listOfStockIterator);
+                        stockStatusInstance.StoreStatus.Add(listOfStockIterator);
                     }
                 }
                 stockStatusList.Add(stockStatusInstance);

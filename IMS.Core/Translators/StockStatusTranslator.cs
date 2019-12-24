@@ -24,22 +24,22 @@ namespace IMS.Core.Translators
             return contractStockStatusResponse;
         }
 
-        public static List<Contracts.StockStatusList> ToDataContractsObject(List<Entities.StockStatusList> stockStatus)
+        public static List<Contracts.StockStatus> ToDataContractsObject(List<Entities.StockStatus> stockStatus)
         {
-            List<Contracts.StockStatusList> contractStockStatusList = new List<Contracts.StockStatusList>();
+            List<Contracts.StockStatus> contractStockStatusList = new List<Contracts.StockStatus>();
             if(stockStatus!=null && stockStatus.Count>0 )
             {
-                foreach(Entities.StockStatusList stockStatusList in stockStatus )
+                foreach(Entities.StockStatus stockStatusList in stockStatus )
                 {
-                    Contracts.StockStatusList contractStockStatus = new Contracts.StockStatusList();
+                    Contracts.StockStatus contractStockStatus = new Contracts.StockStatus();
 
                     if (stockStatusList.Item!=null)
                     {
                         contractStockStatus.Item = ItemTranslator.ToDataContractsObject(stockStatusList.Item);
                     }
-                    if(stockStatusList.StockStatus!=null && stockStatusList.StockStatus.Count>0)
+                    if(stockStatusList.StoreStatus!=null && stockStatusList.StoreStatus.Count>0)
                     {
-                        contractStockStatus.StockStatus = ToDataContractsObject(stockStatusList.StockStatus);
+                        contractStockStatus.StoreStatus = ToDataContractsObject(stockStatusList.StoreStatus);
                     }
                     contractStockStatusList.Add(contractStockStatus);
                 }

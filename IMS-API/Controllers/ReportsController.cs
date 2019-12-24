@@ -160,7 +160,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Get Item Consumption Report", IMS.Entities.Severity.High, startDate + ";" + endDate, itemConsumptionReport); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetItemsConsumption", IMS.Entities.Severity.High, startDate + ";" + endDate, itemConsumptionReport); }).Start();
             }
             return itemConsumptionReport;
         }
@@ -216,7 +216,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Get Stock Status", IMS.Entities.Severity.Critical, "Get Stock Status", stockStatusResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetStockStatus", IMS.Entities.Severity.Critical, "GetStockStatus", stockStatusResponse); }).Start();
             }
             return stockStatusResponse;
         }
