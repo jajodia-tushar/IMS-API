@@ -50,11 +50,11 @@ namespace IMS.Core.Translators
         public static List<Contracts.ItemStockStatus> ToDataContractsObject(List<Entities.ItemStockStatus> list)
         {
             List<Contracts.ItemStockStatus> contractList = new List<Contracts.ItemStockStatus>();
-            foreach(Entities.ItemStockStatus storeColourQuantity in list)
+            foreach(Entities.ItemStockStatus itemStockStatus in list)
             {
-                if(storeColourQuantity!=null)
+                if(itemStockStatus!=null)
                 {
-                    contractList.Add(ToDataContractsObject(storeColourQuantity));
+                    contractList.Add(ToDataContractsObject(itemStockStatus));
                 }
             }
             return contractList;
@@ -69,13 +69,21 @@ namespace IMS.Core.Translators
                 Quantity=storeColourQuantity.Quantity
             };
         }
-
         public static Contracts.Colour ToDataContractsObject(Entities.Colour colour)
         {
-            switch (colour)
+            try
             {
-                case Entities.Colour.Red: return Contracts.Colour.Red;
-                case Entities.Colour.Amber: return Contracts.Colour.Amber;
+                switch (colour)
+                {
+                    case Entities.Colour.Red:
+                        return Contracts.Colour.Red;
+                    case Entities.Colour.Amber:
+                        return Contracts.Colour.Amber;
+                }
+            }
+            catch (Exception exception)
+            {
+                throw exception;
             }
             return Contracts.Colour.Green;
         }

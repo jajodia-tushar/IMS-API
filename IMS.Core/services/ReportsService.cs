@@ -451,11 +451,11 @@ namespace IMS.Core.services
                 StockStatus stockStatusInstance = new StockStatus();
                 stockStatusInstance.Item = item;
                 stockStatusInstance.StoreStatus = new List<ItemStockStatus>();
-                List<ItemStockStatus> storeColourQuantities = new List<ItemStockStatus>();
+                List<ItemStockStatus> itemStockStatusList = new List<ItemStockStatus>();
                 if(stockStatus.StockStatusDict.ContainsKey(item.Id))
                 {
-                    storeColourQuantities = stockStatus.StockStatusDict[item.Id];
-                    foreach (ItemStockStatus listOfStockIterator in storeColourQuantities)
+                    itemStockStatusList = stockStatus.StockStatusDict[item.Id];
+                    foreach (ItemStockStatus listOfStockIterator in itemStockStatusList)
                     {
                         stockStatusInstance.StoreStatus.Add(listOfStockIterator);
                     }

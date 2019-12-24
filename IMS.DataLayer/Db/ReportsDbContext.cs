@@ -232,16 +232,16 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "getRAGStatusOfItemsInWarehouse";
                     reader = command.ExecuteReader();
                     int itemId;
-                    string ragColor;
+                    Colour ragColor;
                     int quantity;
                     while (reader.Read())
                     {
                         itemId = (int)reader["ItemId"];
-                        ragColor = (string)reader["WarehouseRAG"];
+                        ragColor = StringToEnum((string)reader["WarehouseRAG"]);
                         quantity = Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.StockStatusDict.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = "Warehouse", Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
+                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = "Warehouse", Colour = ragColor, Quantity = quantity });
                         }
                     }
                     reader.Close();
@@ -251,12 +251,12 @@ namespace IMS.DataLayer.Db
                     while (reader.Read())
                     {
                         itemId = (int)reader["ItemId"];
-                        ragColor = (string)reader["ShelvesRAG"];
+                        ragColor = StringToEnum((string)reader["ShelvesRAG"]);
                         shelfName = (string)reader["ShelfName"];
                         quantity = (int)Convert.ToInt32(reader["Quantity"]);
                         if (stockStatus.StockStatusDict.ContainsKey(itemId))
                         {
-                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = shelfName, Colour = ReturnAccurateColourEnum(ragColor), Quantity = quantity });
+                            stockStatus.StockStatusDict[itemId].Add(new ItemStockStatus() { StoreName = shelfName, Colour =ragColor, Quantity = quantity });
                         }
                     }
                     reader.Close();
@@ -268,16 +268,6 @@ namespace IMS.DataLayer.Db
                 }
 
             }
-        }
-
-        private Colour ReturnAccurateColourEnum(string RAGColour)
-        {
-            switch (RAGColour)
-            {
-                case "Red": return Colour.Red;
-                case "Amber": return Colour.Amber;
-            }
-            return Colour.Green;
         }
     }
 }
