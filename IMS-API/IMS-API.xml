@@ -158,6 +158,16 @@
             <returns>Datewise item consumption count</returns>
             <response code="200">Returns datewise item consumption count if input is valid otherwise it returns status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.ReportsController.GetItemsByLocationAndColour(System.String,System.String,System.String)">
+            <summary>
+            Retrieve Location and Colour based items list
+            </summary>
+            <param name="Location NameName"></param>
+            <param name="Location CodeCode"></param>
+            <param name="Colour"></param>
+            <returns>Location and Colour based Items list</returns>
+            <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.ShelfController.Get">
             <summary>
             Getting all Shelf List 
