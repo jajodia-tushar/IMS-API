@@ -53,7 +53,7 @@ namespace IMS.Core.Translators
             {
                 IMS.Entities.ItemQuantityMapping entityItemQuantityMapping = new IMS.Entities.ItemQuantityMapping()
                 {
-                    Item = Translator.ToEntitiesObject(itemQuantityMapping.Item),
+                    Item = ItemTranslator.ToEntitiesObject(itemQuantityMapping.Item),
                     Quantity = itemQuantityMapping.Quantity
                 };
                 entityItemQuantityList.Add(entityItemQuantityMapping);

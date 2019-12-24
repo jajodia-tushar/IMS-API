@@ -64,6 +64,8 @@ namespace IMS.Core
             public const string NoToken = "Token Required";
             public const string TranferFailure = "The items transfer failed";
             public const string DateFormatInvalid = "Given Date Format is Invalid";
+            public const string NoItemsInStore = "No items in store";
+            public const string UnableToShowStockStatus = "Sorry, Unable to show stock status";
         }
 
         public static class ErrorCodes

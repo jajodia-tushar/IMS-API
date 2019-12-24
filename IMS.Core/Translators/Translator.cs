@@ -30,18 +30,5 @@ namespace IMS.Core.Translators
                 ErrorMessage = error.ErrorMessage
             };
         }
-
-        public static Entities.Item ToEntitiesObject(Contracts.Item contractsItem)
-        {
-            return new Entities.Item()
-            {
-                Id = contractsItem.Id,
-                Name = contractsItem.Name,
-                MaxLimit = contractsItem.MaxLimit,
-                ImageUrl = contractsItem.ImageUrl,
-                IsActive = contractsItem.IsActive,
-                Rate = contractsItem.Rate
-            };
-        }
     }
 }

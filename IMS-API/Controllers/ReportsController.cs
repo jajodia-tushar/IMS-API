@@ -19,13 +19,13 @@ namespace IMS_API.Controllers
     [Authorize(Roles = "Admin,SuperAdmin")]
     public class ReportsController : ControllerBase
     {
+
         private IReportsService _reportsService;
         private ILogManager _logger;
-        public ReportsController(IReportsService reportsService, ILogManager logManager)
+        public ReportsController(IReportsService reportsService , ILogManager logger)
         {
             _reportsService = reportsService;
-            _logger = logManager;
-
+            _logger = logger;
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "Get Item Consumption Report", IMS.Entities.Severity.High, startDate + ";" + endDate, itemConsumptionReport); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetItemsConsumption", IMS.Entities.Severity.High, startDate + ";" + endDate, itemConsumptionReport); }).Start();
             }
             return itemConsumptionReport;
         }
@@ -188,6 +188,37 @@ namespace IMS_API.Controllers
             };
             itemsAvailabilityResponse.Status = Status.Success;
             return itemsAvailabilityResponse;
+        }
+
+        /// <summary>
+        /// Retrieve the stock status at any given point of time
+        /// </summary>
+        /// <returns>Returns the whole items list with the stock status at any given point of time</returns>
+        /// <response code="200">Retrieve the stock status at any given point of time</response>
+        // GET: api/Default/5
+        [HttpGet("GetStockStatus", Name = "GetStockStatus")]
+        public async Task<StockStatusResponse> GetStockStatus()
+        {
+            StockStatusResponse stockStatusResponse = null;
+            try
+            {
+                IMS.Entities.StockStatusResponse entityStockStatusResponse = await _reportsService.GetStockStatus();
+                stockStatusResponse = StockStatusTranslator.ToDataContractsObject(entityStockStatusResponse);
+            }
+            catch (Exception exception)
+            {
+                stockStatusResponse = new IMS.Contracts.StockStatusResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetStockStatus", IMS.Entities.Severity.Critical, "GetStockStatus", stockStatusResponse); }).Start();
+            }
+            return stockStatusResponse;
         }
     }
 }

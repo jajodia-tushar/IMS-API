@@ -1,5 +1,6 @@
-﻿using IMS.Core;
+using IMS.Core;
 using IMS.Core.Validators;
+using IMS.DataLayer.Dto;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
@@ -22,17 +23,20 @@ namespace IMS.Core.services
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenProvider _tokenProvider;
         private IShelfService _shelfService;
-        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService)
+        private IItemDbContext _itemDbContext;
+
+        public ReportsService(IReportsDbContext reportsDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IShelfService shelfService, IItemDbContext itemDbContext)
         {
             this._reportsDbContext = reportsDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
+            this._shelfService = shelfService;
             this._httpContextAccessor = httpContextAccessor;
-            _shelfService = shelfService;
+            this._itemDbContext = itemDbContext;
         }
         public async Task<ShelfWiseOrderCountResponse> GetShelfWiseOrderCount(string fromDate, string toDate)
         {
-            
+
             ShelfWiseOrderCountResponse shelfWiseOrderCountResponse = new ShelfWiseOrderCountResponse();
             int userId = -1;
             try
@@ -48,9 +52,9 @@ namespace IMS.Core.services
                     {
                         if (ReportsValidator.IsDateValid(fromDate, toDate, out startDate, out endDate))
                         {
-                            
+
                             List<ShelfOrderStats> dateShelfOrderMappings = await PopulateListWithZeroValues(startDate, endDate);
-                             _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate,dateShelfOrderMappings);
+                            _reportsDbContext.GetShelfWiseOrderCountByDate(startDate, endDate, dateShelfOrderMappings);
 
                             if (dateShelfOrderMappings == null || dateShelfOrderMappings.Count == 0)
                             {
@@ -72,7 +76,7 @@ namespace IMS.Core.services
                             Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.DateRangeIsInvalid);
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         shelfWiseOrderCountResponse.Status = Entities.Status.Failure;
                         shelfWiseOrderCountResponse.Error =
@@ -85,12 +89,12 @@ namespace IMS.Core.services
                 else
                 {
                     shelfWiseOrderCountResponse.Status = Status.Failure;
-                    shelfWiseOrderCountResponse.Error = 
-                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, 
+                    shelfWiseOrderCountResponse.Error =
+                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
                         Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 shelfWiseOrderCountResponse.Status = Status.Failure;
                 shelfWiseOrderCountResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
@@ -141,7 +145,7 @@ namespace IMS.Core.services
             }
             return list;
         }
-        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate,int itemsCount)
+        public async Task<MostConsumedItemsResponse> GetMostConsumedItems(string startDate, string endDate, int itemsCount)
         {
             MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
             int userId = -1;
@@ -155,10 +159,10 @@ namespace IMS.Core.services
                     List<ItemQuantityMapping> itemQuantityMappings;
                     try
                     {
-                        mostConsumedItemsResponse = ReportsValidator.ValidateDateAndItemsCount(startDate,endDate,itemsCount);
+                        mostConsumedItemsResponse = ReportsValidator.ValidateDateAndItemsCount(startDate, endDate, itemsCount);
                         if (mostConsumedItemsResponse.Error == null)
                         {
-                            itemQuantityMappings = await _reportsDbContext.GetMostConsumedItemsByDate(startDate,endDate,itemsCount);
+                            itemQuantityMappings = await _reportsDbContext.GetMostConsumedItemsByDate(startDate, endDate, itemsCount);
                             if (itemQuantityMappings.Count != 0)
                             {
                                 mostConsumedItemsResponse.Status = Status.Success;
@@ -177,7 +181,7 @@ namespace IMS.Core.services
                     {
                         mostConsumedItemsResponse.Status = Status.Failure;
                         mostConsumedItemsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", Severity.High, startDate+";"+endDate+";"+itemsCount, mostConsumedItemsResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "GetMostConsumedItems", Severity.High, startDate + ";" + endDate + ";" + itemsCount, mostConsumedItemsResponse); }).Start();
                     }
                     return mostConsumedItemsResponse;
                 }
@@ -341,7 +345,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.High;
                 if (itemConsumptionReport.Status == Status.Failure)
                     severity = Severity.High;
-                new Task(() => { _logger.Log(startDate + ";" + endDate , itemConsumptionReport, "GetMostConsumedItems", itemConsumptionReport.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(startDate + ";" + endDate, itemConsumptionReport, "GetMostConsumedItems", itemConsumptionReport.Status, severity, userId); }).Start();
             }
             return itemConsumptionReport;
         }
@@ -360,12 +364,105 @@ namespace IMS.Core.services
                 string dateString = date.ToString("yyyy/MM/dd");
                 if (!datesWithOrders.Contains(dateString))
                 {
-                    dateItemConsumptionList.Add(new DateItemConsumption() { Date = dateString, ItemsConsumptionCount=0});
+                    dateItemConsumptionList.Add(new DateItemConsumption() { Date = dateString, ItemsConsumptionCount = 0 });
                 }
             }
             List<DateItemConsumption> sortedDateItemConsumptionList = dateItemConsumptionList.OrderBy(o => o.Date).ToList();
             return sortedDateItemConsumptionList;
         }
+        public async Task<StockStatusResponse> GetStockStatus()
+        {
+            StockStatusResponse stockStatusResponse = new StockStatusResponse();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        ItemStockStatusDto stockStatus = await InitiliaseListWithItemNames();
+                        _reportsDbContext.GetStockStatus(stockStatus);
+                        if (stockStatus != null && stockStatus.StockStatus.Count != 0)
+                        {
+                            stockStatusResponse.Status = Status.Success;
+                            stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
+                        }
+                        else
+                        {
+                            stockStatusResponse.Status = Status.Failure;
+                            stockStatusResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.NoItemsInStore
+                            };
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        stockStatusResponse.Status = Status.Failure;
+                        stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToShowStockStatus);
+                        new Task(() => { _logger.LogException(exception, "GetStockStatus", Severity.Medium, "GetStockStatus", stockStatusResponse); }).Start();
+                    }
+                }
+                else
+                {
+                    stockStatusResponse.Status = Status.Failure;
+                    stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                stockStatusResponse.Status = Status.Failure;
+                stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToShowStockStatus);
+                new Task(() => { _logger.LogException(exception, "GetStockStatus", Severity.Medium, "GetStockStatus", stockStatusResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (stockStatusResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log("GetStockStatus", stockStatusResponse, "GetStockStatus", stockStatusResponse.Status, severity, userId); }).Start();
+            }
+            return stockStatusResponse;
+        }
 
+        private async Task<ItemStockStatusDto> InitiliaseListWithItemNames()
+        {
+            ItemStockStatusDto stockStatus=new ItemStockStatusDto();
+            stockStatus.StockStatus = new Dictionary<int, List<StockStatus>>();
+            stockStatus.Items = new List<Item>();
+            List<Item> itemsList = await _itemDbContext.GetAllItems();
+            foreach (Item item in itemsList)
+            {
+                stockStatus.Items.Add(item);
+                stockStatus.StockStatus.Add(item.Id, new List<StockStatus>());
+            }
+            return stockStatus;
+        }
+
+        public async Task<List<ItemStockStatus>> ToListFromDictionary(ItemStockStatusDto stockStatus)
+        {
+            List<ItemStockStatus> itemStockStatusList = new List<ItemStockStatus>();
+            foreach(Item item in stockStatus.Items)
+            {
+                ItemStockStatus itemStockStatusInstance = new ItemStockStatus();
+                itemStockStatusInstance.Item = item;
+                itemStockStatusInstance.StoreStatus = new List<StockStatus>();
+                List<StockStatus> stockStatusList = new List<StockStatus>();
+                if(stockStatus.StockStatus.ContainsKey(item.Id))
+                {
+                    stockStatusList = stockStatus.StockStatus[item.Id];
+                    foreach (StockStatus stockStatusIterator in stockStatusList)
+                    {
+                        itemStockStatusInstance.StoreStatus.Add(stockStatusIterator);
+                    }
+                }
+                itemStockStatusList.Add(itemStockStatusInstance);
+            }
+            return itemStockStatusList;
+        }
     }
 }
