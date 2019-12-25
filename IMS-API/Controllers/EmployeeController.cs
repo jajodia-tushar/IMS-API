@@ -14,7 +14,7 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+
     public class EmployeeController : ControllerBase
     {
         private IEmployeeService employeeService;
@@ -41,7 +41,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(employeeId);
                 contractsEmployeeValidationResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 contractsEmployeeValidationResponse = new IMS.Contracts.GetEmployeeResponse()
                 {
@@ -55,6 +55,32 @@ namespace IMS_API.Controllers
                 new Task(() => { _logger.LogException(exception, "GetEmployeeById", IMS.Entities.Severity.Critical, employeeId, contractsEmployeeValidationResponse); }).Start();
             }
             return contractsEmployeeValidationResponse;
+        }
+
+
+        [HttpPost("Add")]
+        public EmployeeResponse Add(string filePath)
+        {
+            EmployeeResponse employeeResponse = new EmployeeResponse();
+            try
+            {
+                IMS.Entities.EmployeeResponse entityEmployeeResponse = employeeService.AddEmployeesFromCsvFile(filePath);
+                employeeResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeResponse);
+            }
+            catch (Exception exception)
+            {
+                employeeResponse = new IMS.Contracts.EmployeeResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Add", IMS.Entities.Severity.High, filePath, employeeResponse); }).Start();
+            }
+            return employeeResponse;
         }
     }
 }

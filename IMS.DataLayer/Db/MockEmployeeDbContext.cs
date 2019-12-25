@@ -44,6 +44,17 @@ namespace IMS.DataLayer.Db
                    IsActive=true
                }
             };
+
+        public bool AddEmployee(List<Employee> employeesList)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Employee> GetAllEmployees()
+        {
+            throw new NotImplementedException();
+        }
+
         public Employee GetEmployeeById(string employeeId)
         {
             return employees.Find
