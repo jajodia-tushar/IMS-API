@@ -203,7 +203,8 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
                     List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageNumber, pageSize);
-                    if (employeeRecentOrders == null || employeeRecentOrders.Count == 0)
+                    PagingInfo pagingInfo = await _employeeOrderDbContext.GetEmployeeOrderCount(pageNumber, pageSize);
+                    if (employeeRecentOrders == null || employeeRecentOrders.Count==0)
                     {
                         employeeRecentOrderResponse.Status = Status.Failure;
                         employeeRecentOrderResponse.Error = new Error()
@@ -216,6 +217,7 @@ namespace IMS.Core.services
                     {
                         employeeRecentOrderResponse.Status = Status.Success;
                         employeeRecentOrderResponse.EmployeeRecentOrders = employeeRecentOrders;
+                        employeeRecentOrderResponse.PagingInfo = pagingInfo;
                     }
                 }
                 else

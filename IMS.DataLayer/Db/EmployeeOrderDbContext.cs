@@ -291,5 +291,10 @@ namespace IMS.DataLayer.Db
                 }
             };
         }
+
+        public Task<PagingInfo> GetEmployeeOrderCount(int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

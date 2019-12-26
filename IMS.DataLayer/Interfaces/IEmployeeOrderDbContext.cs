@@ -11,5 +11,6 @@ namespace IMS.DataLayer.Interfaces
         Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(int pageNumber, int pageSize);
         Task<EmployeeOrder> AddEmployeeOrder(EmployeeOrder employeeOrder);
         Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string employeeId);
+        Task<PagingInfo> GetEmployeeOrderCount(int pageNumber, int pageSize);
     }
 }
