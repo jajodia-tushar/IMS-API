@@ -17,6 +17,7 @@ namespace IMS.Core.Translators
                 dtoEmployeeRecentOrderResponse.Status = Contracts.Status.Success;
                 dtoEmployeeRecentOrderResponse.Error = null;
                 dtoEmployeeRecentOrderResponse.EmployeeRecentOrders = ToDataContractsObject(doEmployeeRecentOrderResponse.EmployeeRecentOrders);
+                dtoEmployeeRecentOrderResponse.PagingInfo = ToDataContractsObject(doEmployeeRecentOrderResponse.PagingInfo);
             }
             else
             {
@@ -25,7 +26,15 @@ namespace IMS.Core.Translators
             }
             return dtoEmployeeRecentOrderResponse;
         }
-
+        public static Contracts.PagingInfo ToDataContractsObject(Entities.PagingInfo pagingInfo)
+        {
+            return new Contracts.PagingInfo()
+            {
+                CurrentPageNumber = pagingInfo.CurrentPageNumber,
+                PageSize = pagingInfo.PageSize,
+                TotalEntries = pagingInfo.TotalEntries
+            };
+        }
         public static List<Contracts.EmployeeRecentOrder> ToDataContractsObject(List<Entities.EmployeeRecentOrder> employeeRecentOrders)
         {
             List<Contracts.EmployeeRecentOrder> dtoEmployeeRecentOrder = new List<Contracts.EmployeeRecentOrder>();
