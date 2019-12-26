@@ -15,7 +15,7 @@ namespace IMS.Core.Translators
                 return new Contracts.User()
                 {
                     Id = user.Id,
-                    Username = user.Username,
+                    Username = user.Username?.ToLower(),
                     Password = null,
                     Firstname = user.Firstname,
                     Lastname = user.Lastname,
@@ -56,6 +56,23 @@ namespace IMS.Core.Translators
                 }
             }
             return contractUsers;
+        }
+        public static Entities.User ToEntitiesObject(Contracts.User user)
+        {
+            if (user != null)
+            {
+                return new Entities.User()
+                {
+                    Id = user.Id,
+                    Username = user.Username?.ToLower(),
+                    Password = user.Password,
+                    Firstname = user.Firstname,
+                    Lastname = user.Lastname,
+                    Email = user.Email,
+                    Role = RoleTranslator.ToDataContractsObject(user.Role)
+                };
+            }
+            return null;
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using IMS.Contracts;
+using IMS.Entities;
 
 namespace IMS.Core.Translators
 {
@@ -14,5 +16,17 @@ namespace IMS.Core.Translators
                 Name = role.Name
             };
         }
+
+        internal static Entities.Role ToDataContractsObject(Contracts.Role role)
+        {
+            if(role!=null)
+            return new Entities.Role()
+            {
+                Id = role.Id,
+                Name = role.Name
+            };
+            return null;
+        }
+
     }
 }

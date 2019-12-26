@@ -66,6 +66,8 @@ namespace IMS.Core
             public const string DateFormatInvalid = "Given Date Format is Invalid";
             public const string NoItemsInStore = "No items in store";
             public const string UnableToShowStockStatus = "Sorry, Unable to show stock status";
+
+            public const string EmailFormatError = "Invalid Email Format";
         }
 
         public static class ErrorCodes
