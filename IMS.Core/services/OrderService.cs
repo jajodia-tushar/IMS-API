@@ -194,30 +194,38 @@ namespace IMS.Core.services
             employeeRecentOrderResponse.Error = new Error() { };
             try
             {
-                pageSize = (pageSize == 0) ? 10 : (pageSize < 0) ? throw new Exception() : pageSize;
-                pageNumber = (pageNumber == 0) ? 1 : (pageNumber < 0) ? throw new Exception() : pageNumber;
-
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 if (await _tokenProvider.IsValidToken(token))
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageNumber, pageSize);
-                    PagingInfo pagingInfo = await _employeeOrderDbContext.GetEmployeeOrderCount(pageNumber, pageSize);
-                    if (employeeRecentOrders == null || employeeRecentOrders.Count==0)
+                    try
                     {
-                        employeeRecentOrderResponse.Status = Status.Failure;
-                        employeeRecentOrderResponse.Error = new Error()
+                        pageSize = (pageSize == 0) ? 10 : (pageSize < 0) ? throw new Exception() : pageSize;
+                        pageNumber = (pageNumber == 0) ? 1 : (pageNumber < 0) ? throw new Exception() : pageNumber;
+                        List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageNumber, pageSize);
+                        PagingInfo pagingInfo = await _employeeOrderDbContext.GetEmployeeOrderCount(pageNumber, pageSize);
+                        if (employeeRecentOrders == null || employeeRecentOrders.Count == 0)
                         {
-                            ErrorCode = Constants.ErrorCodes.NotFound,
-                            ErrorMessage = Constants.ErrorMessages.EmptyRecentEmployeeOrderList
-                        };
+                            employeeRecentOrderResponse.Status = Status.Failure;
+                            employeeRecentOrderResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.EmptyRecentEmployeeOrderList
+                            };
+                        }
+                        else
+                        {
+                            employeeRecentOrderResponse.Status = Status.Success;
+                            employeeRecentOrderResponse.EmployeeRecentOrders = employeeRecentOrders;
+                            employeeRecentOrderResponse.PagingInfo = pagingInfo;
+                        }
                     }
-                    else
+                    catch(Exception ex)
                     {
-                        employeeRecentOrderResponse.Status = Status.Success;
-                        employeeRecentOrderResponse.EmployeeRecentOrders = employeeRecentOrders;
-                        employeeRecentOrderResponse.PagingInfo = pagingInfo;
+                        employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
+                        employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidPageNumber;
+                        return employeeRecentOrderResponse;
                     }
                 }
                 else
