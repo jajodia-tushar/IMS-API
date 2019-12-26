@@ -296,8 +296,8 @@ namespace IMS.DataLayer.Db
         {
             MySqlDataReader reader = null;
             PagingInfo pagingInfo = new PagingInfo();
-            pagingInfo.PageSize = pageSize;
-            pagingInfo.CurrentPageNumber = pageNumber;
+            pagingInfo.pageSize = pageSize;
+            pagingInfo.pageNumber = pageNumber;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -308,7 +308,7 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetEmployeeOrderCount";
                     reader = command.ExecuteReader();
                     reader.Read();
-                    pagingInfo.TotalEntries = (int)reader.GetUInt32(0);
+                    pagingInfo.totalResults = (int)reader.GetUInt32(0);
                 }
                 catch (Exception ex)
                 {

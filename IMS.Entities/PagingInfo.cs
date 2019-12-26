@@ -6,8 +6,8 @@ namespace IMS.Entities
 {
     public class PagingInfo
     {
-        public int CurrentPageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 10;
-        public int TotalEntries { get; set; }
+        public int pageNumber { get; set; } = 1;
+        public int pageSize { get; set; } = 10;
+        public int totalResults { get; set; }
     }
 }
