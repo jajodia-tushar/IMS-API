@@ -69,6 +69,16 @@ namespace IMS.Core
             public static string LocationNotfound = "No Location found on given Input";
             public const string EmailFormatError = "Invalid Email Format";
             public const string EmptyLogList = "No Log history found ";
+            public const string UserDetailsMissing = "Fields Cannot be Empty";
+            public const string UserNameSpacesError = "No Spaces allowed in UserName";
+            public const string UserNameMinMaxLengthError = "UserName should be minimum of 6 and maximum of 15 characters";
+            public const string PasswordLowerCaseError = "Password should contain At least one lower case letter";
+            public const string PasswordUpperCaseError = "Password should contain At least one upper case letter";
+            public const string PasswordLengthError = "Password should be minimum of 8 and maximum of 15 characters";
+            public const string PasswordNumberError = "Password should contain At least one numeric value";
+            public const string PasswordSymbolError = "Password should contain At least one special case characters";
+            public const string PasswordSpaceError = "Password should not contain spaces";
+            public const string NoUserFoundToDelete = "No Users found to delete";
         }
 
         public static class ErrorCodes
