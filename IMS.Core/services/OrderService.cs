@@ -201,10 +201,10 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        pageSize = (pageSize == 0) ? 10 : (pageSize < 0) ? throw new Exception() : pageSize;
-                        pageNumber = (pageNumber == 0) ? 1 : (pageNumber < 0) ? throw new Exception() : pageNumber;
-                        List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageNumber, pageSize);
-                        PagingInfo pagingInfo = await _employeeOrderDbContext.GetEmployeeOrderCount(pageNumber, pageSize);
+                        PagingInfo pagingInfo = new PagingInfo();
+                        pageSize = (pageSize == 0) ?pagingInfo.pageSize=10 : (pageSize < 0) ? throw new Exception() :pagingInfo.pageSize=pageSize;
+                        pageNumber = (pageNumber == 0) ?pagingInfo.pageNumber=1 : (pageNumber < 0) ? throw new Exception() :pagingInfo.pageNumber=pageNumber;
+                        List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pagingInfo);
                         if (employeeRecentOrders == null || employeeRecentOrders.Count == 0)
                         {
                             employeeRecentOrderResponse.Status = Status.Failure;

@@ -83,12 +83,7 @@ namespace IMS.DataLayer.Db
             throw new NotImplementedException();
         }
 
-        public Task<PagingInfo> GetEmployeeOrderCount(int pageNumber, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(int pageNumber, int pageSize)
+        public Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(PagingInfo pagingInfo)
         {
             throw new NotImplementedException();
         }

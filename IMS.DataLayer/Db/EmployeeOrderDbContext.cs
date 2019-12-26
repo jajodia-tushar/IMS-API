@@ -120,13 +120,13 @@ namespace IMS.DataLayer.Db
             string itemqty = string.Join(";", ItemsQuantityList.Select(p => p.Item.Id + "," + p.Quantity));
             return itemqty;
         }
-        public async Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(int pageNumber, int pageSize)
+        public async Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(PagingInfo pagingInfo)
         {
-            MySqlDataReader reader1 = null;
+            MySqlDataReader reader = null;
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
             List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
-            int limit = pageSize;
-            int offset = (pageNumber - 1) * pageSize;
+            int limit =pagingInfo.pageSize;
+            int offset = (pagingInfo.pageNumber - 1) *pagingInfo.pageSize;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -138,19 +138,27 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetAllEmployeeRecentOrders";
                     command.Parameters.AddWithValue("@lim", limit);
                     command.Parameters.AddWithValue("@off", offset);
-                    reader1 = command.ExecuteReader();
-                    while (reader1.Read())
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        RecentEmployeeOrderDto employeeOrder = Extract(reader1);
+                        RecentEmployeeOrderDto employeeOrder = Extract(reader);
                         recentEmployeeOrderDtos.Add(employeeOrder);
                     }
                     listOfEmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
+                    reader.Close();
+
+                    var command1 = connection.CreateCommand();
+                    command1.CommandType = CommandType.StoredProcedure;
+                    command1.CommandText = "spGetEmployeeOrderCount";
+                    reader = command1.ExecuteReader();
+                    reader.Read();
+                    pagingInfo.totalResults = (int)reader.GetUInt32(0);
+                    reader.Close();
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-
             }
             return listOfEmployeeRecentOrders;
         }
@@ -290,32 +298,6 @@ namespace IMS.DataLayer.Db
                     IsActive = (bool)reader["ShelfStatus"]
                 }
             };
-        }
-
-        public async Task<PagingInfo> GetEmployeeOrderCount(int pageNumber, int pageSize)
-        {
-            MySqlDataReader reader = null;
-            PagingInfo pagingInfo = new PagingInfo();
-            pagingInfo.pageSize = pageSize;
-            pagingInfo.pageNumber = pageNumber;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetEmployeeOrderCount";
-                    reader = command.ExecuteReader();
-                    reader.Read();
-                    pagingInfo.totalResults = (int)reader.GetUInt32(0);
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-            }
-            return pagingInfo;
         }
     }
 }
