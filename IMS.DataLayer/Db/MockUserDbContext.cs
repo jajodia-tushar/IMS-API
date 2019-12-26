@@ -57,6 +57,10 @@ namespace IMS.DataLayer.Dal
 
             };
 
+        public Task<List<User>> GetAllUsers(Role requestedRole)
+        {
+            throw new NotImplementedException();
+        }
 
         public User GetUserByCredintials(string username, string password)
         {

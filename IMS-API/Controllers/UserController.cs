@@ -54,5 +54,35 @@ namespace IMS_API.Controllers
             }
             return contractUsersResponse;
         }
+        // GET: api/
+        /// <summary>
+        /// returns all users 
+        /// </summary>
+        /// <returns>all users </returns>
+        /// <response code="200">Returns users with status</response>
+        [HttpGet]
+        public async Task<UsersResponse> GetAllUsers()
+        {
+            UsersResponse contractUsersResponse = null;
+            try
+            {
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.GetAllUsers();
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
+            }
+            catch (Exception exception)
+            {
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetAllUsers", IMS.Entities.Severity.Medium, "Get Request", contractUsersResponse); }).Start();
+            }
+            return contractUsersResponse;
+        }
     }
 }
