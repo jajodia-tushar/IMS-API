@@ -8,6 +8,7 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using System.Data.Common;
 
 namespace IMS.DataLayer.Dal
 {
@@ -112,6 +113,40 @@ namespace IMS.DataLayer.Dal
                     Name = (string)reader["rolename"]
                 }
             };
+        }
+
+        public async Task<bool> HasAccessControl(Role requestedRole, Role accessibleRole)
+        {
+            DbDataReader reader = null;
+            bool hasAccess = false;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spHasAccess";
+                    command.Parameters.AddWithValue("@requestedroleid", requestedRole.Id);
+                    command.Parameters.AddWithValue("@roleidtobeaccessed", accessibleRole.Id);
+                    reader = await command.ExecuteReaderAsync();
+                   
+                    if (reader.Read())
+                    {
+                        hasAccess = (bool)reader["hasaccess"];
+                    }
+                   
+              
+
+                }
+                
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+            return hasAccess;
         }
     }
 }
