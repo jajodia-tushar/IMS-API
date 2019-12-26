@@ -86,5 +86,36 @@ namespace IMS_API.Controllers
             }
             return contractUsersResponse;
         }
+
+        // GET: api/
+        /// <summary>
+        /// returns all pending Approval users 
+        /// </summary>
+        /// <returns>all users </returns>
+        /// <response code="200">Returns users with status</response>
+        [HttpGet("PendingApprovals")]
+        public async Task<UsersResponse> GetAllPendingApprovals()
+        {
+            UsersResponse contractUsersResponse = null;
+            try
+            {
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.GetAllPendingApprovals();
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
+            }
+            catch (Exception exception)
+            {
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetAllPendingApprovals", IMS.Entities.Severity.Medium, "user/pendingapprovals", contractUsersResponse); }).Start();
+            }
+            return contractUsersResponse;
+        }
     }
 }

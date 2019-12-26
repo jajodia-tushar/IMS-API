@@ -26,6 +26,61 @@ namespace IMS.Core.services
             this._httpContextAccessor = httpContextAccessor;
             this._accessControlDbContext = accessControlDbContext;
         }
+
+        public async Task<UsersResponse> GetAllPendingApprovals()
+        {
+            UsersResponse usersResponse = new UsersResponse()
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            try
+            {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User requestedUser = Utility.GetUserFromToken(token);
+                userId = requestedUser.Id;
+
+                List<User> users = await _userDbContext.GetAllPendingApprovals(requestedUser.Role);
+                if (users.Count == 0)
+                    usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
+                else
+                {
+                    usersResponse.Users = users;
+                    usersResponse.Status = Status.Success;
+                }
+
+
+
+            }
+            catch (CustomException e)
+            {
+                usersResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, " GetAllPendingApprovals", Severity.Medium, "Get Request", usersResponse); }).Start();
+            }
+            catch (Exception exception)
+            {
+                usersResponse.Status = Status.Failure;
+                usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetAllPendingApprovals", IMS.Entities.Severity.Medium, "Get Request", usersResponse); }).Start();
+
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (usersResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log("Get Request", usersResponse, "GetAllPendingApprovals", usersResponse.Status, severity, userId); }).Start();
+            }
+
+            return usersResponse;
+        }
+
         public async Task<UsersResponse> GetUsersByRole(string roleName)
         { 
             UsersResponse usersResponse = new UsersResponse();

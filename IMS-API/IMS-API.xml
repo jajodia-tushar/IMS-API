@@ -270,6 +270,13 @@
             <returns>all users of the role name along with status</returns>
             <response code="200">Returns users with status</response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.GetAllPendingApprovals">
+            <summary>
+            returns all pending Approval users 
+            </summary>
+            <returns>all users </returns>
+            <response code="200">Returns users with status</response>
+        </member>
         <member name="M:IMS_API.Controllers.UserController.GetAllUsers">
             <summary>
             returns all users 

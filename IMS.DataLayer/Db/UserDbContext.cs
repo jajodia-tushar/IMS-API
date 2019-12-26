@@ -115,6 +115,90 @@ namespace IMS.DataLayer.Dal
             };
         }
 
+        public async Task<bool> HasAccessControl(Role requestedRole, Role accessibleRole)
+        {
+            DbDataReader reader = null;
+            bool hasAccess = false;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spHasAccess";
+                    command.Parameters.AddWithValue("@requestedroleid", requestedRole.Id);
+                    command.Parameters.AddWithValue("@roleidtobeaccessed", accessibleRole.Id);
+                    reader = await command.ExecuteReaderAsync();
+                   
+                    if (reader.Read())
+                    {
+                        hasAccess = (bool)reader["hasaccess"];
+                    }
+                   
+              
+
+                }
+                
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+            return hasAccess;
+        }
+
+        public async Task<List<User>> GetAllPendingApprovals(Role requestedRole)
+        {
+            List<User> users = new List<User>();
+            DbDataReader reader = null;
+
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetAllPendingApprovalUsersByPermission";
+                    command.Parameters.AddWithValue("@requestedroleid", requestedRole.Id);
+                    reader = await command.ExecuteReaderAsync();
+                    User user = null;
+                    while (reader.Read())
+                    {
+                        user = Extract(reader);
+                        users.Add(user);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return users;
+        }
+        private User Extract(DbDataReader reader)
+        {
+            return new User()
+            {
+                Id = (int)reader["userid"],
+                Username = (string)reader["username"],
+                Password = (string)reader["password"],
+                Firstname = (string)reader["firstname"],
+                Lastname = (string)reader["lastname"],
+                Email = (string)reader["email"],
+                Role = new Role()
+                {
+                    Id = (int)reader["roleid"],
+                    Name = (string)reader["rolename"]
+                }
+            };
+        }
+    }
         public async Task<List<User>> GetAllUsers(Role requestedRole)
         {
             List<User> users = new List<User>();
