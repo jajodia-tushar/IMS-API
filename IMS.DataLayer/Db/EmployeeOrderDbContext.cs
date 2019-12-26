@@ -292,9 +292,30 @@ namespace IMS.DataLayer.Db
             };
         }
 
-        public Task<PagingInfo> GetEmployeeOrderCount(int pageNumber, int pageSize)
+        public async Task<PagingInfo> GetEmployeeOrderCount(int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            MySqlDataReader reader = null;
+            PagingInfo pagingInfo = new PagingInfo();
+            pagingInfo.PageSize = pageSize;
+            pagingInfo.CurrentPageNumber = pageNumber;
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetEmployeeOrderCount";
+                    reader = command.ExecuteReader();
+                    reader.Read();
+                    pagingInfo.TotalEntries = (int)reader.GetUInt32(0);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return pagingInfo;
         }
     }
 }
