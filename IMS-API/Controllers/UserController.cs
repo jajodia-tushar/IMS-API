@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IMS.Contracts;
+﻿using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
@@ -10,6 +6,8 @@ using IMS.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace IMS_API.Controllers
 {
@@ -216,6 +214,37 @@ namespace IMS_API.Controllers
                 new Task(() => { _logger.LogException(exception, "ApproveAdmin", IMS.Entities.Severity.Medium,userId, contractUsersResponse); }).Start();
             }
             return contractUsersResponse;
+        }
+        // DELETE: api/
+        /// <summary>
+        /// returns all users based on the role name
+        /// </summary>
+        /// <param name="userId">Takes the name of the role corresponding to which we need users</param>
+        /// <returns>all users of the role name along with status</returns>
+        /// <response code="200">Returns users with status</response>
+        [HttpDelete(Name = "Delete(int UserId")]
+        public async Task<Response> Delete(int userId)
+        {
+            Response contractDeleteUsersResponse = null;
+            try
+            {
+                IMS.Entities.Response deleteUserResponse = await _userService.DeleteUser(userId);
+                contractDeleteUsersResponse = Translator.ToDataContractsObject(deleteUserResponse);
+            }
+            catch (Exception exception)
+            {
+                contractDeleteUsersResponse = new IMS.Contracts.UsersResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium, "Delete", contractDeleteUsersResponse); }).Start();
+            }
+            return contractDeleteUsersResponse;
         }
     }
 }

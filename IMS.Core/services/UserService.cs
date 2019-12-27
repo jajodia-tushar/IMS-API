@@ -81,6 +81,20 @@ namespace IMS.Core.services
 
             return usersResponse;
         }
+        public async Task<Response> DeleteUser(int userId)
+        {
+            Response deleteUserResponse = new Response();
+            if(userId<=0)
+            {
+                deleteUserResponse.Status = Status.Failure;
+                deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.MissingValues);
+            }
+            else
+            {
+
+            }
+            return deleteUserResponse;
+        }
 
         public async Task<UsersResponse> GetUsersByRole(string roleName)
         {
