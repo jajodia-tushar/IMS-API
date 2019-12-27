@@ -212,7 +212,7 @@ namespace IMS.Core.services
                
                 if (Validators.UserValidator.ValidateNewUser(newUser))
                     {
-                        bool hasAccess = await _userDbContext.HasAccessControl(requestedUser.Role, newUser.Role);
+                        bool hasAccess = await _accessControlDbContext.HasAccessControl(requestedUser.Role, newUser.Role);
                         if (!hasAccess)
                             throw new AccessDeniedException();
                         bool isEmailOrUsernameRepeated = await _userDbContext.IsEmailOrUserNameRepeated(newUser.Email, newUser.Username);

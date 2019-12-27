@@ -79,6 +79,15 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
+        public Task<bool> IsEmailOrUserNameRepeated(string email, string username)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Save(User newUser, int isApproved, int isActive)
+        {
+            throw new NotImplementedException();
+        }
         public Task<List<User>> GetAllPendingAdminApprovals()
         {
             throw new NotImplementedException();
