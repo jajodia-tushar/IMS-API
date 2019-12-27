@@ -126,6 +126,7 @@ namespace IMS_API.Controllers
         /// <returns>created user</returns>
         /// <response code="200">Returns created user with status</response>
         [HttpPost(Name = "AddNewUser")]
+        [Authorize(Roles="Admin,SuperAdmin")]
         public async Task<UsersResponse> AddUser([FromBody] User user)
         {
             IMS.Contracts.UsersResponse contractsUserResponse = null;
