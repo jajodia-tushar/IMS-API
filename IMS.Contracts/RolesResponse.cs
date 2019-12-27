@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IMS.Contracts
 {
-    public class ListOfRolesResponse : Response
+    public class RolesResponse : Response
     {
         public List<Role> Roles { get; set; }
     }

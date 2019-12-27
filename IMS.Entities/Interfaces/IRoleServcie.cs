@@ -7,6 +7,6 @@ namespace IMS.Entities.Interfaces
 {
     public interface IRoleServcie
     {
-        Task<ListOfRolesResponse> GetAllRoles();
+        Task<RolesResponse> GetAllRoles();
     }
 }

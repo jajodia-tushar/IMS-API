@@ -32,17 +32,17 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Roles with status</response>
         [HttpGet]
         [Authorize(Roles ="Admin,SuperAdmin")]
-        public async Task<ListOfRolesResponse> GetAllRoles()
+        public async Task<RolesResponse> GetAllRoles()
         {
-            ListOfRolesResponse contractsRolesResponse = null;
+            RolesResponse contractsRolesResponse = null;
             try
             {
-                IMS.Entities.ListOfRolesResponse entityRolesResponse = await _roleService.GetAllRoles();
+                IMS.Entities.RolesResponse entityRolesResponse = await _roleService.GetAllRoles();
                 contractsRolesResponse = RoleTranslator.ToDataContractsObject(entityRolesResponse);
             }
             catch (Exception exception)
             {
-                contractsRolesResponse = new IMS.Contracts.ListOfRolesResponse()
+                contractsRolesResponse = new IMS.Contracts.RolesResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()

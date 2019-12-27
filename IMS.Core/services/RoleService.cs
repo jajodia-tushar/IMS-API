@@ -27,9 +27,9 @@ namespace IMS.Core.services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ListOfRolesResponse> GetAllRoles()
+        public async Task<RolesResponse> GetAllRoles()
         {
-            ListOfRolesResponse response = new ListOfRolesResponse
+            RolesResponse response = new RolesResponse
             {
                 Status = Status.Failure
             };

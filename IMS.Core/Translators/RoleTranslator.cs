@@ -30,10 +30,10 @@ namespace IMS.Core.Translators
         }
 
 
-        public static Contracts.ListOfRolesResponse ToDataContractsObject(Entities.ListOfRolesResponse doRolesResponse)
+        public static Contracts.RolesResponse ToDataContractsObject(Entities.RolesResponse doRolesResponse)
         {
             if (doRolesResponse!= null)
-                return new Contracts.ListOfRolesResponse
+                return new Contracts.RolesResponse
                 {
                     Status = doRolesResponse.Status == Entities.Status.Success ? Contracts.Status.Success : Contracts.Status.Failure,
                     Error = doRolesResponse.Error == null ? null : Translator.ToDataContractsObject(doRolesResponse.Error),
