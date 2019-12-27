@@ -23,6 +23,13 @@ namespace IMS_API.Controllers
             _logsService = logsService;
             _logger = logManager;
         }
+
+        /// <summary>
+        /// Return Log History 
+        /// </summary>
+        /// <returns>Log History</returns>
+        /// <response code="200">Returns Log History</response>
+        /// <response code="404">Log History Not Found</response>
         // GET: api/Logs
         [HttpGet]
         public async Task<LogsResponse> GetLogs()
