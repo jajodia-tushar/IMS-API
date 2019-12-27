@@ -31,6 +31,7 @@ namespace IMS_API.Controllers
         /// <returns>allRolesalong with status</returns>
         /// <response code="200">Returns Roles with status</response>
         [HttpGet]
+        [Authorize(Roles ="Admin,SuperAdmin")]
         public async Task<ListOfRolesResponse> GetAllRoles()
         {
             ListOfRolesResponse contractsRolesResponse = null;

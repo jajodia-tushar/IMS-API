@@ -18,7 +18,7 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public async Task<List<Role>> GetAllRoles()
+        public async Task<List<Role>> GetAllRolesByRequestedRole(Role requestedRole)
         {
             DbDataReader reader = null;
             List<Role> roles = new List<Role>();
@@ -28,7 +28,8 @@ namespace IMS.DataLayer.Db
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
-                    command.CommandText = "spGetAllRoles";
+                    command.CommandText = "spGetAllRolesByRequestedRoleId";
+                    command.Parameters.AddWithValue("@requestedroleid", requestedRole.Id);
                     command.CommandType = CommandType.StoredProcedure;
 
 

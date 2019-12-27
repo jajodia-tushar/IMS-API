@@ -17,7 +17,7 @@ namespace IMS.Core.Translators
             };
         }
 
-<<<<<<< HEAD
+
         internal static Entities.Role ToDataContractsObject(Contracts.Role role)
         {
             if(role!=null)
@@ -29,7 +29,7 @@ namespace IMS.Core.Translators
             return null;
         }
 
-=======
+
         public static Contracts.ListOfRolesResponse ToDataContractsObject(Entities.ListOfRolesResponse doRolesResponse)
         {
             if (doRolesResponse!= null)
@@ -55,6 +55,5 @@ namespace IMS.Core.Translators
             }
             return null;
         }
->>>>>>> implementation completed
     }
 }

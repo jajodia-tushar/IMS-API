@@ -8,6 +8,6 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface IRoleDbContext
     {
-        Task<List<Role>> GetAllRoles();
+        Task<List<Role>> GetAllRolesByRequestedRole(Role RequestedRole);
     }
 }
