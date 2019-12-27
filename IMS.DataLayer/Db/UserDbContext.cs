@@ -162,7 +162,7 @@ namespace IMS.DataLayer.Dal
 
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllUsersByPermission";
+                    command.CommandText = "spGetAllUsersByRequestedRole";
                     command.Parameters.AddWithValue("@userroleid", requestedRole.Id);
                     reader = await command.ExecuteReaderAsync();
                     User user = null;
