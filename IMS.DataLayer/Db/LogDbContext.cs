@@ -16,6 +16,12 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
+
+        public async void GetLogsRecord()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Log(int userId, string status, string callType, string severity, string request, string response)
         {
 
