@@ -66,6 +66,14 @@
             <returns>User Details and Access Token</returns>
             <response code="200">Returns user details and access token if username and password is valid otherwise it returns null and status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.LogsController.GetLogs">
+            <summary>
+            Return Log History 
+            </summary>
+            <returns>Log History</returns>
+            <response code="200">Returns Log History</response>
+            <response code="404">Log History Not Found</response>
+        </member>
         <member name="M:IMS_API.Controllers.OrderController.GetOrdersByEmployeeId(System.String)">
             <summary>
             Returns orders placed by an employee, returns null if no orders and if wrong employee id, returns failure

@@ -68,6 +68,7 @@ namespace IMS.Core
             public const string UnableToShowStockStatus = "Sorry, Unable to show stock status";
             public static string LocationNotfound = "No Location found on given Input";
             public const string EmailFormatError = "Invalid Email Format";
+            public const string EmptyLogList = "No Log history found ";
         }
 
         public static class ErrorCodes
