@@ -464,5 +464,63 @@ namespace IMS.Core.services
             }
             return itemStockStatusList;
         }
+
+        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour)
+        {
+            var itemsAvailabilityResponse = new ItemsAvailabilityResponse();
+            itemsAvailabilityResponse.Status = Status.Failure;
+            int userId = -1;
+            try
+            {
+                object inputColour;
+                if (!String.IsNullOrEmpty(locationName) && !String.IsNullOrEmpty(locationCode) && !String.IsNullOrEmpty(colour) && Enum.TryParse(typeof(Colour), colour, true, out inputColour))
+                {
+                    if (locationName.ToUpper() == "WAREHOUSE")
+                    {
+                        itemsAvailabilityResponse.ItemQuantityMappings = await _reportsDbContext.GetWarehouseAvailability(inputColour.ToString());
+                        if(itemsAvailabilityResponse.ItemQuantityMappings!=null && itemsAvailabilityResponse.ItemQuantityMappings.Count > 0)
+                        {
+                            itemsAvailabilityResponse.Status = Status.Success;
+                            return itemsAvailabilityResponse;
+                        }
+                        itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                        return itemsAvailabilityResponse;
+                    }
+                    else
+                    {
+                        var shelfResponse = new ShelfResponse();
+                        shelfResponse = await _shelfService.GetShelfByShelfCode(locationCode);
+                        if (shelfResponse.Status == Status.Success)
+                        {
+                            itemsAvailabilityResponse.ItemQuantityMappings = await _reportsDbContext.GetShelfAvailability(shelfResponse.Shelves[0].Id, inputColour.ToString());
+                            if (itemsAvailabilityResponse.ItemQuantityMappings != null && itemsAvailabilityResponse.ItemQuantityMappings.Count > 0)
+                            {
+                                itemsAvailabilityResponse.Status = Status.Success;
+                                return itemsAvailabilityResponse;
+                            }
+                            itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                            return itemsAvailabilityResponse;
+                        }
+                        itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.LocationNotfound);
+                        return itemsAvailabilityResponse;
+                    }
+                }
+                itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidInput);
+                return itemsAvailabilityResponse;
+            }
+            catch(Exception exception)
+            {
+                itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetItemsAvailability", Severity.High, locationName+";"+locationCode+";"+colour, itemsAvailabilityResponse); }).Start();
+                throw exception;
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (itemsAvailabilityResponse.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log("GetItemsAvailability", itemsAvailabilityResponse, "GetItemsAvailability", itemsAvailabilityResponse.Status, severity, userId); }).Start();
+            }
+        }
     }
 }

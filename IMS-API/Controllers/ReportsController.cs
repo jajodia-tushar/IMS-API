@@ -166,31 +166,6 @@ namespace IMS_API.Controllers
         }
 
         /// <summary>
-        /// Retrieve Location and Colour based items list
-        /// </summary>
-        /// <param name="Location Name"></param>
-        /// <param name="Location Code"></param>
-        /// <param name="Colour"></param>
-        /// <returns>Location and Colour based Items list</returns>
-        /// <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
-        [Route("GetItemsAvailability")]
-        [HttpGet]
-        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string  locationCode, string colour)
-        {
-            var itemsAvailabilityResponse = new ItemsAvailabilityResponse()
-            {
-                ItemQuantityMappings = new List<ItemQuantityMapping>()
-                {
-                   {new ItemQuantityMapping(){Item = new Item(){ Name = "Pen"},Quantity = 12} },
-                    {new ItemQuantityMapping(){Item = new Item(){ Name = "Marker"},Quantity = 10} },
-                    {new ItemQuantityMapping(){Item = new Item(){ Name = "Blue Marker"},Quantity = 23} },
-                }
-            };
-            itemsAvailabilityResponse.Status = Status.Success;
-            return itemsAvailabilityResponse;
-        }
-
-        /// <summary>
         /// Retrieve the stock status at any given point of time
         /// </summary>
         /// <returns>Returns the whole items list with the stock status at any given point of time</returns>
@@ -219,6 +194,33 @@ namespace IMS_API.Controllers
                 new Task(() => { _logger.LogException(exception, "GetStockStatus", IMS.Entities.Severity.Critical, "GetStockStatus", stockStatusResponse); }).Start();
             }
             return stockStatusResponse;
+        }
+
+        /// <summary>
+        /// Retrieve Location and Colour based items list
+        /// </summary>
+        /// <param name="Location Name"></param>
+        /// <param name="Location Code"></param>
+        /// <param name="Colour"></param>
+        /// <returns>Location and Colour based Items list</returns>
+        /// <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
+        [Route("GetItemsAvailability")]
+        [HttpGet]
+        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour)
+        {
+            var itemsAvailabilityResponse = new ItemsAvailabilityResponse();
+            try
+            {
+                IMS.Entities.ItemsAvailabilityResponse doItemsAvailabilityResponse = await _reportsService.GetItemsAvailability(locationName, locationCode, colour);
+                itemsAvailabilityResponse = ReportsTranslator.ToDataContractsObject(doItemsAvailabilityResponse);
+            }
+            catch (Exception exception)
+            {
+                itemsAvailabilityResponse.Status = Status.Failure;
+                itemsAvailabilityResponse.Error = Translator.ToDataContractsObject(Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError));
+                new Task(() => { _logger.LogException(exception, "GetItemsAvailability", IMS.Entities.Severity.High, locationName + ";" + locationCode + ";" + colour, itemsAvailabilityResponse); }).Start();
+            }
+            return itemsAvailabilityResponse;
         }
     }
 }

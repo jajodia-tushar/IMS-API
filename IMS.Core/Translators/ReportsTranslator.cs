@@ -162,5 +162,28 @@ namespace IMS.Core.Translators
                 ItemsConsumptionCount = dateItemConsumptionEntity.ItemsConsumptionCount
             };
         }
+
+        public static Contracts.ItemsAvailabilityResponse ToDataContractsObject(Entities.ItemsAvailabilityResponse doItemsAvailabilityResponse)
+        {
+            try
+            {
+                var dtoItemsAvailabilityResponse = new Contracts.ItemsAvailabilityResponse();
+                if (doItemsAvailabilityResponse.Status.Equals(Entities.Status.Success))
+                {
+                    dtoItemsAvailabilityResponse.ItemQuantityMappings = ToDataContractsObject(doItemsAvailabilityResponse.ItemQuantityMappings);
+                    dtoItemsAvailabilityResponse.Status = Contracts.Status.Success;
+                }
+                else
+                {
+                    dtoItemsAvailabilityResponse.Error = Translator.ToDataContractsObject(doItemsAvailabilityResponse.Error);
+                    dtoItemsAvailabilityResponse.Status = Contracts.Status.Failure;
+                }
+                return dtoItemsAvailabilityResponse;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
     }
 }

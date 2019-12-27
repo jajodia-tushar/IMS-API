@@ -269,5 +269,81 @@ namespace IMS.DataLayer.Db
 
             }
         }
+
+        public async Task<List<ItemQuantityMapping>> GetWarehouseAvailability(string colour)
+        {
+            try
+            {
+                var itemQuantityMappings = new List<ItemQuantityMapping>();
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@colour",colour.ToUpper());
+                    command.CommandText = "spGetWarehouseItemsByColour";
+                    var reader = await command.ExecuteReaderAsync();
+                    itemQuantityMappings = GetItemQuantityMapping(reader);
+                    reader.Close();
+                };
+                return itemQuantityMappings;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        public async Task<List<ItemQuantityMapping>> GetShelfAvailability(int id, string colour)
+        {
+            try
+            {
+                var itemQuantityMappings = new List<ItemQuantityMapping>();
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@colour",colour.ToUpper());
+                    command.Parameters.AddWithValue("@id", id);
+                    command.CommandText = "spGetItemsByColourAndShelfId";
+                    var reader = await command.ExecuteReaderAsync();
+                    itemQuantityMappings = GetItemQuantityMapping(reader);
+                    reader.Close();
+                };
+                return itemQuantityMappings;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        private List<ItemQuantityMapping> GetItemQuantityMapping(DbDataReader reader)
+        {
+            var itemQuantityMappings = new List<ItemQuantityMapping>();
+            while (reader.Read())
+            {
+                var itemQuantityMapping = new ItemQuantityMapping()
+                {
+                    Item = new Item()
+                    {
+                        Id = Convert.ToInt32(reader["Id"]),
+                        Name = (string)reader["Name"],
+                        MaxLimit = Convert.ToInt32(reader["MaximumLimit"]),
+                        IsActive = (bool)reader["IsActive"],
+                        ImageUrl = (string)reader["ImageUrl"],
+                        Rate = Convert.ToInt32(reader["Rate"]),
+                        ShelvesRedLimit = Convert.ToInt32(reader["ShelvesRedLimit"]),
+                        ShelvesAmberLimit = Convert.ToInt32(reader["ShelvesAmberLimit"]),
+                        WarehouseRedLimit = Convert.ToInt32(reader["WarehouseRedLimit"]),
+                        WarehouseAmberLimit = Convert.ToInt32(reader["WarehouseAmberLimit"]),
+                    },
+                    Quantity = Convert.ToInt32(reader["Quantity"])
+                };
+                itemQuantityMappings.Add(itemQuantityMapping);
+            }
+            return itemQuantityMappings;
+        }
     }
 }
