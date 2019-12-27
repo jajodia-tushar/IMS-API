@@ -18,7 +18,7 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public async Task<List<Logs>> GetLogsRecord()
+        public async Task<List<Logs>> GetLogs()
         {
             throw new NotImplementedException();
         }
