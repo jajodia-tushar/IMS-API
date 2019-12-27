@@ -57,6 +57,11 @@ namespace IMS.DataLayer.Dal
 
             };
 
+        public Task<User> ApproveAdmin(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
         {
             throw new NotImplementedException();
@@ -71,17 +76,10 @@ namespace IMS.DataLayer.Dal
         {
             throw new NotImplementedException();
         }
-       
 
         public User GetUserByCredintials(string username, string password)
         {
-            return _users.Find
-                   (
-                        u =>
-                        {
-                           return u.Username.Equals(username) && u.Password.Equals(password);
-                        }
-                   );
+            throw new NotImplementedException();
         }
 
         public Task<User> GetUserById(int id)

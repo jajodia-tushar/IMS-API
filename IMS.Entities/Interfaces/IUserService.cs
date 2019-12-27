@@ -8,10 +8,14 @@ namespace IMS.Entities.Interfaces
     public interface IUserService
     {
         Task<UsersResponse> GetUsersByRole(String roleName);
+<<<<<<< HEAD
 
         Task<UsersResponse> GetAllUsers();
         Task<UsersResponse> GetAllPendingAdminApprovals();
         Task<UsersResponse> AddUser(User user);
         Task<UsersResponse> UpdateUser(User userEntity);
+=======
+        Task<UsersResponse> ApproveAdmin(int userId);
+>>>>>>> Implemented.
     }
 }

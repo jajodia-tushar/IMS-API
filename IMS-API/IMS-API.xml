@@ -277,6 +277,14 @@
             <returns>all users of the role name along with status</returns>
             <response code="200">Returns users with status</response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.ApproveAdmin(System.Int32)">
+             <summary>
+            returns the approved new user
+             </summary>
+             <param name="userId">Takes the name of the role corresponding to which we need users</param>
+             <returns>all users of the role name along with status</returns>
+             <response code="200">Returns users with status</response>
+        </member>
         <member name="M:IMS_API.Controllers.UserController.GetAllUsers">
             <summary>
             returns all users 

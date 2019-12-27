@@ -17,5 +17,6 @@ namespace IMS.DataLayer.Interfaces
         Task<bool> CheckEmailOrUserNameAvailability(string email, string username);
         Task<User> GetUserById(int id);
         Task<User> UpdateUser(User user);
+        Task<User> ApproveAdmin(int userId);
     }
 }
