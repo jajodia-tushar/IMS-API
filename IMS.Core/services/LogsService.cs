@@ -1,6 +1,7 @@
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,9 +12,11 @@ namespace IMS.Core.services
     public class LogsService : ILogsService
     {
         private ILogDbContext _logDbContext;
-        public LogsService(ILogDbContext logDbContext)
+        private ILogManager _logger;
+        public LogsService(ILogDbContext logDbContext,ILogManager logger)
         {
             _logDbContext = logDbContext;
+            _logger = logger;
         }
         public async Task<LogsResponse> GetLogsRecord()
         {
@@ -36,10 +39,11 @@ namespace IMS.Core.services
                     logsResponse.LogsRecords = logsRecords;
                 }
             }
-            catch(Exception ex)
+            catch(Exception exception)
             {
                logsResponse.Status = Status.Failure;
                logsResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+             new Task(() => { _logger.LogException(exception, "GetLogsRecord", IMS.Entities.Severity.Critical, null, logsResponse); }).Start();
             }
             return logsResponse;
         }
