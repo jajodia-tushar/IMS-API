@@ -94,6 +94,7 @@ namespace IMS_API.Controllers
         /// <returns>all pending Approval users  </returns>
         /// <response code="200">Returns users with status</response>
         [HttpGet("PendingApprovals")]
+        [Authorize(Roles="SuperAdmin")]
         public async Task<UsersResponse> GetAllPendingApprovals()
         {
             UsersResponse contractUsersResponse = null;
