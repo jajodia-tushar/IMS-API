@@ -478,7 +478,12 @@ namespace IMS.Core.services
                     if (locationName.ToUpper() == "WAREHOUSE")
                     {
                         itemsAvailabilityResponse.ItemQuantityMappings = await _reportsDbContext.GetWarehouseAvailability(inputColour.ToString());
-                        itemsAvailabilityResponse.Status = Status.Success;
+                        if(itemsAvailabilityResponse.ItemQuantityMappings!=null && itemsAvailabilityResponse.ItemQuantityMappings.Count > 0)
+                        {
+                            itemsAvailabilityResponse.Status = Status.Success;
+                            return itemsAvailabilityResponse;
+                        }
+                        itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
                         return itemsAvailabilityResponse;
                     }
                     else
@@ -488,7 +493,12 @@ namespace IMS.Core.services
                         if (shelfResponse.Status == Status.Success)
                         {
                             itemsAvailabilityResponse.ItemQuantityMappings = await _reportsDbContext.GetShelfAvailability(shelfResponse.Shelves[0].Id, inputColour.ToString());
-                            itemsAvailabilityResponse.Status = Status.Success;
+                            if (itemsAvailabilityResponse.ItemQuantityMappings != null && itemsAvailabilityResponse.ItemQuantityMappings.Count > 0)
+                            {
+                                itemsAvailabilityResponse.Status = Status.Success;
+                                return itemsAvailabilityResponse;
+                            }
+                            itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
                             return itemsAvailabilityResponse;
                         }
                         itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.LocationNotfound);
