@@ -218,10 +218,13 @@ namespace IMS.Core.services
                                     userResponse.Status = Status.Success;
                                     userResponse.Users = new List<User>() { updatedUser };
                                 }
+                                else
+                                {
+                                    throw new Exception();
+                                }
                             }
                             catch (Exception exception)
                             {
-                                new Task(() => { _logger.LogException(exception, "UpdateUser", IMS.Entities.Severity.Medium, user, userResponse); }).Start();
                                 throw exception;
                             }
                         }

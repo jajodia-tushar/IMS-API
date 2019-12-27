@@ -90,7 +90,7 @@ namespace IMS.Core.Validators
         }
         public static bool UpdateUserValidation(User user)
         {
-            if (user.Id <= 0 || String.IsNullOrEmpty(user.Firstname) || String.IsNullOrEmpty(user.Lastname) || String.IsNullOrEmpty(user.Email) || user.Role.Id == 0)
+            if (user.Id <= 0 || String.IsNullOrEmpty(user.Firstname) || String.IsNullOrEmpty(user.Lastname) || String.IsNullOrEmpty(user.Email) || user.Role.Id <= 0)
             {
                 return false;
             }
