@@ -54,7 +54,7 @@ namespace IMS.Core.services
 
                 }
                 loginRequest.Password = Utility.Hash(loginRequest.Password);
-                user = _userDbContext.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
+                user = await _userDbContext.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
                 if (user != null)
                 {
                     DateTime expirationTime = GetExpirationTime(user.Role.Name);

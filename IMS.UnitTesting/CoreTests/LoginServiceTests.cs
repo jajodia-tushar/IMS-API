@@ -46,7 +46,7 @@ namespace IMS.UnitTest.CoreTests
         {
             var loginRequest = GetValidLoginRequest();
             User user = null;
-            _moqUserDbContext.Setup(m => m.GetUserByCredintials(It.Is<String>(s => s.Equals(loginRequest.Username)), It.Is<String>(s => s.Equals(loginRequest.Password)))).Returns(user);
+           //await  _moqUserDbContext.Setup(m => m.GetUserByCredintials(It.Is<String>(s => s.Equals(loginRequest.Username)), It.Is<String>(s => s.Equals(loginRequest.Password)))).Returns(user);
            var loginService = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object,_moqHttpContextAccessor.Object, _moqLogManager.Object);
             var response = await loginService.Login(loginRequest);
 
@@ -60,7 +60,7 @@ namespace IMS.UnitTest.CoreTests
             var loginRequest = GetValidLoginRequest();
             User user = GetUserDetails();
             string token = "abcdefghijklmnopqrstuvwxyz";
-            _moqUserDbContext.Setup(m => m.GetUserByCredintials(It.Is<String>(s => s.Equals(loginRequest.Username)), It.Is<String>(s => s.Equals(loginRequest.Password)))).Returns(user);
+            //_moqUserDbContext.Setup(m => m.GetUserByCredintials(It.Is<String>(s => s.Equals(loginRequest.Username)), It.Is<String>(s => s.Equals(loginRequest.Password)))).Returns(user);
             _moqTokenProvider.Setup(m => m.GenerateToken(user,DateTime.Now)).Returns(token);
             var loginService = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var response = await loginService.Login(loginRequest);

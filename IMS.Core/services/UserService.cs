@@ -1,4 +1,5 @@
-﻿using IMS.DataLayer.Interfaces;
+﻿using IMS.Core.Validators;
+using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
@@ -178,7 +179,6 @@ namespace IMS.Core.services
                 usersResponse.Status = Status.Failure;
                 usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "GetAllUsers", IMS.Entities.Severity.Medium, "Get Request", usersResponse); }).Start();
-
             }
             finally
             {
@@ -189,6 +189,71 @@ namespace IMS.Core.services
             }
 
             return usersResponse;
+        }
+
+        public async Task<UsersResponse> UpdateUser(User user)
+        {
+            UsersResponse userResponse = new UsersResponse();
+            userResponse.Status = Status.Failure;
+            try
+            {
+                if (!UserValidator.UpdateUserValidation(user))
+                {
+                    userResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.MissingValues);
+                }
+                else
+                {
+                    string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                    if (await _tokenProvider.IsValidToken(token))
+                    {
+                        User requestesUser = Utility.GetUserFromToken(token);
+                        Response validityResponse = await CheckValidityOfUpdateUserRequest(requestesUser, user);
+                        if (validityResponse.Status.Equals(Status.Success))
+                        {
+                            try
+                            {
+                                User updatedUser = await _userDbContext.UpdateUser(user);
+                                if (updatedUser != null)
+                                {
+                                    userResponse.Status = Status.Success;
+                                    userResponse.Users = new List<User>() { updatedUser };
+                                }
+                            }
+                            catch (Exception exception)
+                            {
+                                new Task(() => { _logger.LogException(exception, "UpdateUser", IMS.Entities.Severity.Medium, user, userResponse); }).Start();
+                                throw exception;
+                            }
+                        }
+                        else
+                        {
+                            userResponse.Error = Utility.ErrorGenerator(validityResponse.Error.ErrorCode, validityResponse.Error.ErrorMessage);
+                        }
+                    }
+                    else
+                    {
+                        userResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                    }
+                }
+            }
+            catch (InvalidEmailException exception)
+            {
+                userResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, exception.ErrorMessage);
+                new Task(() => { _logger.LogException(exception, "UserUpdation", IMS.Entities.Severity.Medium, user, userResponse); }).Start();
+            }
+            catch (Exception exception)
+            {
+                userResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "UserUpdation", IMS.Entities.Severity.Medium, user, userResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (userResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(user, userResponse, "Update User", userResponse.Status, severity, -1); }).Start();
+            }
+            return userResponse;
         }
         public async Task<UsersResponse> AddUser(User newUser)
         {
@@ -260,10 +325,44 @@ namespace IMS.Core.services
                     severity = Severity.Medium;
                 new Task(() => { _logger.Log(newUser, response, "Adding New User", response.Status, severity, userId); }).Start();
             }
-            return response;
-
+            return response;                
         }
-
+        public async Task<Response> CheckValidityOfUpdateUserRequest(User requestedUser, User userToBeUpdated)
+        {
+            Response response = new Response();
+            response.Status = Status.Failure;
+            User existingUserToBeUpdated =await _userDbContext.GetUserById(userToBeUpdated.Id);
+            if (existingUserToBeUpdated != null)
+            {
+                if (await _accessControlDbContext.HasAccessControl(requestedUser.Role, userToBeUpdated.Role))
+                {
+                    if (requestedUser.Role.Name.ToLower() == Constants.Roles.Admin)
+                    {
+                        if (userToBeUpdated.Role.Id != existingUserToBeUpdated.Role.Id)
+                        {
+                            response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.UnAuthorized);
+                        }
+                        else
+                        {
+                            response.Status = Status.Success;
+                        }
+                    }
+                    else
+                    {
+                        response.Status = Status.Success;
+                    }
+                }
+                else
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.UnAuthorized);
+                }
+            }
+            else
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
+            }
+            return response;
+        }
     }
 }
 

@@ -277,6 +277,14 @@
             <returns>all users of the role name along with status</returns>
             <response code="200">Returns users with status</response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.UpdateUser(IMS.Contracts.User)">
+            <summary>
+            returns updated user
+            </summary>
+            <param name="user">Takes the user to be updated</param>
+            <returns>Updated user</returns>
+            <response code="200">Returns the updated user</response>
+        </member>
         <member name="M:IMS_API.Controllers.UserController.GetAllUsers">
             <summary>
             returns all users 

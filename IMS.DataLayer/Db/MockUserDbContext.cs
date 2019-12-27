@@ -57,6 +57,16 @@ namespace IMS.DataLayer.Dal
 
             };
 
+        public Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<User>> GetAllPendingAdminApprovals()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<User>> GetAllUsers(Role requestedRole)
         {
             throw new NotImplementedException();
@@ -74,12 +84,12 @@ namespace IMS.DataLayer.Dal
                    );
         }
 
-        public Task<List<User>> GetUsersByRole(string RoleName)
+        public Task<User> GetUserById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
+        public Task<List<User>> GetUsersByRole(string roleName)
         {
             throw new NotImplementedException();
         }
@@ -88,7 +98,13 @@ namespace IMS.DataLayer.Dal
         {
             throw new NotImplementedException();
         }
-        public Task<List<User>> GetAllPendingAdminApprovals()
+
+        public Task<User> UpdateUser(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<User> IUserDbContext.GetUserByCredintials(string username, string password)
         {
             throw new NotImplementedException();
         }

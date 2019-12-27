@@ -25,7 +25,7 @@ namespace IMS.DataLayer.Dal
         public async Task<List<User>> GetUsersByRole(string roleName)
         {
             List<User> users = new List<User>();
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -38,7 +38,7 @@ namespace IMS.DataLayer.Dal
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetUsersByRole";
                     command.Parameters.AddWithValue("@RoleName", roleName);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     User user = null;
                     while (reader.Read())
                     {
@@ -56,10 +56,10 @@ namespace IMS.DataLayer.Dal
         }
 
 
-        public User GetUserByCredintials(string username, string password)
+        public async Task<User> GetUserByCredintials(string username, string password)
         {
             User user = null;
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -75,7 +75,7 @@ namespace IMS.DataLayer.Dal
 
                     command.Parameters.AddWithValue("@username", username);
                     command.Parameters.AddWithValue("@password", password);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
 
 
                     if (reader.Read())
@@ -98,7 +98,7 @@ namespace IMS.DataLayer.Dal
             return user;
         }
 
-        private User Extract(MySqlDataReader reader)
+        private User Extract(DbDataReader reader)
         {
             return new User()
             {
@@ -114,6 +114,64 @@ namespace IMS.DataLayer.Dal
                     Name = reader["rolename"]?.ToString()
                 }
             };
+        }
+        public async Task<User> GetUserById(int id)
+        {
+            User user = null;
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetUserById";
+                    command.Parameters.AddWithValue("@Id", id);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        user = Extract(reader);
+
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return user;
+        }
+
+        public async Task<User> UpdateUser(User user)
+        {
+            User updatedUser = new User();
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spUpdateUser";
+                    command.Parameters.AddWithValue("@Id", user.Id);
+                    command.Parameters.AddWithValue("@FirstName", user.Firstname);
+                    command.Parameters.AddWithValue("@LastName", user.Lastname);
+                    command.Parameters.AddWithValue("@EmailId", user.Email);
+                    command.Parameters.AddWithValue("@RoleId", user.Role.Id);
+                    reader =await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        updatedUser = Extract(reader);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return updatedUser;
         }
 
        
@@ -148,24 +206,7 @@ namespace IMS.DataLayer.Dal
             }
             return users;
         }
-        private User Extract(DbDataReader reader)
-        {
-            return new User()
-            {
-
-                Id = (int)reader["userid"],
-                Username = reader["username"]?.ToString(),
-                Password = reader["password"]?.ToString(),
-                Firstname = reader["firstname"]?.ToString(),
-                Lastname = reader["lastname"]?.ToString(),
-                Email = reader["email"]?.ToString(),
-                Role = new Role()
-                {
-                    Id = (int)reader["roleid"],
-                    Name = reader["rolename"]?.ToString()
-                }
-            };
-        }
+       
     
         public async Task<List<User>> GetAllUsers(Role requestedRole)
         {
@@ -280,5 +321,6 @@ namespace IMS.DataLayer.Dal
             }
             return isRepeated;
         }
+
     }
 }
