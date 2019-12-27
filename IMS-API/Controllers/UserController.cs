@@ -223,6 +223,7 @@ namespace IMS_API.Controllers
         /// <param name="isHardDelete">Values 1 or 0 corresponds to whether the deletion is a hard delete or a soft delete</param>
         /// <returns>deletion status</returns>
         /// <response code="200">deletion status</response>
+        [Authorize(Roles="SuperAdmin")]
         [HttpDelete(Name = "Delete(int UserId")]
         public async Task<Response> Delete(int userId,int isHardDelete)
         {
