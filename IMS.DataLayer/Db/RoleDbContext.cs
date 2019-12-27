@@ -18,7 +18,7 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public async Task<List<Role>> GetAllRolesByRequestedRole(Role requestedRole)
+        public async Task<List<Role>> GetAccessibleRoles(Role requestedRole)
         {
             DbDataReader reader = null;
             List<Role> roles = new List<Role>();

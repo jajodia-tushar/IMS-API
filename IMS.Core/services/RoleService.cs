@@ -45,7 +45,7 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User requestedUser = Utility.GetUserFromToken(token);
                 requestedUserId = requestedUser.Id;
-                response.Roles = await _roleDbContext.GetAllRolesByRequestedRole(requestedUser.Role);
+                response.Roles = await _roleDbContext.GetAccessibleRoles(requestedUser.Role);
                 response.Status = Status.Success;
             }
             catch (CustomException e)
