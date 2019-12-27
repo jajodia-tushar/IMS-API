@@ -27,7 +27,7 @@ namespace IMS.Core.services
             this._accessControlDbContext = accessControlDbContext;
         }
 
-        public async Task<UsersResponse> GetAllPendingApprovals()
+        public async Task<UsersResponse> GetAllPendingAdminApprovals()
         {
             UsersResponse usersResponse = new UsersResponse()
             {
@@ -46,7 +46,7 @@ namespace IMS.Core.services
                 User requestedUser = Utility.GetUserFromToken(token);
                 userId = requestedUser.Id;
 
-                List<User> users = await _userDbContext.GetAllPendingApprovals();
+                List<User> users = await _userDbContext.GetAllPendingAdminApprovals();
                 if (users.Count == 0)
                     usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
                 else

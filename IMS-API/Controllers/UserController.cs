@@ -93,14 +93,14 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <returns>all pending Approval users  </returns>
         /// <response code="200">Returns users with status</response>
-        [HttpGet("PendingApprovals")]
+        [HttpGet("ApproveAdmins")]
         [Authorize(Roles="SuperAdmin")]
-        public async Task<UsersResponse> GetAllPendingApprovals()
+        public async Task<UsersResponse> GetAllPendingAdminApprovals()
         {
             UsersResponse contractUsersResponse = null;
             try
             {
-                IMS.Entities.UsersResponse entityUsersResponse = await _userService.GetAllPendingApprovals();
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.GetAllPendingAdminApprovals();
                 contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
             }
             catch (Exception exception)

@@ -116,7 +116,7 @@ namespace IMS.DataLayer.Dal
         }
 
        
-        public async Task<List<User>> GetAllPendingApprovals()
+        public async Task<List<User>> GetAllPendingAdminApprovals()
         {
             List<User> users = new List<User>();
             DbDataReader reader = null;
