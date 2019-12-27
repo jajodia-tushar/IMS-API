@@ -45,7 +45,7 @@ namespace IMS.DataLayer.Db
                }
             };
 
-        public bool AddEmployee(List<Employee> employeesList)
+        public List<string> AddEmployee(List<Employee> employeesList)
         {
             throw new NotImplementedException();
         }

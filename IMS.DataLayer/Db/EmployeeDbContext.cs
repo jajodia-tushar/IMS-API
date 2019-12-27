@@ -17,7 +17,6 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
-
         public Employee GetEmployeeById(string employeeId)
         {
             Employee employee = null;
@@ -27,17 +26,12 @@ namespace IMS.DataLayer.Db
             {
                 try
                 {
-
                     connection.Open();
-
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetEmployeeById";
-
-
                     command.Parameters.AddWithValue("@Id", employeeId);
                     reader = command.ExecuteReader();
-
                     while (reader.Read())
                     {
                         employee = new Employee()
@@ -95,20 +89,21 @@ namespace IMS.DataLayer.Db
             }
             return employeesList;
         }
-        public bool AddEmployee(List<Employee> employeesList)
+        public List<String> AddEmployee(List<Employee> employeesList)
         {
-            MySqlTransaction objTrans = null;
-            bool isSuccess = false;
             int rowsAffectedOnDb = 0;
+            List<string> employeesNotAdded = new List<string>();
+            employeesNotAdded.Add("Id  | First Name | Last Name | EmailId");
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
                     connection.Open();
-                    objTrans = connection.BeginTransaction();
-                    try
+                    Console.WriteLine("---- Adding Employees Data In Progress ----");
+                    Console.WriteLine("===========================================");
+                    foreach (var employee in employeesList)
                     {
-                        foreach (var employee in employeesList)
+                        try
                         {
                             var command = connection.CreateCommand();
                             command.CommandType = CommandType.StoredProcedure;
@@ -123,29 +118,20 @@ namespace IMS.DataLayer.Db
                             command.Parameters.AddWithValue("@IsActive", employee.IsActive);
                             rowsAffectedOnDb += command.ExecuteNonQuery();
                         }
-                        objTrans.Commit();
-                    }
-                    catch (Exception exception)
-                    {
-                        try
+                        catch (Exception exception)
                         {
-                            objTrans.Rollback();
+                            Console.WriteLine("Employee Id "+employee.Id +" Data not added");
+                            employeesNotAdded.Add(employee.Id + " | " + employee.Firstname+"   | "+employee.Lastname+"    | "+employee.Email);
+                            continue;
                         }
-                        catch(Exception exception2)
-                        {
-                            throw exception2;
-                        }
-                    }
-                    if (rowsAffectedOnDb == employeesList.Count)
-                    {
-                        isSuccess = true;
+                        Console.WriteLine("Employee Id  "+employee.Id+" Data Added");
                     }
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
-                return isSuccess;
+                return employeesNotAdded;
             }
         }
         public static string ReturnNullOrValueAccordingly(object field)

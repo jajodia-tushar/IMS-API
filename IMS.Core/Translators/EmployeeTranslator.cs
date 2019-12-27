@@ -51,34 +51,5 @@ namespace IMS.Core.Translators
                 IsActive = employee.IsActive
             };
         }
-        public static Contracts.EmployeeResponse ToDataContractsObject(Entities.EmployeeResponse doEmployeeResponse)
-        {
-            Contracts.EmployeeResponse dtoEmployeeValidationResponse = new Contracts.EmployeeResponse();
-            if (doEmployeeResponse.Status == Entities.Status.Success)
-            {
-                dtoEmployeeValidationResponse.Status = Contracts.Status.Success;
-                dtoEmployeeValidationResponse.Employees = ToDataContractsObject(doEmployeeResponse.Employees);
-            }
-            else
-            {
-                dtoEmployeeValidationResponse.Status = Contracts.Status.Failure;
-                dtoEmployeeValidationResponse.Error = Translator.ToDataContractsObject(doEmployeeResponse.Error);
-            }
-            return dtoEmployeeValidationResponse;
-        }
-
-        private static List<Contracts.Employee> ToDataContractsObject(List<Entities.Employee> doEmployeesList)
-        {
-            var dtoEmployeesList = new List<Contracts.Employee>();
-            if (doEmployeesList != null)
-            {
-                foreach (var doEmployee in doEmployeesList)
-                {
-                    Contracts.Employee dtoEmployee = ToDataContractsObject(doEmployee);
-                    dtoEmployeesList.Add(dtoEmployee);
-                }
-            }
-            return dtoEmployeesList;
-        }
     }
 }

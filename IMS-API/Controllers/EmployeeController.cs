@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IMS.Contracts;
@@ -9,6 +10,7 @@ using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 
 namespace IMS_API.Controllers
 {
@@ -55,32 +57,6 @@ namespace IMS_API.Controllers
                 new Task(() => { _logger.LogException(exception, "GetEmployeeById", IMS.Entities.Severity.Critical, employeeId, contractsEmployeeValidationResponse); }).Start();
             }
             return contractsEmployeeValidationResponse;
-        }
-
-
-        [HttpPost("Add")]
-        public EmployeeResponse Add(string filePath)
-        {
-            EmployeeResponse employeeResponse = new EmployeeResponse();
-            try
-            {
-                IMS.Entities.EmployeeResponse entityEmployeeResponse = employeeService.AddEmployeesFromCsvFile(filePath);
-                employeeResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeResponse);
-            }
-            catch (Exception exception)
-            {
-                employeeResponse = new IMS.Contracts.EmployeeResponse()
-                {
-                    Status = Status.Failure,
-                    Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.ServerError,
-                        ErrorMessage = Constants.ErrorMessages.ServerError
-                    }
-                };
-                new Task(() => { _logger.LogException(exception, "Add", IMS.Entities.Severity.High, filePath, employeeResponse); }).Start();
-            }
-            return employeeResponse;
         }
     }
 }

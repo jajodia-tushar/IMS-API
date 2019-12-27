@@ -7,6 +7,5 @@ namespace IMS.Entities.Interfaces
     public interface IEmployeeService 
     {
         GetEmployeeResponse ValidateEmployee(string employeeId);
-        EmployeeResponse AddEmployeesFromCsvFile(string filePath);
     }
 }
