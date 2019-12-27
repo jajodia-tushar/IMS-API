@@ -20,7 +20,7 @@ namespace IMS.DataLayer.Db
 
         public async Task<List<Logs>> GetLogs()
         {
-            List<Logs> listOfLog = new List<Logs>();
+            List<Logs> logsRecords = new List<Logs>();
             MySqlDataReader reader = null;
             try
             {
@@ -48,7 +48,7 @@ namespace IMS.DataLayer.Db
                             DateTime=(DateTime)reader["Timestamp"]
 
                         };
-                        listOfLog.Add(logs);
+                        logsRecords.Add(logs);
                     }
                     reader.Close();
 
@@ -58,7 +58,7 @@ namespace IMS.DataLayer.Db
             {
 
             }
-            return listOfLog;
+            return logsRecords;
         }
 
         public void Log(int userId, string status, string callType, string severity, string request, string response)
