@@ -41,7 +41,7 @@ namespace IMS.Core.Translators
             Contracts.Logs dtoLog = new Contracts.Logs();
             if(doLog!=null)
             {
-                dtoLog.Id = doLog.Id;
+                dtoLog.LogId = doLog.LogId;
                 dtoLog.UserId = doLog.UserId;
                 dtoLog.CallType = doLog.CallType;
                 dtoLog.Request = doLog.Request;

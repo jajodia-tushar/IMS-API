@@ -38,7 +38,7 @@ namespace IMS.DataLayer.Db
                     {
                         Logs logs = new Logs()
                         {
-                            Id = (int)reader["Id"],
+                            LogId = (int)reader["Id"],
                             UserId=(int)reader["UserId"],
                             CallType=(string)reader["CallType"],
                             Request = (string)reader["Request"],
