@@ -22,10 +22,10 @@ namespace IMS.DataLayer.Dal
             _dbProvider = dbConnectionProvider;
         }
 
-        public async Task<List<User>> GetUsersByRole(string roleName)
+        public List<User> GetUsersByRole(string roleName)
         {
             List<User> users = new List<User>();
-            DbDataReader reader = null;
+            MySqlDataReader reader = null;
 
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -38,7 +38,7 @@ namespace IMS.DataLayer.Dal
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetUsersByRole";
                     command.Parameters.AddWithValue("@RoleName", roleName);
-                    reader = await command.ExecuteReaderAsync();
+                    reader = command.ExecuteReader();
                     User user = null;
                     while (reader.Read())
                     {
@@ -56,7 +56,7 @@ namespace IMS.DataLayer.Dal
         }
 
 
-        public async Task<User> GetUserByCredintials(string username, string password)
+        public User GetUserByCredintials(string username, string password)
         {
             User user = null;
             DbDataReader reader = null;
@@ -75,7 +75,7 @@ namespace IMS.DataLayer.Dal
 
                     command.Parameters.AddWithValue("@username", username);
                     command.Parameters.AddWithValue("@password", password);
-                    reader = await command.ExecuteReaderAsync();
+                    reader = command.ExecuteReader();
 
 
                     if (reader.Read())
@@ -98,6 +98,23 @@ namespace IMS.DataLayer.Dal
             return user;
         }
 
+        private User Extract(MySqlDataReader reader)
+        {
+            return new User()
+            {
+                Id = (int)reader["userid"],
+                Username = (string)reader["username"],
+                Password = (string)reader["password"],
+                Firstname = (string)reader["firstname"],
+                Lastname = (string)reader["lastname"],
+                Email = (string)reader["email"],
+                Role = new Role()
+                {
+                    Id = (int)reader["roleid"],
+                    Name = (string)reader["rolename"]
+                }
+            };
+        }
         private User Extract(DbDataReader reader)
         {
             return new User()
