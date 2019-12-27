@@ -74,9 +74,6 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
-        public Task<bool> HasAccessControl(Role requestedRole, Role accessibleRole)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

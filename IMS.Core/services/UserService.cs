@@ -15,13 +15,15 @@ namespace IMS.Core.services
         private ILogManager _logger;
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenProvider _tokenProvider;
+        private IAccessControlDbContext _accessControlDbContext;
 
-        public UserService(IUserDbContext userDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
+        public UserService(IUserDbContext userDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor, IAccessControlDbContext accessControlDbContext)
         {
             this._userDbContext = userDbContext;
             this._logger = logger;
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
+            this._accessControlDbContext = accessControlDbContext;
         }
         public async Task<UsersResponse> GetUsersByRole(string roleName)
         { 

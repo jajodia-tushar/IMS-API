@@ -90,6 +90,7 @@ namespace IMS_API
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
             services.AddTransient<ITransferDbContext, TransferDbContext>();
             services.AddTransient<ITransferService, TransferService>();
+            services.AddTransient<IAccessControlDbContext, AccessControlDbContext>();
         }
         public TokenValidationParameters CreateTokenValidationParameters()
         {
