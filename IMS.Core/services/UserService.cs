@@ -81,17 +81,50 @@ namespace IMS.Core.services
 
             return usersResponse;
         }
-        public async Task<Response> DeleteUser(int userId)
+        public async Task<Response> DeleteUser(int userId, int isHardDelete)
         {
             Response deleteUserResponse = new Response();
-            if(userId<=0)
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    try
+                    {
+                        if (userId <= 0)
+                        {
+                            deleteUserResponse.Status = Status.Failure;
+                            deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.MissingValues);
+                        }
+                        else
+                        {
+                            deleteUserResponse = _userDbContext.DeleteUser(userId,isHardDelete);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium, userId, deleteUserResponse); }).Start();
+                    }
+                }
+                else
+                {
+                    deleteUserResponse.Status = Status.Failure;
+                    deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
             {
                 deleteUserResponse.Status = Status.Failure;
-                deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.MissingValues);
+                deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium, userId, deleteUserResponse); }).Start();
             }
-            else
+            finally
             {
-
+                Severity severity = Severity.No;
+                if (deleteUserResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(userId, deleteUserResponse, "DeleteUser",deleteUserResponse.Status, severity, -1); }).Start();
             }
             return deleteUserResponse;
         }

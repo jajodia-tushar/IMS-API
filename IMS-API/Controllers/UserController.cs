@@ -220,15 +220,16 @@ namespace IMS_API.Controllers
         /// returns all users based on the role name
         /// </summary>
         /// <param name="userId">Takes the name of the role corresponding to which we need users</param>
-        /// <returns>all users of the role name along with status</returns>
-        /// <response code="200">Returns users with status</response>
+        /// <param name="isHardDelete">Values 1 or 0 corresponds to whether the deletion is a hard delete or a soft delete</param>
+        /// <returns>deletion status</returns>
+        /// <response code="200">deletion status</response>
         [HttpDelete(Name = "Delete(int UserId")]
-        public async Task<Response> Delete(int userId)
+        public async Task<Response> Delete(int userId,int isHardDelete)
         {
             Response contractDeleteUsersResponse = null;
             try
             {
-                IMS.Entities.Response deleteUserResponse = await _userService.DeleteUser(userId);
+                IMS.Entities.Response deleteUserResponse = await _userService.DeleteUser(userId, isHardDelete);
                 contractDeleteUsersResponse = Translator.ToDataContractsObject(deleteUserResponse);
             }
             catch (Exception exception)

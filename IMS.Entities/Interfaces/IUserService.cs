@@ -13,6 +13,7 @@ namespace IMS.Entities.Interfaces
         Task<UsersResponse> AddUser(User user);
         Task<UsersResponse> UpdateUser(User userEntity);
         Task<UsersResponse> ApproveAdmin(int userId);
-        Task<Response> DeleteUser(int userId);
+
+        Task<Response> DeleteUser(int userId, int isHardDelete);
     }
 }
