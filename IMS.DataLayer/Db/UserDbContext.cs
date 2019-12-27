@@ -149,7 +149,7 @@ namespace IMS.DataLayer.Dal
             return hasAccess;
         }
 
-        public async Task<List<User>> GetAllPendingApprovals(Role requestedRole)
+        public async Task<List<User>> GetAllPendingApprovals()
         {
             List<User> users = new List<User>();
             DbDataReader reader = null;
@@ -163,8 +163,7 @@ namespace IMS.DataLayer.Dal
 
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllPendingApprovalUsersByPermission";
-                    command.Parameters.AddWithValue("@requestedroleid", requestedRole.Id);
+                    command.CommandText = "spGetAllPendingApprovalUsers";
                     reader = await command.ExecuteReaderAsync();
                     User user = null;
                     while (reader.Read())

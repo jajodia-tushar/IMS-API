@@ -46,7 +46,7 @@ namespace IMS.Core.services
                 User requestedUser = Utility.GetUserFromToken(token);
                 userId = requestedUser.Id;
 
-                List<User> users = await _userDbContext.GetAllPendingApprovals(requestedUser.Role);
+                List<User> users = await _userDbContext.GetAllPendingApprovals();
                 if (users.Count == 0)
                     usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
                 else

@@ -91,7 +91,7 @@ namespace IMS_API.Controllers
         /// <summary>
         /// returns all pending Approval users 
         /// </summary>
-        /// <returns>all users </returns>
+        /// <returns>all pending Approval users  </returns>
         /// <response code="200">Returns users with status</response>
         [HttpGet("PendingApprovals")]
         public async Task<UsersResponse> GetAllPendingApprovals()

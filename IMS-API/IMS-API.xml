@@ -274,7 +274,7 @@
             <summary>
             returns all pending Approval users 
             </summary>
-            <returns>all users </returns>
+            <returns>all pending Approval users  </returns>
             <response code="200">Returns users with status</response>
         </member>
         <member name="M:IMS_API.Controllers.UserController.GetAllUsers">
