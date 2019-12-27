@@ -9,6 +9,6 @@ namespace IMS.DataLayer.Interfaces
     {
         Employee GetEmployeeById(string employeeId);
         List<Employee> GetAllEmployees();
-        List<String> AddEmployee(List<Employee> employeesList);
+        List<String> AddEmployeesFromCsvFile(List<Employee> employeesList);
     }
 }

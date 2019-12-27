@@ -11,28 +11,30 @@ namespace IMS.AddEmployees
 {
     public class AddEmployeesData
     {
-        public IEmployeeDbContext _employeeDbContext;
-        public IConfiguration _configuration;
-        public AddEmployeesData(IEmployeeDbContext employeeDbContext)
+        private IEmployeeDbContext _employeeDbContext;
+        private IConfiguration _configuration;
+        public AddEmployeesData(IEmployeeDbContext employeeDbContext,IConfiguration configuration)
         {
             _employeeDbContext = employeeDbContext;
+            _configuration = configuration;
         }
-        public void AddEmployeesFromCsvFile(string filePath)
+        public void AddEmployeesFromCsvFile()
         {
-            var dir = @"C:\InvalidEmployeesData";
+            var employeesNotAddedFileLocation = @"C:\IMSEmployeesData";
             try
             {
-                var employeesData = File.ReadAllLines(filePath);
+                var employeesData = File.ReadAllLines(_configuration["Path:FilePath"]);
                 List<Employee> employeesList = ReadEmployeesDataFromCsv(employeesData);
-                List<string> employeesNotAdded = _employeeDbContext.AddEmployee(employeesList);
-                if (!Directory.Exists(dir))  // if it doesn't exist, create
-                    Directory.CreateDirectory(dir);
-                File.WriteAllLines(Path.Combine(dir, "IMSEmployeesNotAdded.txt"), employeesNotAdded);
+                List<string> employeesNotAdded = _employeeDbContext.AddEmployeesFromCsvFile(employeesList);
+                if (!Directory.Exists(employeesNotAddedFileLocation))
+                    Directory.CreateDirectory(employeesNotAddedFileLocation);
+                File.WriteAllLines(Path.Combine(employeesNotAddedFileLocation, "IMSEmployeesNotAdded.txt"), employeesNotAdded);
             }
             catch (Exception exception)
             {
                 Console.WriteLine("Status :"+Status.Failure);
                 Console.WriteLine("Error Message : Internal Server Error");
+                Console.WriteLine(exception);
             }
         }
         public List<Employee> ReadEmployeesDataFromCsv(string[] employeesData)

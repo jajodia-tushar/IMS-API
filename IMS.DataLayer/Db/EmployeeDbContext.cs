@@ -89,18 +89,17 @@ namespace IMS.DataLayer.Db
             }
             return employeesList;
         }
-        public List<String> AddEmployee(List<Employee> employeesList)
+        public List<String> AddEmployeesFromCsvFile(List<Employee> employeesList)
         {
-            int rowsAffectedOnDb = 0;
             List<string> employeesNotAdded = new List<string>();
-            employeesNotAdded.Add("Id  | First Name | Last Name | EmailId");
+            employeesNotAdded.Add("Id  | First Name | EmailId");
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
                     connection.Open();
                     Console.WriteLine("---- Adding Employees Data In Progress ----");
-                    Console.WriteLine("===========================================");
+                    Console.WriteLine("==========================================="+"\n" );
                     foreach (var employee in employeesList)
                     {
                         try
@@ -116,16 +115,18 @@ namespace IMS.DataLayer.Db
                             command.Parameters.AddWithValue("@TemporaryCardNumber", employee.TemporaryCardNumber);
                             command.Parameters.AddWithValue("@AccessCardNumber", employee.AccessCardNumber);
                             command.Parameters.AddWithValue("@IsActive", employee.IsActive);
-                            rowsAffectedOnDb += command.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
                         }
                         catch (Exception exception)
                         {
-                            Console.WriteLine("Employee Id "+employee.Id +" Data not added");
-                            employeesNotAdded.Add(employee.Id + " | " + employee.Firstname+"   | "+employee.Lastname+"    | "+employee.Email);
+                            Console.WriteLine("Data For Employee Id "+employee.Id +" not added");
+                            employeesNotAdded.Add(employee.Id + " | " + employee.Firstname+"    | "+employee.Email);
                             continue;
                         }
-                        Console.WriteLine("Employee Id  "+employee.Id+" Data Added");
+                        Console.WriteLine("Data For Employee Id  "+employee.Id+" Added");
                     }
+                    Console.WriteLine("\n" + "===================================================");
+                    Console.WriteLine("---- Process For Adding Employees Is Completed ----");
                 }
                 catch (Exception exception)
                 {

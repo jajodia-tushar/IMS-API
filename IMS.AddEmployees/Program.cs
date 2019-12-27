@@ -26,7 +26,7 @@ namespace IMS.AddEmployees
                 .AddTransient<IEmployeeDbContext, EmployeeDbContext>(); 
             var provider = services.BuildServiceProvider();
             var container = provider.GetService<AddEmployeesData>();
-            container.AddEmployeesFromCsvFile("C:\\Users\\raggarwal\\Desktop\\Employee.csv");
+            container.AddEmployeesFromCsvFile();
             Console.ReadLine();
         }
     }
