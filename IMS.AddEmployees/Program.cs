@@ -1,6 +1,7 @@
 ﻿using IMS.DataLayer.Db;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,7 +24,9 @@ namespace IMS.AddEmployees
             var services = new ServiceCollection().AddTransient<AddEmployeesData>()
                 .AddSingleton(typeof(IConfiguration), configuration)
                 .AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>()
-                .AddTransient<IEmployeeDbContext, EmployeeDbContext>(); 
+                .AddTransient<IEmployeeDbContext, EmployeeDbContext>()
+                .AddTransient<ILogManager, LogImplementation>()
+                .AddTransient<ILogDbContext, LogDbContext>();
             var provider = services.BuildServiceProvider();
             var container = provider.GetService<AddEmployeesData>();
             container.AddEmployeesFromCsvFile();

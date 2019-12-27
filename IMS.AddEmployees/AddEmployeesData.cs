@@ -1,11 +1,13 @@
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Logging;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.AddEmployees
 {
@@ -13,10 +15,12 @@ namespace IMS.AddEmployees
     {
         private IEmployeeDbContext _employeeDbContext;
         private IConfiguration _configuration;
-        public AddEmployeesData(IEmployeeDbContext employeeDbContext,IConfiguration configuration)
+        private ILogManager _logger;
+        public AddEmployeesData(IEmployeeDbContext employeeDbContext,IConfiguration configuration,ILogManager logger)
         {
             _employeeDbContext = employeeDbContext;
             _configuration = configuration;
+            _logger = logger;
         }
         public void AddEmployeesFromCsvFile()
         {
@@ -32,9 +36,9 @@ namespace IMS.AddEmployees
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Status :"+Status.Failure);
-                Console.WriteLine("Error Message : Internal Server Error");
-                Console.WriteLine(exception);
+                Console.WriteLine("Status: "+Status.Failure);
+                Console.WriteLine("Sorry, Internal Server Error");
+                new Task(() => { _logger.LogException(exception, "AddEmployeesFromCsvFile", Severity.High, null, Status.Failure); }).Start();
             }
         }
         public List<Employee> ReadEmployeesDataFromCsv(string[] employeesData)
