@@ -7,6 +7,7 @@ using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,6 +62,7 @@ namespace IMS_API.Controllers
         /// <returns>all users </returns>
         /// <response code="200">Returns users with status</response>
         [HttpGet]
+        [Authorize(Roles="Admin,SuperAdmin")]
         public async Task<UsersResponse> GetAllUsers()
         {
             UsersResponse contractUsersResponse = null;
