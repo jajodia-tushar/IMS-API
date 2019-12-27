@@ -1,4 +1,5 @@
 ﻿using IMS.DataLayer.Interfaces;
+using IMS.Entities;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
@@ -17,7 +18,7 @@ namespace IMS.DataLayer.Db
             _dbConnectionProvider = dbConnectionProvider;
         }
 
-        public async void GetLogsRecord()
+        public async Task<List<Logs>> GetLogsRecord()
         {
             throw new NotImplementedException();
         }
