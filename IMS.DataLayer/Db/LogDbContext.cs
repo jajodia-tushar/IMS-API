@@ -20,7 +20,45 @@ namespace IMS.DataLayer.Db
 
         public async Task<List<Logs>> GetLogs()
         {
-            throw new NotImplementedException();
+            List<Logs> listOfLog = new List<Logs>();
+            MySqlDataReader reader = null;
+            try
+            {
+                using (var connection = _dbConnectionProvider.GetConnection(Databases.LOGGING))
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetLogs";
+
+                    reader = command.ExecuteReader();
+                    while(reader.Read())
+                    {
+                        Logs logs = new Logs()
+                        {
+                            Id = (int)reader["Id"],
+                            UserId=(int)reader["UserId"],
+                            CallType=(string)reader["CallType"],
+                            Request = (string)reader["Request"],
+                            Response=(string)reader["Response"],
+                            Severity =(string)reader["Severity"],
+                            Status =(string)reader["Status"],
+                            DateTime=(DateTime)reader["Timestamp"]
+
+                        };
+                        listOfLog.Add(logs);
+                    }
+                    reader.Close();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return listOfLog;
         }
 
         public void Log(int userId, string status, string callType, string severity, string request, string response)
