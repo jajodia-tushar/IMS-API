@@ -243,7 +243,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium, "Delete", contractDeleteUsersResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium,userId, contractDeleteUsersResponse); }).Start();
             }
             return contractDeleteUsersResponse;
         }
