@@ -99,7 +99,7 @@ namespace IMS.Core.services
                         }
                         else
                         {
-                            deleteUserResponse = _userDbContext.DeleteUser(userId,isHardDelete);
+                            deleteUserResponse = await _userDbContext.DeleteUser(userId,isHardDelete);
                         }
                     }
                     catch (Exception exception)
