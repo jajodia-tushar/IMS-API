@@ -6,6 +6,7 @@ namespace IMS.Contracts
 {
    public class Logs
    {
+        public int Id { get; set; }
         public int UserId { get; set; }
         public string CallType { get; set; }
         public string Request { get; set; }
