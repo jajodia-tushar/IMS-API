@@ -81,7 +81,7 @@ namespace IMS.Core.services
 
             return usersResponse;
         }
-        public async Task<Response> DeleteUser(int userId, int isHardDelete)
+        public async Task<Response> DeleteUser(int userId, bool isHardDelete)
         {
             Response deleteUserResponse = new Response();
             try
