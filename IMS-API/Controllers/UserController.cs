@@ -224,7 +224,7 @@ namespace IMS_API.Controllers
         /// <returns>deletion status</returns>
         /// <response code="200">deletion status</response>
         [Authorize(Roles="SuperAdmin")]
-        [HttpDelete(Name = "Delete(int UserId")]
+        [HttpDelete("{userId}",Name = "Delete(int UserId")]
         public async Task<Response> Delete(int userId,int isHardDelete)
         {
             Response contractDeleteUsersResponse = null;
