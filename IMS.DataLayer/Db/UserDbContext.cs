@@ -164,7 +164,7 @@ namespace IMS.DataLayer.Dal
                 }
             };
         }
-    }
+    
         public async Task<List<User>> GetAllUsers(Role requestedRole)
         {
             List<User> users = new List<User>();
@@ -197,22 +197,6 @@ namespace IMS.DataLayer.Dal
             }
             return users;
         }
-        private User Extract(DbDataReader reader)
-        {
-            return new User()
-            {
-                Id = (int)reader["userid"],
-                Username = (string)reader["username"],
-                Password = (string)reader["password"],
-                Firstname = (string)reader["firstname"],
-                Lastname = (string)reader["lastname"],
-                Email = (string)reader["email"],
-                Role = new Role()
-                {
-                    Id = (int)reader["roleid"],
-                    Name = (string)reader["rolename"]
-                }
-            };
-        }
+        
     }
 }

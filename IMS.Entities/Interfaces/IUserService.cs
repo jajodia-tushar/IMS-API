@@ -9,6 +9,6 @@ namespace IMS.Entities.Interfaces
     {
         Task<UsersResponse> GetUsersByRole(String roleName);
         Task<UsersResponse> GetAllUsers();
-        Task<UsersResponse> GetAllPendingApprovals();
+        Task<UsersResponse> GetAllPendingAdminApprovals();
     }
 }

@@ -61,10 +61,7 @@ namespace IMS.DataLayer.Dal
         {
             throw new NotImplementedException();
         }
-        public Task<List<User>> GetAllPendingApprovals(Role requestedRole)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public User GetUserByCredintials(string username, string password)
         {
@@ -82,6 +79,9 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
-       
+        public Task<List<User>> GetAllPendingAdminApprovals()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
