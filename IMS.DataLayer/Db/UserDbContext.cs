@@ -246,7 +246,7 @@ namespace IMS.DataLayer.Dal
         }
        
 
-        public async Task<bool> IsEmailOrUserNameRepeated(string email, string username)
+        public async Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
         {
             bool isRepeated = true;
             DbDataReader reader = null;

@@ -15,6 +15,6 @@ namespace IMS.DataLayer.Interfaces
 
          Task<List<User>> GetAllUsers(Role requestedRole);
          Task<bool> Save(User newUser, int isApproved, int isActive);
-        Task<bool> IsEmailOrUserNameRepeated(string email, string username);
+        Task<bool> CheckEmailOrUserNameAvailability(string email, string username);
     }
 }

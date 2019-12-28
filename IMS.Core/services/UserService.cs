@@ -215,7 +215,7 @@ namespace IMS.Core.services
                         bool hasAccess = await _accessControlDbContext.HasAccessControl(requestedUser.Role, newUser.Role);
                         if (!hasAccess)
                             throw new AccessDeniedException();
-                        bool isEmailOrUsernameRepeated = await _userDbContext.IsEmailOrUserNameRepeated(newUser.Email, newUser.Username);
+                        bool isEmailOrUsernameRepeated = await _userDbContext.CheckEmailOrUserNameAvailability(newUser.Email, newUser.Username);
                         if (isEmailOrUsernameRepeated)
                             throw new InvalidEmailException("Given UserName or Email is already registered");
                         string requestedRoleName = requestedUser.Role.Name.Trim().ToLower();

@@ -79,7 +79,7 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsEmailOrUserNameRepeated(string email, string username)
+        public Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
         {
             throw new NotImplementedException();
         }
