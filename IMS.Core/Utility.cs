@@ -1,9 +1,11 @@
 ﻿using IMS.Entities;
+using IMS.Entities.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace IMS.Core
@@ -37,7 +39,8 @@ namespace IMS.Core
                     }
 
                 };
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 return null;
             }
@@ -50,6 +53,27 @@ namespace IMS.Core
                 ErrorCode = errorCode,
                 ErrorMessage = errorMessage
             };
+        }
+
+        public static string Hash(string text)
+        {
+            string returnValue = null;
+            if (string.IsNullOrEmpty(text.Trim()))
+                throw new CustomException();
+
+
+            if (!String.IsNullOrEmpty(text))
+            {
+                using (MD5 md5Hash = MD5.Create())
+                {
+                    byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(text));
+                    returnValue = Convert.ToBase64String(data);
+                }
+            }
+
+
+
+            return Convert.ToBase64String(Encoding.Unicode.GetBytes(returnValue));
         }
     }
 }

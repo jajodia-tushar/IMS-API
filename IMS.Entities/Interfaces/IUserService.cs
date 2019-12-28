@@ -10,5 +10,6 @@ namespace IMS.Entities.Interfaces
         Task<UsersResponse> GetUsersByRole(String roleName);
         Task<UsersResponse> GetAllUsers();
         Task<UsersResponse> GetAllPendingAdminApprovals();
+        Task<UsersResponse> AddUser(User user);
     }
 }

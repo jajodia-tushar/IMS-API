@@ -118,5 +118,39 @@ namespace IMS_API.Controllers
             }
             return contractUsersResponse;
         }
+        // POST: api/user
+        /// <summary>
+        /// Creates New USer
+        /// </summary>
+        /// <param name="user">Here user contains all user details along with credintials</param>
+        /// <returns>created user</returns>
+        /// <response code="200">Returns created user with status</response>
+        [HttpPost(Name = "AddNewUser")]
+        [Authorize(Roles="Admin,SuperAdmin")]
+        public async Task<UsersResponse> AddUser([FromBody] User user)
+        {
+            IMS.Contracts.UsersResponse contractsUserResponse = null;
+            try
+            {
+                IMS.Entities.User entitiesUser = UserTranslator.ToEntitiesObject(user);
+                IMS.Entities.UsersResponse entitiesUserResponse = await _userService.AddUser(entitiesUser);
+                contractsUserResponse = UserTranslator.ToDataContractsObject(entitiesUserResponse);
+            }
+            catch (Exception e)
+            {
+                contractsUserResponse = new UsersResponse
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "Add USer", IMS.Entities.Severity.Medium, user, contractsUserResponse); }).Start();
+            }
+            return contractsUserResponse;
+
+        }
     }
 }

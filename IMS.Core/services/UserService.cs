@@ -190,6 +190,80 @@ namespace IMS.Core.services
 
             return usersResponse;
         }
+        public async Task<UsersResponse> AddUser(User newUser)
+        {
+            UsersResponse response = new UsersResponse
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            try
+            {
+
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User requestedUser = Utility.GetUserFromToken(token);
+                userId = requestedUser.Id;
+               
+                if (Validators.UserValidator.ValidateNewUser(newUser))
+                    {
+                        bool hasAccess = await _accessControlDbContext.HasAccessControl(requestedUser.Role, newUser.Role);
+                        if (!hasAccess)
+                            throw new AccessDeniedException();
+                        bool isEmailOrUsernameRepeated = await _userDbContext.CheckEmailOrUserNameAvailability(newUser.Email, newUser.Username);
+                        if (isEmailOrUsernameRepeated)
+                            throw new InvalidEmailException("Given UserName or Email is already registered");
+                        string requestedRoleName = requestedUser.Role.Name.Trim().ToLower();
+                        int requestedRoleId = requestedUser.Role.Id;
+                        int isApproved = 1;
+                        int isActive = 1;
+                        if (requestedRoleName.Equals(Constants.Roles.Admin) && requestedRoleId == newUser.Role.Id)
+                        {
+                            isApproved = 0;
+                            isActive = 0;
+                        }
+                         newUser.Password = Utility.Hash(newUser.Password);
+                        bool isSaved = await _userDbContext.Save(newUser, isApproved,isActive);
+                        if (isSaved)
+                        {
+                            response.Users = new List<User>();
+                            response.Users.Add(newUser);
+                            response.Status = Status.Success;
+                        }
+                        else
+                            throw new Exception();
+
+                }
+                else
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.UserDetailsMissing);
+
+            }
+            catch (CustomException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "Adding New User", Severity.Medium, newUser, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "Adding New User", Severity.Medium, newUser, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log(newUser, response, "Adding New User", response.Status, severity, userId); }).Start();
+            }
+            return response;
+
+        }
+
     }
 }
 

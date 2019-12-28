@@ -14,5 +14,7 @@ namespace IMS.DataLayer.Interfaces
         Task<List<User>> GetAllPendingAdminApprovals();
 
          Task<List<User>> GetAllUsers(Role requestedRole);
+         Task<bool> Save(User newUser, int isApproved, int isActive);
+        Task<bool> CheckEmailOrUserNameAvailability(string email, string username);
     }
 }
