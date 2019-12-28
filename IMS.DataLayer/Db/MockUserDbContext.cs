@@ -89,7 +89,7 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
-        public Task<List<User>> GetUsersByRole(string roleName)
+        public List<User> GetUsersByRole(string roleName)
         {
             throw new NotImplementedException();
         }
@@ -100,11 +100,6 @@ namespace IMS.DataLayer.Dal
         }
 
         public Task<User> UpdateUser(User user)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<User> IUserDbContext.GetUserByCredintials(string username, string password)
         {
             throw new NotImplementedException();
         }

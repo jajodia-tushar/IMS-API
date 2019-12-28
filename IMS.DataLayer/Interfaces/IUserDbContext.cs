@@ -9,8 +9,8 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface IUserDbContext
     {
-        Task<User> GetUserByCredintials(string username, string password);
-        Task<List<User>> GetUsersByRole(string roleName);
+        User GetUserByCredintials(string username, string password);
+        List<User> GetUsersByRole(string roleName);
         Task<List<User>> GetAllPendingAdminApprovals();
          Task<List<User>> GetAllUsers(Role requestedRole);
          Task<bool> Save(User newUser, int isApproved, int isActive);
