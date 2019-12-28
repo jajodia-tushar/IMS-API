@@ -277,6 +277,13 @@
             <returns>all users </returns>
             <response code="200">Returns users with status</response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.GetAllPendingAdminApprovals">
+            <summary>
+            returns all pending Approval users 
+            </summary>
+            <returns>all pending Approval users  </returns>
+            <response code="200">Returns users with status</response>
+        </member>
         <member name="M:IMS_API.Controllers.VendorController.GetVendorById(System.Int32)">
             <summary>
             returns vendor object if id is present, otherwise failure

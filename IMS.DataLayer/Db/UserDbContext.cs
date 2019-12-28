@@ -115,7 +115,8 @@ namespace IMS.DataLayer.Dal
             };
         }
 
-        public async Task<List<User>> GetAllUsers(Role requestedRole)
+       
+        public async Task<List<User>> GetAllPendingAdminApprovals()
         {
             List<User> users = new List<User>();
             DbDataReader reader = null;
@@ -129,8 +130,7 @@ namespace IMS.DataLayer.Dal
 
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllUsersByRequestedRole";
-                    command.Parameters.AddWithValue("@userroleid", requestedRole.Id);
+                    command.CommandText = "spGetAllPendingApprovalUsers";
                     reader = await command.ExecuteReaderAsync();
                     User user = null;
                     while (reader.Read())
@@ -164,5 +164,39 @@ namespace IMS.DataLayer.Dal
                 }
             };
         }
+    
+        public async Task<List<User>> GetAllUsers(Role requestedRole)
+        {
+            List<User> users = new List<User>();
+            DbDataReader reader = null;
+
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetAllUsersByRequestedRole";
+                    command.Parameters.AddWithValue("@userroleid", requestedRole.Id);
+                    reader = await command.ExecuteReaderAsync();
+                    User user = null;
+                    while (reader.Read())
+                    {
+                        user = Extract(reader);
+                        users.Add(user);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return users;
+        }
+        
     }
 }

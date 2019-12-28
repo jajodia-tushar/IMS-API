@@ -11,6 +11,8 @@ namespace IMS.DataLayer.Interfaces
     {
         User GetUserByCredintials(string username, string password);
         Task<List<User>> GetUsersByRole(string roleName);
+        Task<List<User>> GetAllPendingAdminApprovals();
+
          Task<List<User>> GetAllUsers(Role requestedRole);
     }
 }
