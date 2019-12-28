@@ -91,6 +91,8 @@ namespace IMS_API
             services.AddTransient<ITransferDbContext, TransferDbContext>();
             services.AddTransient<ITransferService, TransferService>();
             services.AddTransient<IAccessControlDbContext, AccessControlDbContext>();
+            services.AddTransient<IRoleService, RoleService>();
+            services.AddTransient<IRoleDbContext, RoleDbContext>();
             services.AddTransient<ILogsService, LogsService>();
         }
         public TokenValidationParameters CreateTokenValidationParameters()
