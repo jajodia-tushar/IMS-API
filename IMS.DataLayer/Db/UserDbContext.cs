@@ -177,7 +177,7 @@ namespace IMS.DataLayer.Dal
                     command.Parameters.AddWithValue("@LastName", user.Lastname);
                     command.Parameters.AddWithValue("@EmailId", user.Email);
                     command.Parameters.AddWithValue("@RoleId", user.Role.Id);
-                    reader =await command.ExecuteReaderAsync();
+                    reader = await command.ExecuteReaderAsync();
                     if (reader.Read())
                     {
                         updatedUser = Extract(reader);
@@ -191,7 +191,7 @@ namespace IMS.DataLayer.Dal
             return updatedUser;
         }
 
-       
+
         public async Task<List<User>> GetAllPendingAdminApprovals()
         {
             List<User> users = new List<User>();
@@ -222,8 +222,8 @@ namespace IMS.DataLayer.Dal
             }
             return users;
         }
-       
-    
+
+
         public async Task<List<User>> GetAllUsers(Role requestedRole)
         {
             List<User> users = new List<User>();
@@ -256,10 +256,10 @@ namespace IMS.DataLayer.Dal
             }
             return users;
         }
-        
 
-        
-       
+
+
+
         public async Task<bool> Save(User user, int isApproved, int isActive)
         {
             DbDataReader reader = null;
@@ -302,7 +302,7 @@ namespace IMS.DataLayer.Dal
 
             }
         }
-       
+
 
         public async Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
         {
@@ -321,14 +321,14 @@ namespace IMS.DataLayer.Dal
                     command.Parameters.AddWithValue("@username", username);
                     command.Parameters.AddWithValue("@emailid", email);
                     reader = await command.ExecuteReaderAsync();
-                     if (reader.Read())
+                    if (reader.Read())
                     {
                         isRepeated = (bool)reader["isrepeated"];
                     }
-                   
-                   
+
+
                 }
-              
+
                 catch (Exception ex)
                 {
                     throw ex;
@@ -363,6 +363,42 @@ namespace IMS.DataLayer.Dal
 
             }
             return user;
+        }
+        public async Task<Response> DeleteUser(int userId, int isHardDelete)
+        {
+            Response response = new Response();
+            int rowsAffected = 0;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spDeleteUser";
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@isHardDelete", isHardDelete);
+                    rowsAffected = await command.ExecuteNonQueryAsync();
+                    if (rowsAffected > 0)
+                    {
+                        response.Status = Status.Success;
+                    }
+                    else
+                    {
+                        response.Error = new Error()
+                        {
+                            ErrorCode = 404,
+                            ErrorMessage = "No User Found"
+                        };
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+
+            }
+            return response;
         }
     }
 }

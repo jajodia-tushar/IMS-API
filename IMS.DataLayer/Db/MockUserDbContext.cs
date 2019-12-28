@@ -101,5 +101,10 @@ namespace IMS.DataLayer.Dal
         {
             throw new NotImplementedException();
         }
+
+        Task<Response> IUserDbContext.DeleteUser(int userId, int isHardDelete)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

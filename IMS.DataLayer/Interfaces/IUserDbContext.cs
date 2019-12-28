@@ -18,5 +18,6 @@ namespace IMS.DataLayer.Interfaces
         Task<User> GetUserById(int id);
         Task<User> UpdateUser(User user);
         Task<User> ApproveAdmin(int userId);
+        Task<Response> DeleteUser(int userId, int isHardDelete);
     }
 }
