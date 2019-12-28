@@ -13,5 +13,6 @@ namespace IMS.Entities.Interfaces
         Task<UsersResponse> GetAllPendingAdminApprovals();
         Task<UsersResponse> AddUser(User user);
         Task<UsersResponse> UpdateUser(User userEntity);
+        Task<UsersResponse> ApproveAdmin(int userId);
     }
 }

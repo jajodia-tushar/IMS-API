@@ -219,7 +219,6 @@ namespace IMS.DataLayer.Dal
                 {
                     throw ex;
                 }
-
             }
             return users;
         }
@@ -338,6 +337,32 @@ namespace IMS.DataLayer.Dal
             }
             return isRepeated;
         }
+        public async Task<User> ApproveAdmin(int userId)
+        {
+            User user = null;
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spApproveAdmin";
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        user = Extract(reader);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
 
+            }
+            return user;
+        }
     }
 }
