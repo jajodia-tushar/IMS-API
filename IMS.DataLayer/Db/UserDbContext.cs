@@ -364,7 +364,7 @@ namespace IMS.DataLayer.Dal
             }
             return user;
         }
-        public async Task<Response> DeleteUser(int userId, int isHardDelete)
+        public async Task<Response> DeleteUser(int userId, bool isHardDelete)
         {
             Response response = new Response();
             int rowsAffected = 0;

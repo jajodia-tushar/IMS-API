@@ -315,7 +315,7 @@
             <returns>Updated user</returns>
             <response code="200">Returns the approved user</response>
         </member>
-        <member name="M:IMS_API.Controllers.UserController.Delete(System.Int32,System.Int32)">
+        <member name="M:IMS_API.Controllers.UserController.Delete(System.Int32,System.Boolean)">
             <summary>
             returns all users based on the role name
             </summary>
