@@ -14,8 +14,7 @@ namespace IMS.DataLayer.Interfaces
         Task<List<User>> GetAllPendingAdminApprovals();
 
          Task<List<User>> GetAllUsers(Role requestedRole);
-        Task<bool> HasAccessControl(Role requestedRole, Role accessibleRole);
-        Task<bool> Save(User newUser, int isApproved, int isActive);
+         Task<bool> Save(User newUser, int isApproved, int isActive);
         Task<bool> IsEmailOrUserNameRepeated(string email, string username);
     }
 }

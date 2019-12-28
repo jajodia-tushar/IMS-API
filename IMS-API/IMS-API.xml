@@ -270,14 +270,6 @@
             <returns>all users of the role name along with status</returns>
             <response code="200">Returns users with status</response>
         </member>
-        <member name="M:IMS_API.Controllers.UserController.AddUser(IMS.Contracts.User)">
-            <summary>
-            Creates New USer
-            </summary>
-            <param name="user">Here user contains all user details along with credintials</param>
-            <returns>created user</returns>
-            <response code="200">Returns created user with status</response>
-        </member>
         <member name="M:IMS_API.Controllers.UserController.GetAllUsers">
             <summary>
             returns all users 
@@ -291,6 +283,14 @@
             </summary>
             <returns>all pending Approval users  </returns>
             <response code="200">Returns users with status</response>
+        </member>
+        <member name="M:IMS_API.Controllers.UserController.AddUser(IMS.Contracts.User)">
+            <summary>
+            Creates New USer
+            </summary>
+            <param name="user">Here user contains all user details along with credintials</param>
+            <returns>created user</returns>
+            <response code="200">Returns created user with status</response>
         </member>
         <member name="M:IMS_API.Controllers.VendorController.GetVendorById(System.Int32)">
             <summary>
