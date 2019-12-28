@@ -28,7 +28,6 @@ namespace IMS.Core.services
             this._accessControlDbContext = accessControlDbContext;
         }
 
-<<<<<<< HEAD
         public async Task<UsersResponse> GetAllPendingAdminApprovals()
         {
             UsersResponse usersResponse = new UsersResponse()
@@ -64,79 +63,27 @@ namespace IMS.Core.services
             {
                 usersResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
                 new Task(() => { _logger.LogException(e, " GetAllPendingApprovals", Severity.Medium, "Get Request", usersResponse); }).Start();
-=======
-        public async Task<UsersResponse> ApproveAdmin(int userId)
-        {
-            UsersResponse usersResponse = new UsersResponse();
-            if (userId<=0)
-            {
-                usersResponse.Status = Status.Failure;
-                usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
-            }
-            try
-            {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
-                {
-                    User user = Utility.GetUserFromToken(token);
-                    try
-                    {
-                        usersResponse.Status = Status.Failure;
-                        usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
-                        User approvedUser = await _userDbContext.ApproveAdmin(userId);
-
-                        if (user!=null)
-                        {
-                            usersResponse.Status = Status.Success;
-                            usersResponse.Users = new List<User>() { approvedUser };
-                        }
-                        return usersResponse;
-                    }
-                    catch (Exception exception)
-                    {
-                        new Task(() => { _logger.LogException(exception, "ApproveAdmin", IMS.Entities.Severity.Medium, userId, usersResponse); }).Start();
-                    }
-                }
-                else
-                {
-                    usersResponse.Status = Status.Failure;
-                    usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
-                }
->>>>>>> Implemented.
             }
             catch (Exception exception)
             {
                 usersResponse.Status = Status.Failure;
                 usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-<<<<<<< HEAD
                 new Task(() => { _logger.LogException(exception, "GetAllPendingApprovals", IMS.Entities.Severity.Medium, "Get Request", usersResponse); }).Start();
-=======
-                new Task(() => { _logger.LogException(exception, "ApproveAdmin", IMS.Entities.Severity.Medium, userId, usersResponse); }).Start();
->>>>>>> Implemented.
 
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (usersResponse.Status == Status.Failure)
-<<<<<<< HEAD
                     severity = Severity.Medium;
                 new Task(() => { _logger.Log("Get Request", usersResponse, "GetAllPendingApprovals", usersResponse.Status, severity, userId); }).Start();
             }
 
             return usersResponse;
         }
-=======
-                    severity = Severity.Critical;
-                new Task(() => { _logger.Log(userId, usersResponse, "ApproveAdmin", usersResponse.Status, severity, -1); }).Start();
-            }
-            return usersResponse;
-        }
-    
->>>>>>> Implemented.
 
         public async Task<UsersResponse> GetUsersByRole(string roleName)
-        { 
+        {
             UsersResponse usersResponse = new UsersResponse();
             if (String.IsNullOrEmpty(roleName))
             {
@@ -157,7 +104,7 @@ namespace IMS.Core.services
                         usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
                         List<User> userList = _userDbContext.GetUsersByRole(roleName);
 
-                        if (userList.Count!=0)
+                        if (userList.Count != 0)
                         {
                             usersResponse.Status = Status.Success;
                             usersResponse.Users = userList;
@@ -330,34 +277,34 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User requestedUser = Utility.GetUserFromToken(token);
                 userId = requestedUser.Id;
-               
+
                 if (Validators.UserValidator.ValidateNewUser(newUser))
+                {
+                    bool hasAccess = await _accessControlDbContext.HasAccessControl(requestedUser.Role, newUser.Role);
+                    if (!hasAccess)
+                        throw new AccessDeniedException();
+                    bool isEmailOrUsernameRepeated = await _userDbContext.CheckEmailOrUserNameAvailability(newUser.Email, newUser.Username);
+                    if (isEmailOrUsernameRepeated)
+                        throw new InvalidEmailException("Given UserName or Email is already registered");
+                    string requestedRoleName = requestedUser.Role.Name.Trim().ToLower();
+                    int requestedRoleId = requestedUser.Role.Id;
+                    int isApproved = 1;
+                    int isActive = 1;
+                    if (requestedRoleName.Equals(Constants.Roles.Admin) && requestedRoleId == newUser.Role.Id)
                     {
-                        bool hasAccess = await _accessControlDbContext.HasAccessControl(requestedUser.Role, newUser.Role);
-                        if (!hasAccess)
-                            throw new AccessDeniedException();
-                        bool isEmailOrUsernameRepeated = await _userDbContext.CheckEmailOrUserNameAvailability(newUser.Email, newUser.Username);
-                        if (isEmailOrUsernameRepeated)
-                            throw new InvalidEmailException("Given UserName or Email is already registered");
-                        string requestedRoleName = requestedUser.Role.Name.Trim().ToLower();
-                        int requestedRoleId = requestedUser.Role.Id;
-                        int isApproved = 1;
-                        int isActive = 1;
-                        if (requestedRoleName.Equals(Constants.Roles.Admin) && requestedRoleId == newUser.Role.Id)
-                        {
-                            isApproved = 0;
-                            isActive = 0;
-                        }
-                         newUser.Password = Utility.Hash(newUser.Password);
-                        bool isSaved = await _userDbContext.Save(newUser, isApproved,isActive);
-                        if (isSaved)
-                        {
-                            response.Users = new List<User>();
-                            response.Users.Add(newUser);
-                            response.Status = Status.Success;
-                        }
-                        else
-                            throw new Exception();
+                        isApproved = 0;
+                        isActive = 0;
+                    }
+                    newUser.Password = Utility.Hash(newUser.Password);
+                    bool isSaved = await _userDbContext.Save(newUser, isApproved, isActive);
+                    if (isSaved)
+                    {
+                        response.Users = new List<User>();
+                        response.Users.Add(newUser);
+                        response.Status = Status.Success;
+                    }
+                    else
+                        throw new Exception();
 
                 }
                 else
@@ -381,13 +328,13 @@ namespace IMS.Core.services
                     severity = Severity.Medium;
                 new Task(() => { _logger.Log(newUser, response, "Adding New User", response.Status, severity, userId); }).Start();
             }
-            return response;                
+            return response;
         }
         public async Task<Response> CheckValidityOfUpdateUserRequest(User requestedUser, User userToBeUpdated)
         {
             Response response = new Response();
             response.Status = Status.Failure;
-            User existingUserToBeUpdated =await _userDbContext.GetUserById(userToBeUpdated.Id);
+            User existingUserToBeUpdated = await _userDbContext.GetUserById(userToBeUpdated.Id);
             if (existingUserToBeUpdated != null)
             {
                 if (await _accessControlDbContext.HasAccessControl(requestedUser.Role, userToBeUpdated.Role))
@@ -418,6 +365,59 @@ namespace IMS.Core.services
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
             }
             return response;
+        }
+        public async Task<UsersResponse> ApproveAdmin(int userId)
+        {
+            UsersResponse usersResponse = new UsersResponse();
+            if (userId <= 0)
+            {
+                usersResponse.Status = Status.Failure;
+                usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
+            }
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    try
+                    {
+                        usersResponse.Status = Status.Failure;
+                        usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
+                        User approvedUser = await _userDbContext.ApproveAdmin(userId);
+
+                        if (user != null)
+                        {
+                            usersResponse.Status = Status.Success;
+                            usersResponse.Users = new List<User>() { approvedUser };
+                        }
+                        return usersResponse;
+                    }
+                    catch (Exception exception)
+                    {
+                        new Task(() => { _logger.LogException(exception, "ApproveAdmin", IMS.Entities.Severity.Medium, userId, usersResponse); }).Start();
+                    }
+                }
+                else
+                {
+                    usersResponse.Status = Status.Failure;
+                    usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                usersResponse.Status = Status.Failure;
+                usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "ApproveAdmin", IMS.Entities.Severity.Medium, userId, usersResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (usersResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(userId, usersResponse, "ApproveAdmin", usersResponse.Status, severity, -1); }).Start();
+            }
+            return usersResponse;
         }
     }
 }
