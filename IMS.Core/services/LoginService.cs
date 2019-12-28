@@ -42,7 +42,7 @@ namespace IMS.Core.services
             {
 
 
-                if (loginRequest.Username == null || loginRequest.Password == null)
+                if (string.IsNullOrEmpty(loginRequest.Username) || string.IsNullOrEmpty(loginRequest.Password))
                 {
                     loginResponse.Status = Status.Failure;
                     loginResponse.Error = new Error()
@@ -53,6 +53,7 @@ namespace IMS.Core.services
                     return loginResponse;
 
                 }
+                loginRequest.Password = Utility.Hash(loginRequest.Password);
                 user = _userDbContext.GetUserByCredintials(loginRequest.Username, loginRequest.Password);
                 if (user != null)
                 {
