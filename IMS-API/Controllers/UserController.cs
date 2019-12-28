@@ -1,369 +1,221 @@
-﻿using IMS.Entities.Interfaces;
-using IMS.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using IMS.DataLayer.Interfaces;
-using MySql.Data.MySqlClient;
-using System.Data;
-using Microsoft.Extensions.Configuration;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Data.Common;
-using IMS.Entities.Exceptions;
+using IMS.Contracts;
+using IMS.Core;
+using IMS.Core.Translators;
+using IMS.Entities.Interfaces;
+using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace IMS.DataLayer.Dal
+namespace IMS_API.Controllers
 {
-    public class UserDbContext : IUserDbContext
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UserController : ControllerBase
     {
-        private IDbConnectionProvider _dbProvider;
-
-        public UserDbContext(IDbConnectionProvider dbConnectionProvider)
+        private IUserService _userService;
+        private ILogManager _logger;
+        public UserController(IUserService userService, ILogManager logManager)
         {
-            _dbProvider = dbConnectionProvider;
+            this._userService = userService;
+            this._logger = logManager;
         }
-
-        public List<User> GetUsersByRole(string roleName)
+        // GET: api/
+        /// <summary>
+        /// returns all users based on the role name
+        /// </summary>
+        /// <param name="roleName">Takes the name of the role corresponding to which we need users</param>
+        /// <returns>all users of the role name along with status</returns>
+        /// <response code="200">Returns users with status</response>
+        [HttpGet("Role/{roleName}", Name = "Get(string roleName)")]
+        public async Task<UsersResponse> GetUsersByRoleName(string roleName)
         {
-            List<User> users = new List<User>();
-            MySqlDataReader reader = null;
-
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            UsersResponse contractUsersResponse = null;
+            try
             {
-                try
-                {
-
-                    connection.Open();
-
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetUsersByRole";
-                    command.Parameters.AddWithValue("@RoleName", roleName);
-                    reader = command.ExecuteReader();
-                    User user = null;
-                    while (reader.Read())
-                    {
-                        user = Extract(reader);
-                        users.Add(user);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.GetUsersByRole(roleName);
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
             }
-            return users;
-        }
-
-
-        public User GetUserByCredintials(string username, string password)
-        {
-            User user = null;
-            DbDataReader reader = null;
-
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            catch (Exception exception)
             {
-                try
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
                 {
-
-                    connection.Open();
-
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetUserByCredentials";
-
-
-                    command.Parameters.AddWithValue("@username", username);
-                    command.Parameters.AddWithValue("@password", password);
-                    reader = command.ExecuteReader();
-
-
-                    if (reader.Read())
+                    Status = Status.Failure,
+                    Error = new Error()
                     {
-                        user = Extract(reader);
-
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
                     }
-
-
-
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
+                };
+                new Task(() => { _logger.LogException(exception, "GetUsersRoleByName", IMS.Entities.Severity.Medium, "Get Request", contractUsersResponse); }).Start();
             }
-
-
-            return user;
+            return contractUsersResponse;
         }
-
-        private User Extract(MySqlDataReader reader)
+        // GET: api/
+        /// <summary>
+        /// returns all users 
+        /// </summary>
+        /// <returns>all users </returns>
+        /// <response code="200">Returns users with status</response>
+        [HttpGet]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<UsersResponse> GetAllUsers()
         {
-            return new User()
+            UsersResponse contractUsersResponse = null;
+            try
             {
-                Id = (int)reader["userid"],
-                Username = (string)reader["username"],
-                Password = (string)reader["password"],
-                Firstname = (string)reader["firstname"],
-                Lastname = (string)reader["lastname"],
-                Email = (string)reader["email"],
-                Role = new Role()
-                {
-                    Id = (int)reader["roleid"],
-                    Name = (string)reader["rolename"]
-                }
-            };
-        }
-        private User Extract(DbDataReader reader)
-        {
-            return new User()
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.GetAllUsers();
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
+            }
+            catch (Exception exception)
             {
-                Id = (int)reader["userid"],
-                Username = reader["username"]?.ToString(),
-                Password = reader["password"]?.ToString(),
-                Firstname = reader["firstname"]?.ToString(),
-                Lastname = reader["lastname"]?.ToString(),
-                Email = reader["email"]?.ToString(),
-                Role = new Role()
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
                 {
-                    Id = (int)reader["roleid"],
-                    Name = reader["rolename"]?.ToString()
-                }
-            };
-        }
-        public async Task<User> GetUserById(int id)
-        {
-            User user = null;
-            DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetUserById";
-                    command.Parameters.AddWithValue("@Id", id);
-                    reader = await command.ExecuteReaderAsync();
-                    if (reader.Read())
+                    Status = Status.Failure,
+                    Error = new Error()
                     {
-                        user = Extract(reader);
-
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
                     }
-                }
-                catch (Exception exception)
-                {
-                    throw exception;
-                }
+                };
+                new Task(() => { _logger.LogException(exception, "GetAllUsers", IMS.Entities.Severity.Medium, "Get Request", contractUsersResponse); }).Start();
             }
-            return user;
+            return contractUsersResponse;
         }
 
-        public async Task<User> UpdateUser(User user)
+        // PUT: api/
+        /// <summary>
+        /// returns updated user
+        /// </summary>
+        /// <param name="user">Takes the user to be updated</param>
+        /// <returns>Updated user</returns>
+        /// <response code="200">Returns the updated user</response>
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpPut(Name = "UpdateUser(User user)")]
+        public async Task<UsersResponse> UpdateUser(User user)
         {
-            User updatedUser = new User();
-            DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            UsersResponse contractUsersResponse = null;
+            try
             {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spUpdateUser";
-                    command.Parameters.AddWithValue("@Id", user.Id);
-                    command.Parameters.AddWithValue("@FirstName", user.Firstname);
-                    command.Parameters.AddWithValue("@LastName", user.Lastname);
-                    command.Parameters.AddWithValue("@EmailId", user.Email);
-                    command.Parameters.AddWithValue("@RoleId", user.Role.Id);
-                    reader = await command.ExecuteReaderAsync();
-                    if (reader.Read())
-                    {
-                        updatedUser = Extract(reader);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    throw exception;
-                }
+                IMS.Entities.User userEntity = UserTranslator.ToEntitiesObject(user);
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.UpdateUser(userEntity);
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
             }
-            return updatedUser;
+            catch (Exception exception)
+            {
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "UpdateUser", IMS.Entities.Severity.Medium, "UpdateUser", contractUsersResponse); }).Start();
+            }
+            return contractUsersResponse;
         }
-
-
-        public async Task<List<User>> GetAllPendingAdminApprovals()
+        // GET: api/
+        /// <summary>
+        /// returns all pending Approval users 
+        /// </summary>
+        /// <returns>all pending Approval users  </returns>
+        /// <response code="200">Returns users with status</response>
+        [HttpGet("ApproveAdmins")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<UsersResponse> GetAllPendingAdminApprovals()
         {
-            List<User> users = new List<User>();
-            DbDataReader reader = null;
-
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            UsersResponse contractUsersResponse = null;
+            try
             {
-                try
-                {
-
-                    connection.Open();
-
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllPendingApprovalUsers";
-                    reader = await command.ExecuteReaderAsync();
-                    User user = null;
-                    while (reader.Read())
-                    {
-                        user = Extract(reader);
-                        users.Add(user);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.GetAllPendingAdminApprovals();
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
             }
-            return users;
+            catch (Exception exception)
+            {
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetAllPendingApprovals", IMS.Entities.Severity.Medium, "user/pendingapprovals", contractUsersResponse); }).Start();
+            }
+            return contractUsersResponse;
         }
-
-
-        public async Task<List<User>> GetAllUsers(Role requestedRole)
+        // POST: api/user
+        /// <summary>
+        /// Creates New USer
+        /// </summary>
+        /// <param name="user">Here user contains all user details along with credintials</param>
+        /// <returns>created user</returns>
+        /// <response code="200">Returns created user with status</response>
+        [HttpPost(Name = "AddNewUser")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<UsersResponse> AddUser([FromBody] User user)
         {
-            List<User> users = new List<User>();
-            DbDataReader reader = null;
-
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            IMS.Contracts.UsersResponse contractsUserResponse = null;
+            try
             {
-                try
-                {
-
-                    connection.Open();
-
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllUsersByRequestedRole";
-                    command.Parameters.AddWithValue("@userroleid", requestedRole.Id);
-                    reader = await command.ExecuteReaderAsync();
-                    User user = null;
-                    while (reader.Read())
-                    {
-                        user = Extract(reader);
-                        users.Add(user);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
+                IMS.Entities.User entitiesUser = UserTranslator.ToEntitiesObject(user);
+                IMS.Entities.UsersResponse entitiesUserResponse = await _userService.AddUser(entitiesUser);
+                contractsUserResponse = UserTranslator.ToDataContractsObject(entitiesUserResponse);
             }
-            return users;
+            catch (Exception e)
+            {
+                contractsUserResponse = new UsersResponse
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "Add USer", IMS.Entities.Severity.Medium, user, contractsUserResponse); }).Start();
+            }
+            return contractsUserResponse;
+
         }
-
-
-
-
-        public async Task<bool> Save(User user, int isApproved, int isActive)
+        // PUT: api/
+        /// <summary>
+        /// returns approved admin
+        /// </summary>
+        /// <param name="userId">Takes the user to be approved</param>
+        /// <returns>Updated user</returns>
+        /// <response code="200">Returns the approved user</response>
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpPut("ApproveAdmin/{userId}",Name = "ApproveAdmin(int userId")]
+        public async Task<UsersResponse> ApproveAdmin(int userId)
         {
-            DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            UsersResponse contractUsersResponse = null;
+            try
             {
-                try
-                {
-
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spAddUser";
-                    command.Parameters.AddWithValue("@firstname", user.Firstname);
-                    command.Parameters.AddWithValue("@lastname", user.Lastname);
-                    command.Parameters.AddWithValue("@emailid", user.Email);
-                    command.Parameters.AddWithValue("@username", user.Username);
-                    command.Parameters.AddWithValue("@password", user.Password);
-                    command.Parameters.AddWithValue("@roleid", user.Role.Id);
-                    command.Parameters.AddWithValue("@isapproved", isApproved);
-                    command.Parameters.AddWithValue("@isactive", isActive);
-
-                    reader = await command.ExecuteReaderAsync();
-                    if (reader.Read())
-                    {
-                        user.Id = (int)reader["generatedid"];
-                    }
-                    return true;
-                }
-                catch (CustomException e)
-                {
-                    throw e;
-                }
-                catch (MySqlException ex)
-                {
-                    if (ex.Number == (int)MySqlErrorCode.NoReferencedRow2)
-                        throw new CustomException();
-
-                    return false;
-                }
-
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.ApproveAdmin(userId);
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
             }
-        }
-
-
-        public async Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
-        {
-            bool isRepeated = true;
-            DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            catch (Exception exception)
             {
-                try
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
                 {
-
-                    connection.Open();
-                    var command = connection.CreateCommand();
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spIsEmailOrUserNameRepeated";
-                    command.Parameters.AddWithValue("@username", username);
-                    command.Parameters.AddWithValue("@emailid", email);
-                    reader = await command.ExecuteReaderAsync();
-                    if (reader.Read())
+                    Status = Status.Failure,
+                    Error = new Error()
                     {
-                        isRepeated = (bool)reader["isrepeated"];
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
                     }
-
-
-                }
-
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
+                };
+                new Task(() => { _logger.LogException(exception, "ApproveAdmin", IMS.Entities.Severity.Medium,userId, contractUsersResponse); }).Start();
             }
-            return isRepeated;
-        }
-        public async Task<User> ApproveAdmin(int userId)
-        {
-            User user = null;
-            DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spApproveAdmin";
-                    command.Parameters.AddWithValue("@UserId", userId);
-                    reader = await command.ExecuteReaderAsync();
-                    while (reader.Read())
-                    {
-                        user = Extract(reader);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
-            }
-            return user;
+            return contractUsersResponse;
         }
     }
 }
