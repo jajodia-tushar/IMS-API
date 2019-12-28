@@ -26,15 +26,29 @@ namespace IMS.EmployeeDataDumper
         public void AddEmployeesFromCsvFile()
         {
             Response employeesAddResponse = new Response();
-            var employeesNotAddedFileLocation = @"C:\IMSEmployeesData";
+            var employeesNotAddedFileLocation = @"C:\IMSEmployeesData\";
+            var employeesNotAddedFileName = "IMSEmployeesNotAdded.csv";
             try
             {
                 var employeesData = File.ReadAllLines(_configuration["Path:FilePath"]);
                 List<Employee> employeesList = ReadEmployeesDataFromCsv(employeesData);
-                List<string> employeesNotAdded = _employeesDataDbContext.CreateEmployee(employeesList);
+                List<Employee> employeesNotAdded = _employeesDataDbContext.CreateEmployee(employeesList);
+                StringBuilder sb = new StringBuilder();
+                if (File.Exists(employeesNotAddedFileLocation+employeesNotAddedFileName))
+                {
+                    File.Delete(employeesNotAddedFileLocation + employeesNotAddedFileName);
+                }
+                for (int index = 0; index < employeesNotAdded.Count; index++)
+                    sb.AppendLine(string.Join(",", employeesNotAdded[index].Id,employeesNotAdded[index].Firstname,
+                        employeesNotAdded[index].Lastname,employeesNotAdded[index].Email,
+                        employeesNotAdded[index].ContactNumber,
+                        employeesNotAdded[index].TemporaryCardNumber,
+                        employeesNotAdded[index].AccessCardNumber,
+                        employeesNotAdded[index].IsActive));
+                
                 if (!Directory.Exists(employeesNotAddedFileLocation))
                     Directory.CreateDirectory(employeesNotAddedFileLocation);
-                File.WriteAllLines(Path.Combine(employeesNotAddedFileLocation, "IMSEmployeesNotAdded.txt"), employeesNotAdded);
+                File.AppendAllText(Path.Combine(employeesNotAddedFileLocation, employeesNotAddedFileName),sb.ToString());
                 if (employeesNotAdded.Count > 0)
                     employeesAddResponse.Status = Status.Failure;
                 else

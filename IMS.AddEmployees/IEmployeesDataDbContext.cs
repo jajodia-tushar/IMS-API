@@ -7,6 +7,6 @@ namespace IMS.EmployeeDataDumper
 {
     public interface IEmployeesDataDbContext
     {
-        List<String> CreateEmployee(List<Employee> employeesList);
+        List<Employee> CreateEmployee(List<Employee> employeesList);
     }
 }

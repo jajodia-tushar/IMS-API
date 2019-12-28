@@ -15,10 +15,9 @@ namespace IMS.EmployeeDataDumper
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
-        public List<string> CreateEmployee(List<Employee> employeesList)
+        public List<Employee> CreateEmployee(List<Employee> employeesList)
         {
-            List<string> employeesNotAdded = new List<string>();
-            employeesNotAdded.Add("Id  | First Name | EmailId");
+            List<Employee> employeesNotAdded = new List<Employee>();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -46,7 +45,18 @@ namespace IMS.EmployeeDataDumper
                         catch (Exception exception)
                         {
                             Console.WriteLine("Data For Employee Id " + employee.Id + " not added");
-                            employeesNotAdded.Add(employee.Id + " | " + employee.Firstname + "    | " + employee.Email);
+                            employeesNotAdded.Add(
+                                new Employee()
+                                {
+                                    Id = employee.Id,
+                                    Firstname = employee.Firstname,
+                                    Lastname = employee.Lastname,
+                                    Email = employee.Email,
+                                    ContactNumber = employee.ContactNumber,
+                                    TemporaryCardNumber = employee.TemporaryCardNumber,
+                                    AccessCardNumber = employee.AccessCardNumber,
+                                    IsActive = employee.IsActive
+                                });
                             continue;
                         }
                         Console.WriteLine("Data For Employee Id  " + employee.Id + " Added");

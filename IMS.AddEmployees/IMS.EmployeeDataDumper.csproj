@@ -20,8 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IMS-API\IMS-API.csproj" />
+    <ProjectReference Include="..\IMS.Core\IMS.Core.csproj" />
     <ProjectReference Include="..\IMS.DataLayer\IMS.DataLayer.csproj" />
+    <ProjectReference Include="..\IMS.Logging\IMS.Logging.csproj" />
+	<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
   </ItemGroup>
+
 
 </Project>
