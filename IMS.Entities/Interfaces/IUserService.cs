@@ -8,5 +8,6 @@ namespace IMS.Entities.Interfaces
     public interface IUserService
     {
         Task<UsersResponse> GetUsersByRole(String roleName);
+        Task<UsersResponse> GetAllUsers();
     }
 }

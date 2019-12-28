@@ -1,5 +1,6 @@
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
@@ -79,6 +80,59 @@ namespace IMS.Core.services
                     severity = Severity.Critical;
                 new Task(() => { _logger.Log(roleName, usersResponse, "Get Users By Role Name", usersResponse.Status, severity, -1); }).Start();
             }
+            return usersResponse;
+        }
+        public async Task<UsersResponse> GetAllUsers()
+        {
+            UsersResponse usersResponse = new UsersResponse()
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            try
+            {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User requestedUser = Utility.GetUserFromToken(token);
+                userId = requestedUser.Id;
+
+                List<User> users = await _userDbContext.GetAllUsers(requestedUser.Role);
+                if (users.Count == 0)
+                    usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
+                else
+                {
+                    usersResponse.Users = users;
+                    usersResponse.Status = Status.Success;
+                }
+
+
+
+            }
+            catch (CustomException e)
+            {
+                usersResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, " GetAllUsers", Severity.Medium, "Get Request", usersResponse); }).Start();
+            }
+            catch (Exception exception)
+            {
+                usersResponse.Status = Status.Failure;
+                usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetAllUsers", IMS.Entities.Severity.Medium, "Get Request", usersResponse); }).Start();
+
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (usersResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log("Get Request", usersResponse, "GetAllUsers", usersResponse.Status, severity, userId); }).Start();
+            }
+
             return usersResponse;
         }
     }
