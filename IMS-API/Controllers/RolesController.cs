@@ -16,9 +16,9 @@ namespace IMS_API.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private IRoleServcie _roleService;
+        private IRoleService _roleService;
         private IMS.Logging.ILogManager _logger;
-        public RolesController(IRoleServcie userService, IMS.Logging.ILogManager logManager)
+        public RolesController(IRoleService userService, IMS.Logging.ILogManager logManager)
         {
             _roleService = userService;
             _logger = logManager;

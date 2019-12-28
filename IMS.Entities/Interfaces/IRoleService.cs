@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace IMS.Entities.Interfaces
 {
-    public interface IRoleServcie
+    public interface IRoleService
     {
         Task<RolesResponse> GetAllRoles();
     }

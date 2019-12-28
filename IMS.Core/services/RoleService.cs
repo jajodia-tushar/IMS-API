@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IMS.Core.services
 {
-    public class RoleService : IRoleServcie
+    public class RoleService : IRoleService
     {
         private IRoleDbContext _roleDbContext;
         private ITokenProvider _tokenProvider;
