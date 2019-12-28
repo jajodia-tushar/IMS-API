@@ -1,5 +1,5 @@
 ﻿using IMS.Core;
-using IMS.DataLayer.Interfaces;
+using IMS.EmployeeDataDumper;
 using IMS.Entities;
 using IMS.Logging;
 using Microsoft.Extensions.Configuration;
@@ -10,16 +10,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IMS.AddEmployees
+namespace IMS.EmployeeDataDumper
 {
-    public class AddEmployeesData
+    public class EmployeesDataInjector
     {
-        private IEmployeeDbContext _employeeDbContext;
+        private IEmployeesDataDbContext _employeesDataDbContext;
         private IConfiguration _configuration;
         private ILogManager _logger;
-        public AddEmployeesData(IEmployeeDbContext employeeDbContext,IConfiguration configuration,ILogManager logger)
+        public EmployeesDataInjector(IEmployeesDataDbContext employeesDataDbContext,IConfiguration configuration,ILogManager logger)
         {
-            _employeeDbContext = employeeDbContext;
+            _employeesDataDbContext = employeesDataDbContext;
             _configuration = configuration;
             _logger = logger;
         }
@@ -31,7 +31,7 @@ namespace IMS.AddEmployees
             {
                 var employeesData = File.ReadAllLines(_configuration["Path:FilePath"]);
                 List<Employee> employeesList = ReadEmployeesDataFromCsv(employeesData);
-                List<string> employeesNotAdded = _employeeDbContext.AddEmployeesFromCsvFile(employeesList);
+                List<string> employeesNotAdded = _employeesDataDbContext.CreateEmployee(employeesList);
                 if (!Directory.Exists(employeesNotAddedFileLocation))
                     Directory.CreateDirectory(employeesNotAddedFileLocation);
                 File.WriteAllLines(Path.Combine(employeesNotAddedFileLocation, "IMSEmployeesNotAdded.txt"), employeesNotAdded);
@@ -76,4 +76,5 @@ namespace IMS.AddEmployees
             return employeesList;
         }
     }
+
 }

@@ -89,51 +89,35 @@ namespace IMS.DataLayer.Db
             }
             return employeesList;
         }
-        public List<String> AddEmployeesFromCsvFile(List<Employee> employeesList)
+        public bool CreateEmployee(Employee employee)
         {
-            List<string> employeesNotAdded = new List<string>();
-            employeesNotAdded.Add("Id  | First Name | EmailId");
+            bool isSuccess = false;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
                     connection.Open();
-                    Console.WriteLine("---- Adding Employees Data In Progress ----");
-                    Console.WriteLine("==========================================="+"\n" );
-                    foreach (var employee in employeesList)
-                    {
-                        try
-                        {
-                            var command = connection.CreateCommand();
-                            command.CommandType = CommandType.StoredProcedure;
-                            command.CommandText = "spAddEmployee";
-                            command.Parameters.AddWithValue("@Id", employee.Id);
-                            command.Parameters.AddWithValue("@FirstName", employee.Firstname);
-                            command.Parameters.AddWithValue("@LastName", employee.Lastname);
-                            command.Parameters.AddWithValue("@EmailId", employee.Email);
-                            command.Parameters.AddWithValue("@MobileNumber", employee.ContactNumber);
-                            command.Parameters.AddWithValue("@TemporaryCardNumber", employee.TemporaryCardNumber);
-                            command.Parameters.AddWithValue("@AccessCardNumber", employee.AccessCardNumber);
-                            command.Parameters.AddWithValue("@IsActive", employee.IsActive);
-                            command.ExecuteNonQuery();
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine("Data For Employee Id "+employee.Id +" not added");
-                            employeesNotAdded.Add(employee.Id + " | " + employee.Firstname+"    | "+employee.Email);
-                            continue;
-                        }
-                        Console.WriteLine("Data For Employee Id  "+employee.Id+" Added");
-                    }
-                    Console.WriteLine("\n" + "===================================================");
-                    Console.WriteLine("---- Process For Adding Employees Is Completed ----");
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddEmployee";
+                    command.Parameters.AddWithValue("@Id", employee.Id);
+                    command.Parameters.AddWithValue("@FirstName", employee.Firstname);
+                    command.Parameters.AddWithValue("@LastName", employee.Lastname);
+                    command.Parameters.AddWithValue("@EmailId", employee.Email);
+                    command.Parameters.AddWithValue("@MobileNumber", employee.ContactNumber);
+                    command.Parameters.AddWithValue("@TemporaryCardNumber", employee.TemporaryCardNumber);
+                    command.Parameters.AddWithValue("@AccessCardNumber", employee.AccessCardNumber);
+                    command.Parameters.AddWithValue("@IsActive", employee.IsActive);
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                        isSuccess = true;
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
-                return employeesNotAdded;
             }
+            return isSuccess;
         }
         public static string ReturnNullOrValueAccordingly(object field)
         {

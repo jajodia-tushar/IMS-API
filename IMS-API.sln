@@ -31,9 +31,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{9144
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IMS.UnitTesting", "IMS.UnitTesting\IMS.UnitTesting.csproj", "{B0712418-6AD1-4CE7-BDCC-745C080FAF38}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmployeeData", "EmployeeData", "{4DB6F598-25CF-408D-8757-002DFFF0BDDF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmployeeDataDumper", "EmployeeDataDumper", "{4DB6F598-25CF-408D-8757-002DFFF0BDDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMS.AddEmployees", "IMS.AddEmployees\IMS.AddEmployees.csproj", "{085A5527-A217-41C0-8499-4735E45FD93F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IMS.EmployeeDataDumper", "IMS.AddEmployees\IMS.EmployeeDataDumper.csproj", "{085A5527-A217-41C0-8499-4735E45FD93F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

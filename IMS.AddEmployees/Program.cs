@@ -11,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IMS.AddEmployees
+namespace IMS.EmployeeDataDumper
 {
     public class Program
     {
@@ -21,14 +21,14 @@ namespace IMS.AddEmployees
                .SetBasePath(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..")))
                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfiguration configuration = builder.Build();
-            var services = new ServiceCollection().AddTransient<AddEmployeesData>()
+            var services = new ServiceCollection().AddTransient<EmployeesDataInjector>()
                 .AddSingleton(typeof(IConfiguration), configuration)
                 .AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>()
-                .AddTransient<IEmployeeDbContext, EmployeeDbContext>()
+                .AddTransient<IEmployeesDataDbContext,EmployeesDataDbContext>()
                 .AddTransient<ILogManager, LogImplementation>()
                 .AddTransient<ILogDbContext, LogDbContext>();
             var provider = services.BuildServiceProvider();
-            var container = provider.GetService<AddEmployeesData>();
+            var container = provider.GetService<EmployeesDataInjector>();
             container.AddEmployeesFromCsvFile();
             Console.ReadLine();
         }

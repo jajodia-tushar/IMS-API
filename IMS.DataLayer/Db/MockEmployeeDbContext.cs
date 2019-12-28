@@ -45,7 +45,7 @@ namespace IMS.DataLayer.Db
                }
             };
 
-        public List<string> AddEmployeesFromCsvFile(List<Employee> employeesList)
+        public bool CreateEmployee(Employee employee)
         {
             throw new NotImplementedException();
         }
