@@ -10,7 +10,6 @@ using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
 
 namespace IMS_API.Controllers
 {
