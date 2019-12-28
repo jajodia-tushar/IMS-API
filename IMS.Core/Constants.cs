@@ -79,6 +79,7 @@ namespace IMS.Core
             public const string PasswordSymbolError = "Password should contain At least one special case characters";
             public const string PasswordSpaceError = "Password should not contain spaces";
             public const string NoUserFoundToDelete = "No Users found to delete";
+            public const string UnAuthorized = "You are not authorized to perform this action";
         }
 
         public static class ErrorCodes

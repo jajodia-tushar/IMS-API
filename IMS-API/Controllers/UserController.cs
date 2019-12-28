@@ -89,6 +89,39 @@ namespace IMS_API.Controllers
 
         // GET: api/
         /// <summary>
+        /// returns updated user
+        /// </summary>
+        /// <param name="user">Takes the user to be updated</param>
+        /// <returns>Updated user</returns>
+        /// <response code="200">Returns the updated user</response>
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpPut(Name = "UpdateUser(User user)")]
+        public async Task<UsersResponse> UpdateUser(User user)
+        {
+            UsersResponse contractUsersResponse = null;
+            try
+            {
+                IMS.Entities.User userEntity = UserTranslator.ToEntitiesObject(user);
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.UpdateUser(userEntity);
+                contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
+            }
+            catch (Exception exception)
+            {
+                contractUsersResponse = new IMS.Contracts.UsersResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "UpdateUser", IMS.Entities.Severity.Medium, "UpdateUser", contractUsersResponse); }).Start();
+            }
+            return contractUsersResponse;
+        }
+        // GET: api/
+        /// <summary>
         /// returns all pending Approval users 
         /// </summary>
         /// <returns>all pending Approval users  </returns>

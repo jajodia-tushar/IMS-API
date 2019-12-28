@@ -284,6 +284,14 @@
             <returns>all users </returns>
             <response code="200">Returns users with status</response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.UpdateUser(IMS.Contracts.User)">
+            <summary>
+            returns updated user
+            </summary>
+            <param name="user">Takes the user to be updated</param>
+            <returns>Updated user</returns>
+            <response code="200">Returns the updated user</response>
+        </member>
         <member name="M:IMS_API.Controllers.UserController.GetAllPendingAdminApprovals">
             <summary>
             returns all pending Approval users 

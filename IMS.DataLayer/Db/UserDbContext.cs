@@ -22,7 +22,7 @@ namespace IMS.DataLayer.Dal
             _dbProvider = dbConnectionProvider;
         }
 
-        public async Task<List<User>> GetUsersByRole(string roleName)
+        public List<User> GetUsersByRole(string roleName)
         {
             List<User> users = new List<User>();
             MySqlDataReader reader = null;
@@ -59,7 +59,7 @@ namespace IMS.DataLayer.Dal
         public User GetUserByCredintials(string username, string password)
         {
             User user = null;
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -103,6 +103,23 @@ namespace IMS.DataLayer.Dal
             return new User()
             {
                 Id = (int)reader["userid"],
+                Username = (string)reader["username"],
+                Password = (string)reader["password"],
+                Firstname = (string)reader["firstname"],
+                Lastname = (string)reader["lastname"],
+                Email = (string)reader["email"],
+                Role = new Role()
+                {
+                    Id = (int)reader["roleid"],
+                    Name = (string)reader["rolename"]
+                }
+            };
+        }
+        private User Extract(DbDataReader reader)
+        {
+            return new User()
+            {
+                Id = (int)reader["userid"],
                 Username = reader["username"]?.ToString(),
                 Password = reader["password"]?.ToString(),
                 Firstname = reader["firstname"]?.ToString(),
@@ -114,6 +131,64 @@ namespace IMS.DataLayer.Dal
                     Name = reader["rolename"]?.ToString()
                 }
             };
+        }
+        public async Task<User> GetUserById(int id)
+        {
+            User user = null;
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetUserById";
+                    command.Parameters.AddWithValue("@Id", id);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        user = Extract(reader);
+
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return user;
+        }
+
+        public async Task<User> UpdateUser(User user)
+        {
+            User updatedUser = new User();
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spUpdateUser";
+                    command.Parameters.AddWithValue("@Id", user.Id);
+                    command.Parameters.AddWithValue("@FirstName", user.Firstname);
+                    command.Parameters.AddWithValue("@LastName", user.Lastname);
+                    command.Parameters.AddWithValue("@EmailId", user.Email);
+                    command.Parameters.AddWithValue("@RoleId", user.Role.Id);
+                    reader =await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        updatedUser = Extract(reader);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return updatedUser;
         }
 
        
@@ -148,24 +223,7 @@ namespace IMS.DataLayer.Dal
             }
             return users;
         }
-        private User Extract(DbDataReader reader)
-        {
-            return new User()
-            {
-
-                Id = (int)reader["userid"],
-                Username = reader["username"]?.ToString(),
-                Password = reader["password"]?.ToString(),
-                Firstname = reader["firstname"]?.ToString(),
-                Lastname = reader["lastname"]?.ToString(),
-                Email = reader["email"]?.ToString(),
-                Role = new Role()
-                {
-                    Id = (int)reader["roleid"],
-                    Name = reader["rolename"]?.ToString()
-                }
-            };
-        }
+       
     
         public async Task<List<User>> GetAllUsers(Role requestedRole)
         {
@@ -280,5 +338,6 @@ namespace IMS.DataLayer.Dal
             }
             return isRepeated;
         }
+
     }
 }
