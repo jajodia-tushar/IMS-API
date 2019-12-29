@@ -18,7 +18,7 @@ namespace IMS.EmployeeDataDumper
         public static void Main(string[] args)
         {   
             var builder = new ConfigurationBuilder()
-               .SetBasePath(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..")))
+               .SetBasePath(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory)))
                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfiguration configuration = builder.Build();
             var services = new ServiceCollection().AddTransient<EmployeesDataInjector>()
