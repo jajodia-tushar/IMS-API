@@ -132,5 +132,38 @@ namespace IMS.DataLayer.Db
             }
             return updatedVendor;
         }
+        public async Task<Vendor> AddVendor(Vendor vendor)
+        {
+            Vendor addedVendor = null;
+            DbDataReader reader = null;
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddVendor";
+                    command.Parameters.AddWithValue("@Name", vendor.Name);
+                    command.Parameters.AddWithValue("@MobileNumber", vendor.ContactNumber);
+                    command.Parameters.AddWithValue("@Address", vendor.Address);
+                    command.Parameters.AddWithValue("@Pan", vendor.PAN);
+                    command.Parameters.AddWithValue("@Gst", vendor.GST);
+                    command.Parameters.AddWithValue("@Cin", vendor.CompanyIdentificationNumber);
+                    command.Parameters.AddWithValue("@Title", vendor.Title);
+
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        addedVendor = Extract(reader);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return addedVendor;
+        }
     }
 }

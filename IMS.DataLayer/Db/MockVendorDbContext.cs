@@ -58,6 +58,12 @@ namespace IMS.DataLayer.Db
         {
             throw new NotImplementedException();
         }
+
+        public Task<Vendor> AddVendor(Vendor vendor)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Vendor> UpdateVendor(Vendor vendor)
         {
             throw new NotImplementedException();

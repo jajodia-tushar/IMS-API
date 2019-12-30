@@ -373,5 +373,13 @@
             <returns>the updated vendor</returns>
             <response code="200">Returns updated vendor</response>
         </member>
+        <member name="M:IMS_API.Controllers.VendorController.Add(IMS.Contracts.Vendor)">
+            <summary>
+            Add vendor 
+            </summary>
+            <param name="vendor">takes the vendor to be added</param>
+            <returns>the added vendor</returns>
+            <response code="200">Returns the added vendor</response>
+        </member>
     </members>
 </doc>

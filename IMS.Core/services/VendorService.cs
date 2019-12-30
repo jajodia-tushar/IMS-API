@@ -25,6 +25,69 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
+
+        public async Task<VendorResponse> AddVendor(Vendor vendor)
+        {
+            VendorResponse vendorResponse = new VendorResponse();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    vendorResponse.Vendors = new List<Vendor>();
+                    userId = user.Id;
+                    try
+                    {
+                        if (VendorValidator.Validate(vendor))
+                        {
+                            vendor = await _vendorDbContext.AddVendor(vendor);
+                            if (vendor != null)
+                            {
+                                vendorResponse.Status = Status.Success;
+                                vendorResponse.Vendors.Add(vendor);
+                            }
+                            return vendorResponse;
+                        }
+                        else
+                        {
+                            vendorResponse.Status = Status.Failure;
+                            vendorResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.MissingValues
+                            };
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        vendorResponse.Status = Status.Failure;
+                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "AddVendor", Severity.Medium, vendor, vendorResponse); }).Start();
+                    }
+                }
+                else
+                {
+                    vendorResponse.Status = Status.Failure;
+                    vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                vendorResponse.Status = Status.Failure;
+                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "AddVendor", Severity.High, vendor, vendorResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (vendorResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log(vendor, vendorResponse, "AddVendor", vendorResponse.Status, severity, userId); }).Start();
+            }
+            return vendorResponse;
+        }
         public async Task<VendorResponse> GetVendorById(int vendorId)
         {
             VendorResponse vendorResponse = new VendorResponse();
