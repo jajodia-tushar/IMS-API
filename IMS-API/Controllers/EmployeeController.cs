@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IMS.Contracts;
@@ -14,7 +15,7 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+
     public class EmployeeController : ControllerBase
     {
         private IEmployeeService employeeService;
@@ -41,7 +42,7 @@ namespace IMS_API.Controllers
                 IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(employeeId);
                 contractsEmployeeValidationResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 contractsEmployeeValidationResponse = new IMS.Contracts.GetEmployeeResponse()
                 {

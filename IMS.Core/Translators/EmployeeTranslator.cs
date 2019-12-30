@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using IMS.Contracts;
+using IMS.Entities;
 
 namespace IMS.Core.Translators
 {
@@ -21,18 +23,18 @@ namespace IMS.Core.Translators
             }
             return employeeValidationResponse;
         }
-        public static Contracts.Employee ToDataContractsObject(Entities.Employee employee)
+        public static Contracts.Employee ToDataContractsObject(Entities.Employee doEmployee)
         {
             return new Contracts.Employee()
             {
-                Id = employee.Id,
-                Firstname = employee.Firstname,
-                Lastname = employee.Lastname,
-                Email = employee.Email,
-                ContactNumber = null,
-                TemporaryCardNumber = null,
-                AccessCardNumber = null,
-                IsActive = employee.IsActive
+                Id = doEmployee.Id,
+                Firstname = doEmployee.Firstname,
+                Lastname = doEmployee.Lastname,
+                Email = doEmployee.Email,
+                ContactNumber = doEmployee.ContactNumber,
+                TemporaryCardNumber = doEmployee.TemporaryCardNumber,
+                AccessCardNumber = doEmployee.AccessCardNumber,
+                IsActive = doEmployee.IsActive
             };
         }
         public static Entities.Employee ToEntitiesObject(Contracts.Employee employee)

@@ -8,5 +8,7 @@ namespace IMS.DataLayer.Interfaces
     public interface IEmployeeDbContext
     {
         Employee GetEmployeeById(string employeeId);
+        List<Employee> GetAllEmployees();
+        bool CreateEmployee(Employee employee);
     }
 }
