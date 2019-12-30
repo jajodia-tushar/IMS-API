@@ -144,8 +144,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", offset);
                     command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
                     command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
-
-                    reader = command.ExecuteReader();
+e                    reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         RecentEmployeeOrderDto employeeOrder = Extract(reader);
