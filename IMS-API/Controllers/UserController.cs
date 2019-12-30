@@ -217,9 +217,9 @@ namespace IMS_API.Controllers
         }
         // DELETE: api/
         /// <summary>
-        /// returns all users based on the role name
+        /// returns deletion status
         /// </summary>
-        /// <param name="userId">Takes the name of the role corresponding to which we need users</param>
+        /// <param name="userId">Takes the id of the user to be deleted</param>
         /// <param name="isHardDelete">Values 1 or 0 corresponds to whether the deletion is a hard delete or a soft delete</param>
         /// <returns>deletion status</returns>
         /// <response code="200">deletion status</response>
@@ -235,7 +235,7 @@ namespace IMS_API.Controllers
             }
             catch (Exception exception)
             {
-                contractDeleteUsersResponse = new IMS.Contracts.UsersResponse()
+                contractDeleteUsersResponse = new IMS.Contracts.Response()
                 {
                     Status = Status.Failure,
                     Error = new Error()
