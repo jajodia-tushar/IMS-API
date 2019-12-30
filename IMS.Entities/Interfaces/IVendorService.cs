@@ -11,5 +11,6 @@ namespace IMS.Entities.Interfaces
        Task<VendorsResponse> GetVendors(string name, int pageNumber, int pageSize);
        Task<VendorResponse> UpdateVendor(Vendor vendor);
        Task<VendorResponse> AddVendor(Vendor vendor);
+        Task<Response> DeleteVendor(int vendorId, bool isHardDelete);
     }
 }

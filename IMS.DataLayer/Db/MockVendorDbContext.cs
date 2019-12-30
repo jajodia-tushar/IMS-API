@@ -68,6 +68,11 @@ namespace IMS.DataLayer.Db
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> DeleteVendor(int vendorId, bool isHardDelete)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

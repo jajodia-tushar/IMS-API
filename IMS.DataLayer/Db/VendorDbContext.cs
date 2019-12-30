@@ -165,5 +165,33 @@ namespace IMS.DataLayer.Db
             }
             return addedVendor;
         }
+
+        public async Task<bool> DeleteVendor(int vendorId, bool isHardDelete)
+        {
+            bool isDeleted = false;
+            int rowsAffected = 0;
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spDeleteVendor";
+                    command.Parameters.AddWithValue("@VendorId", vendorId);
+                    command.Parameters.AddWithValue("@isHardDelete", isHardDelete);
+                    rowsAffected = await command.ExecuteNonQueryAsync();
+                    if(rowsAffected>0)
+                    {
+                        isDeleted = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return isDeleted;
+        }
     }
 }

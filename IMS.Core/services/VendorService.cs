@@ -88,6 +88,75 @@ namespace IMS.Core.services
             }
             return vendorResponse;
         }
+
+        public async Task<Response> DeleteVendor(int vendorId, bool isHardDelete)
+        {
+            Response deleteResponse = new Response();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        if (vendorId > 0)
+                        {
+                            bool isDeleted = await _vendorDbContext.DeleteVendor(vendorId,isHardDelete);
+                            if (isDeleted==true)
+                            {
+                                deleteResponse.Status = Status.Success;
+                            }
+                            else
+                            {
+                                deleteResponse.Error = new Error()
+                                {
+                                    ErrorCode = Constants.ErrorCodes.NotFound,
+                                    ErrorMessage = Constants.ErrorMessages.UnableToFetch
+                                };
+                            }
+                            return deleteResponse;
+                        }
+                        else
+                        {
+                            deleteResponse.Status = Status.Failure;
+                            deleteResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.InValidId
+                            };
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        deleteResponse.Status = Status.Failure;
+                        deleteResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                        new Task(() => { _logger.LogException(exception, "Deletevendor", Severity.Medium, vendorId, deleteResponse); }).Start();
+                    }
+                }
+                else
+                {
+                    deleteResponse.Status = Status.Failure;
+                    deleteResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                deleteResponse.Status = Status.Failure;
+                deleteResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Deletevendor", Severity.Medium, vendorId, deleteResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (deleteResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log(vendorId, deleteResponse, "DeletVendor", deleteResponse.Status, severity, userId); }).Start();
+            }
+            return deleteResponse;
+        }
         public async Task<VendorResponse> GetVendorById(int vendorId)
         {
             VendorResponse vendorResponse = new VendorResponse();
