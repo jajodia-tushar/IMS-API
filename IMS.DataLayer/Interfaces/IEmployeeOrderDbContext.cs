@@ -8,7 +8,7 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface IEmployeeOrderDbContext
     {
-        Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(PagingInfo pagingInfo);
+        Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize,int pageNumber);
         Task<EmployeeOrder> AddEmployeeOrder(EmployeeOrder employeeOrder);
         Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string employeeId);
        

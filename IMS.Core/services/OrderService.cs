@@ -202,10 +202,10 @@ namespace IMS.Core.services
                     try
                     {
                         PagingInfo pagingInfo = new PagingInfo();
-                        pageSize = (pageSize == 0) ?pagingInfo.pageSize=10 : (pageSize < 0) ? throw new Exception() :pagingInfo.pageSize=pageSize;
-                        pageNumber = (pageNumber == 0) ?pagingInfo.pageNumber=1 : (pageNumber < 0) ? throw new Exception() :pagingInfo.pageNumber=pageNumber;
-                        List<EmployeeRecentOrder> employeeRecentOrders = await _employeeOrderDbContext.GetRecentEmployeeOrders(pagingInfo);
-                        if (employeeRecentOrders == null || employeeRecentOrders.Count == 0)
+                        pageSize = (pageSize == 0) ?pageSize=10 : (pageSize < 0) ? throw new Exception() :pageSize;
+                        pageNumber = (pageNumber == 0) ?pageNumber=1 : (pageNumber < 0) ? throw new Exception() :pageNumber;
+                   EmployeeRecentOrderResponse     doEmployeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize,pageNumber);
+                        if (doEmployeeRecentOrderResponse.EmployeeRecentOrders == null || doEmployeeRecentOrderResponse.EmployeeRecentOrders.Count == 0)
                         {
                             employeeRecentOrderResponse.Status = Status.Failure;
                             employeeRecentOrderResponse.Error = new Error()
@@ -216,9 +216,8 @@ namespace IMS.Core.services
                         }
                         else
                         {
-                            employeeRecentOrderResponse.Status = Status.Success;
-                            employeeRecentOrderResponse.EmployeeRecentOrders = employeeRecentOrders;
-                            employeeRecentOrderResponse.PagingInfo = pagingInfo;
+                            doEmployeeRecentOrderResponse.Status = Status.Success;
+                            employeeRecentOrderResponse = doEmployeeRecentOrderResponse;
                         }
                     }
                     catch(Exception ex)

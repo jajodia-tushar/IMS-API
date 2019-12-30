@@ -120,13 +120,17 @@ namespace IMS.DataLayer.Db
             string itemqty = string.Join(";", ItemsQuantityList.Select(p => p.Item.Id + "," + p.Quantity));
             return itemqty;
         }
-        public async Task<List<EmployeeRecentOrder>> GetRecentEmployeeOrders(PagingInfo pagingInfo)
+        public async Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize,int pageNumber)
         {
             MySqlDataReader reader = null;
+            PagingInfo pagingInfo = new PagingInfo();
+            pagingInfo.pageNumber = pageNumber;
+            pagingInfo.pageSize = pageSize;
+            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
             List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
-            int limit =pagingInfo.pageSize;
-            int offset = (pagingInfo.pageNumber - 1) *pagingInfo.pageSize;
+            int limit =pageSize;
+            int offset = (pageNumber - 1) *pageSize;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -135,32 +139,32 @@ namespace IMS.DataLayer.Db
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllEmployeeRecentOrders";
+                    command.CommandText = " spGetEmployeeRecentOrdersTest";
                     command.Parameters.AddWithValue("@lim", limit);
                     command.Parameters.AddWithValue("@off", offset);
+                    command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
+                    command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
+
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         RecentEmployeeOrderDto employeeOrder = Extract(reader);
                         recentEmployeeOrderDtos.Add(employeeOrder);
                     }
+                    reader.Close();
+                   
+                    command.ExecuteNonQuery();
+                    pagingInfo.totalResults = (int)command.Parameters["@orderCount"].Value;
                     listOfEmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
-                    reader.Close();
-
-                    var command1 = connection.CreateCommand();
-                    command1.CommandType = CommandType.StoredProcedure;
-                    command1.CommandText = "spGetEmployeeOrderCount";
-                    reader = command1.ExecuteReader();
-                    reader.Read();
-                    pagingInfo.totalResults = (int)reader.GetUInt32(0);
-                    reader.Close();
+                    employeeRecentOrderResponse.EmployeeRecentOrders = listOfEmployeeRecentOrders;
+                    employeeRecentOrderResponse.PagingInfo = pagingInfo;
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
             }
-            return listOfEmployeeRecentOrders;
+            return employeeRecentOrderResponse ;
         }
         private static List<EmployeeRecentOrder> GetListOfEmployeeRecentOrder(List<RecentEmployeeOrderDto> recentEmployeeOrderDtos)
         {
