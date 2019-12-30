@@ -27,17 +27,13 @@ namespace IMS.EmployeeDataDumper
         {
             Response employeesAddResponse = new Response();
             var employeesNotAddedFileLocation = @"C:\IMSEmployeesData\";
-            var employeesNotAddedFileName = "IMSEmployeesNotAdded.csv";
+            var employeesNotAddedFileName = "IMSEmployeesNotAdded_"+DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")+".csv";
             try
             {
                 var employeesData = File.ReadAllLines(_configuration["Path:FilePath"]);
                 List<Employee> employeesList = ReadEmployeesDataFromCsv(employeesData);
                 List<Employee> employeesNotAdded = _employeesDataDbContext.CreateEmployee(employeesList);
                 StringBuilder sb = new StringBuilder();
-                if (File.Exists(employeesNotAddedFileLocation+employeesNotAddedFileName))
-                {
-                    File.Delete(employeesNotAddedFileLocation + employeesNotAddedFileName);
-                }
                 for (int index = 0; index < employeesNotAdded.Count; index++)
                     sb.AppendLine(string.Join(",", employeesNotAdded[index].Id,employeesNotAdded[index].Firstname,
                         employeesNotAdded[index].Lastname,employeesNotAdded[index].Email,
