@@ -103,15 +103,15 @@ namespace IMS.DataLayer.Dal
             return new User()
             {
                 Id = (int)reader["userid"],
-                Username = (string)reader["username"],
-                Password = (string)reader["password"],
-                Firstname = (string)reader["firstname"],
-                Lastname = (string)reader["lastname"],
-                Email = (string)reader["email"],
+                Username = reader["username"]?.ToString(),
+                Password = reader["password"]?.ToString(),
+                Firstname = reader["firstname"]?.ToString(),
+                Lastname = reader["lastname"]?.ToString(),
+                Email = reader["email"]?.ToString(),
                 Role = new Role()
                 {
                     Id = (int)reader["roleid"],
-                    Name = (string)reader["rolename"]
+                    Name = reader["rolename"]?.ToString()
                 }
             };
         }
