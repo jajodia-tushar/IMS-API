@@ -2,6 +2,7 @@
 using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,42 +16,55 @@ namespace IMS.Core.services
     {
         private IEmployeeDbContext employeeDbContext;
         private ILogManager _logger;
-        public EmployeeService(IEmployeeDbContext employeeDbContext, ILogManager logger)
+        private IHttpContextAccessor _httpContextAccessor;
+        private ITokenProvider _tokenProvider;
+        public EmployeeService(IEmployeeDbContext employeeDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
         {
             this.employeeDbContext = employeeDbContext;
             this._logger = logger;
+            this._tokenProvider = tokenProvider;
+            this._httpContextAccessor = httpContextAccessor;
         }
-        public GetEmployeeResponse ValidateEmployee(string employeeId)
+        public async Task<GetEmployeeResponse> ValidateEmployee(string employeeId)
         {
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
             {
-                if (String.IsNullOrEmpty(employeeId))
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    employeeValidationResponse.Status = Status.Failure;
-                    employeeValidationResponse.Error = new Error()
+                    User requestesUser = Utility.GetUserFromToken(token);
+                    if (String.IsNullOrEmpty(employeeId))
                     {
-                        ErrorCode = Constants.ErrorCodes.BadRequest,
-                        ErrorMessage = Constants.ErrorMessages.InvalidId
-                    };
-                    return employeeValidationResponse;
-                }
-                Employee employee = employeeDbContext.GetEmployeeById(employeeId);
-                if (employee != null)
-                {
-                    employeeValidationResponse.Status = Status.Success;
-                    employeeValidationResponse.Employee = employee;
-
+                        employeeValidationResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.BadRequest,
+                            ErrorMessage = Constants.ErrorMessages.InvalidId
+                        };
+                        return employeeValidationResponse;
+                    }
+                    Employee employee = await employeeDbContext.GetEmployeeById(employeeId);
+                    if (employee != null)
+                    {
+                        employeeValidationResponse.Status = Status.Success;
+                        employeeValidationResponse.Employee = employee;
+                    }
+                    else
+                    {
+                        employeeValidationResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.InvalidId
+                        };
+                    }
                 }
                 else
                 {
-                    employeeValidationResponse.Status = Status.Failure;
                     employeeValidationResponse.Error = new Error()
                     {
-                        ErrorCode = Constants.ErrorCodes.NotFound,
-                        ErrorMessage = Constants.ErrorMessages.InvalidId
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
                     };
-
                 }
             }
             catch (Exception exception)
@@ -64,7 +78,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (employeeValidationResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(employeeId, employeeValidationResponse, "Validating employee", employeeValidationResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(employeeId, employeeValidationResponse, "ValidateEmployee", employeeValidationResponse.Status, severity, -1); }).Start();
             }
             return employeeValidationResponse;
         }

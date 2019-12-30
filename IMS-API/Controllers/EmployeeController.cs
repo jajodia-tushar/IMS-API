@@ -34,12 +34,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Employee Details if employee id is valid otherwise it returns null with status failure</response>
         // GET: api/Default/5
         [HttpGet("{employeeId}", Name = "GetEmployeeById")]
-        public GetEmployeeResponse GetEmployeeById(String employeeId)
+        public async Task<GetEmployeeResponse> GetEmployeeById(String employeeId)
         {
             GetEmployeeResponse contractsEmployeeValidationResponse = null;
             try
             {
-                IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = employeeService.ValidateEmployee(employeeId);
+                IMS.Entities.GetEmployeeResponse entityEmployeeValidationResponse = await employeeService.ValidateEmployee(employeeId);
                 contractsEmployeeValidationResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
             catch (Exception exception)

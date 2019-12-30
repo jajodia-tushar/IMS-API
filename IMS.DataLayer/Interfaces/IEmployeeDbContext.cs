@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Interfaces
 {
     public interface IEmployeeDbContext
     {
-        Employee GetEmployeeById(string employeeId);
-        List<Employee> GetAllEmployees();
-        bool CreateEmployee(Employee employee);
+        Task<Employee> GetEmployeeById(string employeeId);
+        Task<List<Employee>> GetAllEmployees();
+        Task<bool> CreateEmployee(Employee employee);
     }
 }
