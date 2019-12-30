@@ -128,5 +128,68 @@ namespace IMS.Core.services
             }
             return vendorResponse;
         }
+        public async Task<VendorResponse> UpdateVendor(Vendor vendor)
+        {
+            VendorResponse vendorResponse = new VendorResponse();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    vendorResponse.Vendors = new List<Vendor>();
+                    userId = user.Id;
+                    try
+                    {
+                        if(vendor != null && vendor.Id > 0)
+                        {
+                            vendor= await _vendorDbContext.UpdateVendor(vendor);
+                            if (vendor != null)
+                            {
+                                vendorResponse.Status = Status.Success;
+                                vendorResponse.Vendors.Add(vendor);
+
+                            }
+                            return vendorResponse;
+                        }
+                        else
+                        {
+                            vendorResponse.Status = Status.Failure;
+                            vendorResponse.Error = new Error()
+                            {
+                                ErrorCode = Constants.ErrorCodes.NotFound,
+                                ErrorMessage = Constants.ErrorMessages.InValidId
+                            };
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        vendorResponse.Status = Status.Failure;
+                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                        new Task(() => { _logger.LogException(exception, "UpdateVendor", Severity.Medium, vendor, vendorResponse); }).Start();
+                    }
+                }
+                else
+                {
+                    vendorResponse.Status = Status.Failure;
+                    vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                vendorResponse.Status = Status.Failure;
+                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                new Task(() => { _logger.LogException(exception, "UpdateVendor", Severity.High, vendor, vendorResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (vendorResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log(vendor, vendorResponse, "UpdateVendor", vendorResponse.Status, severity, userId); }).Start();
+            }
+            return vendorResponse;
+        }
     }
 }

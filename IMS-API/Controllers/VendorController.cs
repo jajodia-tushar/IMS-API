@@ -87,5 +87,37 @@ namespace IMS_API.Controllers
             }
             return vendorResponse;
         }
+        // PUT: api/
+        /// <summary>
+        /// updates vendor details
+        /// </summary>
+        /// <param name="vendor">takes the vendor to be updated</param>
+        /// <returns>the updated vendor</returns>
+        /// <response code="200">Returns updated vendor</response>
+        [HttpGet(Name = "Update(Vendor vendor)")]
+        public async Task<VendorResponse> Update(Vendor vendor)
+        {
+            VendorResponse contractsVendorValidationResponse = null;
+            try
+            {
+                IMS.Entities.Vendor vendorEntity = VendorTranslator.ToEntitiesObject(vendor);
+                IMS.Entities.VendorResponse entityVendorValidationResponse = await _vendorService.UpdateVendor(vendorEntity);
+                contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
+            }
+            catch (Exception exception)
+            {
+                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.High, vendor, contractsVendorValidationResponse); }).Start();
+            }
+            return contractsVendorValidationResponse;
+        }
     }
 }

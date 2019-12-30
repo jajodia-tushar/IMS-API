@@ -365,5 +365,13 @@
             <returns>the vendors object along with status</returns>
             <response code="200">Returns the Vendors object</response>
         </member>
+        <member name="M:IMS_API.Controllers.VendorController.Update(IMS.Contracts.Vendor)">
+            <summary>
+            updates vendor details
+            </summary>
+            <param name="vendor">takes the vendor to be updated</param>
+            <returns>the updated vendor</returns>
+            <response code="200">Returns updated vendor</response>
+        </member>
     </members>
 </doc>

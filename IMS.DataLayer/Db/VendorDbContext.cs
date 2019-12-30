@@ -24,32 +24,25 @@ namespace IMS.DataLayer.Db
         {
             Vendor vendor= null;
             DbDataReader reader = null;
-
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
-
                     connection.Open();
-
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetVendorById";
-
-
                     command.Parameters.AddWithValue("@Id", vendorId);
                     reader = await command.ExecuteReaderAsync();
-
                     while (reader.Read())
                     {
-                       vendor = Extract(reader);
+                        vendor = Extract(reader);
                     }
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-
             }
             return vendor;
         }
@@ -103,6 +96,34 @@ namespace IMS.DataLayer.Db
 
             }
             return vendorsResponse;
+        }
+
+        public async Task<Vendor> UpdateVendor(Vendor vendor)
+        {
+            Vendor updatedVendor = null;
+            DbDataReader reader = null;
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spUpdateVendor";
+                    command.Parameters.AddWithValue("@Id", vendor.Id);
+
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        updatedVendor = Extract(reader);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return updatedVendor;
         }
     }
 }
