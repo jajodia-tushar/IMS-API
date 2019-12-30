@@ -1,4 +1,5 @@
-﻿using IMS.DataLayer.Interfaces;
+using IMS.Core.Validators;
+using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
@@ -24,7 +25,6 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-
         public async Task<VendorResponse> GetVendorById(int vendorId)
         {
             VendorResponse vendorResponse = new VendorResponse();
@@ -142,14 +142,13 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if(vendor != null && vendor.Id > 0)
+                        if(VendorValidator.Validate(vendor))
                         {
                             vendor= await _vendorDbContext.UpdateVendor(vendor);
                             if (vendor != null)
                             {
                                 vendorResponse.Status = Status.Success;
                                 vendorResponse.Vendors.Add(vendor);
-
                             }
                             return vendorResponse;
                         }
@@ -159,14 +158,14 @@ namespace IMS.Core.services
                             vendorResponse.Error = new Error()
                             {
                                 ErrorCode = Constants.ErrorCodes.NotFound,
-                                ErrorMessage = Constants.ErrorMessages.InValidId
+                                ErrorMessage = Constants.ErrorMessages.MissingValues
                             };
                         }
                     }
                     catch (Exception exception)
                     {
                         vendorResponse.Status = Status.Failure;
-                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                         new Task(() => { _logger.LogException(exception, "UpdateVendor", Severity.Medium, vendor, vendorResponse); }).Start();
                     }
                 }
@@ -179,7 +178,7 @@ namespace IMS.Core.services
             catch (Exception exception)
             {
                 vendorResponse.Status = Status.Failure;
-                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
+                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "UpdateVendor", Severity.High, vendor, vendorResponse); }).Start();
             }
             finally

@@ -111,6 +111,13 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spUpdateVendor";
                     command.Parameters.AddWithValue("@Id", vendor.Id);
+                    command.Parameters.AddWithValue("@Name", vendor.Name);
+                    command.Parameters.AddWithValue("@MobileNumber", vendor.ContactNumber);
+                    command.Parameters.AddWithValue("@Address", vendor.Address);
+                    command.Parameters.AddWithValue("@Pan", vendor.PAN);
+                    command.Parameters.AddWithValue("@Gst", vendor.GST);
+                    command.Parameters.AddWithValue("@Cin", vendor.CompanyIdentificationNumber);
+                    command.Parameters.AddWithValue("@Title", vendor.Title);
 
                     reader = await command.ExecuteReaderAsync();
                     while (reader.Read())

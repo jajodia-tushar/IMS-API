@@ -94,8 +94,8 @@ namespace IMS_API.Controllers
         /// <param name="vendor">takes the vendor to be updated</param>
         /// <returns>the updated vendor</returns>
         /// <response code="200">Returns updated vendor</response>
-        [HttpGet(Name = "Update(Vendor vendor)")]
-        public async Task<VendorResponse> Update(Vendor vendor)
+        [HttpPut(Name = "Update(Vendor vendor)")]
+        public async Task<VendorResponse> Update([FromBody]Vendor vendor)
         {
             VendorResponse contractsVendorValidationResponse = null;
             try
