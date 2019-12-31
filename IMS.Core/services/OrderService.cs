@@ -224,7 +224,7 @@ namespace IMS.Core.services
                     {
                         employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
                         employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidPageNumber;
-                        return employeeRecentOrderResponse;
+                        new Task(() => { _logger.LogException(ex, "GetEmployeeRecentOrders", Severity.Critical, pageNumber + ";" + pageSize, employeeRecentOrderResponse); }).Start();
                     }
                 }
                 else
