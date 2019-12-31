@@ -41,7 +41,7 @@ namespace IMS.DataLayer.Db
                             LogId = (int)reader["Id"],
                             UserId=(int)reader["UserId"],
                             CallType=(string)reader["CallType"],
-                            Request = (string)reader["Request"],
+                            Request = ReturnNullOrValueAccordingly(reader["Request"]),
                             Response=(string)reader["Response"],
                             Severity =(string)reader["Severity"],
                             Status =(string)reader["Status"],
@@ -56,9 +56,20 @@ namespace IMS.DataLayer.Db
             }
             catch (Exception ex)
             {
-
+                throw ex;
             }
             return logsRecords;
+        }
+        public static string ReturnNullOrValueAccordingly(object field)
+        {
+            try
+            {
+                return (string)field;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public void Log(int userId, string status, string callType, string severity, string request, string response)
