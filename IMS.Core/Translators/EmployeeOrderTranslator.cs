@@ -10,63 +10,89 @@ namespace IMS.Core.Translators
     {
         public static Contracts.EmployeeRecentOrderResponse ToDataContractsObject(Entities.EmployeeRecentOrderResponse doEmployeeRecentOrderResponse)
         {
-            Contracts.EmployeeRecentOrderResponse dtoEmployeeRecentOrderResponse = new Contracts.EmployeeRecentOrderResponse();
-            dtoEmployeeRecentOrderResponse.Status = Contracts.Status.Failure;
-            if (doEmployeeRecentOrderResponse.Status == Entities.Status.Success)
-            {
-                dtoEmployeeRecentOrderResponse.Status = Contracts.Status.Success;
-                dtoEmployeeRecentOrderResponse.Error = null;
-                dtoEmployeeRecentOrderResponse.EmployeeRecentOrders = ToDataContractsObject(doEmployeeRecentOrderResponse.EmployeeRecentOrders);
-            }
-            else
-            {
-                dtoEmployeeRecentOrderResponse.Status = Contracts.Status.Failure;
-                dtoEmployeeRecentOrderResponse.Error = Translator.ToDataContractsObject(doEmployeeRecentOrderResponse.Error);
-            }
-            return dtoEmployeeRecentOrderResponse;
+            if (doEmployeeRecentOrderResponse != null)
+                return new Contracts.EmployeeRecentOrderResponse
+                {
+                    Status = doEmployeeRecentOrderResponse.Status == Entities.Status.Success ? 
+                    Contracts.Status.Success : Contracts.Status.Failure,
+                    Error = doEmployeeRecentOrderResponse.Error == null ?
+                    null : Translator.ToDataContractsObject(doEmployeeRecentOrderResponse.Error),
+                    EmployeeRecentOrders = doEmployeeRecentOrderResponse.EmployeeRecentOrders == null ? 
+                    null : ToDataContractsObject(doEmployeeRecentOrderResponse.EmployeeRecentOrders),
+                    PagingInfo = doEmployeeRecentOrderResponse.PagingInfo == null ? 
+                    null : ToDataContractsObject(doEmployeeRecentOrderResponse.PagingInfo)
+                };
+            return null;
         }
-
+        public static Contracts.PagingInfo ToDataContractsObject(Entities.PagingInfo pagingInfo)
+        {
+            if(pagingInfo !=null)
+            return new Contracts.PagingInfo()
+            {
+                PageNumber = pagingInfo.PageNumber,
+                PageSize = pagingInfo.PageSize,
+                TotalResults = pagingInfo.TotalResults
+            };
+            return null;
+        }
         public static List<Contracts.EmployeeRecentOrder> ToDataContractsObject(List<Entities.EmployeeRecentOrder> employeeRecentOrders)
         {
-            List<Contracts.EmployeeRecentOrder> dtoEmployeeRecentOrder = new List<Contracts.EmployeeRecentOrder>();
-            foreach (var recentOrder in employeeRecentOrders)
-            {
-                dtoEmployeeRecentOrder.Add(ToDataContractsObject(recentOrder));
+            List<Contracts.EmployeeRecentOrder> dtoEmployeeRecentOrder = null;
+            if (employeeRecentOrders != null)
+            { 
+              dtoEmployeeRecentOrder = new List<Contracts.EmployeeRecentOrder>();
+                foreach (var recentOrder in employeeRecentOrders)
+                {
+                    dtoEmployeeRecentOrder.Add(ToDataContractsObject(recentOrder));
+                }
+                return dtoEmployeeRecentOrder;
             }
-
             return dtoEmployeeRecentOrder;
         }
 
         public static Contracts.EmployeeRecentOrder ToDataContractsObject(Entities.EmployeeRecentOrder recentOrder)
         {
-            Contracts.EmployeeRecentOrder dtoEmployeeRecentOrder = new Contracts.EmployeeRecentOrder();
-            dtoEmployeeRecentOrder.Employee = EmployeeTranslator.ToDataContractsObject(recentOrder.Employee);
-            dtoEmployeeRecentOrder.EmployeeOrder = ToDataContractsObject(recentOrder.EmployeeOrder);
-            return dtoEmployeeRecentOrder;
+            if (recentOrder != null)
+            {
+                return new Contracts.EmployeeRecentOrder
+                {
+                    Employee = recentOrder.Employee == null ? null : EmployeeTranslator.ToDataContractsObject(recentOrder.Employee),
+                    EmployeeOrder = recentOrder.EmployeeOrder == null ? null : ToDataContractsObject(recentOrder.EmployeeOrder)
+                };
+            }
+            return null;
         }
 
         public static Entities.EmployeeOrderDetails ToEntitiesObject(Contracts.EmployeeOrderDetails employeeOrder)
         {
-            return new Entities.EmployeeOrderDetails()
+            if (employeeOrder != null)
             {
-                Date = employeeOrder.Date,
-                OrderId = employeeOrder.OrderId,
-                Shelf = ShelfTranslator.ToEntitiesObject(employeeOrder.Shelf),
-                EmployeeItemsQuantityList = ShelfItemsTranslator.ToEntitiesObject(employeeOrder.EmployeeItemsQuantityList)
-            };
+                return new Entities.EmployeeOrderDetails()
+                {
+                    Date = employeeOrder.Date,
+                    OrderId = employeeOrder.OrderId,
+                    Shelf = employeeOrder.Shelf==null?null:ShelfTranslator.ToEntitiesObject(employeeOrder.Shelf),
+                    EmployeeItemsQuantityList =employeeOrder.EmployeeItemsQuantityList==null?null:
+                    ShelfItemsTranslator.ToEntitiesObject(employeeOrder.EmployeeItemsQuantityList)
+                };
+            }
+            return null;
         }
         public static Contracts.EmployeeOrderResponse ToDataContractsObject(Entities.EmployeeOrderResponse placeEmployeeOrderResponseEntity)
         {
-            Contracts.EmployeeOrderResponse contractPlaceEmployeeOrderResponse = new Contracts.EmployeeOrderResponse();
-            contractPlaceEmployeeOrderResponse.Status = Contracts.Status.Failure;
-            contractPlaceEmployeeOrderResponse.Error = Translator.ToDataContractsObject(placeEmployeeOrderResponseEntity.Error);
-            if (placeEmployeeOrderResponseEntity.Status == Entities.Status.Success)
+            if (placeEmployeeOrderResponseEntity != null)
             {
-                contractPlaceEmployeeOrderResponse.Status = Contracts.Status.Success;
-                contractPlaceEmployeeOrderResponse.Error = null;
-                contractPlaceEmployeeOrderResponse.EmployeeOrder = ToDataContractsObject(placeEmployeeOrderResponseEntity.EmployeeOrder);
+                return new Contracts.EmployeeOrderResponse
+                {
+                    Error = placeEmployeeOrderResponseEntity.Error == null ? null : 
+                    Translator.ToDataContractsObject(placeEmployeeOrderResponseEntity.Error),
+                    Status = placeEmployeeOrderResponseEntity.Status == Entities.Status.Success ? Contracts.Status.Success : 
+                    Contracts.Status.Failure,
+                    EmployeeOrder = placeEmployeeOrderResponseEntity.EmployeeOrder==null?null : 
+                    ToDataContractsObject(placeEmployeeOrderResponseEntity.EmployeeOrder)
+                };
             }
-            return contractPlaceEmployeeOrderResponse;
+            return null;
         }
 
         private static Contracts.EmployeeOrder ToDataContractsObject(Entities.EmployeeOrder employeeOrderEntity)
