@@ -28,27 +28,27 @@ namespace IMS.Core.services
         public async Task<GetEmployeeResponse> ValidateEmployee(string employeeId)
         {
 
-        public Task<EmployeeResponse> Add(Employee employee)
+        public Task<GetEmployeeResponse> Add(Employee employee)
         {
             throw new NotImplementedException();
         }
 
-        public Task<EmployeeResponse> Delete(int id)
+        public Task<bool> Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<EmployeeResponse> GetAllEmployees()
+        public Task<EmployeeResponse> GetAllEmployees(int pageNumber,int pageSize)
         {
             throw new NotImplementedException();
         }
 
-        public Task<EmployeeResponse> GetEmployee(int employeeId)
+        public Task<GetEmployeeResponse> GetEmployee(int employeeId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<EmployeeResponse> Update(Employee employee)
+        public Task<GetEmployeeResponse> Update(Employee employee)
         {
             throw new NotImplementedException();
         }

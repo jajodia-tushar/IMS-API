@@ -9,10 +9,10 @@ namespace IMS.Entities.Interfaces
     {
         Task<GetEmployeeResponse> ValidateEmployee(string employeeId);
         GetEmployeeResponse ValidateEmployee(string employeeId);
-        Task<EmployeeResponse> GetAllEmployees();
-        Task<EmployeeResponse> GetEmployee(int employeeId);
-        Task<EmployeeResponse> Add(Employee employee);
-        Task<EmployeeResponse> Update(Employee employee);
-        Task<EmployeeResponse> Delete(int id);
+        Task<EmployeeResponse> GetAllEmployees(int pageNumber, int pageSize);
+        Task<GetEmployeeResponse> GetEmployee(int employeeId);
+        Task<GetEmployeeResponse> Add(Employee employee);
+        Task<GetEmployeeResponse> Update(Employee employee);
+        Task<bool> Delete(int id);
     }
 }
