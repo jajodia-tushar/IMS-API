@@ -27,6 +27,34 @@ namespace IMS.Core.services
         }
         public async Task<GetEmployeeResponse> ValidateEmployee(string employeeId)
         {
+
+        public Task<EmployeeResponse> Add(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EmployeeResponse> Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EmployeeResponse> GetAllEmployees()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EmployeeResponse> GetEmployee(int employeeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EmployeeResponse> Update(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        public GetEmployeeResponse ValidateEmployee(string employeeId)
+        {
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
             {
