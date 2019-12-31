@@ -9,6 +9,6 @@ namespace IMS.Entities.Interfaces
     {
        Task<VendorResponse> GetVendorById(int vendorId);
        Task<VendorResponse>  GetAllVendors();
-       Task<VendorSearchResponse> SearchByName(string name, int pageNumber, int pageSize);
+       Task<VendorsResponse> SearchByName(string name, int pageNumber, int pageSize);
     }
 }

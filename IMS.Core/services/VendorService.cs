@@ -147,9 +147,9 @@ namespace IMS.Core.services
             return vendorResponse;
         }
 
-        public async Task<VendorSearchResponse> SearchByName(string name, int pageNumber, int pageSize)
+        public async Task<VendorsResponse> SearchByName(string name, int pageNumber, int pageSize)
         {
-            VendorSearchResponse vendorResponse = new VendorSearchResponse();
+            VendorsResponse vendorResponse = new VendorsResponse();
             int userId = -1;
             try
             {

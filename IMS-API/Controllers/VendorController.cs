@@ -96,18 +96,18 @@ namespace IMS_API.Controllers
         /// <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
         // GET: api/Order/EmployeeRecentOrderDetails
         [HttpGet("SearchByName/{name}", Name = "SearchByName(string Name)")]
-        public async Task<VendorSearchResponse> SearchByName(string name, int pageNumber, int pageSize )
+        public async Task<VendorsResponse> SearchByName(string name, int pageNumber, int pageSize )
         {
 
-            VendorSearchResponse vendorResponse = null;
+            VendorsResponse vendorResponse = null;
             try
             {
-                IMS.Entities.VendorSearchResponse vendorResponseEntity = await _vendorService.SearchByName(name,pageNumber, pageSize);
+                IMS.Entities.VendorsResponse vendorResponseEntity = await _vendorService.SearchByName(name,pageNumber, pageSize);
                 vendorResponse = VendorTranslator.ToDataContractsObject(vendorResponseEntity);
             }
             catch (Exception exception)
             {
-                vendorResponse = new VendorSearchResponse()
+                vendorResponse = new VendorsResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()

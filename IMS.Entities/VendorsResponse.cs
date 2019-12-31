@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Contracts
+namespace IMS.Entities
 {
-    public class VendorSearchResponse : Response
+    public class VendorsResponse : Response
     {
         public PagingInfo PagingInfo { get; set; }
         public List<Vendor> Vendors { get; set; }

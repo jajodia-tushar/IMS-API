@@ -65,9 +65,9 @@ namespace IMS.Core.Translators
             return null;
         }
 
-        public static Contracts.VendorSearchResponse ToDataContractsObject(Entities.VendorSearchResponse vendorResponseEntity)
+        public static Contracts.VendorsResponse ToDataContractsObject(Entities.VendorsResponse vendorResponseEntity)
         {
-            Contracts.VendorSearchResponse vendorSearchResponse = new Contracts.VendorSearchResponse();
+            Contracts.VendorsResponse vendorSearchResponse = new Contracts.VendorsResponse();
             vendorSearchResponse.PagingInfo = new Contracts.PagingInfo();
             vendorSearchResponse.Vendors = new List<Contracts.Vendor>();
             if (vendorResponseEntity!=null)
