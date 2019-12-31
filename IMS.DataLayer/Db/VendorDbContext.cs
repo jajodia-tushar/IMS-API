@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace IMS.DataLayer.Db
         public async Task<Vendor> GetVendorById(int vendorId)
         {
             Vendor vendor= null;
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
@@ -37,21 +38,11 @@ namespace IMS.DataLayer.Db
 
 
                     command.Parameters.AddWithValue("@Id", vendorId);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
 
                     while (reader.Read())
                     {
-                        vendor = new Vendor()
-                        {
-                            Id = (int)reader["Id"],
-                            Name = ReturnNullOrValueAccordingly(reader["Name"]),
-                            ContactNumber = ReturnNullOrValueAccordingly(reader["MobileNumber"]),
-                            Title = ReturnNullOrValueAccordingly(reader["Title"]),
-                            Address = ReturnNullOrValueAccordingly(reader["Address"]),
-                            PAN = ReturnNullOrValueAccordingly(reader["Pan"]),
-                            GST = ReturnNullOrValueAccordingly(reader["Gst"]),
-                            CompanyIdentificationNumber = ReturnNullOrValueAccordingly(reader["Cin"])
-                        };
+                       vendor = Extract(reader);
                     }
                 }
                 catch (Exception ex)
@@ -62,22 +53,25 @@ namespace IMS.DataLayer.Db
             }
             return vendor;
         }
-        public static string ReturnNullOrValueAccordingly(object field)
+        public Vendor Extract(DbDataReader reader)
         {
-            try
+            return new Vendor()
             {
-                return (string)field;
-            }
-            catch
-            {
-                return "";
-            }
+                Id = (int)reader["Id"],
+                Name = reader["Name"]?.ToString(),
+                ContactNumber = reader["MobileNumber"]?.ToString(),
+                Title = reader["Title"]?.ToString(),
+                Address = reader["Address"]?.ToString(),
+                PAN = reader["Pan"]?.ToString(),
+                GST = reader["Gst"]?.ToString(),
+                CompanyIdentificationNumber = reader["Cin"]?.ToString()
+            };
         }
 
         public async Task<List<Vendor>> GetAllVendors()
         {
             List<Vendor> vendors = new List<Vendor>();
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
@@ -89,21 +83,11 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetAllVendors";
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
 
                     while (reader.Read())
                     {
-                        Vendor vendor = new Vendor()
-                        {
-                            Id = (int)reader["Id"],
-                            Name = ReturnNullOrValueAccordingly(reader["Name"]),
-                            ContactNumber = ReturnNullOrValueAccordingly(reader["MobileNumber"]),
-                            Title = ReturnNullOrValueAccordingly(reader["Title"]),
-                            Address = ReturnNullOrValueAccordingly(reader["Address"]),
-                            PAN = ReturnNullOrValueAccordingly(reader["Pan"]),
-                            GST = ReturnNullOrValueAccordingly(reader["Gst"]),
-                            CompanyIdentificationNumber = ReturnNullOrValueAccordingly(reader["Cin"])
-                        };
+                        Vendor vendor = Extract(reader);
                         vendors.Add(vendor);
                     }
                 }
@@ -114,6 +98,40 @@ namespace IMS.DataLayer.Db
 
             }
             return vendors;
+        }
+
+        public async Task<int> SearchByName(string name, int limit, int offset, List<Vendor> vendors)
+        {
+            DbDataReader reader = null;
+            int totalCountOfData = 0;
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetVendorByName";
+                    command.Parameters.AddWithValue("@Name", name);
+                    command.Parameters.AddWithValue("@theLimit", limit);
+                    command.Parameters.AddWithValue("@theOffset", offset);
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        totalCountOfData = Convert.ToInt32(reader["totalVendorsCount"]);
+                        Vendor vendor = Extract(reader);
+                        vendors.Add(vendor);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return totalCountOfData;
         }
     }
 }

@@ -146,5 +146,70 @@ namespace IMS.Core.services
             }
             return vendorResponse;
         }
+
+        public async Task<VendorSearchResponse> SearchByName(string name, int pageNumber, int pageSize)
+        {
+            VendorSearchResponse vendorResponse = new VendorSearchResponse();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    if (pageSize == 0)
+                        pageSize = 10;
+                    if (pageNumber == 0)
+                        pageNumber = 1;
+                    vendorResponse.PagingInfo = new PagingInfo()
+                    {
+                        PageNumber = pageNumber,
+                        PageSize = pageSize
+                    };
+                    int limit = pageSize;
+                    int offset = (pageNumber - 1) * pageSize;
+                    List<Vendor> vendors = new List<Vendor>();
+                    vendorResponse.PagingInfo.TotalResults = await _vendorDbContext.SearchByName(name, limit, offset, vendors);
+                    if (vendors == null || vendors.Count == 0)
+                    {
+                        vendorResponse.Status = Status.Failure;
+                        vendorResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.NoVendorsYet
+                        };
+                    }
+                    else
+                    {
+                        vendorResponse.Status = Status.Success;
+                        vendorResponse.Vendors = vendors;
+                    }
+                }
+                else
+                {
+                    vendorResponse.Status = Status.Failure;
+                    vendorResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
+                        ErrorMessage = Constants.ErrorMessages.InvalidToken
+                    };
+                }
+            }
+            catch (Exception exception)
+            {
+                vendorResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
+                vendorResponse.Error.ErrorMessage = Constants.ErrorMessages.UnableToFetch;
+            }
+            finally
+            {
+                Severity severity = Severity.Medium;
+                if (vendorResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log("SearchByName", vendorResponse, "SearchByName", vendorResponse.Status, severity, -1); }).Start();
+            }
+            return vendorResponse;
+
+        }
     }
 }

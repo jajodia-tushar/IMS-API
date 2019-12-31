@@ -10,6 +10,6 @@ namespace IMS.DataLayer.Interfaces
     {
         Task<Vendor> GetVendorById(int vendorId);
         Task<List<Vendor>> GetAllVendors();
-
+        Task<int> SearchByName(string name, int limit, int offset, List<Vendor> vendors);
     }
 }
