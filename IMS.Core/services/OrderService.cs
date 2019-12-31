@@ -241,8 +241,7 @@ namespace IMS.Core.services
             {
                 employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
                 employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.UnableToShowRecentEntries;
-                return employeeRecentOrderResponse;
-
+                new Task(() => { _logger.LogException(exception, "GetEmployeeRecentOrders", Severity.Critical, pageNumber+";"+pageSize, employeeRecentOrderResponse); }).Start();
             }
             finally
             {

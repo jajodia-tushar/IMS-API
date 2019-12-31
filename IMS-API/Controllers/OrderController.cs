@@ -125,6 +125,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
+                new Task(() => { _logger.LogException(ex,"GetEmployeeRecentOrderDetails", IMS.Entities.Severity.Critical,pageNumber+";"+pageSize, dtoEmployeeRecentOrderResponse); }).Start();
             }
             return dtoEmployeeRecentOrderResponse;
         }
