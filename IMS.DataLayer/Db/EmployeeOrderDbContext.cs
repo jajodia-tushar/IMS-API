@@ -124,8 +124,8 @@ namespace IMS.DataLayer.Db
         {
             MySqlDataReader reader = null;
             PagingInfo pagingInfo = new PagingInfo();
-            pagingInfo.pageNumber = pageNumber;
-            pagingInfo.pageSize = pageSize;
+            pagingInfo.PageNumber = pageNumber;
+            pagingInfo.PageSize = pageSize;
             EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
             List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
@@ -139,12 +139,12 @@ namespace IMS.DataLayer.Db
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = " spGetEmployeeRecentOrdersTest";
+                    command.CommandText = "spGetEmployeeRecentOrders";
                     command.Parameters.AddWithValue("@lim", limit);
                     command.Parameters.AddWithValue("@off", offset);
                     command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
                     command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
-e                    reader = command.ExecuteReader();
+                    reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         RecentEmployeeOrderDto employeeOrder = Extract(reader);
@@ -153,7 +153,7 @@ e                    reader = command.ExecuteReader();
                     reader.Close();
                    
                     command.ExecuteNonQuery();
-                    pagingInfo.totalResults = (int)command.Parameters["@orderCount"].Value;
+                    pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
                     listOfEmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
                     employeeRecentOrderResponse.EmployeeRecentOrders = listOfEmployeeRecentOrders;
                     employeeRecentOrderResponse.PagingInfo = pagingInfo;

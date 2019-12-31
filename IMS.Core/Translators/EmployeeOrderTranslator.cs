@@ -29,9 +29,9 @@ namespace IMS.Core.Translators
             if(pagingInfo !=null)
             return new Contracts.PagingInfo()
             {
-                pageNumber = pagingInfo.pageNumber,
-                pageSize = pagingInfo.pageSize,
-                totalResults = pagingInfo.totalResults
+                PageNumber = pagingInfo.PageNumber,
+                PageSize = pagingInfo.PageSize,
+                TotalResults = pagingInfo.TotalResults
             };
             return null;
         }
