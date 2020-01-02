@@ -28,7 +28,7 @@ namespace IMS.Core.services
         public async Task<GetEmployeeResponse> ValidateEmployee(string employeeId)
         {
 
-        public Task<GetEmployeeResponse> Add(Employee employee)
+        public Task<EmployeeResponse> Add(Employee employee)
         {
             throw new NotImplementedException();
         }
@@ -43,12 +43,12 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        public Task<GetEmployeeResponse> GetEmployee(int employeeId)
+        public Task<EmployeeResponse> GetEmployee(int employeeId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<GetEmployeeResponse> Update(Employee employee)
+        public Task<EmployeeResponse> Update(Employee employee)
         {
             throw new NotImplementedException();
         }
