@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IMS.Entities
+namespace IMS.Contracts
 {
-    public class GetListOfVendorOrdersResponse : Response
+    public class ListOfVendorOrdersResponse : Response
     {
         public List<VendorOrder> ListOfVendorOrders { get; set; }
     }

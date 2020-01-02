@@ -304,11 +304,11 @@ namespace IMS.Core.services
 
         }
 
-        public async Task<GetListOfVendorOrdersResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
+        public async Task<ListOfVendorOrdersResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
         {
-            var response = new GetListOfVendorOrdersResponse();
+            var response = new ListOfVendorOrdersResponse();
             response.Status = Status.Failure;
-            if (FilterAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
+            if (ReportsValidator.FilterAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
                 return response;
@@ -326,7 +326,7 @@ namespace IMS.Core.services
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
                 response.ListOfVendorOrders = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
-                if (response.ListOfVendorOrders.Count < 0)
+                if (response.ListOfVendorOrders.Count < 1)
                 {
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
                     return response;
@@ -351,20 +351,6 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(isApproved + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response, "GetVendorOrders", response.Status, severity, userId); }).Start();
             }
             return response;
-        }
-
-        private bool FilterAndValidateDates(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
-        {
-            startDate = new DateTime();
-            endDate = new DateTime();
-            CultureInfo provider = CultureInfo.InvariantCulture;
-            if (String.IsNullOrEmpty(fromDate) && String.IsNullOrEmpty(toDate))
-            {
-                startDate = DateTime.MinValue;
-                endDate = DateTime.Now;
-                return true;
-            }
-            return (DateTime.TryParseExact(fromDate, "yyyyMMdd", provider, DateTimeStyles.None, out startDate) && DateTime.TryParseExact(toDate, "yyyyMMdd", provider, DateTimeStyles.None, out endDate));
         }
 
         private void SetTotalPriceOfItemList(List<ItemQuantityPriceMapping> orderItemDetails)
@@ -428,6 +414,62 @@ namespace IMS.Core.services
             }
             return response;
 
+        }
+
+        public async Task<ListOfVendorOrdersResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate)
+        {
+            var response = new ListOfVendorOrdersResponse();
+            response.Status = Status.Failure;
+            if (ReportsValidator.FilterAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
+                return response;
+            }
+            int userId = -1;
+            try
+            {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User user = Utility.GetUserFromToken(token);
+                userId = user.Id;
+
+                var vendorResponse = await _vendorService.GetVendorById(vendorId);
+                if (vendorResponse.Status.Equals(Status.Failure))
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
+                    return response;
+                }
+                response.ListOfVendorOrders = await _vendorOrderDbContext.GetVendorOrdersByVendorId(vendorId, pageNumber, pageSize, startDate, endDate);
+                if (response.ListOfVendorOrders.Count < 1)
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
+                    return response;
+                }
+                response.Status = Status.Success;
+            }
+            catch (CustomException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "GetVendorOrdersByVendorId", Severity.Critical, vendorId + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "GetVendorOrdersByVendorId", Severity.Critical, vendorId + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(vendorId + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response, "GetVendorOrdersByVendorId", response.Status, severity, userId); }).Start();
+            }
+            return response;
         }
     }
 }

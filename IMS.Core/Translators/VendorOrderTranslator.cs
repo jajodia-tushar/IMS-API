@@ -86,10 +86,10 @@ namespace IMS.Core.Translators
         /*
          * ToDataContractsObject 
          */
-        public static Contracts.GetListOfVendorOrdersResponse ToDataContractsObject(Entities.GetListOfVendorOrdersResponse doGetListOfVendorOrdersResponse)
+        public static Contracts.ListOfVendorOrdersResponse ToDataContractsObject(Entities.ListOfVendorOrdersResponse doGetListOfVendorOrdersResponse)
         {
             if (doGetListOfVendorOrdersResponse != null)
-                return new Contracts.GetListOfVendorOrdersResponse
+                return new Contracts.ListOfVendorOrdersResponse
                 {
                     Status = doGetListOfVendorOrdersResponse.Status == Entities.Status.Success ? Contracts.Status.Success : Contracts.Status.Failure,
                     Error = doGetListOfVendorOrdersResponse.Error == null ? null : Translator.ToDataContractsObject(doGetListOfVendorOrdersResponse.Error),

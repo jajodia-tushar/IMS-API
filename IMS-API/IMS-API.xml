@@ -121,6 +121,13 @@
             <returns>entire List of vendorOrder object along with status</returns>
             <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
         </member>
+        <member name="M:IMS_API.Controllers.OrderController.GetVendorOrdersByVendorId(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Int32,System.String,System.String)">
+            <summary>
+            retrieves the List of vendororders by vendorId.
+            </summary>
+            <returns>entire List of vendorOrder object along with status</returns>
+            <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
+        </member>
         <member name="M:IMS_API.Controllers.OrderController.ApproveVendorOrder(IMS.Contracts.VendorOrder)">
             <summary>
             vendororder is updated and approved along this data transfer from vendororder to warehouse
