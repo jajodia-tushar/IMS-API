@@ -248,5 +248,31 @@ namespace IMS_API.Controllers
             }
             return contractDeleteUsersResponse;
         }
+
+        [HttpGet("{Username}", Name = "ValidateUsername(string Username")]
+        public async Task<Response> GetValidUsername(string username)
+        {
+            Response dtoValidUsername = null;
+            try
+            {
+                IMS.Entities.Response doValidUsernameResponse = await _userService.ValidUsername(username);
+                dtoValidUsername = Translator.ToDataContractsObject(doValidUsernameResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoValidUsername = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetValidUsername", IMS.Entities.Severity.Critical, username, dtoValidUsername); }).Start();
+            }
+            return dtoValidUsername;
+        }
+
     }
 }

@@ -466,6 +466,11 @@ namespace IMS.Core.services
             }
             return usersResponse;
         }
+
+        public Task<Response> ValidUsername(string username)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
