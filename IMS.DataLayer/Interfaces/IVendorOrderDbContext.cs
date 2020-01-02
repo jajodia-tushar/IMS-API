@@ -10,8 +10,7 @@ namespace IMS.DataLayer.Interfaces
     {
         Task<bool> Delete(int orderId);
         Task<bool> Save(VendorOrder vendorOrder);
-        Task<List<VendorOrder>> GetAllVendorOrders(int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
-        Task<List<VendorOrder>> GetVendorOrdersByApproval(bool? isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
+        Task<List<VendorOrder>> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
         Task<bool> ApproveOrder(VendorOrder vendorOrder);
     }
 }

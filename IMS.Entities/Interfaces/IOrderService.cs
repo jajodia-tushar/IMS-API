@@ -13,7 +13,7 @@ namespace IMS.Entities.Interfaces
         Task<OrdersByEmployeeIdResponse> GetEmployeeOrders(string employeeId);
         Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder);
         Task<VendorOrderResponse> SaveVendorOrder(VendorOrder vendorOrder);
-        Task<GetListOfVendorOrdersResponse> GetVendorOrders(bool? isApproved, int pageNumber, int pageSize, string fromDate, string toDate);
+        Task<GetListOfVendorOrdersResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate);
         Task<Response> ApproveVendorOrder(VendorOrder vendorOrder);
     }
 }

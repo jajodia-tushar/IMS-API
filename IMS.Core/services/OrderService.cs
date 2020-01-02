@@ -304,7 +304,7 @@ namespace IMS.Core.services
 
         }
 
-        public async Task<GetListOfVendorOrdersResponse> GetVendorOrders(bool? isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
+        public async Task<GetListOfVendorOrdersResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
         {
             var response = new GetListOfVendorOrdersResponse();
             response.Status = Status.Failure;
@@ -325,8 +325,12 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                response.ListOfVendorOrders = isApproved==null? await _vendorOrderDbContext.GetAllVendorOrders(pageNumber, pageSize, startDate, endDate):
-                    await _vendorOrderDbContext.GetVendorOrdersByApproval(isApproved, pageNumber, pageSize, startDate, endDate);
+                response.ListOfVendorOrders = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
+                if (response.ListOfVendorOrders.Count < 0)
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
+                    return response;
+                }
                 response.Status = Status.Success;
             }
             catch (CustomException e)

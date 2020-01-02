@@ -301,46 +301,7 @@ namespace IMS.DataLayer.Db
             };
         }
 
-        public async Task<List<VendorOrder>> GetAllVendorOrders(int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
-        {
-            DbDataReader reader = null;
-            List<VendorOrder> listOfVendorOrders = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    int lim = pageSize;
-                    int off = (pageNumber - 1) * pageSize;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllVendorOrders";
-                    command.Parameters.AddWithValue("@lim", lim);
-                    command.Parameters.AddWithValue("@off", off);
-                    command.Parameters.AddWithValue("@startDate", startDate);
-                    command.Parameters.AddWithValue("@endDate", endDate);
-                    reader = await command.ExecuteReaderAsync();
-                    List<VendorOrderDto> listOfVendorOrderDtos = new List<VendorOrderDto>();
-                    while (reader.Read())
-                    {
-                        VendorOrderDto vendorOrderDto = Extract(reader);
-                        listOfVendorOrderDtos.Add(vendorOrderDto);
-
-                    }
-                    listOfVendorOrders = ConvertToListOfVendorOrders(listOfVendorOrderDtos);
-
-
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
-            }
-            return listOfVendorOrders;
-        }
-
-        public async Task<List<VendorOrder>> GetVendorOrdersByApproval(bool? isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        public async Task<List<VendorOrder>> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
         {
             DbDataReader reader = null;
             List<VendorOrder> listOfVendorOrders = null;

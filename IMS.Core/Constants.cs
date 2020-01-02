@@ -102,7 +102,7 @@ namespace IMS.Core
             public static Dictionary<string, int> ExpirationTimeInMinutes = new Dictionary<string, int>()
             {
                 { Roles.SuperAdmin,30 },
-                { Roles.Admin,30 },
+                { Roles.Admin,60 },
                 { Roles.Clerk,60 },
                 {Roles.Shelf,600 }
             };
