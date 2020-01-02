@@ -303,12 +303,15 @@ namespace IMS.Core.services
 
         }
 
-        public async Task<GetListOfVendorOrdersResponse> GetAllVendorOrderPendingApprovals(int pageNumber, int pageSize)
+        public async Task<GetListOfVendorOrdersResponse> GetVendorOrders(bool? isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
         {
-            GetListOfVendorOrdersResponse response = new GetListOfVendorOrdersResponse
+            var response = new GetListOfVendorOrdersResponse();
+            response.Status = Status.Failure;
+            if (FilterAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
             {
-                Status = Status.Failure
-            };
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
+                return response;
+            }
             int userId = -1;
             try
             {
@@ -321,31 +324,40 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                response.ListOfVendorOrders = await _vendorOrderDbContext.GetAllPendingApprovals(pageNumber, pageSize);
+                response.ListOfVendorOrders = isApproved==null? await _vendorOrderDbContext.GetAllVendorOrders(pageNumber, pageSize, startDate, endDate):
+                    await _vendorOrderDbContext.GetVendorOrdersByApproval(isApproved, pageNumber, pageSize, startDate, endDate);
                 response.Status = Status.Success;
             }
             catch (CustomException e)
             {
-
                 response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                new Task(() => { _logger.LogException(e, "GetAllVendorPendingApprovals", Severity.Critical, null, response); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrders", Severity.Critical, isApproved + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
             }
             catch (Exception e)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(e, "GetAllVendorPendingApprovals", Severity.Critical, null, response); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrders", Severity.Critical, isApproved + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (response.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(null, response, "Get All VendorOrder Pending Approvals", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(isApproved + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response, "GetVendorOrders", response.Status, severity, userId); }).Start();
             }
             return response;
-
         }
 
+        private bool FilterAndValidateDates(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
+        {
+            if(String.IsNullOrEmpty(fromDate) && String.IsNullOrEmpty(toDate))
+            {
+                startDate = DateTime.MinValue;
+                endDate = DateTime.Now;
+                return true;
+            }
+            return ReportsValidator.IsDateValid(fromDate, toDate, out startDate, out endDate);
+        }
 
         private void SetTotalPriceOfItemList(List<ItemQuantityPriceMapping> orderItemDetails)
         {
