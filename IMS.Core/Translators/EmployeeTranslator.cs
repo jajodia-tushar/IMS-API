@@ -25,31 +25,39 @@ namespace IMS.Core.Translators
         }
         public static Contracts.Employee ToDataContractsObject(Entities.Employee doEmployee)
         {
-            return new Contracts.Employee()
+            if (doEmployee != null)
             {
-                Id = doEmployee.Id,
-                Firstname = doEmployee.Firstname,
-                Lastname = doEmployee.Lastname,
-                Email = doEmployee.Email,
-                ContactNumber = doEmployee.ContactNumber,
-                TemporaryCardNumber = doEmployee.TemporaryCardNumber,
-                AccessCardNumber = doEmployee.AccessCardNumber,
-                IsActive = doEmployee.IsActive
-            };
+                return new Contracts.Employee()
+                {
+                    Id = doEmployee.Id,
+                    Firstname = doEmployee.Firstname,
+                    Lastname = doEmployee.Lastname,
+                    Email = doEmployee.Email,
+                    ContactNumber = doEmployee.ContactNumber,
+                    TemporaryCardNumber = doEmployee.TemporaryCardNumber,
+                    AccessCardNumber = doEmployee.AccessCardNumber,
+                    IsActive = doEmployee.IsActive
+                };
+            }
+            return null;
         }
         public static Entities.Employee ToEntitiesObject(Contracts.Employee employee)
         {
-            return new Entities.Employee()
+            if (employee != null)
             {
-                Id = employee.Id,
-                Firstname = employee.Firstname,
-                Lastname = employee.Lastname,
-                Email = employee.Email,
-                ContactNumber = employee.ContactNumber,
-                TemporaryCardNumber = employee.TemporaryCardNumber,
-                AccessCardNumber = employee.AccessCardNumber,
-                IsActive = employee.IsActive
-            };
+                return new Entities.Employee()
+                {
+                    Id = employee.Id,
+                    Firstname = employee.Firstname,
+                    Lastname = employee.Lastname,
+                    Email = employee.Email,
+                    ContactNumber = employee.ContactNumber,
+                    TemporaryCardNumber = employee.TemporaryCardNumber,
+                    AccessCardNumber = employee.AccessCardNumber,
+                    IsActive = employee.IsActive
+                };
+            }
+            return null; 
         }
     }
 }

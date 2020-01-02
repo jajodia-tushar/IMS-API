@@ -108,7 +108,7 @@ namespace IMS.Core.services
             employeeOrdersResponse.Status = Status.Failure;
             try
             {
-                GetEmployeeResponse employeeResponse = _employeeService.ValidateEmployee(employeeId);
+                GetEmployeeResponse employeeResponse = await _employeeService.ValidateEmployee(employeeId);
                 employeeOrdersResponse.Employee = employeeResponse.Employee;
 
                 if (employeeOrdersResponse.Employee != null)
@@ -154,7 +154,7 @@ namespace IMS.Core.services
             }
             try
             {
-                GetEmployeeResponse employeeResponse = _employeeService.ValidateEmployee(employeeOrder.Employee.Id);
+                GetEmployeeResponse employeeResponse = await _employeeService.ValidateEmployee(employeeOrder.Employee.Id);
                 if (employeeResponse.Employee != null && employeeResponse.Employee.IsActive != false)
                 {
                     placeEmployeeOrderResponse.EmployeeOrder = await _employeeOrderDbContext.AddEmployeeOrder(employeeOrder);

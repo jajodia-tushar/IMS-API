@@ -3,6 +3,7 @@ using IMS.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -45,25 +46,19 @@ namespace IMS.DataLayer.Db
                }
             };
 
-        public bool CreateEmployee(Employee employee)
+        public Task<bool> CreateEmployee(Employee employee)
         {
             throw new NotImplementedException();
         }
 
-        public List<Employee> GetAllEmployees()
+        public Task<List<Employee>> GetAllEmployees()
         {
             throw new NotImplementedException();
         }
 
-        public Employee GetEmployeeById(string employeeId)
+        public Task<Employee> GetEmployeeById(string employeeId)
         {
-            return employees.Find
-                   (
-                        u =>
-                        {
-                            return u.Id.Equals(employeeId) ;
-                        }
-                   );
+            throw new NotImplementedException();
         }
     }
 }

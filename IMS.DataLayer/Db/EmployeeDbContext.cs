@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -17,10 +18,10 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
-        public Employee GetEmployeeById(string employeeId)
+        public  async Task<Employee> GetEmployeeById(string employeeId)
         {
             Employee employee = null;
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
@@ -31,20 +32,10 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetEmployeeById";
                     command.Parameters.AddWithValue("@Id", employeeId);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        employee = new Employee()
-                        {
-                            Id = ReturnNullOrValueAccordingly(reader["Id"]),
-                            Email = ReturnNullOrValueAccordingly(reader["EmailId"]),
-                            ContactNumber = ReturnNullOrValueAccordingly(reader["MobileNumber"]),
-                            Firstname = ReturnNullOrValueAccordingly(reader["FirstName"]),
-                            Lastname = ReturnNullOrValueAccordingly(reader["LastName"]),
-                            TemporaryCardNumber = ReturnNullOrValueAccordingly(reader["TemporaryCardNumber"]),
-                            AccessCardNumber = ReturnNullOrValueAccordingly(reader["AccessCardNumber"]),
-                            IsActive = (bool)reader["IsActive"]
-                        };
+                        employee = Extract(reader);
                     }
                 }
                 catch (Exception ex)
@@ -54,10 +45,10 @@ namespace IMS.DataLayer.Db
                 return employee;
             }
         }
-        public List<Employee> GetAllEmployees()
+        public async Task<List<Employee>> GetAllEmployees()
         {
             List<Employee> employeesList = new List<Employee>();
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -66,20 +57,10 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetAllEmployees";
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        employeesList.Add(new Employee()
-                        {
-                            Id = reader["Id"]?.ToString(),
-                            Email = reader["EmailId"]?.ToString(),
-                            ContactNumber = reader["MobileNumber"]?.ToString(),
-                            Firstname = reader["FirstName"]?.ToString(),
-                            Lastname = reader["LastName"]?.ToString(),
-                            TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString(),
-                            AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
-                            IsActive = (bool)reader["IsActive"]
-                        });
+                        employeesList.Add(Extract(reader));
                     }
                 }
                 catch (Exception ex)
@@ -89,7 +70,21 @@ namespace IMS.DataLayer.Db
             }
             return employeesList;
         }
-        public bool CreateEmployee(Employee employee)
+        public Employee Extract(DbDataReader reader)
+        {
+            return new Employee()
+            {
+                Id = reader["Id"]?.ToString(),
+                Email = reader["EmailId"]?.ToString(),
+                ContactNumber = reader["MobileNumber"]?.ToString(),
+                Firstname = reader["FirstName"]?.ToString(),
+                Lastname = reader["LastName"]?.ToString(),
+                TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString(),
+                AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
+                IsActive = (bool)reader["IsActive"]
+            };
+        }
+        public async Task<bool> CreateEmployee(Employee employee)
         {
             bool isSuccess = false;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
@@ -108,7 +103,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@TemporaryCardNumber", employee.TemporaryCardNumber);
                     command.Parameters.AddWithValue("@AccessCardNumber", employee.AccessCardNumber);
                     command.Parameters.AddWithValue("@IsActive", employee.IsActive);
-                    int rowsAffected = command.ExecuteNonQuery();
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
                     if (rowsAffected > 0)
                         isSuccess = true;
                 }
@@ -118,17 +113,6 @@ namespace IMS.DataLayer.Db
                 }
             }
             return isSuccess;
-        }
-        public static string ReturnNullOrValueAccordingly(object field)
-        {
-            try
-            {
-                return (string)field;
-            }
-            catch
-            {
-                return "";
-            }
         }
     }
 }
