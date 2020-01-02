@@ -39,6 +39,7 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
+                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
                         if (vendorId > 0)
                         {
                             Vendor vendor = await _vendorDbContext.GetVendorById(vendorId);
@@ -46,18 +47,7 @@ namespace IMS.Core.services
                             {
                                 vendorResponse.Status = Status.Success;
                                 vendorResponse.Vendors.Add(vendor);
-
                             }
-                            return vendorResponse;
-                        }
-                        else
-                        {
-                            vendorResponse.Status = Status.Failure;
-                            vendorResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.NotFound,
-                                ErrorMessage = Constants.ErrorMessages.InValidId
-                            };
                         }
                     }
                     catch (Exception exception)
