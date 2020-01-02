@@ -1,6 +1,7 @@
 using IMS.Core.Validators;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
@@ -62,9 +63,7 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        vendorResponse.Status = Status.Failure;
-                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "AddVendor", Severity.Medium, vendor, vendorResponse); }).Start();
+                        throw exception;
                     }
                 }
                 else
@@ -72,6 +71,12 @@ namespace IMS.Core.services
                     vendorResponse.Status = Status.Failure;
                     vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
+            }
+            catch(VendorValueRepeatsException exception)
+            {
+                vendorResponse.Status = Status.Failure;
+                vendorResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
+                new Task(() => { _logger.LogException(exception, "AddVendor", Severity.High, vendor, vendorResponse); }).Start();
             }
             catch (Exception exception)
             {

@@ -1,5 +1,6 @@
 ﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
@@ -22,7 +23,7 @@ namespace IMS.DataLayer.Db
 
         public async Task<Vendor> GetVendorById(int vendorId)
         {
-            Vendor vendor= null;
+            Vendor vendor = null;
             DbDataReader reader = null;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
@@ -140,6 +141,7 @@ namespace IMS.DataLayer.Db
             {
                 try
                 {
+                    VendorValueRepetitionCheck(vendor);
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
@@ -181,7 +183,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@VendorId", vendorId);
                     command.Parameters.AddWithValue("@isHardDelete", isHardDelete);
                     rowsAffected = await command.ExecuteNonQueryAsync();
-                    if(rowsAffected>0)
+                    if (rowsAffected > 0)
                     {
                         isDeleted = true;
                     }
@@ -192,6 +194,41 @@ namespace IMS.DataLayer.Db
                 }
             }
             return isDeleted;
+        }
+        public bool VendorValueRepetitionCheck(Vendor vendor)
+        {
+            bool isRepeated = false;
+            DbDataReader reader = null;
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spCheckVendorDetailsRepetition";
+                    command.Parameters.AddWithValue("@Name", vendor.Name);
+                    command.Parameters.AddWithValue("@Mobile", vendor.ContactNumber);
+                    command.Parameters.AddWithValue("@Pan", vendor.PAN);
+                    command.Parameters.AddWithValue("@Gst", vendor.GST);
+                    command.Parameters.AddWithValue("@Cin", vendor.CompanyIdentificationNumber);
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        isRepeated = Convert.ToBoolean(reader["isrepeated"]);
+                    }
+                    reader.Close();
+                    if (isRepeated == true)
+                    {
+                        throw new VendorValueRepeatsException();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return isRepeated;
         }
     }
 }
