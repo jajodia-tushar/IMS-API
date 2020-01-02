@@ -200,9 +200,9 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <returns>entire List of vendorOrder object along with status</returns>
         /// <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
-        // GET: api/order/VendorOrders/PendingApprovals
-        [HttpGet("VendorOrders/PendingApprovals", Name = "GetAllPendingApprovals")]
-        public async Task<GetListOfVendorOrdersResponse> GetAllPendingApprovals(int? pageNumber, int? pageSize)
+        // GET: api/order/VendorOrders?toDate&pageNumber=1&pageSize=10
+        [HttpGet("VendorOrders", Name = "GetVendorOrders")]
+        public async Task<GetListOfVendorOrdersResponse> GetVendorOrders(int? pageNumber, int? pageSize, bool? isApproved, string fromDate = null, string toDate = null)
         {
             GetListOfVendorOrdersResponse contractsGetListOfVendorOrdersResponse = null;
             try
@@ -221,7 +221,7 @@ namespace IMS_API.Controllers
                         }
                     };
                 }
-                IMS.Entities.GetListOfVendorOrdersResponse entitiesResponse = await _orderService.GetAllVendorOrderPendingApprovals(currentPageNumber, currentPageSize);
+                IMS.Entities.GetListOfVendorOrdersResponse entitiesResponse = await _orderService.GetVendorOrders(isApproved, currentPageNumber, currentPageSize, fromDate, toDate);
                 contractsGetListOfVendorOrdersResponse = VendorOrderTranslator.ToDataContractsObject(entitiesResponse);
             }
             catch (Exception e)
@@ -235,7 +235,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(e, "GetAllPendingApprovals", IMS.Entities.Severity.Critical, null, contractsGetListOfVendorOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrders", IMS.Entities.Severity.Critical,isApproved+";"+pageNumber+";"+pageSize+";"+fromDate+";"+toDate, contractsGetListOfVendorOrdersResponse); }).Start();
             }
 
             return contractsGetListOfVendorOrdersResponse;
