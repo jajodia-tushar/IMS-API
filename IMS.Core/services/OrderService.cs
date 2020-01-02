@@ -7,6 +7,7 @@ using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -350,13 +351,16 @@ namespace IMS.Core.services
 
         private bool FilterAndValidateDates(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
         {
-            if(String.IsNullOrEmpty(fromDate) && String.IsNullOrEmpty(toDate))
+            startDate = new DateTime();
+            endDate = new DateTime();
+            CultureInfo provider = CultureInfo.InvariantCulture;
+            if (String.IsNullOrEmpty(fromDate) && String.IsNullOrEmpty(toDate))
             {
                 startDate = DateTime.MinValue;
                 endDate = DateTime.Now;
                 return true;
             }
-            return ReportsValidator.IsDateValid(fromDate, toDate, out startDate, out endDate);
+            return (DateTime.TryParseExact(fromDate, "yyyyMMdd", provider, DateTimeStyles.None, out startDate) && DateTime.TryParseExact(toDate, "yyyyMMdd", provider, DateTimeStyles.None, out endDate));
         }
 
         private void SetTotalPriceOfItemList(List<ItemQuantityPriceMapping> orderItemDetails)

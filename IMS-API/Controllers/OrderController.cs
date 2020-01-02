@@ -200,7 +200,7 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <returns>entire List of vendorOrder object along with status</returns>
         /// <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
-        // GET: api/order/VendorOrders?toDate&pageNumber=1&pageSize=10
+        // GET: api/order/VendorOrders?isApproved&pageNumbe&pageSize&fromDate&toDate
         [HttpGet("VendorOrders", Name = "GetVendorOrders")]
         public async Task<GetListOfVendorOrdersResponse> GetVendorOrders(int? pageNumber, int? pageSize, bool? isApproved, string fromDate = null, string toDate = null)
         {
