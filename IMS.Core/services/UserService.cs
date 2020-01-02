@@ -467,9 +467,48 @@ namespace IMS.Core.services
             return usersResponse;
         }
 
-        public Task<Response> ValidUsername(string username)
+        public async Task<Response> CheckValidUsername(string username)
         {
-            throw new NotImplementedException();
+            Response response = new Response();
+            try
+            {
+                if (String.IsNullOrEmpty(username))
+                {
+                    response.Status = Status.Failure;
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidUsername);
+                }
+                else
+                {
+                    bool isUserNamePresent = await _userDbContext.CheckUserNameAvailability(username);
+                    if (isUserNamePresent)
+                    {
+                        throw new InvalidUserNameException("User Name Already Exists");
+                    }
+                    else
+                    {
+                        response.Status = Status.Success;
+                        response.Error = null;
+                    }
+                }
+            }
+            catch (CustomException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "", Severity.Critical, username, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "CheckValidUsername", Severity.Critical, username, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(username, response, "CheckValidUsername", response.Status, severity, -1); }).Start();
+            }
+            return response;
         }
     }
 }

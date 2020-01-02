@@ -255,7 +255,7 @@ namespace IMS_API.Controllers
             Response dtoValidUsername = null;
             try
             {
-                IMS.Entities.Response doValidUsernameResponse = await _userService.ValidUsername(username);
+                IMS.Entities.Response doValidUsernameResponse = await _userService.CheckValidUsername(username);
                 dtoValidUsername = Translator.ToDataContractsObject(doValidUsernameResponse);
             }
             catch (Exception exception)

@@ -401,7 +401,7 @@ namespace IMS.DataLayer.Dal
             return response;
         }
 
-        public async Task<bool> CheckUserNameAvailable(string username)
+        public async Task<bool> CheckUserNameAvailability(string username)
         {
             bool isRepeated = true;
             DbDataReader reader = null;

@@ -15,6 +15,6 @@ namespace IMS.Entities.Interfaces
         Task<UsersResponse> ApproveAdmin(int userId);
 
         Task<Response> DeleteUser(int userId, bool isHardDelete);
-        Task<Response> ValidUsername(string username);
+        Task<Response> CheckValidUsername(string username);
     }
 }

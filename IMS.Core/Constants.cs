@@ -80,8 +80,9 @@ namespace IMS.Core
             public const string PasswordSpaceError = "Password should not contain spaces";
             public const string NoUserFoundToDelete = "No Users found to delete";
             public const string UnAuthorized = "You are not authorized to perform this action";
-            
+            public const string InvalidUsername = "Invalid Username";
             public const string InvalidPageNumber = "Page Number is Invalid";
+            
         }
 
         public static class ErrorCodes
