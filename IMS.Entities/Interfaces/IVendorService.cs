@@ -7,10 +7,10 @@ namespace IMS.Entities.Interfaces
 {
     public interface IVendorService
     {
-       Task<VendorResponse> GetVendorById(int vendorId);
+       Task<VendorsResponse> GetVendorById(int vendorId);
        Task<VendorsResponse> GetVendors(string name, int pageNumber, int pageSize);
-       Task<VendorResponse> UpdateVendor(Vendor vendor);
-       Task<VendorResponse> AddVendor(Vendor vendor);
-        Task<Response> DeleteVendor(int vendorId, bool isHardDelete);
+       Task<VendorsResponse> UpdateVendor(Vendor vendor);
+       Task<VendorsResponse> AddVendor(Vendor vendor);
+       Task<Response> DeleteVendor(int vendorId, bool isHardDelete);
     }
 }

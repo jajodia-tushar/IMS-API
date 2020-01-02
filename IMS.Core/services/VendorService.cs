@@ -27,9 +27,9 @@ namespace IMS.Core.services
             this._httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<VendorResponse> AddVendor(Vendor vendor)
+        public async Task<VendorsResponse> AddVendor(Vendor vendor)
         {
-            VendorResponse vendorResponse = new VendorResponse();
+            VendorsResponse vendorResponse = new VendorsResponse();
             int userId = -1;
             try
             {
@@ -162,9 +162,9 @@ namespace IMS.Core.services
             }
             return deleteResponse;
         }
-        public async Task<VendorResponse> GetVendorById(int vendorId)
+        public async Task<VendorsResponse> GetVendorById(int vendorId)
         {
-            VendorResponse vendorResponse = new VendorResponse();
+            VendorsResponse vendorResponse = new VendorsResponse();
             int userId = -1;
             try
             {
@@ -213,7 +213,6 @@ namespace IMS.Core.services
             }
             return vendorResponse;
         }
-
         public async Task<VendorsResponse> GetVendors(string name, int pageNumber, int pageSize)
         {
             VendorsResponse vendorResponse = new VendorsResponse();
@@ -265,9 +264,9 @@ namespace IMS.Core.services
             }
             return vendorResponse;
         }
-        public async Task<VendorResponse> UpdateVendor(Vendor vendor)
+        public async Task<VendorsResponse> UpdateVendor(Vendor vendor)
         {
-            VendorResponse vendorResponse = new VendorResponse();
+            VendorsResponse vendorResponse = new VendorsResponse();
             int userId = -1;
             try
             {

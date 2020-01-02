@@ -33,17 +33,17 @@ namespace IMS_API.Controllers
         /// <returns>entire vendor object along with status</returns>
         /// <response code="200">Returns VendorOrder object  if Vendor id is valid otherwise it returns null and status failure</response>
         [HttpGet("{id}", Name = "Get(int id)")]
-        public async Task<VendorResponse> GetVendorById(int id)
+        public async Task<VendorsResponse> GetVendorById(int id)
         {
-            VendorResponse contractsVendorValidationResponse = null;
+            VendorsResponse contractsVendorValidationResponse = null;
             try
             {
-                IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetVendorById(id);
+                IMS.Entities.VendorsResponse entityVendorValidationResponse =await _vendorService.GetVendorById(id);
                 contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch(Exception exception)
             {
-                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
+                contractsVendorValidationResponse = new IMS.Contracts.VendorsResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -96,18 +96,18 @@ namespace IMS_API.Controllers
         /// <returns>the updated vendor</returns>
         /// <response code="200">Returns updated vendor</response>
         [HttpPut(Name = "Update(Vendor vendor)")]
-        public async Task<VendorResponse> Update([FromBody]Vendor vendor)
+        public async Task<VendorsResponse> Update([FromBody]Vendor vendor)
         {
-            VendorResponse contractsVendorValidationResponse = null;
+            VendorsResponse contractsVendorValidationResponse = null;
             try
             {
                 IMS.Entities.Vendor vendorEntity = VendorTranslator.ToEntitiesObject(vendor);
-                IMS.Entities.VendorResponse entityVendorValidationResponse = await _vendorService.UpdateVendor(vendorEntity);
+                IMS.Entities.VendorsResponse entityVendorValidationResponse = await _vendorService.UpdateVendor(vendorEntity);
                 contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch (Exception exception)
             {
-                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
+                contractsVendorValidationResponse = new IMS.Contracts.VendorsResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -128,18 +128,18 @@ namespace IMS_API.Controllers
         /// <returns>the added vendor</returns>
         /// <response code="200">Returns the added vendor</response>
         [HttpPost(Name = "Add(Vendor vendor)")]
-        public async Task<VendorResponse> Add([FromBody]Vendor vendor)
+        public async Task<VendorsResponse> Add([FromBody]Vendor vendor)
         {
-            VendorResponse contractsVendorValidationResponse = null;
+            VendorsResponse contractsVendorValidationResponse = null;
             try
             {
                 IMS.Entities.Vendor vendorEntity = VendorTranslator.ToEntitiesObject(vendor);
-                IMS.Entities.VendorResponse entityVendorValidationResponse = await _vendorService.AddVendor(vendorEntity);
+                IMS.Entities.VendorsResponse entityVendorValidationResponse = await _vendorService.AddVendor(vendorEntity);
                 contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch (Exception exception)
             {
-                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
+                contractsVendorValidationResponse = new IMS.Contracts.VendorsResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
