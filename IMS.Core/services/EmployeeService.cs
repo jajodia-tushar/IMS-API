@@ -33,7 +33,7 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(int id)
+        public Task<Response> Delete(int id)
         {
             throw new NotImplementedException();
         }

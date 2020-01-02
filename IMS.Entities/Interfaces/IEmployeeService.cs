@@ -13,6 +13,6 @@ namespace IMS.Entities.Interfaces
         Task<GetEmployeeResponse> GetEmployee(int employeeId);
         Task<GetEmployeeResponse> Add(Employee employee);
         Task<GetEmployeeResponse> Update(Employee employee);
-        Task<bool> Delete(int id);
+        Task<Response> Delete(int id);
     }
 }
