@@ -55,54 +55,21 @@ namespace IMS_API.Controllers
             }
             return contractsVendorValidationResponse;
         }
+
         // GET: api/
         /// <summary>
-        /// returns all vendors 
+        /// returns all vendors if name is null or returns vendors with name matching the name provided in request
         /// </summary>
-        /// <returns>all vendors object along with status</returns>
-        /// <response code="200">Returns all Vendors object</response>
-        [HttpGet(Name = "Get()")]
-        public async Task<VendorResponse> GetAllVendors()
-        {
-            VendorResponse contractsVendorValidationResponse = null;
-            try
-            {
-                IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetAllVendors();
-                contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
-            }
-            catch(Exception exception)
-            {
-                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
-                {
-                    Status = Status.Failure,
-                    Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.ServerError,
-                        ErrorMessage = Constants.ErrorMessages.ServerError
-                    }
-                };
-                new Task(() => { _logger.LogException(exception, "GetAllVendors", IMS.Entities.Severity.High, null, contractsVendorValidationResponse); }).Start();
-            }
-            return contractsVendorValidationResponse;
-        }
-
-        /// <summary>
-        /// Returns recent order placed by the employee with employee and employee order details
-        /// </summary>
-        /// <returns>List of employee recent order along with the status</returns>
-        /// <response code="200">Returns the employee recent order along with status success </response>
-        /// <response code="400">If Unable to show recent entries </response>
-        /// <response code="401">If token is Invalid</response>
-        /// <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
-        // GET: api/Order/EmployeeRecentOrderDetails
-        [HttpGet("SearchByName/{name}", Name = "SearchByName(string Name)")]
-        public async Task<VendorsResponse> SearchByName(string name, int pageNumber, int pageSize )
+        /// <returns>the vendors object along with status</returns>
+        /// <response code="200">Returns the Vendors object</response>
+        [HttpGet(Name = "Get(string Name)")]
+        public async Task<VendorsResponse> Get(string name, int pageNumber, int pageSize )
         {
 
             VendorsResponse vendorResponse = null;
             try
             {
-                IMS.Entities.VendorsResponse vendorResponseEntity = await _vendorService.SearchByName(name,pageNumber, pageSize);
+                IMS.Entities.VendorsResponse vendorResponseEntity = await _vendorService.GetVendors(name,pageNumber, pageSize);
                 vendorResponse = VendorTranslator.ToDataContractsObject(vendorResponseEntity);
             }
             catch (Exception exception)
@@ -116,7 +83,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "SearchvendorByName", IMS.Entities.Severity.High, name, vendorResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetVendors", IMS.Entities.Severity.High, name, vendorResponse); }).Start();
             }
             return vendorResponse;
         }

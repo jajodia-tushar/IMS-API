@@ -25,64 +25,6 @@ namespace IMS.Core.services
             this._httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<VendorResponse> GetAllVendors()
-        {
-            VendorResponse vendorResponse = new VendorResponse();
-            int userId = -1;
-            try
-            {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
-                {
-                    User user = Utility.GetUserFromToken(token);
-                    userId = user.Id;
-                    try
-                    {
-                        List<Vendor> vendors = await _vendorDbContext.GetAllVendors();
-                        if (vendors.Count != 0)
-                        {
-                            vendorResponse.Status = Status.Success;
-                            vendorResponse.Vendors = vendors;
-                        }
-                        else
-                        {
-                            vendorResponse.Status = Status.Failure;
-                            vendorResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.NotFound,
-                                ErrorMessage = Constants.ErrorMessages.NoVendorsYet
-                            };
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        vendorResponse.Status = Status.Failure;
-                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
-                        new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, vendorResponse); }).Start();
-                    }
-                }
-                else
-                {
-                    vendorResponse.Status = Status.Failure;
-                    vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
-                }
-            }
-            catch (Exception exception)
-            {
-                vendorResponse.Status = Status.Failure;
-                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
-                new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, vendorResponse); }).Start();
-            }
-            finally
-            {
-                Severity severity = Severity.No;
-                if (vendorResponse.Status == Status.Failure)
-                    severity = Severity.Medium;
-                new Task(() => { _logger.Log("AllVendors", vendorResponse, "Getting all vendors", vendorResponse.Status, severity, userId); }).Start();
-            }
-            return vendorResponse;
-        }
-
         public async Task<VendorResponse> GetVendorById(int vendorId)
         {
             VendorResponse vendorResponse = new VendorResponse();
@@ -120,9 +62,7 @@ namespace IMS.Core.services
                     }
                     catch (Exception exception)
                     {
-                        vendorResponse.Status = Status.Failure;
-                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.LogoutFailed);
-                        new Task(() => { _logger.LogException(exception, "GetAllVendors", Severity.Medium, null, vendorResponse); }).Start();
+                        throw exception;
                     }
                 }
                 else
@@ -142,12 +82,12 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (vendorResponse.Status == Status.Failure)
                     severity = Severity.Medium;
-                new Task(() => { _logger.Log(vendorId, vendorResponse, "Getting Vendor", vendorResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(vendorId, vendorResponse, " GetVendorById", vendorResponse.Status, severity, userId); }).Start();
             }
             return vendorResponse;
         }
 
-        public async Task<VendorsResponse> SearchByName(string name, int pageNumber, int pageSize)
+        public async Task<VendorsResponse> GetVendors(string name, int pageNumber, int pageSize)
         {
             VendorsResponse vendorResponse = new VendorsResponse();
             int userId = -1;
@@ -158,6 +98,8 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
+                    if(String.IsNullOrEmpty(name))
+                        name = "";
                     if (pageSize == 0)
                         pageSize = 10;
                     if (pageNumber == 0)
@@ -170,15 +112,10 @@ namespace IMS.Core.services
                     int limit = pageSize;
                     int offset = (pageNumber - 1) * pageSize;
                     List<Vendor> vendors = new List<Vendor>();
-                    vendorResponse.PagingInfo.TotalResults = await _vendorDbContext.SearchByName(name, limit, offset, vendors);
+                    vendorResponse.PagingInfo.TotalResults = await _vendorDbContext.GetVendors(name, limit, offset, vendors);
                     if (vendors == null || vendors.Count == 0)
                     {
-                        vendorResponse.Status = Status.Failure;
-                        vendorResponse.Error = new Error()
-                        {
-                            ErrorCode = Constants.ErrorCodes.NotFound,
-                            ErrorMessage = Constants.ErrorMessages.NoVendorsYet
-                        };
+                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoVendorsYet);
                     }
                     else
                     {
@@ -188,28 +125,22 @@ namespace IMS.Core.services
                 }
                 else
                 {
-                    vendorResponse.Status = Status.Failure;
-                    vendorResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                    vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception exception)
             {
-                vendorResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
-                vendorResponse.Error.ErrorMessage = Constants.ErrorMessages.UnableToFetch;
+                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.UnableToFetch);
+                new Task(() => { _logger.LogException(exception, "GetVendors", Severity.High, name, vendorResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.Medium;
                 if (vendorResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log("SearchByName", vendorResponse, "SearchByName", vendorResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(name, vendorResponse, "GetVendors", vendorResponse.Status, severity, -1); }).Start();
             }
             return vendorResponse;
-
         }
     }
 }

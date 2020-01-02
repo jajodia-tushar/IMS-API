@@ -8,7 +8,6 @@ namespace IMS.Entities.Interfaces
     public interface IVendorService
     {
        Task<VendorResponse> GetVendorById(int vendorId);
-       Task<VendorResponse>  GetAllVendors();
-       Task<VendorsResponse> SearchByName(string name, int pageNumber, int pageSize);
+       Task<VendorsResponse> GetVendors(string name, int pageNumber, int pageSize);
     }
 }

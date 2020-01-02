@@ -68,39 +68,8 @@ namespace IMS.DataLayer.Db
             };
         }
 
-        public async Task<List<Vendor>> GetAllVendors()
-        {
-            List<Vendor> vendors = new List<Vendor>();
-            DbDataReader reader = null;
 
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-
-                    connection.Open();
-
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllVendors";
-                    reader = await command.ExecuteReaderAsync();
-
-                    while (reader.Read())
-                    {
-                        Vendor vendor = Extract(reader);
-                        vendors.Add(vendor);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
-            }
-            return vendors;
-        }
-
-        public async Task<int> SearchByName(string name, int limit, int offset, List<Vendor> vendors)
+        public async Task<int> GetVendors(string name, int limit, int offset, List<Vendor> vendors)
         {
             DbDataReader reader = null;
             int totalCountOfData = 0;
