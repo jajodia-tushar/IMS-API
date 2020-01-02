@@ -92,14 +92,14 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     try
                     {
-                        if (userId <= 0)
+                        deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
+                        if (userId > 0)
                         {
-                            deleteUserResponse.Status = Status.Failure;
-                            deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.MissingValues);
-                        }
-                        else
-                        {
-                            deleteUserResponse = await _userDbContext.DeleteUser(userId,isHardDelete);
+                            bool isDeleted= await _userDbContext.DeleteUser(userId,isHardDelete);
+                            if(isDeleted)
+                            {
+                                deleteUserResponse.Status = Status.Success;
+                            }
                         }
                     }
                     catch (Exception exception)

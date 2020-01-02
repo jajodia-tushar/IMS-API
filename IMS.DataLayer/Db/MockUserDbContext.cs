@@ -76,6 +76,10 @@ namespace IMS.DataLayer.Dal
         {
             throw new NotImplementedException();
         }
+        public Task<bool> DeleteUser(int userId, bool isHardDelete)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<List<User>> GetAllPendingAdminApprovals()
         {
@@ -108,11 +112,6 @@ namespace IMS.DataLayer.Dal
         }
 
         public Task<User> UpdateUser(User user)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<Response> IUserDbContext.DeleteUser(int userId, bool isHardDelete)
         {
             throw new NotImplementedException();
         }
