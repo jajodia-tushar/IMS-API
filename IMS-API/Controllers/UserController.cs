@@ -256,7 +256,7 @@ namespace IMS_API.Controllers
         /// <returns>response </returns>
         /// <response code="200">return response object</response>
         [Authorize(Roles = "SuperAdmin,Admin")]
-        [HttpGet("CheckUserName")]
+        [HttpGet("UserName")]
         public async Task<Response> IsUsernameExists(string username)
         {
             Response dtoValidUsername = null;
