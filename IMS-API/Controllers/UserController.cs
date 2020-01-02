@@ -248,14 +248,21 @@ namespace IMS_API.Controllers
             }
             return contractDeleteUsersResponse;
         }
-
-        [HttpGet("{Username}", Name = "ValidateUsername(string Username")]
-        public async Task<Response> GetValidUsername(string username)
+        // Get: api/user
+        /// <summary>
+        /// Validate username exist or not
+        /// </summary>
+        /// <param name="username">contains username added by user</param>
+        /// <returns>response </returns>
+        /// <response code="200">return response object</response>
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpGet("CheckUserName")]
+        public async Task<Response> IsUsernameExists(string username)
         {
             Response dtoValidUsername = null;
             try
             {
-                IMS.Entities.Response doValidUsernameResponse = await _userService.CheckValidUsername(username);
+                IMS.Entities.Response doValidUsernameResponse = await _userService.CheckUsernameAvailability(username);
                 dtoValidUsername = Translator.ToDataContractsObject(doValidUsernameResponse);
             }
             catch (Exception exception)
