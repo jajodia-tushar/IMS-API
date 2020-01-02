@@ -43,6 +43,10 @@ namespace IMS.Core.Validators
         }
         public static bool IsDateValid(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
         {
+            startDate = new DateTime();
+            endDate = new DateTime();
+            if (String.IsNullOrEmpty(fromDate) || String.IsNullOrEmpty(toDate))
+                return false;
             startDate = DateTime.ParseExact(fromDate, "yyyyMMdd", CultureInfo.InvariantCulture);
             endDate = DateTime.ParseExact(toDate, "yyyyMMdd", CultureInfo.InvariantCulture);
             return IsDateRangeIsValid(startDate, endDate) ? true : false;
