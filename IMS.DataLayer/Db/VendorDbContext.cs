@@ -220,7 +220,7 @@ namespace IMS.DataLayer.Db
                     reader.Close();
                     if (isRepeated == true)
                     {
-                        throw new VendorValueRepeatsException();
+                        throw new InValidVendorException("Data already present");
                     }
                 }
                 catch (Exception ex)

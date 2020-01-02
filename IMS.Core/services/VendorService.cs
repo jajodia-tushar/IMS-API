@@ -72,7 +72,7 @@ namespace IMS.Core.services
                     vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
-            catch(VendorValueRepeatsException exception)
+            catch(InValidVendorException exception)
             {
                 vendorResponse.Status = Status.Failure;
                 vendorResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
