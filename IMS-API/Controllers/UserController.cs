@@ -281,5 +281,30 @@ namespace IMS_API.Controllers
             return dtoValidUsername;
         }
 
+        //[Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpGet("Email")]
+        public async Task<Response> IsEmailExists(string email)
+        {
+            Response dtoValidEmail = null;
+            try
+            {
+                IMS.Entities.Response doValidEmailResponse = await _userService.CheckEmailAvailability(email);
+                dtoValidEmail = Translator.ToDataContractsObject(doValidEmailResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoValidEmail = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "IsEmailExists", IMS.Entities.Severity.Critical, email, dtoValidEmail); }).Start();
+            }
+            return dtoValidEmail;
+        }
     }
 }

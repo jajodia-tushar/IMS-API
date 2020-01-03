@@ -62,6 +62,11 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
+        public Task<bool> CheckEmailAvailability(string email)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<bool> CheckEmailOrUserNameAvailability(string email, string username)
         {
             throw new NotImplementedException();
