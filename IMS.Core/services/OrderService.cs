@@ -304,11 +304,11 @@ namespace IMS.Core.services
 
         }
 
-        public async Task<ListOfVendorOrdersResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
+        public async Task<VendorsOrderResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
         {
-            var response = new ListOfVendorOrdersResponse();
+            var response = new VendorsOrderResponse();
             response.Status = Status.Failure;
-            if (ReportsValidator.FilterAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
+            if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
                 return response;
@@ -325,8 +325,8 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                response.ListOfVendorOrders = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
-                if (response.ListOfVendorOrders.Count < 1)
+                response.VendorOrders = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
+                if (response.VendorOrders.Count < 1)
                 {
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
                     return response;
@@ -416,11 +416,11 @@ namespace IMS.Core.services
 
         }
 
-        public async Task<ListOfVendorOrdersResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate)
+        public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate)
         {
-            var response = new ListOfVendorOrdersResponse();
+            var response = new VendorsOrderResponse();
             response.Status = Status.Failure;
-            if (ReportsValidator.FilterAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
+            if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
                 return response;
@@ -444,8 +444,8 @@ namespace IMS.Core.services
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
                     return response;
                 }
-                response.ListOfVendorOrders = await _vendorOrderDbContext.GetVendorOrdersByVendorId(vendorId, pageNumber, pageSize, startDate, endDate);
-                if (response.ListOfVendorOrders.Count < 1)
+                response.VendorOrders = await _vendorOrderDbContext.GetVendorOrdersByVendorId(vendorId, pageNumber, pageSize, startDate, endDate);
+                if (response.VendorOrders.Count < 1)
                 {
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
                     return response;

@@ -61,7 +61,7 @@ namespace IMS.Core.Validators
             return false;
         }
 
-        public static bool FilterAndValidateDates(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
+        public static bool InitializeAndValidateDates(string fromDate, string toDate, out DateTime startDate, out DateTime endDate)
         {
             startDate = new DateTime();
             endDate = new DateTime();
