@@ -30,42 +30,17 @@ namespace IMS.Core.services
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                if (!String.IsNullOrEmpty(employeeId))
                 {
-                    User requestesUser = Utility.GetUserFromToken(token);
-                    if (String.IsNullOrEmpty(employeeId))
-                    {
-                        employeeValidationResponse.Error = new Error()
-                        {
-                            ErrorCode = Constants.ErrorCodes.BadRequest,
-                            ErrorMessage = Constants.ErrorMessages.InvalidId
-                        };
-                        return employeeValidationResponse;
-                    }
                     Employee employee = await employeeDbContext.GetEmployeeById(employeeId);
                     if (employee != null)
                     {
                         employeeValidationResponse.Status = Status.Success;
                         employeeValidationResponse.Employee = employee;
-                    }
-                    else
-                    {
-                        employeeValidationResponse.Error = new Error()
-                        {
-                            ErrorCode = Constants.ErrorCodes.NotFound,
-                            ErrorMessage = Constants.ErrorMessages.InvalidId
-                        };
+                        return employeeValidationResponse;
                     }
                 }
-                else
-                {
-                    employeeValidationResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
-                }
+                employeeValidationResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
             }
             catch (Exception exception)
             {
