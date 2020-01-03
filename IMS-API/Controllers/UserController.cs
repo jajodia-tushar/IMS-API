@@ -276,7 +276,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetValidUsername", IMS.Entities.Severity.Critical, username, dtoValidUsername); }).Start();
+                new Task(() => { _logger.LogException(exception, "IsUsernameExists", IMS.Entities.Severity.Critical, username, dtoValidUsername); }).Start();
             }
             return dtoValidUsername;
         }
@@ -288,7 +288,7 @@ namespace IMS_API.Controllers
         /// <returns>response </returns>
         /// <response code="200">return response object</response>
         [Authorize(Roles = "SuperAdmin,Admin")]
-        [HttpGet]
+        [HttpGet("Email")]
         public async Task<Response> IsEmailExists(string email)
         {
             Response dtoValidEmail = null;
