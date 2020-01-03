@@ -430,9 +430,33 @@ namespace IMS.DataLayer.Dal
             return isRepeated;
         }
 
-        public Task<bool> CheckEmailAvailability(string emailId)
+        public async Task<bool> CheckEmailAvailability(string emailId)
         {
-            throw new NotImplementedException();
+            bool isRepeated = true;
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spIsEmailIdPresent";
+                    command.Parameters.AddWithValue("@emailId", emailId);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        isRepeated = (bool)reader["isrepeated"];
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return isRepeated;
         }
     }
 }
