@@ -430,7 +430,7 @@ namespace IMS.DataLayer.Dal
             return isRepeated;
         }
 
-        public Task<bool> CheckEmailAvailability(string email)
+        public Task<bool> CheckEmailAvailability(string emailId)
         {
             throw new NotImplementedException();
         }

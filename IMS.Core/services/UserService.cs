@@ -526,7 +526,7 @@ namespace IMS.Core.services
             return response;
         }
 
-        public Task<Response> CheckEmailAvailability(string email)
+        public Task<Response> CheckEmailAvailability(string emailId)
         {
             throw new NotImplementedException();
         }

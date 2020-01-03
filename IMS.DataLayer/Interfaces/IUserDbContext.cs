@@ -20,6 +20,6 @@ namespace IMS.DataLayer.Interfaces
         Task<User> ApproveAdmin(int userId);
         Task<Response> DeleteUser(int userId, bool isHardDelete);
         Task<bool> CheckUserNameAvailability(string username);
-        Task<bool> CheckEmailAvailability(string email);
+        Task<bool> CheckEmailAvailability(string emailId);
     }
 }
