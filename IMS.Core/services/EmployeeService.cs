@@ -30,7 +30,6 @@ namespace IMS.Core.services
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
             {
-                employeeValidationResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
                 if (!String.IsNullOrEmpty(employeeId))
                 {
                     Employee employee = await employeeDbContext.GetEmployeeById(employeeId);
@@ -38,8 +37,10 @@ namespace IMS.Core.services
                     {
                         employeeValidationResponse.Status = Status.Success;
                         employeeValidationResponse.Employee = employee;
+                        return employeeValidationResponse;
                     }
                 }
+                employeeValidationResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
             }
             catch (Exception exception)
             {
