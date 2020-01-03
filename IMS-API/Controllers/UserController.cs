@@ -282,7 +282,7 @@ namespace IMS_API.Controllers
         }
 
         //[Authorize(Roles = "SuperAdmin,Admin")]
-        [HttpGet("Email")]
+        [HttpGet]
         public async Task<Response> IsEmailExists(string email)
         {
             Response dtoValidEmail = null;
