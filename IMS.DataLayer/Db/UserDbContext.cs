@@ -400,5 +400,34 @@ namespace IMS.DataLayer.Dal
             }
             return response;
         }
+
+        public async Task<bool> CheckUserNameAvailability(string username)
+        {
+            bool isRepeated = true;
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spIsUserNamePresent";
+                    command.Parameters.AddWithValue("@username", username);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        isRepeated = (bool)reader["isrepeated"];
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return isRepeated;
+        }
     }
 }

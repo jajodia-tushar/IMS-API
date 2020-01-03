@@ -324,6 +324,14 @@
             <returns>deletion status</returns>
             <response code="200">deletion status</response>
         </member>
+        <member name="M:IMS_API.Controllers.UserController.IsUsernameExists(System.String)">
+            <summary>
+            Validate username exist or not
+            </summary>
+            <param name="username">contains username added by user</param>
+            <returns>response </returns>
+            <response code="200">return response object</response>
+        </member>
         <member name="M:IMS_API.Controllers.VendorController.GetVendorById(System.Int32)">
             <summary>
             returns vendor object if id is present, otherwise failure

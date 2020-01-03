@@ -67,6 +67,11 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
+        public Task<bool> CheckUserNameAvailability(string username)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<User>> GetAllPendingAdminApprovals()
         {
             throw new NotImplementedException();
