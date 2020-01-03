@@ -204,7 +204,7 @@ namespace IMS_API.Controllers
         [HttpGet("VendorOrders", Name = "GetVendorOrders")]
         public async Task<VendorsOrderResponse> GetVendorOrders(int? pageNumber, int? pageSize, bool isApproved, string fromDate = null, string toDate = null)
         {
-            VendorsOrderResponse contractsGetListOfVendorOrdersResponse = null;
+            VendorsOrderResponse dtoVendorsOrderResponse = null;
             try
             {
                 int currentPageNumber = pageNumber ?? 1;
@@ -222,11 +222,11 @@ namespace IMS_API.Controllers
                     };
                 }
                 IMS.Entities.VendorsOrderResponse entitiesResponse = await _orderService.GetVendorOrders(isApproved, currentPageNumber, currentPageSize, fromDate, toDate);
-                contractsGetListOfVendorOrdersResponse = VendorOrderTranslator.ToDataContractsObject(entitiesResponse);
+                dtoVendorsOrderResponse = VendorOrderTranslator.ToDataContractsObject(entitiesResponse);
             }
             catch (Exception e)
             {
-                contractsGetListOfVendorOrdersResponse = new VendorsOrderResponse
+                dtoVendorsOrderResponse = new VendorsOrderResponse
                 {
                     Status = Status.Failure,
                     Error = new Error
@@ -235,10 +235,10 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(e, "GetVendorOrders", IMS.Entities.Severity.Critical,isApproved+";"+pageNumber+";"+pageSize+";"+fromDate+";"+toDate, contractsGetListOfVendorOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrders", IMS.Entities.Severity.Critical,isApproved+";"+pageNumber+";"+pageSize+";"+fromDate+";"+toDate, dtoVendorsOrderResponse); }).Start();
             }
 
-            return contractsGetListOfVendorOrdersResponse;
+            return dtoVendorsOrderResponse;
         }
 
         /// <summary>
@@ -249,35 +249,35 @@ namespace IMS_API.Controllers
         [HttpGet("VendorOrders/{vendorId}", Name = "GetVendorOrdersByVendorId")]
         public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int? pageNumber, int? pageSize, int vendorId,string fromDate = null, string toDate = null)
         {
-            var dtoListOfVendorOrdersResponse = new VendorsOrderResponse();
+            var dtoVendorsOrderResponse = new VendorsOrderResponse();
             try
             {
                 int currentPageNumber = pageNumber ?? 1;
                 int currentPageSize = pageSize ?? 10;
                 if (currentPageNumber <= 0 || currentPageSize <= 0)
                 {
-                    dtoListOfVendorOrdersResponse.Status = Status.Failure;
-                    dtoListOfVendorOrdersResponse.Error = new Error()
+                    dtoVendorsOrderResponse.Status = Status.Failure;
+                    dtoVendorsOrderResponse.Error = new Error()
                     {
                         ErrorCode = Constants.ErrorCodes.BadRequest,
                         ErrorMessage = Constants.ErrorMessages.InvalidRequest
                     };
                 }
                 var doListOfVendorOrdersResponse = await _orderService.GetVendorOrdersByVendorId(vendorId, currentPageNumber, currentPageSize, fromDate, toDate);
-                dtoListOfVendorOrdersResponse = VendorOrderTranslator.ToDataContractsObject(doListOfVendorOrdersResponse);
+                dtoVendorsOrderResponse = VendorOrderTranslator.ToDataContractsObject(doListOfVendorOrdersResponse);
             }
             catch (Exception e)
             {
-                dtoListOfVendorOrdersResponse.Status = Status.Failure;
-                dtoListOfVendorOrdersResponse.Error = new Error()
+                dtoVendorsOrderResponse.Status = Status.Failure;
+                dtoVendorsOrderResponse.Error = new Error()
                 {
                     ErrorCode = Constants.ErrorCodes.ServerError,
                     ErrorMessage = Constants.ErrorMessages.ServerError
                 };
-                new Task(() => { _logger.LogException(e, "GetVendorOrdersByVendorId", IMS.Entities.Severity.Critical,vendorId+";"+pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, dtoListOfVendorOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrdersByVendorId", IMS.Entities.Severity.Critical,vendorId+";"+pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, dtoVendorsOrderResponse); }).Start();
             }
 
-            return dtoListOfVendorOrdersResponse;
+            return dtoVendorsOrderResponse;
 
         }
         /// <summary>

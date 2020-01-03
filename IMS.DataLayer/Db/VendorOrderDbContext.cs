@@ -304,7 +304,7 @@ namespace IMS.DataLayer.Db
         public async Task<List<VendorOrder>> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
         {
             DbDataReader reader = null;
-            var listOfVendorOrders = new List<VendorOrder>();
+            var VendorOrders = new List<VendorOrder>();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -321,14 +321,14 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@startDate", startDate);
                     command.Parameters.AddWithValue("@endDate", endDate);
                     reader = await command.ExecuteReaderAsync();
-                    List<VendorOrderDto> listOfVendorOrderDtos = new List<VendorOrderDto>();
+                    List<VendorOrderDto> VendorOrderDtos = new List<VendorOrderDto>();
                     while (reader.Read())
                     {
                         VendorOrderDto vendorOrderDto = Extract(reader);
-                        listOfVendorOrderDtos.Add(vendorOrderDto);
+                        VendorOrderDtos.Add(vendorOrderDto);
 
                     }
-                    listOfVendorOrders = ConvertToListOfVendorOrders(listOfVendorOrderDtos);
+                    VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
 
 
                 }
@@ -338,13 +338,13 @@ namespace IMS.DataLayer.Db
                 }
 
             }
-            return listOfVendorOrders;
+            return VendorOrders;
         }
 
         public async Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
         {
             DbDataReader reader = null;
-            var listOfVendorOrders = new List<VendorOrder>();
+            var VendorOrders = new List<VendorOrder>();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -361,21 +361,21 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@startDate", startDate);
                     command.Parameters.AddWithValue("@endDate", endDate);
                     reader = await command.ExecuteReaderAsync();
-                    List<VendorOrderDto> listOfVendorOrderDtos = new List<VendorOrderDto>();
+                    List<VendorOrderDto> VendorOrderDtos = new List<VendorOrderDto>();
                     while (reader.Read())
                     {
                         VendorOrderDto vendorOrderDto = Extract(reader);
-                        listOfVendorOrderDtos.Add(vendorOrderDto);
+                        VendorOrderDtos.Add(vendorOrderDto);
 
                     }
-                    listOfVendorOrders = ConvertToListOfVendorOrders(listOfVendorOrderDtos);
+                    VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
             }
-            return listOfVendorOrders;
+            return VendorOrders;
         }
     }
 }
