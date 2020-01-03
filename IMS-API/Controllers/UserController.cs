@@ -281,7 +281,13 @@ namespace IMS_API.Controllers
             return dtoValidUsername;
         }
 
-        //[Authorize(Roles = "SuperAdmin,Admin")]
+        /// <summary>
+        /// check Email Id exist or not
+        /// </summary>
+        /// <param name="email">email entered by user</param>
+        /// <returns>response </returns>
+        /// <response code="200">return response object</response>
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet]
         public async Task<Response> IsEmailExists(string email)
         {
