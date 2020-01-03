@@ -30,28 +30,15 @@ namespace IMS.Core.services
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
             {
-                if (String.IsNullOrEmpty(employeeId))
+                employeeValidationResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
+                if (!String.IsNullOrEmpty(employeeId))
                 {
-                    employeeValidationResponse.Error = new Error()
+                    Employee employee = await employeeDbContext.GetEmployeeById(employeeId);
+                    if (employee != null)
                     {
-                        ErrorCode = Constants.ErrorCodes.BadRequest,
-                        ErrorMessage = Constants.ErrorMessages.InvalidId
-                    };
-                    return employeeValidationResponse;
-                }
-                Employee employee = await employeeDbContext.GetEmployeeById(employeeId);
-                if (employee != null)
-                {
-                    employeeValidationResponse.Status = Status.Success;
-                    employeeValidationResponse.Employee = employee;
-                }
-                else
-                {
-                    employeeValidationResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.NotFound,
-                        ErrorMessage = Constants.ErrorMessages.InvalidId
-                    };
+                        employeeValidationResponse.Status = Status.Success;
+                        employeeValidationResponse.Employee = employee;
+                    }
                 }
             }
             catch (Exception exception)
