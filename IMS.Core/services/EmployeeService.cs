@@ -33,7 +33,7 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        public Task<Response> Delete(int id,bool isHardDelete)
+        public Task<Response> Delete(string id,bool isHardDelete)
         {
             throw new NotImplementedException();
         }
@@ -43,7 +43,7 @@ namespace IMS.Core.services
             throw new NotImplementedException();
         }
 
-        public Task<EmployeeResponse> GetEmployee(int employeeId)
+        public Task<EmployeeResponse> GetEmployee(string employeeId)
         {
             throw new NotImplementedException();
         }
