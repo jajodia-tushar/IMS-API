@@ -7,6 +7,7 @@ using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -311,12 +312,15 @@ namespace IMS.Core.services
 
         }
 
-        public async Task<GetListOfVendorOrdersResponse> GetAllVendorOrderPendingApprovals(int pageNumber, int pageSize)
+        public async Task<VendorsOrderResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate)
         {
-            GetListOfVendorOrdersResponse response = new GetListOfVendorOrdersResponse
+            var response = new VendorsOrderResponse();
+            response.Status = Status.Failure;
+            if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
             {
-                Status = Status.Failure
-            };
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
+                return response;
+            }
             int userId = -1;
             try
             {
@@ -329,31 +333,33 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                response.ListOfVendorOrders = await _vendorOrderDbContext.GetAllPendingApprovals(pageNumber, pageSize);
+                response.VendorOrders = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
+                if (response.VendorOrders.Count < 1)
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
+                    return response;
+                }
                 response.Status = Status.Success;
             }
             catch (CustomException e)
             {
-
                 response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                new Task(() => { _logger.LogException(e, "GetAllVendorPendingApprovals", Severity.Critical, null, response); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrders", Severity.Critical, isApproved + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
             }
             catch (Exception e)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(e, "GetAllVendorPendingApprovals", Severity.Critical, null, response); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrders", Severity.Critical, isApproved + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (response.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(null, response, "Get All VendorOrder Pending Approvals", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(isApproved + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response, "GetVendorOrders", response.Status, severity, userId); }).Start();
             }
             return response;
-
         }
-
 
         private void SetTotalPriceOfItemList(List<ItemQuantityPriceMapping> orderItemDetails)
         {
@@ -416,6 +422,62 @@ namespace IMS.Core.services
             }
             return response;
 
+        }
+
+        public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate)
+        {
+            var response = new VendorsOrderResponse();
+            response.Status = Status.Failure;
+            if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
+                return response;
+            }
+            int userId = -1;
+            try
+            {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User user = Utility.GetUserFromToken(token);
+                userId = user.Id;
+
+                var vendorResponse = await _vendorService.GetVendorById(vendorId);
+                if (vendorResponse.Status.Equals(Status.Failure))
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
+                    return response;
+                }
+                response.VendorOrders = await _vendorOrderDbContext.GetVendorOrdersByVendorId(vendorId, pageNumber, pageSize, startDate, endDate);
+                if (response.VendorOrders.Count < 1)
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
+                    return response;
+                }
+                response.Status = Status.Success;
+            }
+            catch (CustomException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "GetVendorOrdersByVendorId", Severity.Critical, vendorId + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "GetVendorOrdersByVendorId", Severity.Critical, vendorId + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(vendorId + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response, "GetVendorOrdersByVendorId", response.Status, severity, userId); }).Start();
+            }
+            return response;
         }
     }
 }

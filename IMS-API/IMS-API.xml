@@ -114,9 +114,16 @@
             <returns>entire vendorOrder object along with status</returns>
             <response code="200">Returns VendorOrder object  if Vendororder is valid otherwise it returns null and status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.OrderController.GetAllPendingApprovals(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+        <member name="M:IMS_API.Controllers.OrderController.GetVendorOrders(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.String,System.String)">
             <summary>
             retrieves the List of vendororders.
+            </summary>
+            <returns>entire List of vendorOrder object along with status</returns>
+            <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.GetVendorOrdersByVendorId(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Int32,System.String,System.String)">
+            <summary>
+            retrieves the List of vendororders by vendorId.
             </summary>
             <returns>entire List of vendorOrder object along with status</returns>
             <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>

@@ -201,18 +201,18 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <returns>entire List of vendorOrder object along with status</returns>
         /// <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
-        // GET: api/order/VendorOrders/PendingApprovals
-        [HttpGet("VendorOrders/PendingApprovals", Name = "GetAllPendingApprovals")]
-        public async Task<GetListOfVendorOrdersResponse> GetAllPendingApprovals(int? pageNumber, int? pageSize)
+        // GET: api/order/VendorOrders?isApproved&pageNumbe&pageSize&fromDate&toDate
+        [HttpGet("VendorOrders", Name = "GetVendorOrders")]
+        public async Task<VendorsOrderResponse> GetVendorOrders(int? pageNumber, int? pageSize, bool isApproved, string fromDate = null, string toDate = null)
         {
-            GetListOfVendorOrdersResponse contractsGetListOfVendorOrdersResponse = null;
+            VendorsOrderResponse dtoVendorsOrderResponse = null;
             try
             {
                 int currentPageNumber = pageNumber ?? 1;
                 int currentPageSize = pageSize ?? 10;
                 if (currentPageNumber <= 0 || currentPageSize <= 0)
                 {
-                    return new GetListOfVendorOrdersResponse
+                    return new VendorsOrderResponse
                     {
                         Status = Status.Failure,
                         Error = new Error
@@ -222,12 +222,12 @@ namespace IMS_API.Controllers
                         }
                     };
                 }
-                IMS.Entities.GetListOfVendorOrdersResponse entitiesResponse = await _orderService.GetAllVendorOrderPendingApprovals(currentPageNumber, currentPageSize);
-                contractsGetListOfVendorOrdersResponse = VendorOrderTranslator.ToDataContractsObject(entitiesResponse);
+                IMS.Entities.VendorsOrderResponse entitiesResponse = await _orderService.GetVendorOrders(isApproved, currentPageNumber, currentPageSize, fromDate, toDate);
+                dtoVendorsOrderResponse = VendorOrderTranslator.ToDataContractsObject(entitiesResponse);
             }
             catch (Exception e)
             {
-                contractsGetListOfVendorOrdersResponse = new GetListOfVendorOrdersResponse
+                dtoVendorsOrderResponse = new VendorsOrderResponse
                 {
                     Status = Status.Failure,
                     Error = new Error
@@ -236,10 +236,50 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(e, "GetAllPendingApprovals", IMS.Entities.Severity.Critical, null, contractsGetListOfVendorOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(e, "GetVendorOrders", IMS.Entities.Severity.Critical,isApproved+";"+pageNumber+";"+pageSize+";"+fromDate+";"+toDate, dtoVendorsOrderResponse); }).Start();
             }
 
-            return contractsGetListOfVendorOrdersResponse;
+            return dtoVendorsOrderResponse;
+        }
+
+        /// <summary>
+        /// retrieves the List of vendororders by vendorId.
+        /// </summary>
+        /// <returns>entire List of vendorOrder object along with status</returns>
+        /// <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
+        [HttpGet("VendorOrders/{vendorId}", Name = "GetVendorOrdersByVendorId")]
+        public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int? pageNumber, int? pageSize, int vendorId,string fromDate = null, string toDate = null)
+        {
+            var dtoVendorsOrderResponse = new VendorsOrderResponse();
+            try
+            {
+                int currentPageNumber = pageNumber ?? 1;
+                int currentPageSize = pageSize ?? 10;
+                if (currentPageNumber <= 0 || currentPageSize <= 0)
+                {
+                    dtoVendorsOrderResponse.Status = Status.Failure;
+                    dtoVendorsOrderResponse.Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.BadRequest,
+                        ErrorMessage = Constants.ErrorMessages.InvalidRequest
+                    };
+                }
+                var doListOfVendorOrdersResponse = await _orderService.GetVendorOrdersByVendorId(vendorId, currentPageNumber, currentPageSize, fromDate, toDate);
+                dtoVendorsOrderResponse = VendorOrderTranslator.ToDataContractsObject(doListOfVendorOrdersResponse);
+            }
+            catch (Exception e)
+            {
+                dtoVendorsOrderResponse.Status = Status.Failure;
+                dtoVendorsOrderResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+                new Task(() => { _logger.LogException(e, "GetVendorOrdersByVendorId", IMS.Entities.Severity.Critical,vendorId+";"+pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, dtoVendorsOrderResponse); }).Start();
+            }
+
+            return dtoVendorsOrderResponse;
+
         }
         /// <summary>
         /// vendororder is updated and approved along this data transfer from vendororder to warehouse
@@ -247,7 +287,6 @@ namespace IMS_API.Controllers
         /// <param name="vendorOrder">Here vendorOrder contains two objects named vendor and vendororderdetails</param>
         /// <returns>Response</returns>
         /// <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
-
         // PUT: api/order/VendorOrders/PendingApprovals
         [HttpPut("VendorOrders/PendingApprovals", Name = "ApproveVendorOrder")]
         public async Task<Response> ApproveVendorOrder([FromBody] VendorOrder vendorOrder)

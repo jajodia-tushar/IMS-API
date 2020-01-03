@@ -164,44 +164,6 @@ namespace IMS.DataLayer.Db
             return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.Quantity + "," + p.TotalPrice));
         }
 
-        public async Task<List<VendorOrder>> GetAllPendingApprovals(int pageNumber, int pageSize)
-        {
-            DbDataReader reader = null;
-            List<VendorOrder> listOfVendorOrders = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    int lim = pageSize;
-                    int off = (pageNumber - 1) * pageSize;
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetAllVendorOrdersPendingApprovals";
-                    command.Parameters.AddWithValue("@lim", lim);
-                    command.Parameters.AddWithValue("@off", off);
-                    reader = await command.ExecuteReaderAsync();
-                    List<VendorOrderDto> listOfVendorOrderDtos = new List<VendorOrderDto>();
-                    while (reader.Read())
-                    {
-                        VendorOrderDto vendorOrderDto = Extract(reader);
-                        listOfVendorOrderDtos.Add(vendorOrderDto);
-
-                    }
-                    listOfVendorOrders = ConvertToListOfVendorOrders(listOfVendorOrderDtos);
-
-
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
-            }
-            return listOfVendorOrders;
-
-        }
-
         public VendorOrderDto Extract(DbDataReader reader)
         {
             return new VendorOrderDto
@@ -337,6 +299,83 @@ namespace IMS.DataLayer.Db
                 MaxLimit = vendorOrderDto.ItemMaxLimit,
                 ImageUrl = vendorOrderDto.ItemImageUrl
             };
+        }
+
+        public async Task<List<VendorOrder>> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        {
+            DbDataReader reader = null;
+            var VendorOrders = new List<VendorOrder>();
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    int lim = pageSize;
+                    int off = (pageNumber - 1) * pageSize;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetApprovalBasedVendorOrders";
+                    command.Parameters.AddWithValue("@isApproved", isApproved);
+                    command.Parameters.AddWithValue("@lim", lim);
+                    command.Parameters.AddWithValue("@off", off);
+                    command.Parameters.AddWithValue("@startDate", startDate);
+                    command.Parameters.AddWithValue("@endDate", endDate);
+                    reader = await command.ExecuteReaderAsync();
+                    List<VendorOrderDto> VendorOrderDtos = new List<VendorOrderDto>();
+                    while (reader.Read())
+                    {
+                        VendorOrderDto vendorOrderDto = Extract(reader);
+                        VendorOrderDtos.Add(vendorOrderDto);
+
+                    }
+                    VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
+
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            return VendorOrders;
+        }
+
+        public async Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        {
+            DbDataReader reader = null;
+            var VendorOrders = new List<VendorOrder>();
+            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    int lim = pageSize;
+                    int off = (pageNumber - 1) * pageSize;
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetVendorOrdersByVendorId";
+                    command.Parameters.AddWithValue("@vendorId", vendorId);
+                    command.Parameters.AddWithValue("@lim", lim);
+                    command.Parameters.AddWithValue("@off", off);
+                    command.Parameters.AddWithValue("@startDate", startDate);
+                    command.Parameters.AddWithValue("@endDate", endDate);
+                    reader = await command.ExecuteReaderAsync();
+                    List<VendorOrderDto> VendorOrderDtos = new List<VendorOrderDto>();
+                    while (reader.Read())
+                    {
+                        VendorOrderDto vendorOrderDto = Extract(reader);
+                        VendorOrderDtos.Add(vendorOrderDto);
+
+                    }
+                    VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return VendorOrders;
         }
     }
 }
