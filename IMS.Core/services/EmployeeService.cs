@@ -42,12 +42,6 @@ namespace IMS.Core.services
         {
             throw new NotImplementedException();
         }
-
-        public Task<EmployeeResponse> GetEmployee(string employeeId)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<EmployeeResponse> Update(Employee employee)
         {
             throw new NotImplementedException();
