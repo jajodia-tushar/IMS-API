@@ -370,7 +370,7 @@ namespace IMS.Core.services
             List<DateItemConsumption> sortedDateItemConsumptionList = dateItemConsumptionList.OrderBy(o => o.Date).ToList();
             return sortedDateItemConsumptionList;
         }
-        public async Task<StockStatusResponse> GetStockStatus()
+        public async Task<StockStatusResponse> GetStockStatus(int pageNumber, int pageSize, string itemName)
         {
             StockStatusResponse stockStatusResponse = new StockStatusResponse();
             int userId = -1;
@@ -380,14 +380,29 @@ namespace IMS.Core.services
                 if (await _tokenProvider.IsValidToken(token))
                 {
                     User user = Utility.GetUserFromToken(token);
-                    userId = user.Id;
+                    if(pageSize<=0||pageNumber<=0)
+                    {
+                        stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                        return stockStatusResponse;
+                    }
+                    if(String.IsNullOrEmpty(itemName))
+                    {
+                        itemName = "";
+                    }
+                    int limit = pageSize;
+                    int offset = (pageNumber - 1) * pageSize;
                     try
                     {
-                        ItemStockStatusDto stockStatus = await InitiliaseListWithItemNames();
-                        _reportsDbContext.GetStockStatus(stockStatus);
+                        ItemStockStatusDto stockStatus = await _reportsDbContext.GetStockStatus(limit,offset,itemName);
                         if (stockStatus != null && stockStatus.StockStatus.Count != 0)
                         {
                             stockStatusResponse.Status = Status.Success;
+                            stockStatusResponse.PagingInfo = new PagingInfo()
+                            {
+                                TotalResults = stockStatus.PagingInfo.TotalResults,
+                                PageNumber = pageNumber,
+                                PageSize = pageSize
+                            };
                             stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
                         }
                         else
@@ -428,21 +443,6 @@ namespace IMS.Core.services
             }
             return stockStatusResponse;
         }
-
-        private async Task<ItemStockStatusDto> InitiliaseListWithItemNames()
-        {
-            ItemStockStatusDto stockStatus=new ItemStockStatusDto();
-            stockStatus.StockStatus = new Dictionary<int, List<StockStatus>>();
-            stockStatus.Items = new List<Item>();
-            List<Item> itemsList = await _itemDbContext.GetAllItems();
-            foreach (Item item in itemsList)
-            {
-                stockStatus.Items.Add(item);
-                stockStatus.StockStatus.Add(item.Id, new List<StockStatus>());
-            }
-            return stockStatus;
-        }
-
         public async Task<List<ItemStockStatus>> ToListFromDictionary(ItemStockStatusDto stockStatus)
         {
             List<ItemStockStatus> itemStockStatusList = new List<ItemStockStatus>();

@@ -172,12 +172,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Retrieve the stock status at any given point of time</response>
         // GET: api/Default/5
         [HttpGet("GetStockStatus", Name = "GetStockStatus")]
-        public async Task<StockStatusResponse> GetStockStatus()
+        public async Task<StockStatusResponse> GetStockStatus(int pageNumber,int pageSize, string itemName)
         {
             StockStatusResponse stockStatusResponse = null;
             try
             {
-                IMS.Entities.StockStatusResponse entityStockStatusResponse = await _reportsService.GetStockStatus();
+                IMS.Entities.StockStatusResponse entityStockStatusResponse = await _reportsService.GetStockStatus(pageNumber,pageSize,itemName);
                 stockStatusResponse = StockStatusTranslator.ToDataContractsObject(entityStockStatusResponse);
             }
             catch (Exception exception)

@@ -9,6 +9,7 @@ using IMS.Entities.Interfaces;
 using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace IMS.DataLayer.Db
 {
@@ -219,9 +220,13 @@ namespace IMS.DataLayer.Db
             return Colour.Green;
         }
 
-        public void GetStockStatus(ItemStockStatusDto stockStatus)
+        public async Task<ItemStockStatusDto> GetStockStatus(int limit, int offset, string itemName)
         {
-            MySqlDataReader reader = null;
+            ItemStockStatusDto stockStatus = new ItemStockStatusDto();
+            DbDataReader reader = null;
+            stockStatus.Items = new List<Item>();
+            stockStatus.StockStatus = new Dictionary<int, List<StockStatus>>();
+            stockStatus.PagingInfo = new PagingInfo();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -229,47 +234,64 @@ namespace IMS.DataLayer.Db
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;               
-                    command.CommandText = "getRAGStatusOfItemsInWarehouse";
-                    reader = command.ExecuteReader();
+                    command.CommandText = "spGetStockStatus";
+                    command.Parameters.AddWithValue("@theLimit", limit);
+                    command.Parameters.AddWithValue("@theOffset", offset);
+                    command.Parameters.AddWithValue("@ItemName", itemName);
+                    reader = await command.ExecuteReaderAsync();
                     int itemId;
                     Colour ragColor;
                     int quantity;
-                    while (reader.Read())
-                    {
-                        itemId = (int)reader["ItemId"];
-                        ragColor = StringToEnum((string)reader["WarehouseRAG"]);
-                        quantity = Convert.ToInt32(reader["Quantity"]);
-                        if (stockStatus.StockStatus.ContainsKey(itemId))
-                        {
-                            stockStatus.StockStatus[itemId].Add(new StockStatus() { StoreName = "Warehouse", Colour = ragColor, Quantity = quantity });
-                        }
-                    }
-                    reader.Close();
-                    command.CommandText = "getRAGStatusOfItemsInShelves";
-                    reader = command.ExecuteReader();
                     string shelfName;
                     while (reader.Read())
                     {
+                        stockStatus.PagingInfo.TotalResults = Convert.ToInt32(reader["TotalItems"]);
                         itemId = (int)reader["ItemId"];
-                        ragColor = StringToEnum((string)reader["ShelvesRAG"]);
-                        shelfName = (string)reader["ShelfName"];
-                        quantity = (int)Convert.ToInt32(reader["Quantity"]);
-                        if (stockStatus.StockStatus.ContainsKey(itemId))
+                        if(!(stockStatus.Items.Select(x => x.Id).Distinct().Contains(itemId)))
                         {
-                            stockStatus.StockStatus[itemId].Add(new StockStatus() { StoreName = shelfName, Colour =ragColor, Quantity = quantity });
+                            stockStatus.Items.Add(Extract(reader));
+                            stockStatus.StockStatus.Add(itemId, new List<StockStatus>());
+                        }
+                        try
+                        {
+                            ragColor = StringToEnum((string)reader["RAG"]);
+                            shelfName = (string)reader["Location"];
+                            quantity = Convert.ToInt32(reader["Quantity"]);
+                            if (stockStatus.StockStatus.ContainsKey(itemId))
+                            {
+                                stockStatus.StockStatus[itemId].Add(new StockStatus() { Location = shelfName, Colour = ragColor, Quantity = quantity });
+                            }
+                        }
+                        catch(Exception e)
+                        {
+
                         }
                     }
                     reader.Close();
-
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
-
+                return stockStatus;
             }
         }
-
+        public Item Extract(DbDataReader reader)
+        {
+            return new Item()
+            {
+                Id = (int)reader["ItemId"],
+                Name = reader["Name"]?.ToString(),
+                MaxLimit = Convert.ToInt32(reader["MaximumLimit"]),
+                IsActive = (bool)reader["IsActive"],
+                ImageUrl = reader["ImageUrl"]?.ToString(),
+                Rate = Convert.ToInt32(reader["Rate"]),
+                ShelvesRedLimit = Convert.ToInt32(reader["ShelvesRedLimit"]),
+                ShelvesAmberLimit = Convert.ToInt32(reader["ShelvesAmberLimit"]),
+                WarehouseRedLimit = Convert.ToInt32(reader["WarehouseRedLimit"]),
+                WarehouseAmberLimit = Convert.ToInt32(reader["WarehouseAmberLimit"])
+            };
+        }
         public async Task<List<ItemQuantityMapping>> GetWarehouseAvailability(string colour)
         {
             try

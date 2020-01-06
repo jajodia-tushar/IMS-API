@@ -9,5 +9,6 @@ namespace IMS.DataLayer.Dto
     {
         public Dictionary<int, List<StockStatus>> StockStatus { get; set; }
         public List<Item> Items { get; set; }
+        public PagingInfo PagingInfo { get; set; }
     }
 }
