@@ -292,8 +292,15 @@ namespace IMS.DataLayer.Db
                 WarehouseAmberLimit = Convert.ToInt32(reader["WarehouseAmberLimit"])
             };
         }
-        public async Task<List<ItemQuantityMapping>> GetWarehouseAvailability(string colour)
+
+        public async Task<ItemsAvailabilityResponse> GetWarehouseAvailability(string colour, int pageNumber, int pageSize)
         {
+            ItemsAvailabilityResponse itemsAvailabilityResponse = new ItemsAvailabilityResponse();
+            PagingInfo pagingInfo = new PagingInfo();
+            pagingInfo.PageNumber = pageNumber;
+            pagingInfo.PageSize = pageSize;
+            int limit = pageSize;
+            int offset = (pageNumber - 1) * pageSize;
             try
             {
                 var itemQuantityMappings = new List<ItemQuantityMapping>();
@@ -303,12 +310,20 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@colour",colour.ToUpper());
-                    command.CommandText = "spGetWarehouseItemsByColour";
+                    command.Parameters.AddWithValue("@lim", limit);
+                    command.Parameters.AddWithValue("@off", offset);
+                    command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
+                    command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
+                    command.CommandText = "spGetWarehouseItemsByColourTest";
                     var reader = await command.ExecuteReaderAsync();
                     itemQuantityMappings = GetItemQuantityMapping(reader);
                     reader.Close();
+                    command.ExecuteNonQuery();
+                    pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
                 };
-                return itemQuantityMappings;
+                itemsAvailabilityResponse.ItemQuantityMappings = itemQuantityMappings;
+                itemsAvailabilityResponse.pagingInfo = pagingInfo;
+                return itemsAvailabilityResponse;
             }
             catch (Exception exception)
             {
@@ -316,8 +331,14 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<List<ItemQuantityMapping>> GetShelfAvailability(int id, string colour)
+        public async Task<ItemsAvailabilityResponse> GetShelfAvailability(int id, string colour,int pageNumber,int pageSize)
         {
+            ItemsAvailabilityResponse itemsAvailabilityResponse = new ItemsAvailabilityResponse();
+            PagingInfo pagingInfo = new PagingInfo();
+            pagingInfo.PageNumber = pageNumber;
+            pagingInfo.PageSize = pageSize;
+            int limit = pageSize;
+            int offset = (pageNumber - 1) * pageSize;
             try
             {
                 var itemQuantityMappings = new List<ItemQuantityMapping>();
@@ -328,12 +349,20 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@colour",colour.ToUpper());
                     command.Parameters.AddWithValue("@id", id);
-                    command.CommandText = "spGetItemsByColourAndShelfId";
+                    command.Parameters.AddWithValue("@lim", limit);
+                    command.Parameters.AddWithValue("@off", offset);
+                    command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
+                    command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
+                    command.CommandText = "spGetItemsByColourAndShelfIdTest";
                     var reader = await command.ExecuteReaderAsync();
                     itemQuantityMappings = GetItemQuantityMapping(reader);
                     reader.Close();
+                    command.ExecuteNonQuery();
+                    pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
                 };
-                return itemQuantityMappings;
+                itemsAvailabilityResponse.ItemQuantityMappings = itemQuantityMappings;
+                itemsAvailabilityResponse.pagingInfo = pagingInfo;
+                return itemsAvailabilityResponse;
             }
             catch (Exception exception)
             {
