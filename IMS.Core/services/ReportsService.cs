@@ -515,12 +515,12 @@ namespace IMS.Core.services
             catch (CustomException e)
             {
                 itemsAvailabilityResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                new Task(() => { _logger.LogException(e, "GetItemsAvailability", Severity.High, locationName + ";" + locationCode + ";" + colour + ";" + pageNumber + ";" + pa, itemsAvailabilityResponse); }).Start();
+                new Task(() => { _logger.LogException(e, "GetItemsAvailability", Severity.High, locationName + ";" + locationCode + ";" + colour + ";" + pageNumber + ";" + pageSize, itemsAvailabilityResponse); }).Start();
             }
             catch (Exception exception)
             {
                 itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetItemsAvailability", Severity.High, locationName+";"+locationCode+";"+colour, itemsAvailabilityResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetItemsAvailability", Severity.High, locationName+";"+locationCode+";"+colour + ";" + pageNumber + ";" + pageSize, itemsAvailabilityResponse); }).Start();
                 throw exception;
             }
             finally

@@ -199,9 +199,11 @@ namespace IMS_API.Controllers
         /// <summary>
         /// Retrieve Location and Colour based items list
         /// </summary>
-        /// <param name="Location Name"></param>
-        /// <param name="Location Code"></param>
-        /// <param name="Colour"></param>
+        /// <param name="locationName"></param>
+        /// <param name="locationCode"></param>
+        /// <param name="colour"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
         /// <returns>Location and Colour based Items list</returns>
         /// <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
         [Route("GetItemsAvailability")]
