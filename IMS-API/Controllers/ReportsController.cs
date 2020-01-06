@@ -206,12 +206,14 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
         [Route("GetItemsAvailability")]
         [HttpGet]
-        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour)
+        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour, int? pageNumber = null, int? pageSize = null)
         {
             var itemsAvailabilityResponse = new ItemsAvailabilityResponse();
             try
             {
-                IMS.Entities.ItemsAvailabilityResponse doItemsAvailabilityResponse = await _reportsService.GetItemsAvailability(locationName, locationCode, colour);
+                int currentPageNumber = pageNumber ?? 1;
+                int currentPageSize = pageSize ?? 10;
+                IMS.Entities.ItemsAvailabilityResponse doItemsAvailabilityResponse = await _reportsService.GetItemsAvailability(locationName, locationCode, colour,currentPageNumber,currentPageSize);
                 itemsAvailabilityResponse = ReportsTranslator.ToDataContractsObject(doItemsAvailabilityResponse);
             }
             catch (Exception exception)

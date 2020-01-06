@@ -3,6 +3,7 @@ using IMS.Core.Validators;
 using IMS.DataLayer.Dto;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
@@ -465,14 +466,17 @@ namespace IMS.Core.services
             return itemStockStatusList;
         }
 
-        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour)
+        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour,int pageNumber,int pageSize)
         {
             var itemsAvailabilityResponse = new ItemsAvailabilityResponse();
+            PagingInfo pagingInfo = new PagingInfo();
             itemsAvailabilityResponse.Status = Status.Failure;
             int userId = -1;
             try
             {
                 object inputColour;
+                if (pageSize <= 0 || pageNumber <= 0)
+                    throw new InvalidPagingInfo();
                 if (!String.IsNullOrEmpty(locationName) && !String.IsNullOrEmpty(locationCode) && !String.IsNullOrEmpty(colour) && Enum.TryParse(typeof(Colour), colour, true, out inputColour))
                 {
                     if (locationName.ToUpper() == "WAREHOUSE")
@@ -508,7 +512,12 @@ namespace IMS.Core.services
                 itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidInput);
                 return itemsAvailabilityResponse;
             }
-            catch(Exception exception)
+            catch (CustomException e)
+            {
+                itemsAvailabilityResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "GetItemsAvailability", Severity.High, locationName + ";" + locationCode + ";" + colour + ";" + pageNumber + ";" + pa, itemsAvailabilityResponse); }).Start();
+            }
+            catch (Exception exception)
             {
                 itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "GetItemsAvailability", Severity.High, locationName+";"+locationCode+";"+colour, itemsAvailabilityResponse); }).Start();
@@ -521,6 +530,7 @@ namespace IMS.Core.services
                     severity = Severity.High;
                 new Task(() => { _logger.Log("GetItemsAvailability", itemsAvailabilityResponse, "GetItemsAvailability", itemsAvailabilityResponse.Status, severity, userId); }).Start();
             }
+            return itemsAvailabilityResponse;
         }
     }
 }
