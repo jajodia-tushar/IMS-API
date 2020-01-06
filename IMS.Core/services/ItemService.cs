@@ -206,7 +206,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
-        public async Task<ItemResponse> Delete(int id)
+        public async Task<ItemResponse> Delete(int id,bool isHardDelete)
         {
             ItemResponse itemResponse = new ItemResponse();
             int userId = -1;
@@ -219,13 +219,20 @@ namespace IMS.Core.services
                     userId = user.Id;
                     try
                     {
-                        if (await IsItemAlreadyDeleted(id))
+                        bool isPresent = await _itemDbContext.IsItemAlreadyDeleted(id, isHardDelete);
+                        if(isPresent == false && isHardDelete == true)
+                        {
+                            itemResponse.Status = Status.Failure;
+                            itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
+                            return itemResponse;
+                        }
+                        else if(isPresent == false && isHardDelete == false)
                         {
                             itemResponse.Status = Status.Failure;
                             itemResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.AlreadyDeleted);
                             return itemResponse;
                         }
-                        bool isDeleted = await _itemDbContext.Delete(id);
+                        bool isDeleted = await _itemDbContext.Delete(id,isHardDelete);
                         if (isDeleted)
                         {
                             itemResponse.Status = Status.Success;
@@ -357,19 +364,19 @@ namespace IMS.Core.services
             return false;
         }
 
-        private async Task<bool> IsItemAlreadyDeleted(int id)
-        {
-            List<Item> items = await _itemDbContext.GetAllItems();
-            foreach (var item in items)
-            {
-                if (item.Id.Equals(id))
-                {
-                    if (item.IsActive == false)
-                        return true;
-                }
-            }
-            return false;
-        }
+        //private async Task<bool> IsItemAlreadyDeleted(int id)
+        //{
+        //    List<Item> items = await _itemDbContext.GetAllItems();
+        //    foreach (var item in items)
+        //    {
+        //        if (item.Id.Equals(id))
+        //        {
+        //            if (item.IsActive == false)
+        //                return true;
+        //        }
+        //    }
+        //    return false;
+        //}
         private ItemResponse ValidateItemId(int id)
         {
             ItemResponse itemResponse = new ItemResponse();

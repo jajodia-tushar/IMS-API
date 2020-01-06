@@ -51,11 +51,12 @@
             <returns>Returns Item List along with updtaed Item</returns>
             <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ItemController.Delete(System.Int32)">
+        <member name="M:IMS_API.Controllers.ItemController.Delete(System.Int32,System.Boolean)">
             <summary>
             Deactivate the specific Item
             </summary>
             <param name="id">The ID of that Item</param>
+            <param name="isHardDelete">give boolean value wether item should be har delete or soft delete</param>
             <response code="200">Returns Item List along with Deactivated Item if that Item is softdeleted successfully otherwise it returns null with status failure</response>
         </member>
         <member name="M:IMS_API.Controllers.LoginController.Login(IMS.Contracts.LoginRequest)">

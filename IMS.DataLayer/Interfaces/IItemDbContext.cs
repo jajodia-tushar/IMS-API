@@ -11,7 +11,8 @@ namespace IMS.DataLayer.Interfaces
         Task<List<Item>> GetAllItems();
         Task<Item> GetItemById(int id);
         Task<int> AddItem(Item item);
-        Task<bool> Delete(int id);
+        Task<bool> Delete(int id,bool isHardDelete);
         Task<Item> UpdateItem(Item item);
+        Task<bool> IsItemAlreadyDeleted(int id,bool isHardDelete);
     }
 }

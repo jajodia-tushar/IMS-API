@@ -108,9 +108,9 @@ namespace IMS.DataLayer.Db
             return latestAddedItemId;
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id,bool isHardDelete)
         {
-            DbDataReader reader = null;
+            //DbDataReader reader = null;
             bool isDeleted = false;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -121,12 +121,11 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spDelete";
                     command.Parameters.AddWithValue("@Id", id);
-                    reader = await command.ExecuteReaderAsync();
-                    if (reader.Read())
+                    command.Parameters.AddWithValue("@isHardDelete", isHardDelete);
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+                    if (rowsAffected > 0)
                     {
-                        bool isActiveValue = (bool)reader["IsActive"];
-                        if (!isActiveValue)
-                            isDeleted = true;
+                        isDeleted = true;
                     }
                 }
                 catch (Exception exception)
@@ -187,6 +186,33 @@ namespace IMS.DataLayer.Db
             item.WarehouseRedLimit = (int)reader["WarehouseRedLimit"];
             item.WarehouseAmberLimit = (int)reader["WarehouseAmberLimit"];
             return item;
+        }
+        public async Task<bool> IsItemAlreadyDeleted(int id, bool isHardDelete)
+        {
+            bool isPresent = false;
+            DbDataReader reader = null;
+            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spIsItemAlreadyDeleted";
+                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@isHardDelete", isHardDelete);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        isPresent = Convert.ToBoolean(reader["isPresent"]);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return isPresent;
         }
     }
 }

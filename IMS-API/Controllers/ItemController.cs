@@ -155,20 +155,21 @@ namespace IMS_API.Controllers
             }
             return contractItemsResponse;
         }
-        
+
         /// <summary>
         /// Deactivate the specific Item
         /// </summary>
         /// <param name="id">The ID of that Item</param>
+        /// <param name="isHardDelete">give boolean value wether item should be har delete or soft delete</param>
         /// <response code="200">Returns Item List along with Deactivated Item if that Item is softdeleted successfully otherwise it returns null with status failure</response>
         // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public async Task<ItemResponse> Delete(int id)
+        [HttpDelete]
+        public async Task<ItemResponse> Delete(int id,bool isHardDelete)
         {
             ItemResponse contractItemsResponse = null;
             try
             {
-                IMS.Entities.ItemResponse entityItemResponse = await _itemService.Delete(id);
+                IMS.Entities.ItemResponse entityItemResponse = await _itemService.Delete(id,isHardDelete);
                 contractItemsResponse = ItemTranslator.ToDataContractsObject(entityItemResponse);
             }
             catch(Exception exception)

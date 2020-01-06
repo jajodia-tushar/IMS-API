@@ -57,7 +57,7 @@ namespace IMS.DataLayer.Db
             return latestAddedItemId;
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id,bool isHardDelete)
         {
             foreach (var item in _items)
             {
@@ -84,6 +84,11 @@ namespace IMS.DataLayer.Db
                 }
             }
             return null;
+        }
+
+        public Task<bool> IsItemAlreadyDeleted(int id, bool isHardDelete)
+        {
+            throw new NotImplementedException();
         }
     }
 }

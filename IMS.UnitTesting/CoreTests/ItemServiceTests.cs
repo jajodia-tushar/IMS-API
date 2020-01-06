@@ -26,7 +26,6 @@ namespace IMS.UnitTesting.CoreTests
             _moqItemDbContext = new Mock<IItemDbContext>();
             _moqTokenProvider = new Mock<ITokenProvider>();
             _moqLogManager = new Mock<ILogManager>();
-
             _moqHttpContextAccessor = new Mock<IHttpContextAccessor>();
         }
 
@@ -98,10 +97,10 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void Delete_Method_Should_Return_Status_Success_When_Item_Is_Deleted_Correct()
         {
-            _moqItemDbContext.Setup(m => m.Delete(2)).Returns(Task.FromResult(true));
+            _moqItemDbContext.Setup(m => m.Delete(2,false)).Returns(Task.FromResult(true));
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
-            var resultant = await itemServiceObject.Delete(2);
+            var resultant = await itemServiceObject.Delete(2,false);
             Assert.Equal(Status.Success, resultant.Status);
             Assert.NotNull(resultant.Items);
         }
@@ -109,10 +108,10 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void Delete_Method_Should_Return_Status_Failure_When_Item_Is_Not_Deleted()
         {
-            _moqItemDbContext.Setup(m => m.Delete(3)).Returns(Task.FromResult(false));
+            _moqItemDbContext.Setup(m => m.Delete(3,false)).Returns(Task.FromResult(false));
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
-            var resultant = await itemServiceObject.Delete(3);
+            var resultant = await itemServiceObject.Delete(3,false);
             Assert.Equal(Status.Failure, resultant.Status);
             Assert.Null(resultant.Items);
         }
