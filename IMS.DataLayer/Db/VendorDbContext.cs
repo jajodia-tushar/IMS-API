@@ -141,7 +141,6 @@ namespace IMS.DataLayer.Db
             {
                 try
                 {
-                    VendorValueRepetitionCheck(vendor);
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
@@ -195,7 +194,7 @@ namespace IMS.DataLayer.Db
             }
             return isDeleted;
         }
-        public bool VendorValueRepetitionCheck(Vendor vendor)
+        public async Task<bool> VendorValueRepetitionCheck(Vendor vendor)
         {
             bool isRepeated = false;
             DbDataReader reader = null;
@@ -212,16 +211,12 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@Pan", vendor.PAN);
                     command.Parameters.AddWithValue("@Gst", vendor.GST);
                     command.Parameters.AddWithValue("@Cin", vendor.CompanyIdentificationNumber);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         isRepeated = Convert.ToBoolean(reader["isrepeated"]);
                     }
                     reader.Close();
-                    if (isRepeated == true)
-                    {
-                        throw new InValidVendorException("Data already present");
-                    }
                 }
                 catch (Exception ex)
                 {

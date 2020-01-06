@@ -73,6 +73,11 @@ namespace IMS.DataLayer.Db
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> VendorValueRepetitionCheck(Vendor vendor)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

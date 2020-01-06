@@ -43,6 +43,10 @@ namespace IMS.Core.services
                     {
                         if (VendorValidator.Validate(vendor))
                         {
+                            if(await _vendorDbContext.VendorValueRepetitionCheck(vendor))
+                            {
+                                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnprocessableEntity,Constants.ErrorMessages.DataAlreadyPresent);
+                            }
                             vendor = await _vendorDbContext.AddVendor(vendor);
                             if (vendor != null)
                             {
@@ -71,12 +75,6 @@ namespace IMS.Core.services
                     vendorResponse.Status = Status.Failure;
                     vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
-            }
-            catch(InValidVendorException exception)
-            {
-                vendorResponse.Status = Status.Failure;
-                vendorResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
-                new Task(() => { _logger.LogException(exception, "AddVendor", Severity.High, vendor, vendorResponse); }).Start();
             }
             catch (Exception exception)
             {
