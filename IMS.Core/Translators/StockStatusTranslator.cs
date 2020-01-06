@@ -14,6 +14,12 @@ namespace IMS.Core.Translators
             if(entityStockStatusResponse.Status==Entities.Status.Success)
             {
                 contractStockStatusResponse.Status = Contracts.Status.Success;
+                contractStockStatusResponse.PagingInfo = new Contracts.PagingInfo()
+                {
+                    PageNumber = entityStockStatusResponse.PagingInfo.PageNumber,
+                    PageSize = entityStockStatusResponse.PagingInfo.PageSize,
+                    TotalResults = entityStockStatusResponse.PagingInfo.TotalResults
+                };
                 contractStockStatusResponse.StockStatusList = ToDataContractsObject(entityStockStatusResponse.StockStatusList);
             }
             else
@@ -65,7 +71,7 @@ namespace IMS.Core.Translators
             return new Contracts.StockStatus()
             {
                 Colour=ToDataContractsObject(storeColourQuantity.Colour),
-                StoreName=storeColourQuantity.StoreName,
+                Location=storeColourQuantity.Location,
                 Quantity=storeColourQuantity.Quantity
             };
         }

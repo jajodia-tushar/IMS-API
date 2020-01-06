@@ -8,7 +8,7 @@ namespace IMS.Contracts
     public class StockStatus
     {
         public int Quantity { get; set; }
-        public string StoreName { get; set; }
+        public string Location { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Colour Colour { get; set; }
 
