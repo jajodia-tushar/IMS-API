@@ -24,8 +24,9 @@ namespace IMS.Core.services
         private IHttpContextAccessor _httpContextAccessor;
         private IEmployeeService _employeeService;
         private IVendorService _vendorService;
+        private IMailService _mailService;
 
-        public OrderService(IVendorOrderDbContext vendorOrderDbContext, IEmployeeOrderDbContext employeeOrderDbContext, ITokenProvider tokenProvider, ILogManager logger, IHttpContextAccessor httpContextAccessor, IEmployeeService employeeService, IVendorService vendorService)
+        public OrderService(IVendorOrderDbContext vendorOrderDbContext, IEmployeeOrderDbContext employeeOrderDbContext, ITokenProvider tokenProvider, ILogManager logger, IHttpContextAccessor httpContextAccessor, IEmployeeService employeeService, IVendorService vendorService, IMailService mailService)
         {
 
             _vendorOrderDbContext = vendorOrderDbContext;
@@ -35,6 +36,7 @@ namespace IMS.Core.services
             _httpContextAccessor = httpContextAccessor;
             _employeeService = employeeService;
             _vendorService = vendorService;
+            _mailService = mailService;
         }
         public async Task<Response> Delete(int orderId)
         {
@@ -184,6 +186,10 @@ namespace IMS.Core.services
                 if (placeEmployeeOrderResponse.Status == Status.Failure)
                     severity = Severity.Critical;
                 new Task(() => { _logger.Log(employeeOrder, placeEmployeeOrderResponse, "Place employee order", placeEmployeeOrderResponse.Status, severity, -1); }).Start();
+                if(placeEmployeeOrderResponse.Status == Status.Success)
+                {
+                    new Task(() => {_mailService.SendOrderRecieptToEmployee(placeEmployeeOrderResponse.EmployeeOrder); }).Start();
+                }
             }
             return placeEmployeeOrderResponse;
         }

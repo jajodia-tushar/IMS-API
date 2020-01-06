@@ -94,6 +94,8 @@ namespace IMS_API
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IRoleDbContext, RoleDbContext>();
             services.AddTransient<ILogsService, LogsService>();
+            services.AddTransient<INotificationProvider, NotificationProvider>();
+            services.AddTransient<IMailService, MailService>();
         }
         public TokenValidationParameters CreateTokenValidationParameters()
         {
