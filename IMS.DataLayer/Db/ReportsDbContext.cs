@@ -314,7 +314,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", offset);
                     command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
                     command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
-                    command.CommandText = "spGetWarehouseItemsByColourTest";
+                    command.CommandText = "spGetWarehouseItemsByColour";
                     var reader = await command.ExecuteReaderAsync();
                     itemQuantityMappings = GetItemQuantityMapping(reader);
                     reader.Close();
@@ -353,7 +353,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", offset);
                     command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
                     command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
-                    command.CommandText = "spGetItemsByColourAndShelfIdTest";
+                    command.CommandText = "spGetItemsByColourAndShelfId";
                     var reader = await command.ExecuteReaderAsync();
                     itemQuantityMappings = GetItemQuantityMapping(reader);
                     reader.Close();

@@ -16,8 +16,7 @@ namespace IMS.DataLayer.Interfaces
         Task<List<DateItemConsumption>> GetItemsConsumptionReport(string startDate,string endDate);
         void GetShelfWiseOrderCountByDate(DateTime startDate,DateTime toDate, List<ShelfOrderStats> shelfOrderStats );
         Task<ItemStockStatusDto> GetStockStatus( int limit, int offset, string itemName);
-        
-        Task<ItemsAvailabilityResponse> GetWarehouseAvailability(string colour,int pageNumber,int pageSize);
-        Task<ItemsAvailabilityResponse> GetShelfAvailability(int id, string colour,int pageNumber,int pageSize);
+        Task<ItemsAvailabilityResponse> GetWarehouseAvailability(string colour, int pageNumber, int pageSize);
+        Task<ItemsAvailabilityResponse> GetShelfAvailability(int id, string colour, int pageNumber, int pageSize);
     }
 }
