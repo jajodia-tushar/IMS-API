@@ -25,6 +25,25 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
+        
+        public Task<EmployeeResponse> Add(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response> Delete(string id,bool isHardDelete)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EmployeeResponse> GetAllEmployees(int pageNumber,int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<EmployeeResponse> Update(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
         public async Task<GetEmployeeResponse> ValidateEmployee(string employeeId)
         {
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
