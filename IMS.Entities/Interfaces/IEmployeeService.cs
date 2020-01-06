@@ -8,7 +8,6 @@ namespace IMS.Entities.Interfaces
     public interface IEmployeeService 
     {
         Task<GetEmployeeResponse> ValidateEmployee(string employeeId);
-        GetEmployeeResponse ValidateEmployee(string employeeId);
         Task<EmployeeResponse> GetAllEmployees(int pageNumber, int pageSize);
         Task<EmployeeResponse> Add(Employee employee);
         Task<EmployeeResponse> Update(Employee employee);

@@ -25,9 +25,7 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-        public async Task<GetEmployeeResponse> ValidateEmployee(string employeeId)
-        {
-
+        
         public Task<EmployeeResponse> Add(Employee employee)
         {
             throw new NotImplementedException();
@@ -46,8 +44,7 @@ namespace IMS.Core.services
         {
             throw new NotImplementedException();
         }
-
-        public GetEmployeeResponse ValidateEmployee(string employeeId)
+        public async Task<GetEmployeeResponse> ValidateEmployee(string employeeId)
         {
             GetEmployeeResponse employeeValidationResponse = new GetEmployeeResponse();
             try
