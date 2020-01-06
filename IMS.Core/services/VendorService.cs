@@ -90,9 +90,9 @@ namespace IMS.Core.services
                     userId = user.Id;
                     if(String.IsNullOrEmpty(name))
                         name = "";
-                    if (pageSize == 0)
+                    if (pageSize <= 0)
                         pageSize = 10;
-                    if (pageNumber == 0)
+                    if (pageNumber <= 0)
                         pageNumber = 1;
                     vendorResponse.PagingInfo = new PagingInfo()
                     {
