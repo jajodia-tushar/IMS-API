@@ -34,6 +34,14 @@ namespace IMS.EmployeeDataDumper
                 List<Employee> employeesList = ReadEmployeesDataFromCsv(employeesData);
                 List<Employee> employeesNotAdded = await _employeesDataDbContext.CreateEmployee(employeesList);
                 StringBuilder sb = new StringBuilder();
+                sb.AppendLine(string.Join(",", "Id", 
+                    "First Name", 
+                    "Last Name", 
+                    "Email", 
+                    "Contact Number", 
+                    "Temporary Card Number", 
+                    "Access Card Number", 
+                    "IsActive"));
                 for (int index = 0; index < employeesNotAdded.Count; index++)
                     sb.AppendLine(string.Join(",", employeesNotAdded[index].Id,employeesNotAdded[index].Firstname,
                         employeesNotAdded[index].Lastname,employeesNotAdded[index].Email,
@@ -69,22 +77,28 @@ namespace IMS.EmployeeDataDumper
         public List<Employee> ReadEmployeesDataFromCsv(string[] employeesData)
         {
             List<Employee> employeesList = new List<Employee>();
-            foreach (var employeeData in employeesData)
+            try
             {
-                var data = employeeData.Split(',');
-                Employee employee = new Employee();
-                employee.Id = data[0].Trim();
-                employee.Firstname = data[1].Trim();
-                employee.Lastname = data[2].Trim();
-                employee.Email = data[3].Trim();
-                employee.ContactNumber = data[4].Trim();
-                employee.TemporaryCardNumber = data[5].Trim();
-                employee.AccessCardNumber = data[6].Trim();
-                employee.IsActive = Boolean.Parse(data[7]);
-                employeesList.Add(employee);
+                foreach (var employeeData in employeesData)
+                {
+                    var data = employeeData.Split(',');
+                    Employee employee = new Employee();
+                    employee.Id = data[0].Trim();
+                    employee.Firstname = data[1].Trim();
+                    employee.Lastname = data[2].Trim();
+                    employee.Email = data[3].Trim();
+                    employee.ContactNumber = data[4].Trim();
+                    employee.TemporaryCardNumber = data[5].Trim();
+                    employee.AccessCardNumber = data[6].Trim();
+                    employee.IsActive = Boolean.Parse(data[7]);
+                    employeesList.Add(employee);
+                }
+            }
+            catch(Exception exception)
+            {
+                throw exception;
             }
             return employeesList;
         }
     }
-
 }
