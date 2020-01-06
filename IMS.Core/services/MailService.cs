@@ -10,17 +10,31 @@ namespace IMS.Core.services
     public class MailService : IMailService
     {
         private INotificationProvider _notificationProvider;
-        public MailService(INotificationProvider notificationProvider)
+        private IEmployeeService _employeeService;
+        public MailService(INotificationProvider notificationProvider, IEmployeeService employeeService)
         {
             this._notificationProvider = notificationProvider;
+            this._employeeService = employeeService;
         }
         public async Task<bool> SendOrderRecieptToEmployee(EmployeeOrder employeeOrder)
         {
-            Email email = new Email();
-            email.ToAddress = employeeOrder.Employee.Email;
-            email.Body = GenerateHTMLTemplateForEmployeeOrder(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList);
-            email.Subject = "Order Reciept";
-            return await _notificationProvider.SendEmail(email);
+            try
+            {
+                var email = new Email();
+                var employeeResponse = await _employeeService.ValidateEmployee(employeeOrder.Employee.Id);
+                if (employeeResponse.Status.Equals(Status.Success))
+                {
+                    email.ToAddress = employeeResponse.Employee.Email;
+                    email.Body = GenerateHTMLTemplateForEmployeeOrder(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList);
+                    email.Subject = "Order Reciept";
+                    return await _notificationProvider.SendEmail(email);
+                }
+                return false;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
         }
 
         private string GenerateHTMLTemplateForEmployeeOrder(List<ItemQuantityMapping> employeeItemsQuantityList)
