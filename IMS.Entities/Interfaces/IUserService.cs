@@ -16,5 +16,6 @@ namespace IMS.Entities.Interfaces
 
         Task<Response> DeleteUser(int userId, bool isHardDelete);
         Task<Response> CheckUsernameAvailability(string username);
+        Task<Response> CheckEmailAvailability(string emailId);
     }
 }

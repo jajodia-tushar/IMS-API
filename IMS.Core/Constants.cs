@@ -82,6 +82,7 @@ namespace IMS.Core
             public const string UnAuthorized = "You are not authorized to perform this action";
             public const string InvalidUsername = "Invalid Username";
             public const string InvalidPageNumber = "Page Number is Invalid";
+            public const string InvalidEmailId = "Invalid Email Id";
             
         }
 

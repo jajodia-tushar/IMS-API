@@ -525,6 +525,65 @@ namespace IMS.Core.services
             }
             return response;
         }
+
+        public async Task<Response> CheckEmailAvailability(string emailId)
+        {
+            Response response = new Response();
+            if (String.IsNullOrEmpty(emailId))
+            {
+                response.Status = Status.Failure;
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidEmailId);
+                return response;
+            }
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        bool isUserNamePresent = await _userDbContext.CheckEmailAvailability(emailId);
+                        if (isUserNamePresent)
+                        {
+                            throw new InvalidEmailException("Email Id Already Exists");
+                        }
+                        else
+                        {
+                            response.Status = Status.Success;
+                            response.Error = null;
+                        }
+                    }
+                    catch (CustomException e)
+                    {
+                        response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                        new Task(() => { _logger.LogException(e, "CheckEmailAvailability", Severity.Critical, emailId, response); }).Start();
+                    }
+                }
+                else
+                {
+                    response.Status = Status.Failure;
+                    response.Error =
+                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
+                        Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "CheckEmailAvailability", Severity.Critical, emailId, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(emailId, response, "CheckEmailAvailability", response.Status, severity, userId); }).Start();
+            }
+            return response;
+        }
     }
 }
 

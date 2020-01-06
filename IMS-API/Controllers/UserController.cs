@@ -276,10 +276,41 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetValidUsername", IMS.Entities.Severity.Critical, username, dtoValidUsername); }).Start();
+                new Task(() => { _logger.LogException(exception, "IsUsernameExists", IMS.Entities.Severity.Critical, username, dtoValidUsername); }).Start();
             }
             return dtoValidUsername;
         }
 
+        /// <summary>
+        /// check Email Id exist or not
+        /// </summary>
+        /// <param name="email">email entered by user</param>
+        /// <returns>response </returns>
+        /// <response code="200">return response object</response>
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpGet("Email")]
+        public async Task<Response> IsEmailExists(string email)
+        {
+            Response dtoValidEmail = null;
+            try
+            {
+                IMS.Entities.Response doValidEmailResponse = await _userService.CheckEmailAvailability(email);
+                dtoValidEmail = Translator.ToDataContractsObject(doValidEmailResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoValidEmail = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "IsEmailExists", IMS.Entities.Severity.Critical, email, dtoValidEmail); }).Start();
+            }
+            return dtoValidEmail;
+        }
     }
 }
