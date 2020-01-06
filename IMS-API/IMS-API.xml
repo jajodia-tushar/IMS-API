@@ -180,13 +180,15 @@
             <returns>Returns the whole items list with the stock status at any given point of time</returns>
             <response code="200">Retrieve the stock status at any given point of time</response>
         </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetItemsAvailability(System.String,System.String,System.String)">
+        <member name="M:IMS_API.Controllers.ReportsController.GetItemsAvailability(System.String,System.String,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32})">
             <summary>
             Retrieve Location and Colour based items list
             </summary>
-            <param name="Location NameName"></param>
-            <param name="Location CodeCode"></param>
-            <param name="Colour"></param>
+            <param name="locationName"></param>
+            <param name="locationCode"></param>
+            <param name="colour"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
             <returns>Location and Colour based Items list</returns>
             <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
         </member>

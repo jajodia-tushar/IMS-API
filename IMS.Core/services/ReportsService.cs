@@ -3,6 +3,7 @@ using IMS.Core.Validators;
 using IMS.DataLayer.Dto;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
@@ -465,26 +466,33 @@ namespace IMS.Core.services
             return itemStockStatusList;
         }
 
-        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour)
+        public async Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour,int pageNumber,int pageSize)
         {
-            var itemsAvailabilityResponse = new ItemsAvailabilityResponse();
-            itemsAvailabilityResponse.Status = Status.Failure;
+            var dtoItemsAvailabilityResponse = new ItemsAvailabilityResponse();
+            PagingInfo pagingInfo = new PagingInfo();
+            dtoItemsAvailabilityResponse.Status = Status.Failure;
             int userId = -1;
             try
             {
                 object inputColour;
+                if (pageSize <= 0 || pageNumber <= 0)
+                    throw new InvalidPagingInfo();
+                pagingInfo.PageNumber = pageNumber;
+                pagingInfo.PageSize = pageSize;
                 if (!String.IsNullOrEmpty(locationName) && !String.IsNullOrEmpty(locationCode) && !String.IsNullOrEmpty(colour) && Enum.TryParse(typeof(Colour), colour, true, out inputColour))
                 {
                     if (locationName.ToUpper() == "WAREHOUSE")
                     {
-                        itemsAvailabilityResponse.ItemQuantityMappings = await _reportsDbContext.GetWarehouseAvailability(inputColour.ToString());
+                       var itemsAvailabilityResponse = await _reportsDbContext.GetWarehouseAvailability(inputColour.ToString(),pageNumber,pageSize);
                         if(itemsAvailabilityResponse.ItemQuantityMappings!=null && itemsAvailabilityResponse.ItemQuantityMappings.Count > 0)
                         {
+
                             itemsAvailabilityResponse.Status = Status.Success;
-                            return itemsAvailabilityResponse;
+                            dtoItemsAvailabilityResponse = itemsAvailabilityResponse;
+                            return dtoItemsAvailabilityResponse;
                         }
-                        itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
-                        return itemsAvailabilityResponse;
+                        dtoItemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                        return dtoItemsAvailabilityResponse;
                     }
                     else
                     {
@@ -492,35 +500,42 @@ namespace IMS.Core.services
                         shelfResponse = await _shelfService.GetShelfByShelfCode(locationCode);
                         if (shelfResponse.Status == Status.Success)
                         {
-                            itemsAvailabilityResponse.ItemQuantityMappings = await _reportsDbContext.GetShelfAvailability(shelfResponse.Shelves[0].Id, inputColour.ToString());
+                            var itemsAvailabilityResponse = await _reportsDbContext.GetShelfAvailability(shelfResponse.Shelves[0].Id, inputColour.ToString(),pageNumber,pageSize);
                             if (itemsAvailabilityResponse.ItemQuantityMappings != null && itemsAvailabilityResponse.ItemQuantityMappings.Count > 0)
                             {
                                 itemsAvailabilityResponse.Status = Status.Success;
-                                return itemsAvailabilityResponse;
+                                dtoItemsAvailabilityResponse = itemsAvailabilityResponse;
+                                return dtoItemsAvailabilityResponse;
                             }
-                            itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
-                            return itemsAvailabilityResponse;
+                            dtoItemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                            return dtoItemsAvailabilityResponse;
                         }
-                        itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.LocationNotfound);
-                        return itemsAvailabilityResponse;
+                        dtoItemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.LocationNotfound);
+                        return dtoItemsAvailabilityResponse;
                     }
                 }
-                itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidInput);
-                return itemsAvailabilityResponse;
+                dtoItemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidInput);
+                return dtoItemsAvailabilityResponse;
             }
-            catch(Exception exception)
+            catch (CustomException e)
             {
-                itemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetItemsAvailability", Severity.High, locationName+";"+locationCode+";"+colour, itemsAvailabilityResponse); }).Start();
+                dtoItemsAvailabilityResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "GetItemsAvailability", Severity.High, locationName + ";" + locationCode + ";" + colour + ";" + pageNumber + ";" + pageSize, dtoItemsAvailabilityResponse); }).Start();
+            }
+            catch (Exception exception)
+            {
+                dtoItemsAvailabilityResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetItemsAvailability", Severity.High, locationName+";"+locationCode+";"+colour + ";" + pageNumber + ";" + pageSize, dtoItemsAvailabilityResponse); }).Start();
                 throw exception;
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (itemsAvailabilityResponse.Status == Status.Failure)
+                if (dtoItemsAvailabilityResponse.Status == Status.Failure)
                     severity = Severity.High;
-                new Task(() => { _logger.Log("GetItemsAvailability", itemsAvailabilityResponse, "GetItemsAvailability", itemsAvailabilityResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log("GetItemsAvailability", dtoItemsAvailabilityResponse, "GetItemsAvailability", dtoItemsAvailabilityResponse.Status, severity, userId); }).Start();
             }
+            return dtoItemsAvailabilityResponse;
         }
     }
 }
