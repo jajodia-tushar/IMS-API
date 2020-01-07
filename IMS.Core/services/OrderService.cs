@@ -188,7 +188,7 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(employeeOrder, placeEmployeeOrderResponse, "Place employee order", placeEmployeeOrderResponse.Status, severity, -1); }).Start();
                 if(placeEmployeeOrderResponse.Status == Status.Success)
                 {
-                    new Task(() => {_mailService.SendOrderRecieptToEmployee(placeEmployeeOrderResponse.EmployeeOrder); }).Start();
+                    new Task(() => {_mailService.SendEmployeeOrderReciept(placeEmployeeOrderResponse.EmployeeOrder); }).Start();
                 }
             }
             return placeEmployeeOrderResponse;

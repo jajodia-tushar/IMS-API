@@ -7,6 +7,6 @@ namespace IMS.Entities.Interfaces
 {
     public interface IMailService
     {
-        Task<bool> SendOrderRecieptToEmployee(EmployeeOrder employeeOrder); 
+        Task<bool> SendEmployeeOrderReciept(EmployeeOrder employeeOrder); 
     }
 }

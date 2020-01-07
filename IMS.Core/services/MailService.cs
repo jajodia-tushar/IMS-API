@@ -1,5 +1,6 @@
 ﻿using IMS.Entities;
 using IMS.Entities.Interfaces;
+using IMS.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,12 +12,14 @@ namespace IMS.Core.services
     {
         private INotificationProvider _notificationProvider;
         private IEmployeeService _employeeService;
-        public MailService(INotificationProvider notificationProvider, IEmployeeService employeeService)
+        private ILogManager _logger;
+        public MailService(INotificationProvider notificationProvider, IEmployeeService employeeService, ILogManager logger)
         {
             this._notificationProvider = notificationProvider;
             this._employeeService = employeeService;
+            this._logger = logger;
         }
-        public async Task<bool> SendOrderRecieptToEmployee(EmployeeOrder employeeOrder)
+        public async Task<bool> SendEmployeeOrderReciept(EmployeeOrder employeeOrder)
         {
             try
             {
@@ -25,7 +28,7 @@ namespace IMS.Core.services
                 if (employeeResponse.Status.Equals(Status.Success))
                 {
                     email.ToAddress = employeeResponse.Employee.Email;
-                    email.Body = GenerateHTMLTemplateForEmployeeOrder(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList);
+                    email.Body = GenerateEmployeeOrderHTMLTemplate(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList, employeeResponse.Employee.Firstname + " " + employeeResponse.Employee.Lastname);
                     email.Subject = "Order Reciept";
                     return await _notificationProvider.SendEmail(email);
                 }
@@ -33,22 +36,25 @@ namespace IMS.Core.services
             }
             catch (Exception exception)
             {
+                new Task(() => { _logger.LogException(exception, "SendEmployeeOrderReciept", IMS.Entities.Severity.Medium, employeeOrder, false); }).Start();
                 throw exception;
             }
         }
 
-        private string GenerateHTMLTemplateForEmployeeOrder(List<ItemQuantityMapping> employeeItemsQuantityList)
+        private string GenerateEmployeeOrderHTMLTemplate(List<ItemQuantityMapping> employeeItemsQuantityList, string name)
         {
-            string emailBody = "You have taken &nbsp"+employeeItemsQuantityList.Count+"&nbsp Items<br><br>";
+            string emailBody = "<div style = 'float:left;'><h3>Hi&nbsp" + name + "&nbsp</h3>";
+            emailBody += "You have taken &nbsp"+employeeItemsQuantityList.Count+"&nbsp Items<br><br>";
             emailBody += "<table>";
-            emailBody+= "<tr><th style='float:left;'>Item Name</th><th>Quantity</th></tr>";
+            emailBody+= "<tr><th>Item Name</th><th>Quantity</th></tr>";
             foreach(var employeeItemQuantity in employeeItemsQuantityList)
             {
                 emailBody += ("<tr><td>" + employeeItemQuantity.Item.Name + "</td>");
                 emailBody+= ("<td>" + employeeItemQuantity.Quantity + "</td></tr>");
             }
             emailBody += "</table>";
-            emailBody += "<br>If it's not you please report back to <a>mnaukarkar@tavisca.com</a>";
+            emailBody += "<br>Please drop an email to mnaukarkar@tavisca.com to report if this transaction was not authorized by you<br>";
+            emailBody += "<br>Regards,<br>Tavisca Admin Team<br></div>";
             return emailBody;
         }
     }
