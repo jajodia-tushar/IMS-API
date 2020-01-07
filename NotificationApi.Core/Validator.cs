@@ -12,6 +12,8 @@ namespace NotificationApi.Core
         {
             bool isValidEmail = false;
             isValidEmail = ValidateEmailAddress(email.ToAddress);
+            if (!string.IsNullOrEmpty(email.CC))
+                isValidEmail = ValidateEmailAddress(email.CC);
             return isValidEmail;
         }
         public static bool ValidateEmailAddress(string emailAddress)
