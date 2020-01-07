@@ -34,8 +34,8 @@ namespace Notification_API.Controllers
                     Status = Status.Failure,
                     Error = new Error
                     {
-                        ErrorCode=500,
-                        ErrorMessage="Internal Server"
+                        ErrorCode=Constants.ErrorCodes.ServerError,
+                        ErrorMessage=Constants.ErrorMessages.ServerError
                     }
                 };
             }
