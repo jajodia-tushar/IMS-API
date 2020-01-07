@@ -7,5 +7,6 @@ namespace IMS.Contracts
     public class VendorsOrderResponse : Response
     {
         public List<VendorOrder> VendorOrders { get; set; }
+        public PagingInfo PagingInfo { get; set; }
     }
 }

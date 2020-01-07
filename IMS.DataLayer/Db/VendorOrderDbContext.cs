@@ -301,10 +301,10 @@ namespace IMS.DataLayer.Db
             };
         }
 
-        public async Task<List<VendorOrder>> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        public async Task<VendorOrdersDto> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
         {
+            VendorOrdersDto vendorOrdersDto = new VendorOrdersDto();
             DbDataReader reader = null;
-            var VendorOrders = new List<VendorOrder>();
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -320,25 +320,22 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", off);
                     command.Parameters.AddWithValue("@startDate", startDate);
                     command.Parameters.AddWithValue("@endDate", endDate);
-                    reader = await command.ExecuteReaderAsync();
+                    reader =await command.ExecuteReaderAsync();
                     List<VendorOrderDto> VendorOrderDtos = new List<VendorOrderDto>();
                     while (reader.Read())
                     {
                         VendorOrderDto vendorOrderDto = Extract(reader);
                         VendorOrderDtos.Add(vendorOrderDto);
-
+                        vendorOrdersDto.TotalNumberOfVendorOrders = Convert.ToInt32(reader["totalResults"]);
                     }
-                    VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
-
-
+                    vendorOrdersDto.VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-
+                return vendorOrdersDto;
             }
-            return VendorOrders;
         }
 
         public async Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)

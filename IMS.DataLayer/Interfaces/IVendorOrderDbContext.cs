@@ -1,4 +1,5 @@
-﻿using IMS.Entities;
+﻿using IMS.DataLayer.Dto;
+using IMS.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,7 +11,7 @@ namespace IMS.DataLayer.Interfaces
     {
         Task<bool> Delete(int orderId);
         Task<bool> Save(VendorOrder vendorOrder);
-        Task<List<VendorOrder>> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
+        Task<VendorOrdersDto> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
         Task<bool> ApproveOrder(VendorOrder vendorOrder);
         Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
     }

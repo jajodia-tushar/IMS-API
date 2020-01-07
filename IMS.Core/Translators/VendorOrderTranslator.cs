@@ -93,7 +93,8 @@ namespace IMS.Core.Translators
                 {
                     Status = doGetListOfVendorOrdersResponse.Status == Entities.Status.Success ? Contracts.Status.Success : Contracts.Status.Failure,
                     Error = doGetListOfVendorOrdersResponse.Error == null ? null : Translator.ToDataContractsObject(doGetListOfVendorOrdersResponse.Error),
-                    VendorOrders = doGetListOfVendorOrdersResponse.VendorOrders == null ? null : ToDataContractsObject(doGetListOfVendorOrdersResponse.VendorOrders)
+                    VendorOrders = doGetListOfVendorOrdersResponse.VendorOrders == null ? null : ToDataContractsObject(doGetListOfVendorOrdersResponse.VendorOrders),
+                    PagingInfo = doGetListOfVendorOrdersResponse.PagingInfo == null ? null : Translator.ToDataContractsObject(doGetListOfVendorOrdersResponse.PagingInfo)
                 };
 
             return null;
