@@ -9,7 +9,7 @@ namespace IMS.Entities.Exceptions
        
         public InvalidTokenException(string errorMessage= "Invalid Token")
         {
-            ErrorCode = 400;
+            ErrorCode = 401;
             ErrorMessage =errorMessage;
         }
     }
