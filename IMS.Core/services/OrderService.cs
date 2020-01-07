@@ -340,7 +340,7 @@ namespace IMS.Core.services
                 {
                     PageNumber = pageNumber,
                     PageSize = pageSize,
-                    TotalResults = vendorOrdersDto.TotalNumberOfVendorOrders
+                    TotalResults = vendorOrdersDto.TotalRecords
                 };
                 if (response.VendorOrders.Count < 1)
                 {

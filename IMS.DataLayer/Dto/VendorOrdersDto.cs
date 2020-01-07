@@ -8,6 +8,6 @@ namespace IMS.DataLayer.Dto
     public class VendorOrdersDto
     {
         public List<VendorOrder> VendorOrders{get;set;}
-        public int TotalNumberOfVendorOrders { get; set; }
+        public int TotalRecords { get; set; }
     }
 }

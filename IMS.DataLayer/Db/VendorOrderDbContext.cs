@@ -326,7 +326,7 @@ namespace IMS.DataLayer.Db
                     {
                         VendorOrderDto vendorOrderDto = Extract(reader);
                         VendorOrderDtos.Add(vendorOrderDto);
-                        vendorOrdersDto.TotalNumberOfVendorOrders = Convert.ToInt32(reader["totalResults"]);
+                        vendorOrdersDto.TotalRecords = Convert.ToInt32(reader["totalResults"]);
                     }
                     vendorOrdersDto.VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
                 }
