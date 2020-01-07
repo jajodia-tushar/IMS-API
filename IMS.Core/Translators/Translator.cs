@@ -30,5 +30,19 @@ namespace IMS.Core.Translators
                 ErrorMessage = error.ErrorMessage
             };
         }
+
+        public static Contracts.PagingInfo ToDataContractsObject(Entities.PagingInfo pagingInfo)
+        {
+            if (pagingInfo != null)
+            {
+                return new Contracts.PagingInfo
+                {
+                    PageNumber = pagingInfo.PageNumber,
+                    PageSize = pagingInfo.PageSize,
+                    TotalResults = pagingInfo.TotalResults
+                };
+            }
+            return null;
+        }
     }
 }

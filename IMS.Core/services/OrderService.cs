@@ -1,4 +1,5 @@
 using IMS.Core.Validators;
+using IMS.DataLayer.Dto;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
 using IMS.Entities.Exceptions;
@@ -333,7 +334,14 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                response.VendorOrders = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
+                VendorOrdersDto vendorOrdersDto = await  _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
+                response.VendorOrders = vendorOrdersDto.VendorOrders;
+                response.PagingInfo = new PagingInfo()
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalResults = vendorOrdersDto.TotalRecords
+                };
                 if (response.VendorOrders.Count < 1)
                 {
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
@@ -445,7 +453,6 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-
                 var vendorResponse = await _vendorService.GetVendorById(vendorId);
                 if (vendorResponse.Status.Equals(Status.Failure))
                 {
