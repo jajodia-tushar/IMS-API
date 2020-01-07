@@ -17,26 +17,37 @@ namespace NotificationApi.Core
             };
             try
             {
-                SmtpClient client = new SmtpClient("smtp.gmail.com");
-            client.Port = 587;
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.UseDefaultCredentials = false;
-            System.Net.NetworkCredential credentials =
-                new System.Net.NetworkCredential("taviscaims@gmail.com", "Tavisca@123");
-            client.EnableSsl = true;
-            client.Credentials = credentials;        
-            var mail = new MailMessage("taviscaims@gmail.com", email.ToAddress);
-            mail.Subject = email.Subject;
-            mail.Body = email.Body;
-                if (email.CC != null)
+                if (Validator.Validate(email))
                 {
-                    MailAddress copy = new MailAddress(email.CC);
-                    mail.CC.Add(copy);
+                    SmtpClient client = new SmtpClient("smtp.gmail.com");
+                    client.Port = 587;
+                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    client.UseDefaultCredentials = false;
+                    System.Net.NetworkCredential credentials =
+                        new System.Net.NetworkCredential("taviscaims@gmail.com", "Tavisca@123");
+                    client.EnableSsl = true;
+                    client.Credentials = credentials;
+                    var mail = new MailMessage("taviscaims@gmail.com", email.ToAddress);
+                    mail.Subject = email.Subject;
+                    mail.Body = email.Body;
+                    if (email.CC != null)
+                    {
+                        MailAddress copy = new MailAddress(email.CC);
+                        mail.CC.Add(copy);
+                    }
+                    mail.SubjectEncoding = System.Text.Encoding.UTF8;
+                    mail.IsBodyHtml = true;
+                    await client.SendMailAsync(mail);
+                    response.Status = Status.Success;
                 }
-            mail.SubjectEncoding = System.Text.Encoding.UTF8;
-            mail.IsBodyHtml = true;
-            await client.SendMailAsync(mail);
-            response.Status = Status.Success;
+                else
+                {
+                    response.Error = new Error
+                    {
+                        ErrorCode = 400,
+                        ErrorMessage = "Invalid Email"
+                    };
+                }
             }
             catch (Exception ex)
             {
