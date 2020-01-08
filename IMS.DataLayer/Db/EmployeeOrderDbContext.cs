@@ -127,10 +127,7 @@ namespace IMS.DataLayer.Db
             PagingInfo pagingInfo = new PagingInfo();
             pagingInfo.PageNumber = pageNumber;
             pagingInfo.PageSize = pageSize;
-            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse
-            { 
-                Status = Status.Failure
-            };
+            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();            
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
             int limit =pageSize;
             int offset = (pageNumber - 1) *pageSize;

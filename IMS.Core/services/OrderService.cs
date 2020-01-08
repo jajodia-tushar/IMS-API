@@ -196,7 +196,10 @@ namespace IMS.Core.services
 
         public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
         {
-            EmployeeRecentOrderResponse employeeRecentOrderResponse = null;
+            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse
+            {
+                Status = Status.Failure
+            };
             int userId = -1;
             try
             {
