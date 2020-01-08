@@ -357,12 +357,12 @@
             <returns>entire vendor object along with status</returns>
             <response code="200">Returns VendorOrder object  if Vendor id is valid otherwise it returns null and status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.VendorController.GetAllVendors">
+        <member name="M:IMS_API.Controllers.VendorController.Get(System.String,System.Int32,System.Int32)">
             <summary>
-            returns all vendors 
+            returns all vendors if name is null or returns vendors with name matching the name provided in request
             </summary>
-            <returns>all vendors object along with status</returns>
-            <response code="200">Returns all Vendors object</response>
+            <returns>the vendors object along with status</returns>
+            <response code="200">Returns the Vendors object</response>
         </member>
     </members>
 </doc>

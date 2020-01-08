@@ -55,24 +55,26 @@ namespace IMS_API.Controllers
             }
             return contractsVendorValidationResponse;
         }
+
         // GET: api/
         /// <summary>
-        /// returns all vendors 
+        /// returns all vendors if name is null or returns vendors with name matching the name provided in request
         /// </summary>
-        /// <returns>all vendors object along with status</returns>
-        /// <response code="200">Returns all Vendors object</response>
-        [HttpGet(Name = "Get()")]
-        public async Task<VendorResponse> GetAllVendors()
+        /// <returns>the vendors object along with status</returns>
+        /// <response code="200">Returns the Vendors object</response>
+        [HttpGet(Name = "Get(string Name)")]
+        public async Task<VendorsResponse> Get(string name, int pageNumber, int pageSize )
         {
-            VendorResponse contractsVendorValidationResponse = null;
+
+            VendorsResponse vendorResponse = null;
             try
             {
-                IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetAllVendors();
-                contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
+                IMS.Entities.VendorsResponse vendorResponseEntity = await _vendorService.GetVendors(name,pageNumber, pageSize);
+                vendorResponse = VendorTranslator.ToDataContractsObject(vendorResponseEntity);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
-                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
+                vendorResponse = new VendorsResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -81,9 +83,9 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetAllVendors", IMS.Entities.Severity.High, null, contractsVendorValidationResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetVendors", IMS.Entities.Severity.High, name, vendorResponse); }).Start();
             }
-            return contractsVendorValidationResponse;
+            return vendorResponse;
         }
     }
 }

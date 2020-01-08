@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using IMS.Contracts;
+using IMS.Entities;
 
 namespace IMS.Core.Translators
 {
@@ -61,6 +63,31 @@ namespace IMS.Core.Translators
                     Address = entityVendor.Address
                 };
             return null;
+        }
+
+        public static Contracts.VendorsResponse ToDataContractsObject(Entities.VendorsResponse vendorResponseEntity)
+        {
+            Contracts.VendorsResponse vendorSearchResponse = new Contracts.VendorsResponse();
+            vendorSearchResponse.PagingInfo = new Contracts.PagingInfo();
+            vendorSearchResponse.Vendors = new List<Contracts.Vendor>();
+            if (vendorResponseEntity!=null)
+            {
+                if (vendorResponseEntity.Status == Entities.Status.Success)
+                {
+                    vendorSearchResponse.Status = Contracts.Status.Success;
+                    if(vendorResponseEntity.PagingInfo!=null)
+                    {
+                        vendorSearchResponse.PagingInfo = Translator.ToDataContractsObject(vendorResponseEntity.PagingInfo);
+                    }
+                    vendorSearchResponse.Vendors = ToDataContractsObject(vendorResponseEntity.Vendors);
+                }
+                else
+                {
+                    vendorSearchResponse.Status = Contracts.Status.Failure;
+                    vendorSearchResponse.Error = Translator.ToDataContractsObject(vendorResponseEntity.Error);
+                }
+            }
+            return vendorSearchResponse;
         }
     }
 }
