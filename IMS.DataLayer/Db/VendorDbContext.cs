@@ -194,7 +194,7 @@ namespace IMS.DataLayer.Db
             }
             return isDeleted;
         }
-        public async Task<bool> VendorValueRepetitionCheck(Vendor vendor)
+        public async Task<bool> IsVendorPresent(Vendor vendor)
         {
             bool isRepeated = false;
             DbDataReader reader = null;

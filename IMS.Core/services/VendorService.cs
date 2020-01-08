@@ -43,7 +43,7 @@ namespace IMS.Core.services
                     {
                         if (VendorValidator.Validate(vendor))
                         {
-                            if(await _vendorDbContext.VendorValueRepetitionCheck(vendor))
+                            if(await _vendorDbContext.IsVendorPresent(vendor))
                             {
                                 vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnprocessableEntity,Constants.ErrorMessages.DataAlreadyPresent);
                             }

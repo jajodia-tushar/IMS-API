@@ -4,9 +4,9 @@ using System.Text;
 
 namespace IMS.Entities.Exceptions
 {
-    public class InValidVendorException : CustomException
+    public class InvalidVendorException : CustomException
     {
-        public InValidVendorException(string errorMessage = "Values entered already exists")
+        public InvalidVendorException(string errorMessage = "Values entered already exists")
         {
             ErrorCode = 422;
             ErrorMessage = errorMessage;

@@ -13,6 +13,6 @@ namespace IMS.DataLayer.Interfaces
         Task<Vendor> AddVendor(Vendor vendor);
         Task<Vendor> UpdateVendor(Vendor vendor);
         Task<bool> DeleteVendor(int vendorId, bool isHardDelete);
-        Task<bool> VendorValueRepetitionCheck(Vendor vendor);
+        Task<bool> IsVendorPresent(Vendor vendor);
     }
 }
