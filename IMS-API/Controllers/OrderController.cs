@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace IMS_API.Controllers
 {
@@ -104,13 +105,25 @@ namespace IMS_API.Controllers
         [HttpGet("EmployeeRecentOrderDetails", Name = "GetEmployeeRecentOrderDetails")]
         public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrderDetails(int? pageNumber = null, int? pageSize = null)
         {
-
+            var watch = new Stopwatch();
+            watch.Start();
             EmployeeRecentOrderResponse dtoEmployeeRecentOrderResponse = null;
             try
             {
                 int currentPageNumber = pageNumber ?? 1;
                 int currentPageSize = pageSize ?? 10;
-
+                if (currentPageNumber <= 0 || currentPageSize <= 0)
+                {
+                    return new EmployeeRecentOrderResponse
+                    {
+                        Status = Status.Failure,
+                        Error = new Error
+                        {
+                            ErrorCode = Constants.ErrorCodes.BadRequest,
+                            ErrorMessage = Constants.ErrorMessages.InvalidPagingDetails
+                        }
+                    };
+                }
                 IMS.Entities.EmployeeRecentOrderResponse doEmployeeRecentOrderResponse = await _orderService.GetEmployeeRecentOrders(currentPageNumber, currentPageSize);
                 dtoEmployeeRecentOrderResponse = EmployeeOrderTranslator.ToDataContractsObject(doEmployeeRecentOrderResponse);
             }
@@ -127,6 +140,9 @@ namespace IMS_API.Controllers
                 };
                 new Task(() => { _logger.LogException(ex,"GetEmployeeRecentOrderDetails", IMS.Entities.Severity.Critical,pageNumber+";"+pageSize, dtoEmployeeRecentOrderResponse); }).Start();
             }
+            watch.Stop();
+            var responseTimeForCompleteRequest = watch.ElapsedMilliseconds;
+            var time = watch.Elapsed;
             return dtoEmployeeRecentOrderResponse;
         }
         /// <summary>

@@ -127,9 +127,11 @@ namespace IMS.DataLayer.Db
             PagingInfo pagingInfo = new PagingInfo();
             pagingInfo.PageNumber = pageNumber;
             pagingInfo.PageSize = pageSize;
-            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
+            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse
+            { 
+                Status = Status.Failure
+            };
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
-            List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
             int limit =pageSize;
             int offset = (pageNumber - 1) *pageSize;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
@@ -155,8 +157,7 @@ namespace IMS.DataLayer.Db
                    
                     command.ExecuteNonQuery();
                     pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
-                    listOfEmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
-                    employeeRecentOrderResponse.EmployeeRecentOrders = listOfEmployeeRecentOrders;
+                    employeeRecentOrderResponse.EmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
                     employeeRecentOrderResponse.PagingInfo = pagingInfo;
                 }
                 catch (Exception ex)
