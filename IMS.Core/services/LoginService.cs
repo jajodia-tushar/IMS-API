@@ -101,16 +101,26 @@ namespace IMS.Core.services
 
         public async Task<Response> Logout()
         {
-            Response response = new Response();
+            Response response = new Response
+            {
+                Status=Status.Failure
+            };
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                User user = Utility.GetUserFromToken(token);
-                userId = user.Id;
-                bool isTokenDeleted = await _tokenProvider.DeleteToken(token);
-                if (isTokenDeleted)
-                    response.Status = Status.Success;
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (isTokenPresentInHeader)
+                {
+                    string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    bool isTokenDeleted = await _tokenProvider.DeleteToken(token);
+                    if (isTokenDeleted)
+                        response.Status = Status.Success;
+                }
+                else
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+
                
 
             }
