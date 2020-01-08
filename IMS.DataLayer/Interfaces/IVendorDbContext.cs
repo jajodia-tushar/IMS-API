@@ -9,6 +9,6 @@ namespace IMS.DataLayer.Interfaces
     public interface IVendorDbContext
     {
         Task<Vendor> GetVendorById(int vendorId);
-        Task<int> GetVendors(string name, int limit, int offset, List<Vendor> vendors);
+        Task<VendorsResponse> GetVendors(string name, int limit, int offset);
     }
 }

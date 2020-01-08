@@ -59,7 +59,7 @@ namespace IMS.DataLayer.Db
                    );
         }
 
-        public Task<int> GetVendors(string name, int limit, int offset, List<Vendor> vendors)
+        public Task<VendorsResponse> GetVendors(string name, int limit, int offset)
         {
             throw new NotImplementedException();
         }

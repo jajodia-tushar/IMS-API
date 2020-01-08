@@ -95,23 +95,18 @@ namespace IMS.Core.services
                         vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
                         return vendorResponse;
                     }
-                    vendorResponse.PagingInfo = new PagingInfo()
-                    {
-                        PageNumber = pageNumber,
-                        PageSize = pageSize
-                    };
                     int limit = pageSize;
                     int offset = (pageNumber - 1) * pageSize;
-                    List<Vendor> vendors = new List<Vendor>();
-                    vendorResponse.PagingInfo.TotalResults = await _vendorDbContext.GetVendors(name, limit, offset, vendors);
-                    if (vendors == null || vendors.Count == 0)
+                    vendorResponse = await _vendorDbContext.GetVendors(name, limit, offset);
+                    vendorResponse.PagingInfo.PageNumber = pageNumber;
+                    vendorResponse.PagingInfo.PageSize = pageSize;
+                    if (vendorResponse.Vendors == null || vendorResponse.Vendors.Count == 0)
                     {
                         vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoVendorsYet);
                     }
                     else
                     {
                         vendorResponse.Status = Status.Success;
-                        vendorResponse.Vendors = vendors;
                     }
                 }
                 else

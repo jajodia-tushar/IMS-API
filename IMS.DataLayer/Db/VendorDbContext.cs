@@ -69,10 +69,12 @@ namespace IMS.DataLayer.Db
         }
 
 
-        public async Task<int> GetVendors(string name, int limit, int offset, List<Vendor> vendors)
+        public async Task<VendorsResponse> GetVendors(string name, int limit, int offset)
         {
+            VendorsResponse vendorsResponse = new VendorsResponse();
+            vendorsResponse.Vendors = new List<Vendor>();
+            vendorsResponse.PagingInfo = new PagingInfo();
             DbDataReader reader = null;
-            int totalCountOfData = 0;
             using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -89,9 +91,9 @@ namespace IMS.DataLayer.Db
                     reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        totalCountOfData = Convert.ToInt32(reader["totalVendorsCount"]);
+                        vendorsResponse.PagingInfo.TotalResults = Convert.ToInt32(reader["totalVendorsCount"]);
                         Vendor vendor = Extract(reader);
-                        vendors.Add(vendor);
+                        vendorsResponse.Vendors.Add(vendor);
                     }
                 }
                 catch (Exception ex)
@@ -100,7 +102,7 @@ namespace IMS.DataLayer.Db
                 }
 
             }
-            return totalCountOfData;
+            return vendorsResponse;
         }
     }
 }

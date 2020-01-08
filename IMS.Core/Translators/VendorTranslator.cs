@@ -75,9 +75,10 @@ namespace IMS.Core.Translators
                 if (vendorResponseEntity.Status == Entities.Status.Success)
                 {
                     vendorSearchResponse.Status = Contracts.Status.Success;
-                    vendorSearchResponse.PagingInfo.PageNumber = vendorResponseEntity.PagingInfo.PageNumber;
-                    vendorSearchResponse.PagingInfo.PageSize = vendorResponseEntity.PagingInfo.PageSize;
-                    vendorSearchResponse.PagingInfo.TotalResults = vendorResponseEntity.PagingInfo.TotalResults;
+                    if(vendorResponseEntity.PagingInfo!=null)
+                    {
+                        vendorSearchResponse.PagingInfo = Translator.ToDataContractsObject(vendorResponseEntity.PagingInfo);
+                    }
                     vendorSearchResponse.Vendors = ToDataContractsObject(vendorResponseEntity.Vendors);
                 }
                 else
