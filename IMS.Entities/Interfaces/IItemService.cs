@@ -10,7 +10,7 @@ namespace IMS.Entities.Interfaces
         Task<ItemResponse> GetAllItems();
         Task<ItemResponse> GetItemById(int id);
         Task<ItemResponse> AddItem(Item item);
-        Task<ItemResponse> Delete(int id);
+        Task<ItemResponse> Delete(int id,bool isHardDelete);
         Task<ItemResponse> UpdateItem(Item item);
     }
 }

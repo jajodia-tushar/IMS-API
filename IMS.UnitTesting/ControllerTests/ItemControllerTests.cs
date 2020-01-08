@@ -112,9 +112,9 @@ namespace IMS.UnitTesting.ControllerTests
                 Status = IMS.Contracts.Status.Success,
                 Items = GetContractTypeItemsList()
             };
-            _moqItemService.Setup(m => m.Delete(2)).Returns(Task.FromResult(entityItemResponse));
+            _moqItemService.Setup(m => m.Delete(2,false)).Returns(Task.FromResult(entityItemResponse));
             var itemController = new ItemController(_moqItemService.Object, _moqLogManager.Object);
-            IMS.Contracts.ItemResponse actualResult = await itemController.Delete(2);
+            IMS.Contracts.ItemResponse actualResult = await itemController.Delete(2,false);
             Assert.Equal(expectedResult.Status, actualResult.Status);
             Assert.NotEmpty(actualResult.Items);
         }
