@@ -18,6 +18,7 @@ namespace IMS.Core.services
             this._notificationProvider = notificationProvider;
             this._employeeService = employeeService;
             this._logger = logger;
+
         }
         public async Task<bool> SendEmployeeOrderReciept(EmployeeOrder employeeOrder)
         {
@@ -43,18 +44,19 @@ namespace IMS.Core.services
 
         private string GenerateEmployeeOrderHTMLTemplate(List<ItemQuantityMapping> employeeItemsQuantityList, string name)
         {
-            string emailBody = "<div style = 'float:left;'><h3>Hi&nbsp" + name + "&nbsp</h3>";
-            emailBody += "You have taken &nbsp"+employeeItemsQuantityList.Count+"&nbsp Items<br><br>";
-            emailBody += "<table>";
-            emailBody+= "<tr><th>Item Name</th><th>Quantity</th></tr>";
+            string emailBody = "<div style='font-family:sans-serif;'>";
+            emailBody += "<h3 style='color:#244061;'>Hi,&nbsp" + name + "&nbsp</h3>";
+            emailBody += "<p style='color:#244061;font-size: 12.0pt;'>You have taken &nbsp" + employeeItemsQuantityList.Count+"&nbsp Items</p>";
+            emailBody += "<table><tr><th align='left'>Item Name</th><th align='center'>Quantity</th></tr>";
             foreach(var employeeItemQuantity in employeeItemsQuantityList)
             {
                 emailBody += ("<tr><td>" + employeeItemQuantity.Item.Name + "</td>");
-                emailBody+= ("<td>" + employeeItemQuantity.Quantity + "</td></tr>");
+                emailBody+= ("<td align='center'>" + employeeItemQuantity.Quantity + "</td></tr>");
             }
             emailBody += "</table>";
-            emailBody += "<br>Please drop an email to mnaukarkar@tavisca.com to report if this transaction was not authorized by you<br>";
-            emailBody += "<br>Regards,<br>Tavisca Admin Team<br></div>";
+            emailBody += "<br>Please drop an email to mnaukarkar@tavisca.com to report if this transaction was not authorized by you<br><br>";
+            emailBody += "<div style='color:#244061;font-size: 12.0pt;'>Regards,</div>";
+            emailBody += "<div style = 'color:#002060;font-size: 12.0pt;'> Tavisca Admin Team</div>";
             return emailBody;
         }
     }
