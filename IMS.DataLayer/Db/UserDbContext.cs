@@ -98,23 +98,6 @@ namespace IMS.DataLayer.Dal
             return user;
         }
 
-        private User Extract(MySqlDataReader reader)
-        {
-            return new User()
-            {
-                Id = (int)reader["userid"],
-                Username = reader["username"]?.ToString(),
-                Password = reader["password"]?.ToString(),
-                Firstname = reader["firstname"]?.ToString(),
-                Lastname = reader["lastname"]?.ToString(),
-                Email = reader["email"]?.ToString(),
-                Role = new Role()
-                {
-                    Id = (int)reader["roleid"],
-                    Name = reader["rolename"]?.ToString()
-                }
-            };
-        }
         private User Extract(DbDataReader reader)
         {
             return new User()
@@ -364,9 +347,9 @@ namespace IMS.DataLayer.Dal
             }
             return user;
         }
-        public async Task<Response> DeleteUser(int userId, bool isHardDelete)
+        public async Task<bool> DeleteUser(int userId, bool isHardDelete)
         {
-            Response response = new Response();
+            bool isDeleted = false ;
             int rowsAffected = 0;
             using (var connection = _dbProvider.GetConnection(Databases.IMS))
             {
@@ -381,15 +364,7 @@ namespace IMS.DataLayer.Dal
                     rowsAffected = await command.ExecuteNonQueryAsync();
                     if (rowsAffected > 0)
                     {
-                        response.Status = Status.Success;
-                    }
-                    else
-                    {
-                        response.Error = new Error()
-                        {
-                            ErrorCode = 404,
-                            ErrorMessage = "No User Found"
-                        };
+                        isDeleted = true;
                     }
                 }
                 catch (Exception exception)
@@ -398,7 +373,7 @@ namespace IMS.DataLayer.Dal
                 }
 
             }
-            return response;
+            return isDeleted;
         }
 
         public async Task<bool> CheckUserNameAvailability(string username)
