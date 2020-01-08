@@ -141,7 +141,6 @@ namespace IMS_API.Controllers
                 new Task(() => { _logger.LogException(ex,"GetEmployeeRecentOrderDetails", IMS.Entities.Severity.Critical,pageNumber+";"+pageSize, dtoEmployeeRecentOrderResponse); }).Start();
             }
             watch.Stop();
-            var responseTimeForCompleteRequest = watch.ElapsedMilliseconds;
             var time = watch.Elapsed;
             return dtoEmployeeRecentOrderResponse;
         }

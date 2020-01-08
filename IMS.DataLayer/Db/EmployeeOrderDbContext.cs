@@ -166,7 +166,7 @@ namespace IMS.DataLayer.Db
         }
         private static List<EmployeeRecentOrder> GetListOfEmployeeRecentOrder(List<RecentEmployeeOrderDto> recentEmployeeOrderDtos)
         {
-            List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
+            List<EmployeeRecentOrder> listOfEmployeeRecentOrders = null;
             Dictionary<int, EmployeeRecentOrder> mapping = new Dictionary<int, EmployeeRecentOrder>();
             foreach (RecentEmployeeOrderDto order in recentEmployeeOrderDtos)
             {
@@ -191,8 +191,7 @@ namespace IMS.DataLayer.Db
                 }
             }
             listOfEmployeeRecentOrders = mapping.Values.ToList();
-            bool chk = !listOfEmployeeRecentOrders.Any();
-            if (chk)
+            if (listOfEmployeeRecentOrders==null)
             {
                 return new List<EmployeeRecentOrder>();
             }
