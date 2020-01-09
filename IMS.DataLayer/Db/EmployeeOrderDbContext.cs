@@ -172,16 +172,7 @@ namespace IMS.DataLayer.Db
             {
                 if (mapping.ContainsKey(order.OrderId))
                 {
-                    ItemQuantityMapping itemQuantityMapping = new ItemQuantityMapping
-                    {
-                        Item = new Item
-                        {
-                            Id = order.ItemId,
-                            Name = order.ItemName,
-                            IsActive = order.ItemStatus
-                        },
-                        Quantity = order.ItemQuantity
-                    };
+                    ItemQuantityMapping itemQuantityMapping = ConvertToItemQuantityMappingObject(order);
                     mapping[order.OrderId].EmployeeOrder.EmployeeItemsQuantityList.Add(itemQuantityMapping);
                 }
                 else
@@ -197,18 +188,33 @@ namespace IMS.DataLayer.Db
             }
             return listOfEmployeeRecentOrders;
         }
-
+        public static ItemQuantityMapping ConvertToItemQuantityMappingObject(RecentEmployeeOrderDto order)
+        {
+            return new ItemQuantityMapping
+            {
+                Item = new Item
+                {
+                    Id = order.ItemId,
+                    Name = order.ItemName,
+                    IsActive = order.ItemStatus
+                },
+                Quantity = order.ItemQuantity
+            };
+        }
         private static EmployeeRecentOrder ConvertToEmployeeRecentOrderObject(RecentEmployeeOrderDto employeeOrderDto)
         {
-            Item item = new Item { Id = employeeOrderDto.ItemId, Name = employeeOrderDto.ItemName, IsActive = employeeOrderDto.ItemStatus };
-            ItemQuantityMapping itemQuantityMapping = new ItemQuantityMapping
+            ItemQuantityMapping itemQuantityMapping = ConvertToItemQuantityMappingObject(employeeOrderDto);
+            List<ItemQuantityMapping> itemswithqty = new List<ItemQuantityMapping>
             {
-                Item = item,
-                Quantity = employeeOrderDto.ItemQuantity
+                itemQuantityMapping
             };
-            List<ItemQuantityMapping> itemswithqty = new List<ItemQuantityMapping>();
-            itemswithqty.Add(itemQuantityMapping);
-            Shelf shelf = new Shelf { Id = employeeOrderDto.ShelfId, Name = employeeOrderDto.ShelfName, IsActive = employeeOrderDto.ShelfStatus, Code = employeeOrderDto.ShelfCode };
+            Shelf shelf = new Shelf
+            {
+                Id = employeeOrderDto.ShelfId,
+                Name = employeeOrderDto.ShelfName,
+                IsActive = employeeOrderDto.ShelfStatus,
+                Code = employeeOrderDto.ShelfCode
+            };
             Employee employee = new Employee
             {
                 Id = employeeOrderDto.EmployeeId,
@@ -239,35 +245,55 @@ namespace IMS.DataLayer.Db
             return new RecentEmployeeOrderDto
             {
                 EmployeeId = (string)reader["EmployeeId"],
-                FirstName = (string)reader["FirstName"],
-                LastName = ReturnNullOrValueAccordingly(reader["LastName"]),
-                Email = ReturnNullOrValueAccordingly(reader["EmailId"]),
-                ContactNumber = ReturnNullOrValueAccordingly(reader["MobileNumber"]),
-                TemporaryCardNumber = ReturnNullOrValueAccordingly(reader["TemporaryCardNumber"]),
-                AccessCardNumber = ReturnNullOrValueAccordingly(reader["AccessCardNumber"]),
+                FirstName = reader["FirstName"]?.ToString(),
+                LastName = reader["LastName"]?.ToString(),
+                Email =reader["EmailId"]?.ToString(),
+                ContactNumber = reader["MobileNumber"]?.ToString(),
+                TemporaryCardNumber =reader["TemporaryCardNumber"]?.ToString(),
+                AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
                 EmployeeStatus = (bool)reader["IsActive"],
                 OrderId = (int)reader["EmployeeOrderId"],
                 EmployeeOrderDate = (DateTime)reader["EmployeeOrderDate"],
                 ItemQuantity = (int)reader["ItemQuantity"],
                 ItemId = (int)reader["ItemId"],
-                ItemName = (string)reader["ItemName"],
+                ItemName = reader["ItemName"]?.ToString(),
                 ItemStatus = (bool)reader["ItemStatus"],
                 ShelfId = (int)reader["ShelfId"],
-                ShelfName = (string)reader["ShelfName"],
+                ShelfName = reader["ShelfName"]?.ToString(),
                 ShelfStatus = (bool)reader["ShelfStatus"],
-                ShelfCode = (string)reader["ShelfCode"]
+                ShelfCode = reader["ShelfCode"]?.ToString()
             };
         }
-        public static string ReturnNullOrValueAccordingly(object field)
+        private static ItemQuantityMapping ExtractItemQuantityList(MySqlDataReader reader)
         {
-            try
+            return new ItemQuantityMapping()
             {
-                return (string)field;
-            }
-            catch
+                Item = new Item()
+                {
+                    Name = reader["Name"]?.ToString(),
+                    Id = (int)reader["ItemId"],
+                    IsActive = (bool)reader["ItemStatus"],
+                    MaxLimit = (int)reader["ItemMaximumLimit"],
+                    ImageUrl = reader["ImageUrl"]?.ToString(),
+                    Rate = (double)reader["Rate"]
+                },
+                Quantity = (int)reader["Quantity"]
+            };
+        }
+        private static EmployeeOrderDetails ExtractEmployeeOrderDetails(MySqlDataReader reader)
+        {
+            return new EmployeeOrderDetails()
             {
-                return null;
-            }
+                OrderId = (int)reader["Id"],
+                Date = (DateTime)reader["Date"],
+                Shelf = new Shelf()
+                {
+                    Id = (Int32)reader["ShelfId"],
+                    Name = reader["ShelfName"]?.ToString(),
+                    Code = reader["ShelfCode"]?.ToString(),
+                    IsActive = (bool)reader["ShelfStatus"]
+                }
+            };
         }
     }
 }

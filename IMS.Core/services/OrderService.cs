@@ -215,20 +215,17 @@ namespace IMS.Core.services
                    }
                    else
                    {
-                        employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.NotFound;
-                        employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.EmptyRecentEmployeeOrderList;
+                     employeeRecentOrderResponse.Error=Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.EmptyRecentEmployeeOrderList);
                    }                 
                 }
                 else
                 {
-                    employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.UnAuthorized;
-                    employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidToken;                    
+                    employeeRecentOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception exception)
             {
-                employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.ServerError;
-                employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.ServerError;
+                employeeRecentOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "GetEmployeeRecentOrders", Severity.Critical, pageNumber+";"+pageSize, employeeRecentOrderResponse); }).Start();
             }
             finally
