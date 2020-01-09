@@ -196,10 +196,11 @@ namespace IMS.Core.services
 
         public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
         {
-            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
+            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse
+            {
+                Status = Status.Failure
+            };
             int userId = -1;
-            employeeRecentOrderResponse.Status = Status.Failure;
-            employeeRecentOrderResponse.Error = new Error() { };
             try
             {
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
@@ -207,48 +208,24 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    try
-                    {
-                        PagingInfo pagingInfo = new PagingInfo();
-                        pageSize = (pageSize == 0) ?pageSize=10 : (pageSize < 0) ? throw new Exception() :pageSize;
-                        pageNumber = (pageNumber == 0) ?pageNumber=1 : (pageNumber < 0) ? throw new Exception() :pageNumber;
-                   EmployeeRecentOrderResponse     doEmployeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize,pageNumber);
-                        if (doEmployeeRecentOrderResponse.EmployeeRecentOrders == null || doEmployeeRecentOrderResponse.EmployeeRecentOrders.Count == 0)
-                        {
-                            employeeRecentOrderResponse.Status = Status.Failure;
-                            employeeRecentOrderResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.NotFound,
-                                ErrorMessage = Constants.ErrorMessages.EmptyRecentEmployeeOrderList
-                            };
-                        }
-                        else
-                        {
-                            doEmployeeRecentOrderResponse.Status = Status.Success;
-                            employeeRecentOrderResponse = doEmployeeRecentOrderResponse;
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
-                        employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidPageNumber;
-                        new Task(() => { _logger.LogException(ex, "GetEmployeeRecentOrders", Severity.Critical, pageNumber + ";" + pageSize, employeeRecentOrderResponse); }).Start();
-                    }
+                   employeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize,pageNumber);
+                   if(employeeRecentOrderResponse!=null)
+                   {
+                        employeeRecentOrderResponse.Status = Status.Success;
+                   }
+                   else
+                   {
+                     employeeRecentOrderResponse.Error=Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.EmptyRecentEmployeeOrderList);
+                   }                 
                 }
                 else
                 {
-                    employeeRecentOrderResponse.Status = Status.Failure;
-                    employeeRecentOrderResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidToken
-                    };
+                    employeeRecentOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception exception)
             {
-                employeeRecentOrderResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
-                employeeRecentOrderResponse.Error.ErrorMessage = Constants.ErrorMessages.UnableToShowRecentEntries;
+                employeeRecentOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "GetEmployeeRecentOrders", Severity.Critical, pageNumber+";"+pageSize, employeeRecentOrderResponse); }).Start();
             }
             finally
@@ -256,10 +233,9 @@ namespace IMS.Core.services
                 Severity severity = Severity.Medium;
                 if (employeeRecentOrderResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(new String("GET Method"), employeeRecentOrderResponse, "Employee Recent Order Entries", employeeRecentOrderResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(pageNumber + ";" + pageSize, employeeRecentOrderResponse, "GetEmployeeRecentOrders", employeeRecentOrderResponse.Status, severity, userId); }).Start();
             }
             return employeeRecentOrderResponse;
-
         }
         //vendororders
 

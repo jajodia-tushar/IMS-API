@@ -121,7 +121,7 @@ namespace IMS.DataLayer.Db
             string itemqty = string.Join(";", ItemsQuantityList.Select(p => p.Item.Id + "," + p.Quantity));
             return itemqty;
         }
-        public async Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize,int pageNumber)
+        public async Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize, int pageNumber)
         {
             DbDataReader reader = null;
             PagingInfo pagingInfo = new PagingInfo();
@@ -129,7 +129,6 @@ namespace IMS.DataLayer.Db
             pagingInfo.PageSize = pageSize;
             EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
-            List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
             int limit =pageSize;
             int offset = (pageNumber - 1) *pageSize;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
@@ -145,18 +144,17 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", offset);
                     command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
                     command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
-                    reader =await command.ExecuteReaderAsync();
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         RecentEmployeeOrderDto employeeOrder = Extract(reader);
                         recentEmployeeOrderDtos.Add(employeeOrder);
                     }
                     reader.Close();
-                   
+
                     command.ExecuteNonQuery();
                     pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
-                    listOfEmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
-                    employeeRecentOrderResponse.EmployeeRecentOrders = listOfEmployeeRecentOrders;
+                    employeeRecentOrderResponse.EmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
                     employeeRecentOrderResponse.PagingInfo = pagingInfo;
                 }
                 catch (Exception ex)
@@ -164,26 +162,17 @@ namespace IMS.DataLayer.Db
                     throw ex;
                 }
             }
-            return employeeRecentOrderResponse ;
+            return employeeRecentOrderResponse;
         }
         private static List<EmployeeRecentOrder> GetListOfEmployeeRecentOrder(List<RecentEmployeeOrderDto> recentEmployeeOrderDtos)
         {
-            List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
+            List<EmployeeRecentOrder> listOfEmployeeRecentOrders = null;
             Dictionary<int, EmployeeRecentOrder> mapping = new Dictionary<int, EmployeeRecentOrder>();
             foreach (RecentEmployeeOrderDto order in recentEmployeeOrderDtos)
             {
                 if (mapping.ContainsKey(order.OrderId))
                 {
-                    ItemQuantityMapping itemQuantityMapping = new ItemQuantityMapping
-                    {
-                        Item = new Item
-                        {
-                            Id = order.ItemId,
-                            Name = order.ItemName,
-                            IsActive = order.ItemStatus
-                        },
-                        Quantity = order.ItemQuantity
-                    };
+                    ItemQuantityMapping itemQuantityMapping = ConvertToItemQuantityMappingObject(order);
                     mapping[order.OrderId].EmployeeOrder.EmployeeItemsQuantityList.Add(itemQuantityMapping);
                 }
                 else
@@ -193,26 +182,65 @@ namespace IMS.DataLayer.Db
                 }
             }
             listOfEmployeeRecentOrders = mapping.Values.ToList();
-            bool chk = !listOfEmployeeRecentOrders.Any();
-            if (chk)
+            if (listOfEmployeeRecentOrders == null)
             {
                 return new List<EmployeeRecentOrder>();
             }
             return listOfEmployeeRecentOrders;
         }
-
+        public static ItemQuantityMapping ConvertToItemQuantityMappingObject(RecentEmployeeOrderDto order)
+        {
+            return new ItemQuantityMapping
+            {
+                Item = new Item
+                {
+                    Id = order.ItemId,
+                    Name = order.ItemName,
+                    IsActive = order.ItemStatus
+                },
+                Quantity = order.ItemQuantity
+            };
+        }
         private static EmployeeRecentOrder ConvertToEmployeeRecentOrderObject(RecentEmployeeOrderDto employeeOrderDto)
         {
-            Item item = new Item { Id = employeeOrderDto.ItemId, Name = employeeOrderDto.ItemName, IsActive = employeeOrderDto.ItemStatus };
-            ItemQuantityMapping itemQuantityMapping = new ItemQuantityMapping
+            if (employeeOrderDto != null)
             {
-                Item = item,
-                Quantity = employeeOrderDto.ItemQuantity
+                return new EmployeeRecentOrder
+                {
+                    Employee = ConvertToEmployeeObject(employeeOrderDto),
+                    EmployeeOrder = ConvertToEmployeeOrderDetailsObject(employeeOrderDto)
+                };
+            }
+            return null;
+        }
+
+        private static EmployeeOrderDetails ConvertToEmployeeOrderDetailsObject(RecentEmployeeOrderDto employeeOrderDto)
+        {
+           EmployeeOrderDetails employeeOrderDetails = new EmployeeOrderDetails
+           {
+                OrderId = employeeOrderDto.OrderId,
+                Date = employeeOrderDto.EmployeeOrderDate,
+                Shelf = ConvertToShelfObject(employeeOrderDto),
+                EmployeeItemsQuantityList = new List<ItemQuantityMapping>()
+           };
+            employeeOrderDetails.EmployeeItemsQuantityList.Add(ConvertToItemQuantityMappingObject(employeeOrderDto));
+            return employeeOrderDetails;
+        }
+
+        private static Shelf ConvertToShelfObject(RecentEmployeeOrderDto employeeOrderDto)
+        {
+            return new Shelf
+            {
+                Id = employeeOrderDto.ShelfId,
+                Name = employeeOrderDto.ShelfName,
+                IsActive = employeeOrderDto.ShelfStatus,
+                Code = employeeOrderDto.ShelfCode
             };
-            List<ItemQuantityMapping> itemswithqty = new List<ItemQuantityMapping>();
-            itemswithqty.Add(itemQuantityMapping);
-            Shelf shelf = new Shelf { Id = employeeOrderDto.ShelfId, Name = employeeOrderDto.ShelfName, IsActive = employeeOrderDto.ShelfStatus, Code = employeeOrderDto.ShelfCode };
-            Employee employee = new Employee
+        }
+
+        private static Employee ConvertToEmployeeObject(RecentEmployeeOrderDto employeeOrderDto)
+        {
+            return new Employee
             {
                 Id = employeeOrderDto.EmployeeId,
                 Firstname = employeeOrderDto.FirstName,
@@ -223,18 +251,6 @@ namespace IMS.DataLayer.Db
                 TemporaryCardNumber = employeeOrderDto.TemporaryCardNumber,
                 IsActive = employeeOrderDto.EmployeeStatus
             };
-            EmployeeOrderDetails employeeOrderDetails = new EmployeeOrderDetails
-            {
-                OrderId = employeeOrderDto.OrderId,
-                Date = employeeOrderDto.EmployeeOrderDate,
-                Shelf = shelf,
-                EmployeeItemsQuantityList = itemswithqty,
-            };
-            return new EmployeeRecentOrder
-            {
-                Employee = employee,
-                EmployeeOrder = employeeOrderDetails
-            };
         }
 
         private RecentEmployeeOrderDto Extract(DbDataReader reader)
@@ -242,35 +258,55 @@ namespace IMS.DataLayer.Db
             return new RecentEmployeeOrderDto
             {
                 EmployeeId = (string)reader["EmployeeId"],
-                FirstName = (string)reader["FirstName"],
-                LastName = ReturnNullOrValueAccordingly(reader["LastName"]),
-                Email = ReturnNullOrValueAccordingly(reader["EmailId"]),
-                ContactNumber = ReturnNullOrValueAccordingly(reader["MobileNumber"]),
-                TemporaryCardNumber = ReturnNullOrValueAccordingly(reader["TemporaryCardNumber"]),
-                AccessCardNumber = ReturnNullOrValueAccordingly(reader["AccessCardNumber"]),
+                FirstName = reader["FirstName"]?.ToString(),
+                LastName = reader["LastName"]?.ToString(),
+                Email =reader["EmailId"]?.ToString(),
+                ContactNumber = reader["MobileNumber"]?.ToString(),
+                TemporaryCardNumber =reader["TemporaryCardNumber"]?.ToString(),
+                AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
                 EmployeeStatus = (bool)reader["IsActive"],
                 OrderId = (int)reader["EmployeeOrderId"],
                 EmployeeOrderDate = (DateTime)reader["EmployeeOrderDate"],
                 ItemQuantity = (int)reader["ItemQuantity"],
                 ItemId = (int)reader["ItemId"],
-                ItemName = (string)reader["ItemName"],
+                ItemName = reader["ItemName"]?.ToString(),
                 ItemStatus = (bool)reader["ItemStatus"],
                 ShelfId = (int)reader["ShelfId"],
-                ShelfName = (string)reader["ShelfName"],
+                ShelfName = reader["ShelfName"]?.ToString(),
                 ShelfStatus = (bool)reader["ShelfStatus"],
-                ShelfCode = (string)reader["ShelfCode"]
+                ShelfCode = reader["ShelfCode"]?.ToString()
             };
         }
-        public static string ReturnNullOrValueAccordingly(object field)
+        private static ItemQuantityMapping ExtractItemQuantityList(MySqlDataReader reader)
         {
-            try
+            return new ItemQuantityMapping()
             {
-                return (string)field;
-            }
-            catch
+                Item = new Item()
+                {
+                    Name = reader["Name"]?.ToString(),
+                    Id = (int)reader["ItemId"],
+                    IsActive = (bool)reader["ItemStatus"],
+                    MaxLimit = (int)reader["ItemMaximumLimit"],
+                    ImageUrl = reader["ImageUrl"]?.ToString(),
+                    Rate = (double)reader["Rate"]
+                },
+                Quantity = (int)reader["Quantity"]
+            };
+        }
+        private static EmployeeOrderDetails ExtractEmployeeOrderDetails(MySqlDataReader reader)
+        {
+            return new EmployeeOrderDetails()
             {
-                return null;
-            }
+                OrderId = (int)reader["Id"],
+                Date = (DateTime)reader["Date"],
+                Shelf = new Shelf()
+                {
+                    Id = (Int32)reader["ShelfId"],
+                    Name = reader["ShelfName"]?.ToString(),
+                    Code = reader["ShelfCode"]?.ToString(),
+                    IsActive = (bool)reader["ShelfStatus"]
+                }
+            };
         }
     }
 }
