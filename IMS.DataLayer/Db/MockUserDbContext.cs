@@ -115,5 +115,15 @@ namespace IMS.DataLayer.Dal
         {
             throw new NotImplementedException();
         }
+
+        Task<User> IUserDbContext.GetUserByCredintials(string username, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<List<User>> IUserDbContext.GetUsersByRole(string roleName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

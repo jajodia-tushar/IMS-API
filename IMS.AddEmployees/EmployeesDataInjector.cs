@@ -23,7 +23,7 @@ namespace IMS.EmployeeDataDumper
             _configuration = configuration;
             _logger = logger;
         }
-        public void AddEmployeesFromCsvFile()
+        public async void AddEmployeesFromCsvFile()
         {
             Response employeesAddResponse = new Response();
             var employeesNotAddedFileLocation = @"C:\IMSEmployeesData\";
@@ -32,7 +32,7 @@ namespace IMS.EmployeeDataDumper
             {
                 var employeesData = File.ReadAllLines(_configuration["Path:FilePath"]);
                 List<Employee> employeesList = ReadEmployeesDataFromCsv(employeesData);
-                List<Employee> employeesNotAdded = _employeesDataDbContext.CreateEmployee(employeesList);
+                List<Employee> employeesNotAdded = await _employeesDataDbContext.CreateEmployee(employeesList);
                 StringBuilder sb = new StringBuilder();
                 for (int index = 0; index < employeesNotAdded.Count; index++)
                     sb.AppendLine(string.Join(",", employeesNotAdded[index].Id,employeesNotAdded[index].Firstname,

@@ -25,7 +25,7 @@ namespace IMS.DataLayer.Db
         public async Task<bool> Delete(int orderId)
         {
             bool isDeleted = false;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -50,7 +50,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
 
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -94,7 +94,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
 
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -305,7 +305,7 @@ namespace IMS.DataLayer.Db
         {
             VendorOrdersDto vendorOrdersDto = new VendorOrdersDto();
             DbDataReader reader = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -342,7 +342,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
             var VendorOrders = new List<VendorOrder>();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {

@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace IMS.DataLayer.Db
            
 
 
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -46,8 +47,8 @@ namespace IMS.DataLayer.Db
         public async Task<bool> IsValidToken(string hashToken)
         {
             bool isValid = false;
-            MySqlDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            DbDataReader reader = null;
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -61,7 +62,7 @@ namespace IMS.DataLayer.Db
 
                     command.Parameters.AddWithValue("@tokenhash", hashToken);
 
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
 
                     
                     while (reader.Read())
@@ -85,7 +86,7 @@ namespace IMS.DataLayer.Db
         {
             bool isStoredToken = false;
             string timestamp = expirationTime.ToString("yyyy-MM-dd HH:mm:ss");
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await  _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -97,7 +98,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@accesstoken", accessToken);
                     command.Parameters.AddWithValue("@hashtoken", hashToken);
                     command.Parameters.AddWithValue("@expirytimestamp", timestamp);
-                    command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync();
                     isStoredToken = true;
                 }
                 catch(Exception e)

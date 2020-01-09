@@ -18,7 +18,7 @@ namespace IMS.DataLayer.Db
         {
             bool transferToShelfStatus = false;
 
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -27,7 +27,7 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spTransferFromWarehouseToShelf";
                     command.Parameters.AddWithValue("@shelfItemQuantity", StringifyShelfItemQuantityList(transferRequest));
-                    int rowsAffected = command.ExecuteNonQuery();
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
                     transferToShelfStatus = true;
                 }
                 catch (Exception ex)

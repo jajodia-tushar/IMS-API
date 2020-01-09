@@ -24,7 +24,7 @@ namespace IMS.DataLayer.Db
             DbDataReader reader = null;
             List<Item> items = new List<Item>();
 
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -50,7 +50,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
             Item item = new Item();
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -77,7 +77,7 @@ namespace IMS.DataLayer.Db
         {
             int latestAddedItemId = 0;
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -112,7 +112,7 @@ namespace IMS.DataLayer.Db
         {
             //DbDataReader reader = null;
             bool isDeleted = false;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -141,7 +141,7 @@ namespace IMS.DataLayer.Db
             
             DbDataReader reader = null;
             Item item = new Item();
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -176,10 +176,10 @@ namespace IMS.DataLayer.Db
         {
             Item item = new Item();
             item.Id = (int)reader["Id"];
-            item.Name = (string)reader["Name"];
+            item.Name = reader["Name"]?.ToString();
             item.MaxLimit = (int)reader["MaximumLimit"];
             item.IsActive = (bool)reader["IsActive"];
-            item.ImageUrl = (string)reader["ImageUrl"];
+            item.ImageUrl = reader["ImageUrl"]?.ToString();
             item.Rate = (double)reader["Rate"];
             item.ShelvesRedLimit = (int)reader["ShelvesRedLimit"];
             item.ShelvesAmberLimit = (int)reader["ShelvesAmberLimit"];
@@ -191,7 +191,7 @@ namespace IMS.DataLayer.Db
         {
             bool isPresent = false;
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {

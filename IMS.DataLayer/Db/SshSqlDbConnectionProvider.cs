@@ -5,6 +5,7 @@ using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -17,11 +18,11 @@ namespace IMS.DataLayer.Db
             _configuration = configuration;
          
         }
-        public MySqlConnection GetConnection(string databaseName)
+        public async Task<MySqlConnection> GetConnection(string databaseName)
         {  try
              {
                 if (!IsSshClientConnected())
-                    (_sshClient, _localPort) = ConnectSsh(
+                    (_sshClient, _localPort) =  ConnectSsh(
                                                        _configuration["Ssh:Server"],
                                                        _configuration["Ssh:UserName"],
                                                        _configuration["Ssh:Password"]

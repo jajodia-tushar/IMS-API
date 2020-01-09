@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Interfaces
 {
     public interface IDbConnectionProvider
     {
-        MySqlConnection GetConnection(string databaseName);
+        Task<MySqlConnection> GetConnection(string databaseName);
     }
 }

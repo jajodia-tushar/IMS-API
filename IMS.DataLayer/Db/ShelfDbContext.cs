@@ -20,7 +20,7 @@ namespace IMS.DataLayer
         public async Task<List<Shelf>> AddShelf(Shelf shelf)
         {
             List<Shelf> Shelves = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -33,7 +33,7 @@ namespace IMS.DataLayer
                     command.Parameters.AddWithValue("@Name", shelf.Name);
                     command.Parameters.AddWithValue("@IsActive", true);
                     command.Parameters.AddWithValue("@Code", shelf.Code);
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                     Shelves = await GetAllShelves();
                 }
                 catch (Exception e)
@@ -50,7 +50,7 @@ namespace IMS.DataLayer
         {
             List<Shelf> Shelves = null;
         
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -61,7 +61,7 @@ namespace IMS.DataLayer
             
                     command.Parameters.AddWithValue("@Code", shelfCode);
                   
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                     Shelves =await  GetAllShelves();
                 }
                 catch (Exception e)
@@ -79,7 +79,7 @@ namespace IMS.DataLayer
             DbDataReader reader = null;
             List<Shelf> shelves = new List<Shelf>();
 
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -93,9 +93,9 @@ namespace IMS.DataLayer
                         shelves.Add(new Shelf()
                         {
                             Id = (int)reader["Id"],
-                            Name = (string)reader["Name"],
+                            Name = reader["Name"]?.ToString(),
                             IsActive = (bool)reader["IsActive"],
-                            Code = (string)reader["Code"],
+                            Code = reader["Code"]?.ToString()
 
                         });
                     }

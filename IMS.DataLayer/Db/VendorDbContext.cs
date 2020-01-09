@@ -25,7 +25,7 @@ namespace IMS.DataLayer.Db
             Vendor vendor= null;
             DbDataReader reader = null;
 
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -75,7 +75,7 @@ namespace IMS.DataLayer.Db
             vendorsResponse.Vendors = new List<Vendor>();
             vendorsResponse.PagingInfo = new PagingInfo();
             DbDataReader reader = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {

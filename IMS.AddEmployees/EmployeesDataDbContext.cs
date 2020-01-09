@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 using IMS.DataLayer;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
@@ -15,10 +16,10 @@ namespace IMS.EmployeeDataDumper
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
-        public List<Employee> CreateEmployee(List<Employee> employeesList)
+        public async Task<List<Employee>> CreateEmployee(List<Employee> employeesList)
         {
             List<Employee> employeesNotAdded = new List<Employee>();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -40,7 +41,7 @@ namespace IMS.EmployeeDataDumper
                             command.Parameters.AddWithValue("@TemporaryCardNumber", employee.TemporaryCardNumber);
                             command.Parameters.AddWithValue("@AccessCardNumber", employee.AccessCardNumber);
                             command.Parameters.AddWithValue("@IsActive", employee.IsActive);
-                            command.ExecuteNonQuery();
+                            await command.ExecuteNonQueryAsync();
                         }
                         catch (Exception exception)
                         {

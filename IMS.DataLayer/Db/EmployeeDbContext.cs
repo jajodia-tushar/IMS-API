@@ -23,7 +23,7 @@ namespace IMS.DataLayer.Db
             Employee employee = null;
             DbDataReader reader = null;
 
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -49,7 +49,7 @@ namespace IMS.DataLayer.Db
         {
             List<Employee> employeesList = new List<Employee>();
             DbDataReader reader = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -87,7 +87,7 @@ namespace IMS.DataLayer.Db
         public async Task<bool> CreateEmployee(Employee employee)
         {
             bool isSuccess = false;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection =await  _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {

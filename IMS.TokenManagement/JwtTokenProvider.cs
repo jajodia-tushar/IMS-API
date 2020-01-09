@@ -25,7 +25,7 @@ namespace IMS.TokenManagement
             _configuration = configuration;
             _tokenDbContext = tokenDbContext;
         }
-        public string GenerateToken(User user,DateTime expirationTime)
+        public async Task<string> GenerateToken(User user,DateTime expirationTime)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

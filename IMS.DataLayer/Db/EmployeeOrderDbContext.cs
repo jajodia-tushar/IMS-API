@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +21,9 @@ namespace IMS.DataLayer.Db
         }
         public async Task<EmployeeOrder> AddEmployeeOrder(EmployeeOrder employeeOrder)
         {
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -34,7 +35,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@ShelfId", employeeOrder.EmployeeOrderDetails.Shelf.Id);
                     command.Parameters.AddWithValue("@OrderDate", DateTime.Now);
                     command.Parameters.AddWithValue("@itemswithqty", ConvertToString(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList));
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     employeeOrder.EmployeeOrderDetails.Date = DateTime.Now;
 
                     int generatedOrderId = 0;
@@ -55,9 +56,9 @@ namespace IMS.DataLayer.Db
         }
         public async Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string id)
         {
-            MySqlDataReader reader1 = null;
+            DbDataReader reader1 = null;
             List<EmployeeOrderDetails> employeeOrders = new List<EmployeeOrderDetails>();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -66,7 +67,7 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetEmployeeOrdersByEmployeeId";
                     command.Parameters.AddWithValue("@Id", id);
-                    reader1 = command.ExecuteReader();
+                    reader1 = await command.ExecuteReaderAsync();
                     while (reader1.Read())
                     {
                         employeeOrders.Add(new EmployeeOrderDetails()
@@ -76,8 +77,8 @@ namespace IMS.DataLayer.Db
                             Shelf = new Shelf()
                             {
                                 Id = (Int32)reader1["ShelfId"],
-                                Name = (string)reader1["ShelfName"],
-                                Code = (string)reader1["ShelfCode"],
+                                Name = reader1["ShelfName"]?.ToString(),
+                                Code = reader1["ShelfCode"]?.ToString(),
                                 IsActive = (bool)reader1["ShelfStatus"]
                             }
                         });
@@ -90,14 +91,14 @@ namespace IMS.DataLayer.Db
                         command2.CommandType = CommandType.StoredProcedure;
                         command2.CommandText = "spGetEmployeeOrderDetailsByOrderId";
                         command2.Parameters.AddWithValue("@Id", currentOrder.OrderId);
-                        reader1 = command2.ExecuteReader();
+                        reader1 = await command2.ExecuteReaderAsync();
                         while (reader1.Read())
                         {
                             currentOrder.EmployeeItemsQuantityList.Add(new ItemQuantityMapping
                             {
                                 Item = new Item()
                                 {
-                                    Name = (string)reader1["Name"],
+                                    Name = reader1["Name"].ToString(),
                                     Id = (int)reader1["ItemId"],
                                     IsActive = (bool)reader1["ItemStatus"],
                                     MaxLimit = (int)reader1["ItemMaximumLimit"]
@@ -122,7 +123,7 @@ namespace IMS.DataLayer.Db
         }
         public async Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize,int pageNumber)
         {
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             PagingInfo pagingInfo = new PagingInfo();
             pagingInfo.PageNumber = pageNumber;
             pagingInfo.PageSize = pageSize;
@@ -131,7 +132,7 @@ namespace IMS.DataLayer.Db
             List<EmployeeRecentOrder> listOfEmployeeRecentOrders = new List<EmployeeRecentOrder>();
             int limit =pageSize;
             int offset = (pageNumber - 1) *pageSize;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -144,7 +145,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", offset);
                     command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
                     command.Parameters["@orderCount"].Direction = ParameterDirection.Output;
-                    reader = command.ExecuteReader();
+                    reader =await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         RecentEmployeeOrderDto employeeOrder = Extract(reader);
@@ -236,7 +237,7 @@ namespace IMS.DataLayer.Db
             };
         }
 
-        private RecentEmployeeOrderDto Extract(MySqlDataReader reader)
+        private RecentEmployeeOrderDto Extract(DbDataReader reader)
         {
             return new RecentEmployeeOrderDto
             {
@@ -270,37 +271,6 @@ namespace IMS.DataLayer.Db
             {
                 return null;
             }
-        }
-        private static ItemQuantityMapping ExtractItemQuantityList(MySqlDataReader reader)
-        {
-            return new ItemQuantityMapping()
-            {
-                Item = new Item()
-                {
-                    Name = reader["Name"]?.ToString(),
-                    Id = (int)reader["ItemId"],
-                    IsActive = (bool)reader["ItemStatus"],
-                    MaxLimit = (int)reader["ItemMaximumLimit"],
-                    ImageUrl = reader["ImageUrl"]?.ToString(),
-                    Rate = (double)reader["Rate"]
-                },
-                Quantity = (int)reader["Quantity"]
-            };
-        }
-        private static EmployeeOrderDetails ExtractEmployeeOrderDetails(MySqlDataReader reader)
-        {
-            return new EmployeeOrderDetails()
-            {
-                OrderId = (int)reader["Id"],
-                Date = (DateTime)reader["Date"],
-                Shelf = new Shelf()
-                {
-                    Id = (Int32)reader["ShelfId"],
-                    Name = reader["ShelfName"]?.ToString(),
-                    Code = reader["ShelfCode"]?.ToString(),
-                    IsActive = (bool)reader["ShelfStatus"]
-                }
-            };
         }
     }
 }

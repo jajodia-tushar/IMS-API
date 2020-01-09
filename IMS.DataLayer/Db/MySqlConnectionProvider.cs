@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
@@ -14,7 +15,7 @@ namespace IMS.DataLayer.Db
             _configuration = configuration;
         }
         private IConfiguration _configuration;
-        public MySqlConnection GetConnection(string databaseName)
+        public async Task<MySqlConnection> GetConnection(string databaseName)
         {
             try
             {
