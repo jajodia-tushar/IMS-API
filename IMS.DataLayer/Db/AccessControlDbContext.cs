@@ -20,7 +20,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
             bool hasAccess = false;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection =await  _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {

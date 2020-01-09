@@ -22,7 +22,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
             List<Role> roles = new List<Role>();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {

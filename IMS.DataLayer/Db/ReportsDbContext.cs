@@ -25,7 +25,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
             List<DateItemConsumption> dateItemConsumption = new List<DateItemConsumption>();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -57,7 +57,7 @@ namespace IMS.DataLayer.Db
             DbDataReader reader = null;
             MostConsumedItemsResponse mostConsumedItemsResponse = new MostConsumedItemsResponse();
             List<ItemQuantityMapping> itemQuantityMappings = new List<ItemQuantityMapping>();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -76,10 +76,10 @@ namespace IMS.DataLayer.Db
                             Item = new Item()
                             {
                                 Id = Convert.ToInt32(reader["ItemId"]),
-                                Name = (string)reader["Name"],
+                                Name = reader["Name"]?.ToString(),
                                 MaxLimit = Convert.ToInt32(reader["MaximumLimit"]),
                                 IsActive = (bool)reader["IsActive"],
-                                ImageUrl = (string)reader["ImageUrl"],
+                                ImageUrl = reader["ImageUrl"]?.ToString(),
                                 Rate = (double)reader["Rate"]
                             },
                             Quantity = Convert.ToInt32(reader["Quantity"])
@@ -95,11 +95,11 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public void GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate,List<ShelfOrderStats> shelfOrderStats)
+        public async void GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate,List<ShelfOrderStats> shelfOrderStats)
         {
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             List<ShelfOrderStats> dateShelfOrderMappings = shelfOrderStats;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -110,12 +110,12 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetOrderCountByDate";
                     command.Parameters.AddWithValue("@FromDate", startDate);
                     command.Parameters.AddWithValue("@ToDate", newToDate); 
-                    reader = command.ExecuteReader();
+                    reader =await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
 
                         DateTime date = (DateTime)reader["OrderDate"];
-                        string shelfName = (string)reader["FloorName"];
+                        string shelfName = reader["FloorName"]?.ToString();
                         int orderCount = Convert.ToInt32(reader["TotalNumberOfEntries"]);
                         var list = dateShelfOrderMappings.FindAll(obj => obj.Date.Date.Equals(date.Date));
                         list.ForEach(obj =>
@@ -141,7 +141,7 @@ namespace IMS.DataLayer.Db
             {
                 DbDataReader reader = null;
                 var dictionaryRAG = new Dictionary<string, List<ColourCountMapping>>();
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
@@ -150,10 +150,10 @@ namespace IMS.DataLayer.Db
                     reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        string locationDetail = (string)reader["ShelfCode"] + ";" + (string)reader["ShelfName"];
+                        string locationDetail = reader["ShelfCode"]?.ToString() + ";" + reader["ShelfName"]?.ToString();
                         var colourCountMapping = new ColourCountMapping()
                         {
-                            Colour = StringToEnum((string)reader["ShelvesRAG"]),
+                            Colour = StringToEnum(reader["ShelvesRAG"]?.ToString()),
                             Count = Convert.ToInt32(reader["Count"])
                         };
                         if (dictionaryRAG.ContainsKey(locationDetail))
@@ -180,7 +180,7 @@ namespace IMS.DataLayer.Db
             {
                 DbDataReader reader = null;
                 var colourCountMappings = new List<ColourCountMapping>();
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
@@ -192,7 +192,7 @@ namespace IMS.DataLayer.Db
                         colourCountMappings.Add(
                             new ColourCountMapping()
                             {
-                                Colour = StringToEnum((string)reader["WarehouseRAG"]),
+                                Colour = StringToEnum(reader["WarehouseRAG"]?.ToString()),
                                 Count = Convert.ToInt32(reader["Count"])
                             }
                             );
@@ -227,7 +227,7 @@ namespace IMS.DataLayer.Db
             stockStatus.Items = new List<Item>();
             stockStatus.StockStatus = new Dictionary<int, List<StockStatus>>();
             stockStatus.PagingInfo = new PagingInfo();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -254,8 +254,8 @@ namespace IMS.DataLayer.Db
                         }
                         try
                         {
-                            ragColor = StringToEnum((string)reader["RAG"]);
-                            shelfName = (string)reader["Location"];
+                            ragColor = StringToEnum(reader["RAG"]?.ToString());
+                            shelfName = reader["Location"]?.ToString();
                             quantity = Convert.ToInt32(reader["Quantity"]);
                             if (stockStatus.StockStatus.ContainsKey(itemId))
                             {
@@ -304,7 +304,7 @@ namespace IMS.DataLayer.Db
             try
             {
                 var itemQuantityMappings = new List<ItemQuantityMapping>();
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
@@ -318,7 +318,7 @@ namespace IMS.DataLayer.Db
                     var reader = await command.ExecuteReaderAsync();
                     itemQuantityMappings = GetItemQuantityMapping(reader);
                     reader.Close();
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                     pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
                 };
                 itemsAvailabilityResponse.ItemQuantityMappings = itemQuantityMappings;
@@ -342,7 +342,7 @@ namespace IMS.DataLayer.Db
             try
             {
                 var itemQuantityMappings = new List<ItemQuantityMapping>();
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
@@ -357,7 +357,7 @@ namespace IMS.DataLayer.Db
                     var reader = await command.ExecuteReaderAsync();
                     itemQuantityMappings = GetItemQuantityMapping(reader);
                     reader.Close();
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                     pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
                 };
                 itemsAvailabilityResponse.ItemQuantityMappings = itemQuantityMappings;
@@ -380,10 +380,10 @@ namespace IMS.DataLayer.Db
                     Item = new Item()
                     {
                         Id = Convert.ToInt32(reader["Id"]),
-                        Name = (string)reader["Name"],
+                        Name = reader["Name"]?.ToString(),
                         MaxLimit = Convert.ToInt32(reader["MaximumLimit"]),
                         IsActive = (bool)reader["IsActive"],
-                        ImageUrl = (string)reader["ImageUrl"],
+                        ImageUrl = reader["ImageUrl"]?.ToString(),
                         Rate = Convert.ToInt32(reader["Rate"]),
                         ShelvesRedLimit = Convert.ToInt32(reader["ShelvesRedLimit"]),
                         ShelvesAmberLimit = Convert.ToInt32(reader["ShelvesAmberLimit"]),

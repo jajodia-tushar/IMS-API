@@ -149,7 +149,7 @@ namespace IMS.Core.services
                     {
                         usersResponse.Status = Status.Failure;
                         usersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoUsers);
-                        List<User> userList = _userDbContext.GetUsersByRole(roleName);
+                        List<User> userList = await _userDbContext.GetUsersByRole(roleName);
 
                         if (userList.Count != 0)
                         {

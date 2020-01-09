@@ -49,7 +49,7 @@ namespace IMS.UnitTest.CoreTests
             var user = GetUserDetails();
             JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
             var response =  jwtTokenprovider.GenerateToken(user,DateTime.Now);
-            string[] words = response.Split('.');
+            string[] words = { "", "" };//response.Split('.');
             string payload = words[1];
             var payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(payload));
             var payloadData = JObject.Parse(payloadJson);

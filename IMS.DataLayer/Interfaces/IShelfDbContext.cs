@@ -14,6 +14,6 @@ namespace IMS.DataLayer
       
         Task<bool> IsShelfPresentByCode(string shelfCode);
         Task<List<Shelf>> DeleteShelfByCode(string shelfCode);
-       Task< bool> GetShelfStatusByCode(string shelfCode);
+        Task< bool> GetShelfStatusByCode(string shelfCode);
     }
 }

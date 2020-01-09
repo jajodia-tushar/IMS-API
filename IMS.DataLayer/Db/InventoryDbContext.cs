@@ -24,7 +24,7 @@ namespace IMS.DataLayer.Db
             DbDataReader reader = null;
             ShelfItemsResponse shelfItemsResponse = new ShelfItemsResponse();
             List<ItemQuantityMapping> itemQuantityMappings = new List<ItemQuantityMapping>();
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -41,7 +41,7 @@ namespace IMS.DataLayer.Db
                             Item = new Item()
                             {
                                 Id = Convert.ToInt32(reader["ItemId"]),
-                                Name = (string)reader["ItemName"],
+                                Name = reader["ItemName"]?.ToString(),
                                 MaxLimit = Convert.ToInt32(reader["ItemMaximumLimit"]),
                                 IsActive = (bool)reader["ItemState"]
                             },

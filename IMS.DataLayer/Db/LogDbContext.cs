@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,10 +22,10 @@ namespace IMS.DataLayer.Db
         public async Task<List<Logs>> GetLogs()
         {
             List<Logs> logsRecords = new List<Logs>();
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
             try
             {
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.LOGGING))
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.LOGGING))
                 {
 
                     connection.Open();
@@ -33,18 +34,18 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetLogs";
 
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
                     while(reader.Read())
                     {
                         Logs logs = new Logs()
                         {
                             LogId = (int)reader["Id"],
                             UserId=(int)reader["UserId"],
-                            CallType=(string)reader["CallType"],
-                            Request = ReturnNullOrValueAccordingly(reader["Request"]),
-                            Response=(string)reader["Response"],
-                            Severity =(string)reader["Severity"],
-                            Status =(string)reader["Status"],
+                            CallType=reader["CallType"]?.ToString(),
+                            Request = reader["Request"]?.ToString(),
+                            Response=reader["Response"]?.ToString(),
+                            Severity =reader["Severity"]?.ToString(),
+                            Status =reader["Status"]?.ToString(),
                             DateTime=(DateTime)reader["Timestamp"]
 
                         };
@@ -60,24 +61,13 @@ namespace IMS.DataLayer.Db
             }
             return logsRecords;
         }
-        public static string ReturnNullOrValueAccordingly(object field)
-        {
-            try
-            {
-                return (string)field;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public void Log(int userId, string status, string callType, string severity, string request, string response)
+    
+        public async void Log(int userId, string status, string callType, string severity, string request, string response)
         {
 
             try
             {
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.LOGGING))
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.LOGGING))
                 {
 
                     connection.Open();
@@ -97,7 +87,7 @@ namespace IMS.DataLayer.Db
 
 
 
-                    command.ExecuteNonQueryAsync();
+                    await  command.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -107,12 +97,12 @@ namespace IMS.DataLayer.Db
             
         }
 
-        public void LogException(string callType, string request, string response, string stackTrace, string exceptionMessage, string innerException, string targetSite, string exceptionType, string severity)
+        public async  void LogException(string callType, string request, string response, string stackTrace, string exceptionMessage, string innerException, string targetSite, string exceptionType, string severity)
         {
 
             try
             {
-                using (var connection = _dbConnectionProvider.GetConnection(Databases.LOGGING))
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.LOGGING))
                 {
 
                     connection.Open();
@@ -129,7 +119,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@targetSite",targetSite);
                     command.Parameters.AddWithValue("@exceptionType", exceptionType);
                     command.Parameters.AddWithValue("@severity",severity);
-                    command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)

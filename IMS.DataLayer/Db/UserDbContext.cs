@@ -22,12 +22,12 @@ namespace IMS.DataLayer.Dal
             _dbProvider = dbConnectionProvider;
         }
 
-        public List<User> GetUsersByRole(string roleName)
+        public async Task<List<User>> GetUsersByRole(string roleName)
         {
             List<User> users = new List<User>();
-            MySqlDataReader reader = null;
+            DbDataReader reader = null;
 
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await  _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -38,7 +38,7 @@ namespace IMS.DataLayer.Dal
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetUsersByRole";
                     command.Parameters.AddWithValue("@RoleName", roleName);
-                    reader = command.ExecuteReader();
+                    reader =await command.ExecuteReaderAsync();
                     User user = null;
                     while (reader.Read())
                     {
@@ -56,12 +56,12 @@ namespace IMS.DataLayer.Dal
         }
 
 
-        public User GetUserByCredintials(string username, string password)
+        public async Task<User> GetUserByCredintials(string username, string password)
         {
             User user = null;
             DbDataReader reader = null;
 
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -75,7 +75,7 @@ namespace IMS.DataLayer.Dal
 
                     command.Parameters.AddWithValue("@username", username);
                     command.Parameters.AddWithValue("@password", password);
-                    reader = command.ExecuteReader();
+                    reader = await command.ExecuteReaderAsync();
 
 
                     if (reader.Read())
@@ -119,7 +119,7 @@ namespace IMS.DataLayer.Dal
         {
             User user = null;
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -147,7 +147,7 @@ namespace IMS.DataLayer.Dal
         {
             User updatedUser = new User();
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -180,7 +180,7 @@ namespace IMS.DataLayer.Dal
             List<User> users = new List<User>();
             DbDataReader reader = null;
 
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -212,7 +212,7 @@ namespace IMS.DataLayer.Dal
             List<User> users = new List<User>();
             DbDataReader reader = null;
 
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -246,7 +246,7 @@ namespace IMS.DataLayer.Dal
         public async Task<bool> Save(User user, int isApproved, int isActive)
         {
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -291,7 +291,7 @@ namespace IMS.DataLayer.Dal
         {
             bool isRepeated = true;
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -324,7 +324,7 @@ namespace IMS.DataLayer.Dal
         {
             User user = null;
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -351,7 +351,7 @@ namespace IMS.DataLayer.Dal
         {
             bool isDeleted = false ;
             int rowsAffected = 0;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection =await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -380,7 +380,7 @@ namespace IMS.DataLayer.Dal
         {
             bool isRepeated = true;
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -409,7 +409,7 @@ namespace IMS.DataLayer.Dal
         {
             bool isRepeated = true;
             DbDataReader reader = null;
-            using (var connection = _dbProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
