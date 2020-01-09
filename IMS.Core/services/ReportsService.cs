@@ -200,7 +200,7 @@ namespace IMS.Core.services
             }
             finally
             {
-                Severity severity = Severity.High;
+                Severity severity = Severity.No;
                 if (mostConsumedItemsResponse.Status == Status.Failure)
                     severity = Severity.High;
                 new Task(() => { _logger.Log(startDate + ";" + endDate + ";" + itemsCount, mostConsumedItemsResponse, "GetMostConsumedItems", mostConsumedItemsResponse.Status, severity, userId); }).Start();
