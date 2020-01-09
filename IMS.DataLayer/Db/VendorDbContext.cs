@@ -103,7 +103,7 @@ namespace IMS.DataLayer.Db
         {
             Vendor updatedVendor = null;
             DbDataReader reader = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -137,7 +137,7 @@ namespace IMS.DataLayer.Db
         {
             Vendor addedVendor = null;
             DbDataReader reader = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -171,7 +171,7 @@ namespace IMS.DataLayer.Db
         {
             bool isDeleted = false;
             int rowsAffected = 0;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -198,7 +198,7 @@ namespace IMS.DataLayer.Db
         {
             bool isRepeated = false;
             DbDataReader reader = null;
-            using (var connection = _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
