@@ -105,8 +105,6 @@ namespace IMS_API.Controllers
         [HttpGet("EmployeeRecentOrderDetails", Name = "GetEmployeeRecentOrderDetails")]
         public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrderDetails(int? pageNumber = null, int? pageSize = null)
         {
-            var watch = new Stopwatch();
-            watch.Start();
             EmployeeRecentOrderResponse dtoEmployeeRecentOrderResponse = null;
             try
             {
@@ -140,8 +138,6 @@ namespace IMS_API.Controllers
                 };
                 new Task(() => { _logger.LogException(ex,"GetEmployeeRecentOrderDetails", IMS.Entities.Severity.Critical,pageNumber+";"+pageSize, dtoEmployeeRecentOrderResponse); }).Start();
             }
-            watch.Stop();
-            var time = watch.Elapsed;
             return dtoEmployeeRecentOrderResponse;
         }
         /// <summary>
