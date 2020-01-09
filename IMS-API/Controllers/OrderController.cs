@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using IMS.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace IMS_API.Controllers
 {
