@@ -374,5 +374,30 @@ namespace IMS.DataLayer.Db
             }
             return VendorOrders;
         }
+
+        public async Task<VendorOrder> GetVendorOrdersByOrderIdAsync(int orderId)
+        {
+            DbDataReader reader = null;
+            var vendorOrder = new VendorOrder();
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetVendorOrderByOrderId";
+                    command.Parameters.AddWithValue("@orderId", orderId);
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                        vendorOrder = ConvertToVendorOrderObject(Extract(reader));
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return vendorOrder;
+        }
     }
 }
