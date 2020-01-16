@@ -93,7 +93,6 @@ namespace IMS.DataLayer.Db
         public async Task<bool> ApproveOrder(VendorOrder vendorOrder)
         {
             DbDataReader reader = null;
-
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -145,7 +144,6 @@ namespace IMS.DataLayer.Db
                         throw e;
                     if (e is InvalidOrderException)
                         return false;
-
                     if (e is MySqlException)
                     {
                         MySqlException mySqlException = (MySqlException)e;
@@ -375,7 +373,71 @@ namespace IMS.DataLayer.Db
             return VendorOrders;
         }
 
-        public async Task<VendorOrder> GetVendorOrdersByOrderId(int orderId)
+        public async Task<bool> EditOrder(VendorOrder vendorOrder, User user)
+        {
+            DbDataReader reader = null;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spIsVendorOrderApproved";
+                    command.Parameters.AddWithValue("@orderid", vendorOrder.VendorOrderDetails.OrderId);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        bool isApproved = (bool)reader["IsApproved"];
+                        if (isApproved)
+                            throw new OrderAlreadyApprovedException();
+                    }
+                    else
+                    {
+                        throw new InvalidOrderException();
+                    }
+                    command.Dispose();
+                    command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spEditVendorOrder";
+                    command.Parameters.AddWithValue("@orderid", vendorOrder.VendorOrderDetails.OrderId);
+                    command.Parameters.AddWithValue("@vendorid", vendorOrder.Vendor.Id);
+                    command.Parameters.AddWithValue("@recievedby", vendorOrder.VendorOrderDetails.RecievedBy);
+                    command.Parameters.AddWithValue("@finalamount", vendorOrder.VendorOrderDetails.FinalAmount);
+                    command.Parameters.AddWithValue("@taxableamount", vendorOrder.VendorOrderDetails.TaxableAmount);
+                    command.Parameters.AddWithValue("@recieveddate", vendorOrder.VendorOrderDetails.Date);
+                    command.Parameters.AddWithValue("@invoicenumber", vendorOrder.VendorOrderDetails.InvoiceNumber);
+                    command.Parameters.AddWithValue("@submittedto", vendorOrder.VendorOrderDetails.SubmittedTo);
+                    command.Parameters.AddWithValue("@invoiceimageurl", vendorOrder.VendorOrderDetails.InvoiceImageUrl);
+                    command.Parameters.AddWithValue("@challannumber", vendorOrder.VendorOrderDetails.ChallanNumber);
+                    command.Parameters.AddWithValue("@challanimageurl", vendorOrder.VendorOrderDetails.ChallanImageUrl);
+                    string listOfItemIdQuantityPrice = ConvertToString(vendorOrder.VendorOrderDetails.OrderItemDetails);
+                    command.Parameters.AddWithValue("@listof_itemid_qty_price", listOfItemIdQuantityPrice);
+                    command.Parameters.AddWithValue("@userid", user.Id);
+                    await command.ExecuteNonQueryAsync();
+                    return true;
+                }
+                catch (Exception e)
+                {
+
+                    if (e is OrderAlreadyApprovedException)
+                        throw e;
+                    if (e is InvalidOrderException)
+                        return false;
+                    if (e is MySqlException)
+                    {
+                        MySqlException mySqlException = (MySqlException)e;
+                        if (mySqlException.Number == (int)MySqlErrorCode.NoReferencedRow2)
+                            return false;
+                    }
+                    throw e;
+
+                }
+
+            }
+        }
+
+        public async Task<VendorOrder> GetVendorOrdersByOrderIdAsync(int orderId)
         {
             DbDataReader reader = null;
             var vendorOrder = new VendorOrder();
@@ -398,6 +460,35 @@ namespace IMS.DataLayer.Db
                 }
             }
             return vendorOrder;
+        }
+
+        public async Task<bool> CheckUserAlreadyEditedOrder(int userId, int orderId)
+        {
+            DbDataReader reader = null;
+            var userEntryExists = false;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetEntryFromVendorOrderEdits";
+                    command.Parameters.AddWithValue("@orderId", orderId);
+                    command.Parameters.AddWithValue("@userId", userId);
+                    reader = await command.ExecuteReaderAsync();
+                    if(reader.Read())
+                    {
+                        userEntryExists = true;
+                        return userEntryExists;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return userEntryExists;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IMS.Entities
 {
+    [Serializable]
     public class Item
     {
         public int Id { get; set; }
