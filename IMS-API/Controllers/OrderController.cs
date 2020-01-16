@@ -327,11 +327,11 @@ namespace IMS_API.Controllers
 
         }
         /// <summary>
-        /// It returns VendorOrder using orderId
+        /// Retrieves VendorOrder using orderId
         /// </summary>
         /// <returns>Response</returns>
-        /// <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
-        // PUT: api/order/VendorOrders/PendingApprovals
+        /// <response code="200">Returns Status Success if vendorOrder is found on the given orderId</response>
+        // GET: api/order/VendorOrders/OrderId
 
         [Route("VendorOrders/{orderId}")]
         [HttpGet]
