@@ -130,7 +130,7 @@ namespace IMS_API.Controllers
         /// <returns>Returns Item List along with updtaed Item</returns>
         /// <response code="200">Returns Item List along with updated Item if Item is updated successfully otherwise it returns null with status failure</response>
         // PATCH: api/Item
-        [HttpPatch]
+        [HttpPut]
         public async Task<ItemResponse> Update([FromBody] Item item)
         {
             ItemResponse contractItemsResponse = null;
