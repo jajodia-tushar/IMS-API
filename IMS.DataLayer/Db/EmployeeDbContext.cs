@@ -114,5 +114,10 @@ namespace IMS.DataLayer.Db
             }
             return isSuccess;
         }
+
+        public Task<bool> CheckEmpEmailAvailability(string email)
+        {
+
+        }
     }
 }
