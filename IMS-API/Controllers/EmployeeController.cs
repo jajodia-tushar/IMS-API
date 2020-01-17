@@ -67,8 +67,8 @@ namespace IMS_API.Controllers
             Response dtoValidEmailResponse = null;
             try
             {
-                IMS.Entities.Response doValidEmailRespponse = await employeeService.CheckEmailAvailability(email);
-                dtoValidEmailResponse = Translator.ToDataContractsObject(doValidEmailRespponse);
+                IMS.Entities.Response doValidEmailResponse = await employeeService.CheckEmailAvailability(email);
+                dtoValidEmailResponse = Translator.ToDataContractsObject(doValidEmailResponse);
             }
             catch(Exception exception)
             {
