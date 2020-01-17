@@ -10,4 +10,11 @@ namespace IMS.Contracts
         Amber,
         Green
     }
+
+    public enum BulkOrderRequestStatus
+    {
+        Pending,
+        Rejected,
+        Approved
+    }
 }

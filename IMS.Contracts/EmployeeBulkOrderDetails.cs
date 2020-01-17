@@ -8,8 +8,8 @@ namespace IMS.Contracts
     {
         public int BulkOrderId { get; set; }
         public DateTime Date { get; set; }
-        public DateTime TargetDate { get; set; }
-        public string Status { get; set; }
+        public DateTime RequirementDate { get; set; }
+        public BulkOrderRequestStatus BulkOrderRequestStatus { get; set; }
         public string ReasonForRequirement { get; set; }
         public List<ItemQuantityMapping> EmployeeItemsQuantityList { get; set; }
     }

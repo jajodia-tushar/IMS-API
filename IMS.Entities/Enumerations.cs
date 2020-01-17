@@ -10,4 +10,11 @@ namespace IMS.Entities
         Amber,
         Green
     }
+
+    public enum BulkOrderRequestStatus
+    {
+        Pending,
+        Rejected,
+        Approved
+    }
 }
