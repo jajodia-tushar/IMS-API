@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IMS.Entities
 {
-    public class EmployeeBulkOrderResponse: Response
+    public class EmployeeBulkOrdersResponse: Response
     {
         public List<EmployeeBulkOrder> EmployeeBulkOrders { get; set; }
     }
