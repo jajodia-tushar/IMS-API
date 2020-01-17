@@ -115,9 +115,33 @@ namespace IMS.DataLayer.Db
             return isSuccess;
         }
 
-        public Task<bool> CheckEmpEmailAvailability(string email)
+        public async Task<bool> CheckEmpEmailAvailability(string email)
         {
+            bool emailIdAlreadypresent = false;
+            DbDataReader reader = null;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
 
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spEmailIdAlreadyPresent";
+                    command.Parameters.AddWithValue("@emailID", email);
+                    reader = await command.ExecuteReaderAsync();
+
+                    if (reader.Read())
+                    {   
+                        emailIdAlreadypresent = true;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return emailIdAlreadypresent;
         }
     }
 }
