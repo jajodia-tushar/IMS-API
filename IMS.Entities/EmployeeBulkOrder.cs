@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IMS.Entities
 {
-    class EmployeeBulkOrder
+    public class EmployeeBulkOrder
     {
         public Employee Employee { get; set; }
         public EmployeeBulkOrderDetails EmployeeBulkOrderDetails { get; set; }

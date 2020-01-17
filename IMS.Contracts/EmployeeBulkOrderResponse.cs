@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IMS.Contracts
 {
-    class EmployeeBulkOrderResponse : Response
+    public class EmployeeBulkOrderResponse : Response
     {
         public List<EmployeeBulkOrder> EmployeeBulkOrders { get; set; }
     }

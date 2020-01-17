@@ -357,5 +357,13 @@ namespace IMS_API.Controllers
             return dtoVendorOrderResponse;
         }
 
+        }
+
+        [HttpPost("EmployeeBulkOrders", Name ="CreateEmployeeBulkOrder")]
+        public async Task<EmployeeBulkOrderResponse> PlaceEmployeeBulkOrder([FromBody] EmployeeBulkOrder)
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IMS.Contracts
 {
-    class EmployeeBulkOrderDetails
+    public class EmployeeBulkOrderDetails
     {
         public int BulkOrderId { get; set; }
         public DateTime Date { get; set; }
