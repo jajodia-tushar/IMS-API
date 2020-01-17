@@ -360,7 +360,7 @@ namespace IMS_API.Controllers
         }
 
         [HttpPost("EmployeeBulkOrders", Name ="CreateEmployeeBulkOrder")]
-        public async Task<EmployeeBulkOrderResponse> PlaceEmployeeBulkOrder([FromBody] EmployeeBulkOrder)
+        public async Task<EmployeeBulkOrderResponse> PlaceEmployeeBulkOrder([FromBody] EmployeeBulkOrder employeeBulkOrder)
         {
             throw new NotImplementedException();
         }
