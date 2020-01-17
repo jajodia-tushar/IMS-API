@@ -105,7 +105,7 @@ namespace IMS.DataLayer.Dal
                 Firstname = reader["firstname"]?.ToString(),
                 Lastname = reader["lastname"]?.ToString(),
                 Email = reader["email"]?.ToString(),
-                IsDefaultPasswordChanged=(bool)reader["passwordreset"],
+                IsDefaultPasswordChanged=(bool)reader["IsDefaultPasswordChanged"],
                 Role = new Role()
                 {
                     Id = (int)reader["roleid"],
