@@ -1,15 +1,12 @@
-﻿using IMS.Entities.Interfaces;
+﻿using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using IMS.DataLayer.Interfaces;
-using MySql.Data.MySqlClient;
 using System.Data;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
 using System.Data.Common;
-using IMS.Entities.Exceptions;
+using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Dal
 {
@@ -108,6 +105,7 @@ namespace IMS.DataLayer.Dal
                 Firstname = reader["firstname"]?.ToString(),
                 Lastname = reader["lastname"]?.ToString(),
                 Email = reader["email"]?.ToString(),
+                IsDefaultPasswordChanged=(bool)reader["passwordreset"],
                 Role = new Role()
                 {
                     Id = (int)reader["roleid"],
