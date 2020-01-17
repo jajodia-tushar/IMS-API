@@ -88,7 +88,13 @@ namespace IMS_API.Controllers
             }
             return contractsResponse;
         }
-        
-       
+
+        [Route("api/[action]")]
+        [HttpPatch]
+        public async Task<Response> UpdateUserPassword(int userId, [FromBody] string newPassword)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

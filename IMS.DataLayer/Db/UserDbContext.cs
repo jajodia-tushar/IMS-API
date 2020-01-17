@@ -433,5 +433,10 @@ namespace IMS.DataLayer.Dal
             }
             return isRepeated;
         }
+
+        public Task<bool> UpdateUserPassword(int userId, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

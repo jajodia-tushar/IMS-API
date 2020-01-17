@@ -116,6 +116,11 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
+        public Task<bool> UpdateUserPassword(int userId, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
+
         Task<User> IUserDbContext.GetUserByCredintials(string username, string password)
         {
             throw new NotImplementedException();

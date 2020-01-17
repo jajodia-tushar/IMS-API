@@ -576,6 +576,11 @@ namespace IMS.Core.services
             }
             return response;
         }
+
+        public Task<Response> UpdateUserPassword(int userId, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
