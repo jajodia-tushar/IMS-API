@@ -537,5 +537,86 @@ namespace IMS.Core.services
             }
             return dtoItemsAvailabilityResponse;
         }
+
+        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string startDate, string endDate, int itemId)
+        {
+            DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    List<DateItemsMapping> dateItemMapping;
+                    if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
+                    {
+                        dateItemMapping = await _reportsDbContext.GetItemsConsumptionReports(startDate, endDate,itemId);
+                        if (dateItemMapping != null)
+                        {
+                            dateWiseItemsConsumption.Status = Status.Success;
+                            dateItemMapping = FillDatesInTheRange(startDate, endDate,dateItemMapping);
+                            dateWiseItemsConsumption.DateItemMapping = dateItemMapping;
+                        }
+                        else
+                        {
+                            dateWiseItemsConsumption.Status = Status.Failure;
+                            dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                        }
+                        return dateWiseItemsConsumption;
+                    }
+                    else
+                    {
+                        dateWiseItemsConsumption.Status = Status.Failure;
+                        dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDate);
+                    }
+                    return dateWiseItemsConsumption;
+                }
+                else
+                {
+                    dateWiseItemsConsumption.Status = Status.Failure;
+                    dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                dateWiseItemsConsumption.Status = Status.Failure;
+                dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetItemsConsumptionReports", Severity.High, startDate + ";" + endDate, dateWiseItemsConsumption); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.High;
+                if (dateWiseItemsConsumption.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log(startDate + ";" + endDate, dateWiseItemsConsumption, "GetMostConsumedItems", dateWiseItemsConsumption.Status, severity, userId); }).Start();
+            }
+            return dateWiseItemsConsumption;
+        }
+
+        private List<DateItemsMapping> FillDatesInTheRange(string startDateString, string endDateString, List<DateItemsMapping> dateItemMappingList)
+        {
+            DateTime startDate = DateTime.ParseExact(startDateString, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+            DateTime endDate = DateTime.ParseExact(endDateString, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+            List<String> datesWithOrders = new List<String>();
+            foreach (DateItemsMapping dateItemMapping in dateItemMappingList)
+            {
+                datesWithOrders.Add(dateItemMapping.Date);
+            }
+            for (DateTime date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1))
+            {
+                string dateString = date.ToString("yyyy/MM/dd");
+                if (!datesWithOrders.Contains(dateString))
+                {
+                    dateItemMappingList.Add(new DateItemsMapping
+                    { Date = dateString,
+                      ItemQuantityMappings = null
+                    });
+                }
+            }
+            List<DateItemsMapping> sortedDateItemsMappingList = dateItemMappingList.OrderBy(o => o.Date).ToList();
+            return sortedDateItemsMappingList;
+        }
     }
 }

@@ -396,5 +396,69 @@ namespace IMS.DataLayer.Db
             }
             return itemQuantityMappings;
         }
+
+        public async Task<List<DateItemsMapping>> GetItemsConsumptionReports(string startDate, string endDate, int itemId)
+        {
+            DbDataReader reader = null;
+            List<DateItemsMapping> dateItemMapping = new List<DateItemsMapping>();
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetItemsConsumptionReport";
+                    command.Parameters.AddWithValue("@fromDate", startDate);
+                    command.Parameters.AddWithValue("@toDate", endDate);
+                    command.Parameters.AddWithValue("@itemId", itemId);
+                    reader = await command.ExecuteReaderAsync();
+                    string Date = "";
+
+                    while (reader.Read())
+                    {
+                        Date = reader["Date"]?.ToString().Split(" ")[0];
+                        Date = Date.Substring(6, 4) + '/' + Date.Substring(0, 2) + '/' + Date.Substring(3, 2);
+
+                        List<ItemQuantityMapping> itemQuantityMapping = new List<ItemQuantityMapping>
+                        {
+                            new ItemQuantityMapping
+                            {
+                                Item = new Item
+                                {
+                                    Id = Convert.ToInt32(reader["ItemId"]),
+                                    Name = reader["Name"]?.ToString()
+                                },
+                                Quantity = Convert.ToInt32(reader["Quantity"])
+                            }
+                        };
+
+                        dateItemMapping.Add
+                         (new DateItemsMapping {
+                             Date = Date,
+                             ItemQuantityMappings = itemQuantityMapping
+                         });
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+
+
+                var result = dateItemMapping.GroupBy(obj => obj.Date,
+                    obj => obj.ItemQuantityMappings.FirstOrDefault(),
+                    (key, g) => new DateItemsMapping
+                    {
+                        Date = key,
+                        ItemQuantityMappings = g.ToList()
+                    }).ToList();
+
+                dateItemMapping.GroupBy(x => x.Date,y=>y.ItemQuantityMappings);
+
+
+                return result.OrderBy(obj => obj.Date).ToList();
+            }
+        }
     }
 }

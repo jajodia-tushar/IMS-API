@@ -226,5 +226,31 @@ namespace IMS_API.Controllers
             }
             return itemsAvailabilityResponse;
         }
+
+        [Route("GetItemConsumptionReports")]
+        [HttpGet]
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string startDate, string endDate,int itemId)
+        {
+            DateWiseItemsConsumption dateWiseItemsConsumption = null;
+            try
+            {
+                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(startDate, endDate,itemId);
+                dateWiseItemsConsumption = ReportsTranslator.ToDataContractsObject(dateWiseItemsConsumptionEntity);
+            }
+            catch (Exception exception)
+            {
+                dateWiseItemsConsumption = new IMS.Contracts.DateWiseItemsConsumption()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetItemConsumptionReports", IMS.Entities.Severity.High, startDate + ";" + endDate, dateWiseItemsConsumption); }).Start();
+            }
+            return dateWiseItemsConsumption;
+        }
     }
 }
