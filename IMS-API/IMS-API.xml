@@ -75,7 +75,7 @@
             <response code="200">Returns Log History</response>
             <response code="404">Log History Not Found</response>
         </member>
-        <member name="M:IMS_API.Controllers.OrderController.GetOrdersByEmployeeId(System.String)">
+        <member name="M:IMS_API.Controllers.OrderController.GetEmployeeOrders(System.String,System.Int32,System.Int32,System.String,System.String)">
             <summary>
             Returns orders placed by an employee, returns null if no orders and if wrong employee id, returns failure
             </summary>

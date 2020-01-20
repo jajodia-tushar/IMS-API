@@ -54,47 +54,58 @@ namespace IMS.DataLayer.Db
             }
             return employeeOrder;
         }
-        public async Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string id)
+        public async Task<EmployeeOrderResponse> GetEmployeeOrders(string employeeId, int limit, int offset, string startDate, string endDate)
         {
             DbDataReader reader1 = null;
-            List<EmployeeOrderDetails> employeeOrders = new List<EmployeeOrderDetails>();
-            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
+            EmployeeOrderResponse employeeOrderResponse = new EmployeeOrderResponse();
+            employeeOrderResponse.EmployeeOrders = new List<EmployeeOrder>();
+            employeeOrderResponse.PagingInfo = new PagingInfo();
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetEmployeeOrdersByEmployeeId";
-                    command.Parameters.AddWithValue("@Id", id);
+                    command.CommandText = "spGetEmployeeOrders";
+                    command.Parameters.AddWithValue("@Id", employeeId);
+                    command.Parameters.AddWithValue("@lim",limit);
+                    command.Parameters.AddWithValue("@off", offset);
+                    command.Parameters.AddWithValue("@startDate", startDate);
+                    command.Parameters.AddWithValue("@endDate", endDate);
                     reader1 = await command.ExecuteReaderAsync();
                     while (reader1.Read())
                     {
-                        employeeOrders.Add(new EmployeeOrderDetails()
+                        employeeOrderResponse.EmployeeOrders.Add(new EmployeeOrder()
                         {
-                            OrderId = (int)reader1["Id"],
-                            Date = (DateTime)reader1["Date"],
-                            Shelf = new Shelf()
+                            Employee = ExtractEmployee(reader1),
+                            EmployeeOrderDetails = new EmployeeOrderDetails()
                             {
-                                Id = (Int32)reader1["ShelfId"],
-                                Name = reader1["ShelfName"]?.ToString(),
-                                Code = reader1["ShelfCode"]?.ToString(),
-                                IsActive = (bool)reader1["ShelfStatus"]
+                                OrderId = (int)reader1["Id"],
+                                Date = (DateTime)reader1["Date"],
+                                Shelf = new Shelf()
+                                {
+                                    Id = (Int32)reader1["ShelfId"],
+                                    Name = reader1["ShelfName"]?.ToString(),
+                                    Code = reader1["ShelfCode"]?.ToString(),
+                                    IsActive = (bool)reader1["ShelfStatus"]
+                                }
                             }
                         });
+                        employeeOrderResponse.PagingInfo.TotalResults = Convert.ToInt32(reader1["TotalResults"]);
                     }
                     reader1.Close();
-                    foreach (EmployeeOrderDetails currentOrder in employeeOrders)
+                    foreach (EmployeeOrder currentOrder in employeeOrderResponse.EmployeeOrders)
                     {
-                        currentOrder.EmployeeItemsQuantityList = new List<ItemQuantityMapping>();
+                        currentOrder.EmployeeOrderDetails.EmployeeItemsQuantityList = new List<ItemQuantityMapping>();
                         var command2 = connection.CreateCommand();
                         command2.CommandType = CommandType.StoredProcedure;
                         command2.CommandText = "spGetEmployeeOrderDetailsByOrderId";
-                        command2.Parameters.AddWithValue("@Id", currentOrder.OrderId);
+                        command2.Parameters.AddWithValue("@Id", currentOrder.EmployeeOrderDetails.OrderId);
                         reader1 = await command2.ExecuteReaderAsync();
                         while (reader1.Read())
                         {
-                            currentOrder.EmployeeItemsQuantityList.Add(new ItemQuantityMapping
+                            currentOrder.EmployeeOrderDetails.EmployeeItemsQuantityList.Add(new ItemQuantityMapping
                             {
                                 Item = new Item()
                                 {
@@ -114,7 +125,7 @@ namespace IMS.DataLayer.Db
                     return null;
                 }
             }
-            return employeeOrders;
+            return employeeOrderResponse;
         }
         private string ConvertToString(List<ItemQuantityMapping> ItemsQuantityList)
         {
@@ -129,8 +140,8 @@ namespace IMS.DataLayer.Db
             pagingInfo.PageSize = pageSize;
             EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
-            int limit =pageSize;
-            int offset = (pageNumber - 1) *pageSize;
+            int limit = pageSize;
+            int offset = (pageNumber - 1) * pageSize;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -216,13 +227,13 @@ namespace IMS.DataLayer.Db
 
         private static EmployeeOrderDetails ConvertToEmployeeOrderDetailsObject(RecentEmployeeOrderDto employeeOrderDto)
         {
-           EmployeeOrderDetails employeeOrderDetails = new EmployeeOrderDetails
-           {
+            EmployeeOrderDetails employeeOrderDetails = new EmployeeOrderDetails
+            {
                 OrderId = employeeOrderDto.OrderId,
                 Date = employeeOrderDto.EmployeeOrderDate,
                 Shelf = ConvertToShelfObject(employeeOrderDto),
                 EmployeeItemsQuantityList = new List<ItemQuantityMapping>()
-           };
+            };
             employeeOrderDetails.EmployeeItemsQuantityList.Add(ConvertToItemQuantityMappingObject(employeeOrderDto));
             return employeeOrderDetails;
         }
@@ -260,9 +271,9 @@ namespace IMS.DataLayer.Db
                 EmployeeId = (string)reader["EmployeeId"],
                 FirstName = reader["FirstName"]?.ToString(),
                 LastName = reader["LastName"]?.ToString(),
-                Email =reader["EmailId"]?.ToString(),
+                Email = reader["EmailId"]?.ToString(),
                 ContactNumber = reader["MobileNumber"]?.ToString(),
-                TemporaryCardNumber =reader["TemporaryCardNumber"]?.ToString(),
+                TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString(),
                 AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
                 EmployeeStatus = (bool)reader["IsActive"],
                 OrderId = (int)reader["EmployeeOrderId"],
@@ -306,6 +317,20 @@ namespace IMS.DataLayer.Db
                     Code = reader["ShelfCode"]?.ToString(),
                     IsActive = (bool)reader["ShelfStatus"]
                 }
+            };
+        }
+        public Employee ExtractEmployee(DbDataReader reader)
+        {
+            return new Employee()
+            {
+                Id = reader["EmployeeId"]?.ToString(),
+                Email = reader["EmailId"]?.ToString(),
+                ContactNumber = reader["MobileNumber"]?.ToString(),
+                Firstname = reader["FirstName"]?.ToString(),
+                Lastname = reader["LastName"]?.ToString(),
+                TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString(),
+                AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
+                IsActive = (bool)reader["IsActive"]
             };
         }
     }

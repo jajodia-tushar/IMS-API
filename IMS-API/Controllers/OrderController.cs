@@ -37,17 +37,17 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns list of employee orders along with the employee details if employee id is valid otherwise it returns null and status failure</response>
         // GET: api/Orders/EmployeOrders/1126
         [HttpGet("EmployeeOrders/{EmployeeId}", Name = "GetEmployeeOrderById")]
-        public async Task<OrdersByEmployeeIdResponse> GetOrdersByEmployeeId(string employeeId)
+        public async Task<EmployeeOrderResponse> GetEmployeeOrders(string employeeId,int pageNumber, int pageSize, string startDate, string endDate)
         {
-            OrdersByEmployeeIdResponse emloyeeOrderResponse = null;
+            EmployeeOrderResponse emloyeeOrderResponse = null;
             try
             {
-                IMS.Entities.OrdersByEmployeeIdResponse employeeOrderResponseEntity = await _orderService.GetEmployeeOrders(employeeId);
+                IMS.Entities.EmployeeOrderResponse employeeOrderResponseEntity = await _orderService.GetEmployeeOrders(employeeId, pageNumber,  pageSize, startDate, endDate);
                 emloyeeOrderResponse = EmployeeOrderTranslator.ToDataContractsObject(employeeOrderResponseEntity);
             }
             catch (Exception ex)
             {
-                emloyeeOrderResponse = new IMS.Contracts.OrdersByEmployeeIdResponse()
+                emloyeeOrderResponse = new IMS.Contracts.EmployeeOrderResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()

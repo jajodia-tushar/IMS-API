@@ -78,11 +78,22 @@ namespace IMS.DataLayer.Db
             throw new NotImplementedException();
         }
 
-        public Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string employeeId)
+        public Task<List<EmployeeOrder>> GetEmployeeOrders(string employeeId)
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<EmployeeOrder>> GetEmployeeOrders(string employeeId, int limit, int offset, string startDate, string endDate)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize, int pageNumber)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<EmployeeOrderResponse> IEmployeeOrderDbContext.GetEmployeeOrders(string employeeId, int limit, int offset, string startDate, string endDate)
         {
             throw new NotImplementedException();
         }

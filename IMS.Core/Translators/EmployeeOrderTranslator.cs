@@ -20,19 +20,8 @@ namespace IMS.Core.Translators
                     EmployeeRecentOrders = doEmployeeRecentOrderResponse.EmployeeRecentOrders == null ? 
                     null : ToDataContractsObject(doEmployeeRecentOrderResponse.EmployeeRecentOrders),
                     PagingInfo = doEmployeeRecentOrderResponse.PagingInfo == null ? 
-                    null : ToDataContractsObject(doEmployeeRecentOrderResponse.PagingInfo)
+                    null : Translator.ToDataContractsObject(doEmployeeRecentOrderResponse.PagingInfo)
                 };
-            return null;
-        }
-        public static Contracts.PagingInfo ToDataContractsObject(Entities.PagingInfo pagingInfo)
-        {
-            if(pagingInfo !=null)
-            return new Contracts.PagingInfo()
-            {
-                PageNumber = pagingInfo.PageNumber,
-                PageSize = pagingInfo.PageSize,
-                TotalResults = pagingInfo.TotalResults
-            };
             return null;
         }
         public static List<Contracts.EmployeeRecentOrder> ToDataContractsObject(List<Entities.EmployeeRecentOrder> employeeRecentOrders)
@@ -88,11 +77,26 @@ namespace IMS.Core.Translators
                     Translator.ToDataContractsObject(placeEmployeeOrderResponseEntity.Error),
                     Status = placeEmployeeOrderResponseEntity.Status == Entities.Status.Success ? Contracts.Status.Success : 
                     Contracts.Status.Failure,
-                    EmployeeOrder = placeEmployeeOrderResponseEntity.EmployeeOrder==null?null : 
-                    ToDataContractsObject(placeEmployeeOrderResponseEntity.EmployeeOrder)
+                    EmployeeOrders = placeEmployeeOrderResponseEntity.EmployeeOrders==null?null : 
+                    ToDataContractsObject(placeEmployeeOrderResponseEntity.EmployeeOrders),
+                    PagingInfo = placeEmployeeOrderResponseEntity.PagingInfo == null ? null :
+                    Translator.ToDataContractsObject(placeEmployeeOrderResponseEntity.PagingInfo)
                 };
             }
             return null;
+        }
+
+        private static List<Contracts.EmployeeOrder> ToDataContractsObject(List<Entities.EmployeeOrder> employeeOrders)
+        {
+            List<Contracts.EmployeeOrder> employeeOrdersContract = new List<Contracts.EmployeeOrder>();
+            if(employeeOrders!=null && employeeOrders.Count!=0)
+            {
+                foreach (Entities.EmployeeOrder employeeOrder in employeeOrders )
+                {
+                    employeeOrdersContract.Add(ToDataContractsObject(employeeOrder));
+                }
+            }
+            return employeeOrdersContract;
         }
 
         private static Contracts.EmployeeOrder ToDataContractsObject(Entities.EmployeeOrder employeeOrderEntity)
@@ -108,25 +112,6 @@ namespace IMS.Core.Translators
                 contractEmployeeOrder.EmployeeOrderDetails = ToDataContractsObject(employeeOrderEntity.EmployeeOrderDetails);
             }
             return contractEmployeeOrder;
-        }
-        public static Contracts.OrdersByEmployeeIdResponse ToDataContractsObject(Entities.OrdersByEmployeeIdResponse entityEmployeeOrderResponse)
-        {
-            Contracts.OrdersByEmployeeIdResponse employeeOrderResponse = new Contracts.OrdersByEmployeeIdResponse();
-            employeeOrderResponse.Status = Contracts.Status.Failure;
-            employeeOrderResponse.Error = Translator.ToDataContractsObject(entityEmployeeOrderResponse.Error);
-            if (entityEmployeeOrderResponse.Status == Entities.Status.Success)
-            {
-                employeeOrderResponse.Status = Contracts.Status.Success;
-                employeeOrderResponse.Error = null;
-                if (employeeOrderResponse.EmployeeOrders != null && employeeOrderResponse.EmployeeOrders.Count > 0)
-                {
-                    employeeOrderResponse.EmployeeOrders = ToDataContractsObject(entityEmployeeOrderResponse.EmployeeOrders);
-                }
-                employeeOrderResponse.EmployeeOrders = ToDataContractsObject(entityEmployeeOrderResponse.EmployeeOrders);
-            }
-            if (entityEmployeeOrderResponse.Employee != null)
-                employeeOrderResponse.Employee = EmployeeTranslator.ToDataContractsObject(entityEmployeeOrderResponse.Employee);
-            return employeeOrderResponse;
         }
         public static List<Contracts.EmployeeOrderDetails> ToDataContractsObject(List<Entities.EmployeeOrderDetails> employeeOrders)
         {
