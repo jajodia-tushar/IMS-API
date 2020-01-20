@@ -93,7 +93,27 @@ namespace IMS_API.Controllers
         [HttpPatch]
         public async Task<Response> UpdateUserPassword(int userId, [FromBody] string newPassword)
         {
-            throw new NotImplementedException();
+            IMS.Contracts.Response contractsResponse = null;
+            try
+            {
+                IMS.Entities.Response response = await _loginService.UpdateUserPassword(userId,newPassword);
+                contractsResponse = Translator.ToDataContractsObject(response);
+
+            }
+            catch (Exception exception)
+            {
+                contractsResponse = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "UpdateUserPassword", IMS.Entities.Severity.Critical,userId+";"+newPassword, contractsResponse); }).Start();
+            }
+            return contractsResponse;
         }
 
     }
