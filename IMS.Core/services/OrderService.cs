@@ -186,9 +186,9 @@ namespace IMS.Core.services
                 if (placeEmployeeOrderResponse.Status == Status.Failure)
                     severity = Severity.Critical;
                 new Task(() => { _logger.Log(employeeOrder, placeEmployeeOrderResponse, "Place employee order", placeEmployeeOrderResponse.Status, severity, -1); }).Start();
-                if(placeEmployeeOrderResponse.Status == Status.Success)
+                if (placeEmployeeOrderResponse.Status == Status.Success)
                 {
-                    new Task(() => {_mailService.SendEmployeeOrderReciept(placeEmployeeOrderResponse.EmployeeOrder); }).Start();
+                    new Task(() => { _mailService.SendEmployeeOrderReciept(placeEmployeeOrderResponse.EmployeeOrder); }).Start();
                 }
             }
             return placeEmployeeOrderResponse;
@@ -208,15 +208,15 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                   employeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize,pageNumber);
-                   if(employeeRecentOrderResponse!=null)
-                   {
+                    employeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize, pageNumber);
+                    if (employeeRecentOrderResponse != null)
+                    {
                         employeeRecentOrderResponse.Status = Status.Success;
-                   }
-                   else
-                   {
-                     employeeRecentOrderResponse.Error=Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.EmptyRecentEmployeeOrderList);
-                   }                 
+                    }
+                    else
+                    {
+                        employeeRecentOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.EmptyRecentEmployeeOrderList);
+                    }
                 }
                 else
                 {
@@ -226,7 +226,7 @@ namespace IMS.Core.services
             catch (Exception exception)
             {
                 employeeRecentOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeRecentOrders", Severity.Critical, pageNumber+";"+pageSize, employeeRecentOrderResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetEmployeeRecentOrders", Severity.Critical, pageNumber + ";" + pageSize, employeeRecentOrderResponse); }).Start();
             }
             finally
             {
@@ -316,7 +316,7 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                VendorOrdersDto vendorOrdersDto = await  _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
+                VendorOrdersDto vendorOrdersDto = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
                 response.VendorOrders = vendorOrdersDto.VendorOrders;
                 response.PagingInfo = new PagingInfo()
                 {
@@ -391,7 +391,7 @@ namespace IMS.Core.services
                 else
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
             }
-           
+
             catch (CustomException e)
             {
 
@@ -467,6 +467,46 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(vendorId + ";" + pageNumber + ";" + pageSize + ";" + fromDate + ";" + toDate, response, "GetVendorOrdersByVendorId", response.Status, severity, userId); }).Start();
             }
             return response;
+        }
+
+        public async Task<VendorOrderResponse> GetVendorOrderByOrderId(int orderId)
+        {
+            {
+                var vendorOrderResponse = new VendorOrderResponse();
+                vendorOrderResponse.Status = Status.Failure;
+                int userId = -1;
+                try
+                {
+                    bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                    if (!isTokenPresentInHeader)
+                        throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                    string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                    bool isValidToken = await _tokenProvider.IsValidToken(token);
+                    if (!isValidToken)
+                        throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    vendorOrderResponse.VendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
+                }
+                catch (CustomException e)
+                {
+                    vendorOrderResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                    new Task(() => { _logger.LogException(e, "GetVendorOrderByOrderId", Severity.Critical, orderId, vendorOrderResponse); }).Start();
+                }
+                catch (Exception e)
+                {
+                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                    new Task(() => { _logger.LogException(e, "GetVendorOrderByOrderId", Severity.Critical, orderId, vendorOrderResponse); }).Start();
+                }
+                finally
+                {
+                    Severity severity = Severity.No;
+                    if (vendorOrderResponse.Status == Status.Failure)
+                        severity = Severity.Critical;
+                    new Task(() => { _logger.Log(orderId, vendorOrderResponse, "GetVendorOrderByOrderId", vendorOrderResponse.Status, severity, userId); }).Start();
+                }
+                return vendorOrderResponse;
+            }
         }
     }
 }

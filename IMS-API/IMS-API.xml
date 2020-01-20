@@ -137,6 +137,13 @@
             <returns>Response</returns>
             <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.OrderController.GetVendorOrderByOrderId(System.Int32)">
+            <summary>
+            Retrieves VendorOrder using orderId
+            </summary>
+            <returns>Response</returns>
+            <response code="200">Returns Status Success if vendorOrder is found on the given orderId</response>
+        </member>
         <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
             <summary>
             Retrieve RAG(Red, Amber, Green) status of every inventory location

@@ -257,7 +257,7 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <returns>entire List of vendorOrder object along with status</returns>
         /// <response code="200">Returns List of VendorOrder object and status success.If fails only status and error will be sent</response>
-        [HttpGet("VendorOrders/{vendorId}", Name = "GetVendorOrdersByVendorId")]
+        [HttpGet("Vendors/{vendorId}", Name = "GetVendorOrdersByVendorId")]
         public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int? pageNumber, int? pageSize, int vendorId,string fromDate = null, string toDate = null)
         {
             var dtoVendorsOrderResponse = new VendorsOrderResponse();
@@ -326,5 +326,36 @@ namespace IMS_API.Controllers
             return contractsResponse;
 
         }
+        /// <summary>
+        /// Retrieves VendorOrder using orderId
+        /// </summary>
+        /// <returns>Response</returns>
+        /// <response code="200">Returns Status Success if vendorOrder is found on the given orderId</response>
+        // GET: api/order/VendorOrders/OrderId
+
+        [Route("VendorOrders/{orderId}")]
+        [HttpGet]
+        public async Task<VendorOrderResponse> GetVendorOrderByOrderId(int orderId)
+        {
+            var dtoVendorOrderResponse = new VendorOrderResponse();
+            try
+            {
+                var doListOfVendorOrderResponse = await _orderService.GetVendorOrderByOrderId(orderId);
+                dtoVendorOrderResponse = VendorOrderTranslator.ToDataContractsObject(doListOfVendorOrderResponse);
+            }
+            catch (Exception e)
+            {
+                dtoVendorOrderResponse.Status = Status.Failure;
+                dtoVendorOrderResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+                new Task(() => { _logger.LogException(e, "GetVendorOrderByOrderId", IMS.Entities.Severity.Critical, orderId, dtoVendorOrderResponse); }).Start();
+            }
+
+            return dtoVendorOrderResponse;
+        }
+
     }
 }
