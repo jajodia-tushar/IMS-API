@@ -16,6 +16,6 @@ namespace IMS.DataLayer.Interfaces
         Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
         Task<VendorOrder> GetVendorOrdersByOrderId(int orderId);
         Task<bool> EditOrder(VendorOrder vendorOrder, User user);
-        Task<bool> CheckUserAlreadyEditedOrder(int userId, int orderId);
+        Task<bool> CheckUserEditedOrderBefore(int userId, int orderId);
     }
 }

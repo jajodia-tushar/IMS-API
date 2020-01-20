@@ -462,7 +462,7 @@ namespace IMS.DataLayer.Db
             return vendorOrder;
         }
 
-        public async Task<bool> CheckUserAlreadyEditedOrder(int userId, int orderId)
+        public async Task<bool> CheckUserEditedOrderBefore(int userId, int orderId)
         {
             DbDataReader reader = null;
             var userEntryExists = false;

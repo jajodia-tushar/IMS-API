@@ -172,8 +172,6 @@ namespace IMS.Core.services
             }
             return employeeOrdersResponse;
         }
-
-
         public async Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder)
         {
             EmployeeOrderResponse placeEmployeeOrderResponse = new EmployeeOrderResponse();
@@ -412,7 +410,7 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                response =  await EditOrApproveOrderAsync(vendorOrder, user);
+                response =  await RestrictOrderApproval(vendorOrder, user);
             }
             catch (CustomException e)
             {
@@ -435,26 +433,27 @@ namespace IMS.Core.services
             return response;
         }
 
-        private async Task<Response> EditOrApproveOrderAsync(VendorOrder vendorOrder, User user)
+        private async Task<Response> RestrictOrderApproval(VendorOrder vendorOrder, User user)
         {
             try
             {
                 var response = new Response();
                 response.Status = Status.Failure;
                 if (user.Role.Id.Equals(4))
-                    return await ApproveOrderAsync(vendorOrder);
+                    return await ApproveOrder(vendorOrder);
                 else if (user.Role.Id.Equals(1))
                 {
-                    bool hasUserEditedOrder = await _vendorOrderDbContext.CheckUserAlreadyEditedOrder(user.Id, vendorOrder.VendorOrderDetails.OrderId);
-                    if (!await CheckEditedOrderAsync(vendorOrder))
+                    bool hasUserEditedBefore = await _vendorOrderDbContext.CheckUserEditedOrderBefore(user.Id, vendorOrder.VendorOrderDetails.OrderId);
+                    bool isOrderEdited = await CheckOrderEdited(vendorOrder);
+                    if (!isOrderEdited)
                     {
-                        if (!hasUserEditedOrder)
-                            return await ApproveOrderAsync(vendorOrder);
+                        if (!hasUserEditedBefore)
+                            return await ApproveOrder(vendorOrder);
                         response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.AlreadyEdited);
                         return response;
                     }
-                    if (!hasUserEditedOrder)
-                        return await EditOrderAsync(vendorOrder, user);
+                    if (!hasUserEditedBefore)
+                        return await EditOrder(vendorOrder, user);
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.AlreadyEdited);
                     return response;
                 }
@@ -467,7 +466,7 @@ namespace IMS.Core.services
             }
         }
 
-        private async Task<Response> EditOrderAsync(VendorOrder vendorOrder, User user)
+        private async Task<Response> EditOrder(VendorOrder vendorOrder, User user)
         {
             var response = new Response();
             response.Status = Status.Failure;
@@ -481,7 +480,7 @@ namespace IMS.Core.services
             return response;
         }
 
-        private async Task<Response> ApproveOrderAsync(VendorOrder vendorOrder)
+        private async Task<Response> ApproveOrder(VendorOrder vendorOrder)
         {
             var response = new Response();
             response.Status = Status.Failure;
@@ -496,7 +495,7 @@ namespace IMS.Core.services
         }
 
         //returns true if order is edited
-        private async Task<bool> CheckEditedOrderAsync(VendorOrder vendorOrder)
+        private async Task<bool> CheckOrderEdited(VendorOrder vendorOrder)
         {
             try
             {
@@ -509,44 +508,6 @@ namespace IMS.Core.services
             {
                 throw exception;
             }
-        }
-
-        private  async Task<VendorOrderResponse> GetVendorOrderByOrderId(int orderId)
-        {
-            var vendorOrderResponse = new VendorOrderResponse();
-            vendorOrderResponse.Status = Status.Failure;
-            int userId = -1;
-            try
-            {
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = Utility.GetUserFromToken(token);
-                userId = user.Id;
-                vendorOrderResponse.VendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
-            }
-            catch (CustomException e)
-            {
-                vendorOrderResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                new Task(() => { _logger.LogException(e, "GetVendorOrderByOrderId", Severity.Critical,orderId, vendorOrderResponse); }).Start();
-            }
-            catch (Exception e)
-            {
-                vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(e, "GetVendorOrderByOrderId", Severity.Critical, orderId, vendorOrderResponse); }).Start();
-            }
-            finally
-            {
-                Severity severity = Severity.No;
-                if (vendorOrderResponse.Status == Status.Failure)
-                    severity = Severity.Critical;
-                new Task(() => { _logger.Log(orderId, vendorOrderResponse, "GetVendorOrderByOrderId", vendorOrderResponse.Status, severity, userId); }).Start();
-            }
-            return vendorOrderResponse;
         }
 
         public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate)
@@ -609,6 +570,7 @@ namespace IMS.Core.services
             {
                 var vendorOrderResponse = new VendorOrderResponse();
                 vendorOrderResponse.Status = Status.Failure;
+                vendorOrderResponse.CanEdit = false;
                 int userId = -1;
                 try
                 {
@@ -622,13 +584,14 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
                     var vendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
-                    if (vendorOrder != null && vendorOrder.VendorOrderDetails!=null)
+                    if (vendorOrder.VendorOrderDetails != null)
                     {
                         vendorOrderResponse.VendorOrder = vendorOrder;
-                        vendorOrderResponse.Status = Status.Success;
+                        vendorOrderResponse.CanEdit = !await _vendorOrderDbContext.CheckUserEditedOrderBefore(user.Id, orderId);
                         return vendorOrderResponse;
                     }
-                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidOrderId);
+                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotFount);
+                    return vendorOrderResponse;
                 }
                 catch (CustomException e)
                 {
