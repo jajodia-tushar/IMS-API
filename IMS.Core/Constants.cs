@@ -84,6 +84,7 @@ namespace IMS.Core
             public const string InvalidPageNumber = "Page Number is Invalid";
             public const string InvalidEmailId = "Invalid Email Id";
             public const string InvalidPagingDetails = "The page number or page size is invalid";
+            public const string DataAlreadyPresent = "Data is already present";
         }
 
         public static class ErrorCodes

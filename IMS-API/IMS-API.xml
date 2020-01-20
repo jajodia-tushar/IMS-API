@@ -372,5 +372,30 @@
             <returns>the vendors object along with status</returns>
             <response code="200">Returns the Vendors object</response>
         </member>
+        <member name="M:IMS_API.Controllers.VendorController.Update(IMS.Contracts.Vendor)">
+            <summary>
+            updates vendor details
+            </summary>
+            <param name="vendor">takes the vendor to be updated</param>
+            <returns>the updated vendor</returns>
+            <response code="200">Returns updated vendor</response>
+        </member>
+        <member name="M:IMS_API.Controllers.VendorController.Add(IMS.Contracts.Vendor)">
+            <summary>
+            Add vendor 
+            </summary>
+            <param name="vendor">takes the vendor to be added</param>
+            <returns>the added vendor</returns>
+            <response code="200">Returns the added vendor</response>
+        </member>
+        <member name="M:IMS_API.Controllers.VendorController.Delete(System.Int32,System.Boolean)">
+            <summary>
+            returns delete status
+            </summary>
+            <param name="vendorId">Takes the id of the vendor to be deleted</param>
+            <param name="isHardDelete">Values 1 or 0 corresponds to whether the deletion is a hard delete or a soft delete</param>
+            <returns>deletion status</returns>
+            <response code="200">deletion status</response>
+        </member>
     </members>
 </doc>

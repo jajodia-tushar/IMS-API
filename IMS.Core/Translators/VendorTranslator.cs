@@ -8,22 +8,29 @@ namespace IMS.Core.Translators
 {
     public static class VendorTranslator
     {
-        public static Contracts.VendorResponse ToDataContractsObject(Entities.VendorResponse entityVendorResponse)
+        public static Contracts.VendorsResponse ToDataContractsObject(Entities.VendorsResponse vendorResponseEntity)
         {
-            Contracts.VendorResponse contractVendorResponse = new Contracts.VendorResponse();
-            if (entityVendorResponse.Status == Entities.Status.Success)
+            Contracts.VendorsResponse vendorSearchResponse = new Contracts.VendorsResponse();
+            vendorSearchResponse.PagingInfo = new Contracts.PagingInfo();
+            vendorSearchResponse.Vendors = new List<Contracts.Vendor>();
+            if (vendorResponseEntity != null)
             {
-                contractVendorResponse.Status = Contracts.Status.Success;
-                contractVendorResponse.Vendors = ToDataContractsObject(entityVendorResponse.Vendors);
+                if (vendorResponseEntity.Status == Entities.Status.Success)
+                {
+                    vendorSearchResponse.Status = Contracts.Status.Success;
+                    vendorSearchResponse.PagingInfo.PageNumber = vendorResponseEntity.PagingInfo.PageNumber;
+                    vendorSearchResponse.PagingInfo.PageSize = vendorResponseEntity.PagingInfo.PageSize;
+                    vendorSearchResponse.PagingInfo.TotalResults = vendorResponseEntity.PagingInfo.TotalResults;
+                    vendorSearchResponse.Vendors = ToDataContractsObject(vendorResponseEntity.Vendors);
+                }
+                else
+                {
+                    vendorSearchResponse.Status = Contracts.Status.Failure;
+                    vendorSearchResponse.Error = Translator.ToDataContractsObject(vendorResponseEntity.Error);
+                }
             }
-            else
-            {
-                contractVendorResponse.Status = Contracts.Status.Failure;
-                contractVendorResponse.Error = Translator.ToDataContractsObject(entityVendorResponse.Error);
-            }
-            return contractVendorResponse;
+            return vendorSearchResponse;
         }
-        
         public static List<Contracts.Vendor> ToDataContractsObject(List<Entities.Vendor> entityVendors)
         {
             List<Contracts.Vendor> contractVendors = new List<Contracts.Vendor>();
@@ -63,31 +70,6 @@ namespace IMS.Core.Translators
                     Address = entityVendor.Address
                 };
             return null;
-        }
-
-        public static Contracts.VendorsResponse ToDataContractsObject(Entities.VendorsResponse vendorResponseEntity)
-        {
-            Contracts.VendorsResponse vendorSearchResponse = new Contracts.VendorsResponse();
-            vendorSearchResponse.PagingInfo = new Contracts.PagingInfo();
-            vendorSearchResponse.Vendors = new List<Contracts.Vendor>();
-            if (vendorResponseEntity!=null)
-            {
-                if (vendorResponseEntity.Status == Entities.Status.Success)
-                {
-                    vendorSearchResponse.Status = Contracts.Status.Success;
-                    if(vendorResponseEntity.PagingInfo!=null)
-                    {
-                        vendorSearchResponse.PagingInfo = Translator.ToDataContractsObject(vendorResponseEntity.PagingInfo);
-                    }
-                    vendorSearchResponse.Vendors = ToDataContractsObject(vendorResponseEntity.Vendors);
-                }
-                else
-                {
-                    vendorSearchResponse.Status = Contracts.Status.Failure;
-                    vendorSearchResponse.Error = Translator.ToDataContractsObject(vendorResponseEntity.Error);
-                }
-            }
-            return vendorSearchResponse;
         }
     }
 }

@@ -43,11 +43,6 @@ namespace IMS.DataLayer.Db
                },
             };
 
-        public async Task<List<Vendor>> GetAllVendors()
-        {
-            return vendors;
-        }
-
         public async Task<Vendor> GetVendorById(int vendorId)
         {
             return vendors.Find
@@ -60,6 +55,26 @@ namespace IMS.DataLayer.Db
         }
 
         public Task<VendorsResponse> GetVendors(string name, int limit, int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Vendor> AddVendor(Vendor vendor)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Vendor> UpdateVendor(Vendor vendor)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DeleteVendor(int vendorId, bool isHardDelete)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsVendorPresent(Vendor vendor)
         {
             throw new NotImplementedException();
         }

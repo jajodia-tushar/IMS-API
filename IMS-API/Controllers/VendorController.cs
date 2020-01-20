@@ -7,6 +7,7 @@ using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,17 +33,17 @@ namespace IMS_API.Controllers
         /// <returns>entire vendor object along with status</returns>
         /// <response code="200">Returns VendorOrder object  if Vendor id is valid otherwise it returns null and status failure</response>
         [HttpGet("{id}", Name = "Get(int id)")]
-        public async Task<VendorResponse> GetVendorById(int id)
+        public async Task<VendorsResponse> GetVendorById(int id)
         {
-            VendorResponse contractsVendorValidationResponse = null;
+            VendorsResponse contractsVendorValidationResponse = null;
             try
             {
-                IMS.Entities.VendorResponse entityVendorValidationResponse =await _vendorService.GetVendorById(id);
+                IMS.Entities.VendorsResponse entityVendorValidationResponse =await _vendorService.GetVendorById(id);
                 contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
             }
             catch(Exception exception)
             {
-                contractsVendorValidationResponse = new IMS.Contracts.VendorResponse()
+                contractsVendorValidationResponse = new IMS.Contracts.VendorsResponse()
                 {
                     Status = Status.Failure,
                     Error = new Error()
@@ -86,6 +87,102 @@ namespace IMS_API.Controllers
                 new Task(() => { _logger.LogException(exception, "GetVendors", IMS.Entities.Severity.High, name, vendorResponse); }).Start();
             }
             return vendorResponse;
+        }
+        // PUT: api/
+        /// <summary>
+        /// updates vendor details
+        /// </summary>
+        /// <param name="vendor">takes the vendor to be updated</param>
+        /// <returns>the updated vendor</returns>
+        /// <response code="200">Returns updated vendor</response>
+        [HttpPut(Name = "Update(Vendor vendor)")]
+        public async Task<VendorsResponse> Update([FromBody]Vendor vendor)
+        {
+            VendorsResponse contractsVendorValidationResponse = null;
+            try
+            {
+                IMS.Entities.Vendor vendorEntity = VendorTranslator.ToEntitiesObject(vendor);
+                IMS.Entities.VendorsResponse entityVendorValidationResponse = await _vendorService.UpdateVendor(vendorEntity);
+                contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
+            }
+            catch (Exception exception)
+            {
+                contractsVendorValidationResponse = new IMS.Contracts.VendorsResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.High, vendor, contractsVendorValidationResponse); }).Start();
+            }
+            return contractsVendorValidationResponse;
+        }
+        // POST: api/
+        /// <summary>
+        /// Add vendor 
+        /// </summary>
+        /// <param name="vendor">takes the vendor to be added</param>
+        /// <returns>the added vendor</returns>
+        /// <response code="200">Returns the added vendor</response>
+        [HttpPost(Name = "Add(Vendor vendor)")]
+        public async Task<VendorsResponse> Add([FromBody]Vendor vendor)
+        {
+            VendorsResponse contractsVendorValidationResponse = null;
+            try
+            {
+                IMS.Entities.Vendor vendorEntity = VendorTranslator.ToEntitiesObject(vendor);
+                IMS.Entities.VendorsResponse entityVendorValidationResponse = await _vendorService.AddVendor(vendorEntity);
+                contractsVendorValidationResponse = VendorTranslator.ToDataContractsObject(entityVendorValidationResponse);
+            }
+            catch (Exception exception)
+            {
+                contractsVendorValidationResponse = new IMS.Contracts.VendorsResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Add", IMS.Entities.Severity.High, vendor, contractsVendorValidationResponse); }).Start();
+            }
+            return contractsVendorValidationResponse;
+        }
+        // DELETE: api/
+        /// <summary>
+        /// returns delete status
+        /// </summary>
+        /// <param name="vendorId">Takes the id of the vendor to be deleted</param>
+        /// <param name="isHardDelete">Values 1 or 0 corresponds to whether the deletion is a hard delete or a soft delete</param>
+        /// <returns>deletion status</returns>
+        /// <response code="200">deletion status</response>
+        [HttpDelete("{vendorId}", Name = "Delete(int vendorId")]
+        public async Task<Response> Delete(int vendorId, bool isHardDelete)
+        {
+            Response deleteVendor = null;
+            try
+            {
+                IMS.Entities.Response deleteVendorEntity = await _vendorService.DeleteVendor(vendorId, isHardDelete);
+                deleteVendor = Translator.ToDataContractsObject(deleteVendorEntity);
+            }
+            catch (Exception exception)
+            {
+                deleteVendor = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "DeleteVendor", IMS.Entities.Severity.Medium, vendorId, deleteVendor); }).Start();
+            }
+            return deleteVendor;
         }
     }
 }
