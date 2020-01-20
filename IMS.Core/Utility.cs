@@ -81,18 +81,14 @@ namespace IMS.Core
         public static String GenerateKey(Object sourceObject)
         {
             String hashString;
-
-            //Catch unuseful parameter values
             if (sourceObject == null)
             {
                 throw new ArgumentNullException("Null as parameter is not allowed");
             }
             else
             {
-                //We determine if the passed object is really serializable.
                 try
                 {
-                    //Now we begin to do the real work.
                     hashString = ComputeHash(ObjectToByteArray(sourceObject));
                     return hashString;
                 }
@@ -109,9 +105,6 @@ namespace IMS.Core
             try
             {
                 byte[] result = md5.ComputeHash(objectAsBytes);
-
-                // Build the final string by converting each byte
-                // into hex and appending it to a StringBuilder
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < result.Length; i++)
                 {
@@ -121,9 +114,6 @@ namespace IMS.Core
             }
             catch (ArgumentNullException ane)
             {
-                //If something occurred during serialization, 
-                //this method is called with a null argument. 
-                Console.WriteLine("Hash has not been generated.");
                 return null;
             }
         }
@@ -136,8 +126,6 @@ namespace IMS.Core
             BinaryFormatter formatter = new BinaryFormatter();
             try
             {
-                //Here's the core functionality! One Line!
-                //To be thread-safe we lock the object
                 lock (locker)
                 {
                     formatter.Serialize(fs, objectToSerialize);
@@ -146,7 +134,6 @@ namespace IMS.Core
             }
             catch (SerializationException se)
             {
-                Console.WriteLine("Error occurred during serialization. Message: " +se.Message);
                 return null;
             }
             finally
