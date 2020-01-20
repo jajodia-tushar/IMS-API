@@ -229,7 +229,7 @@ namespace IMS_API.Controllers
 
         [Route("GetItemConsumptionReports")]
         [HttpGet]
-        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate,int itemId)
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate,string itemId)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = null;
             try

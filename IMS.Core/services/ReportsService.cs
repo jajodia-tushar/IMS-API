@@ -538,7 +538,7 @@ namespace IMS.Core.services
             return dtoItemsAvailabilityResponse;
         }
 
-        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate, int itemId)
+        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate, string itemId)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
             int userId = -1;
