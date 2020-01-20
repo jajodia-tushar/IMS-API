@@ -6,7 +6,6 @@ namespace IMS.Contracts
 {
     public class EmployeeBulkOrderDetails
     {
-        public int BulkOrderId { get; set; }
         public DateTime Date { get; set; }
         public DateTime RequirementDate { get; set; }
         public BulkOrderRequestStatus BulkOrderRequestStatus { get; set; }
