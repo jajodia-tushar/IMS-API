@@ -26,7 +26,6 @@ namespace IMS.Core.Translators
                 return new Entities.VendorOrderDetails
                 {
                     OrderId = dtoVendorOrderDetails.OrderId,
-                    IsApproved = dtoVendorOrderDetails.IsApproved,
                     RecievedBy = dtoVendorOrderDetails.RecievedBy,
                     SubmittedTo = dtoVendorOrderDetails.SubmittedTo,
                     TaxableAmount = dtoVendorOrderDetails.TaxableAmount,
