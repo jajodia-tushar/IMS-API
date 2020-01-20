@@ -229,12 +229,12 @@ namespace IMS_API.Controllers
 
         [Route("GetItemConsumptionReports")]
         [HttpGet]
-        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string startDate, string endDate,int itemId)
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate,int itemId)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = null;
             try
             {
-                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(startDate, endDate,itemId);
+                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(fromDate, toDate,itemId);
                 dateWiseItemsConsumption = ReportsTranslator.ToDataContractsObject(dateWiseItemsConsumptionEntity);
             }
             catch (Exception exception)
@@ -248,7 +248,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetItemConsumptionReports", IMS.Entities.Severity.High, startDate + ";" + endDate, dateWiseItemsConsumption); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetItemConsumptionReports", IMS.Entities.Severity.High, fromDate + ";" + toDate, dateWiseItemsConsumption); }).Start();
             }
             return dateWiseItemsConsumption;
         }
