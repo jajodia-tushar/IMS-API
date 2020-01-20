@@ -131,7 +131,10 @@ namespace IMS.Core.services
                                 return employeeOrdersResponse;
                             }
                         }
-                        employeeId = "";
+                        else
+                        {
+                            employeeId = "";
+                        }
                         int limit = pageSize;
                         int offset = (pageNumber - 1) * pageSize;
                         employeeOrdersResponse = await _employeeOrderDbContext.GetEmployeeOrders(employeeId, limit, offset, startDate, endDate);
