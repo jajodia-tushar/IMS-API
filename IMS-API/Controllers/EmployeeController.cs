@@ -8,6 +8,7 @@ using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -56,6 +57,34 @@ namespace IMS_API.Controllers
                 new Task(() => { _logger.LogException(exception, "GetEmployeeById", IMS.Entities.Severity.Critical, employeeId, contractsEmployeeValidationResponse); }).Start();
             }
             return contractsEmployeeValidationResponse;
+        }
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpGet("Email")]
+
+        public async Task<Response> CheckEmailAlreadyExists(string email)
+        {
+            Response dtoValidEmailResponse = null;
+            try
+            {
+                IMS.Entities.Response doValidEmailResponse = await employeeService.CheckEmailAvailability(email);
+                dtoValidEmailResponse = Translator.ToDataContractsObject(doValidEmailResponse);
+            }
+            catch(Exception exception)
+            {
+                dtoValidEmailResponse = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "CheckEmailAlreadyExists", IMS.Entities.Severity.Critical, email, dtoValidEmailResponse); }).Start();
+            }
+            return dtoValidEmailResponse;
         }
     }
 }

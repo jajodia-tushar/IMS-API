@@ -11,5 +11,7 @@ namespace IMS.DataLayer.Interfaces
         Task<Employee> GetEmployeeById(string employeeId);
         Task<List<Employee>> GetAllEmployees();
         Task<bool> CreateEmployee(Employee employee);
+
+        Task<bool> CheckEmpEmailAvailability(string email);
     }
 }

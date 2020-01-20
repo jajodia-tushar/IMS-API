@@ -60,5 +60,11 @@ namespace IMS.DataLayer.Db
         {
             throw new NotImplementedException();
         }
+       
+
+        public Task<bool> CheckEmpEmailAvailability(string email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
