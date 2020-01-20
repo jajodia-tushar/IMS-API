@@ -31,8 +31,8 @@ namespace IMS.Core.Translators
                     SubmittedTo = dtoVendorOrderDetails.SubmittedTo,
                     TaxableAmount = dtoVendorOrderDetails.TaxableAmount,
                     InvoiceNumber = dtoVendorOrderDetails.InvoiceNumber,
-                    InvoiceImageUrl = dtoVendorOrderDetails.InvoiceImageUrl,
-                    ChallanImageUrl = dtoVendorOrderDetails.ChallanImageUrl,
+                    InvoiceImageUrl = dtoVendorOrderDetails.InvoiceImageUrl == null ? "" : dtoVendorOrderDetails.InvoiceImageUrl,
+                    ChallanImageUrl = dtoVendorOrderDetails.ChallanImageUrl == null ? "" : dtoVendorOrderDetails.ChallanImageUrl,
                     ChallanNumber = dtoVendorOrderDetails.ChallanNumber,
                     Date = dtoVendorOrderDetails.Date,
                     OrderItemDetails = dtoVendorOrderDetails.OrderItemDetails == null ? null : ToEntitiesObject(dtoVendorOrderDetails.OrderItemDetails)

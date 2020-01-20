@@ -502,7 +502,7 @@ namespace IMS.Core.services
                 VendorOrderResponse vendorOrderResponse = await GetVendorOrderByOrderId(vendorOrder.VendorOrderDetails.OrderId);
                 string originalDataHash = Utility.GenerateKey(vendorOrderResponse.VendorOrder);
                 string editedDataHash = Utility.GenerateKey(vendorOrder);
-                    return originalDataHash != editedDataHash;
+                return originalDataHash != editedDataHash;
             }
             catch (Exception exception)
             {
