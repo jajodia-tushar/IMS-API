@@ -375,7 +375,7 @@ namespace IMS.DataLayer.Db
             return VendorOrders;
         }
 
-        public async Task<VendorOrder> GetVendorOrdersByOrderIdAsync(int orderId)
+        public async Task<VendorOrder> GetVendorOrdersByOrderId(int orderId)
         {
             DbDataReader reader = null;
             var vendorOrder = new VendorOrder();

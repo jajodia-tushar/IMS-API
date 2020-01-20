@@ -486,7 +486,7 @@ namespace IMS.Core.services
                         throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    vendorOrderResponse.VendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderIdAsync(orderId);
+                    vendorOrderResponse.VendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
                 }
                 catch (CustomException e)
                 {
