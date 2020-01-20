@@ -132,13 +132,13 @@ namespace IMS.DataLayer.Db
             string itemqty = string.Join(";", ItemsQuantityList.Select(p => p.Item.Id + "," + p.Quantity));
             return itemqty;
         }
-        public async Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize, int pageNumber)
+        public async Task<EmployeeOrderResponse> GetRecentEmployeeOrders(int pageSize, int pageNumber)
         {
             DbDataReader reader = null;
             PagingInfo pagingInfo = new PagingInfo();
             pagingInfo.PageNumber = pageNumber;
             pagingInfo.PageSize = pageSize;
-            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse();
+            EmployeeOrderResponse employeeRecentOrderResponse = new EmployeeOrderResponse();
             List<RecentEmployeeOrderDto> recentEmployeeOrderDtos = new List<RecentEmployeeOrderDto>();
             int limit = pageSize;
             int offset = (pageNumber - 1) * pageSize;
@@ -165,7 +165,7 @@ namespace IMS.DataLayer.Db
 
                     command.ExecuteNonQuery();
                     pagingInfo.TotalResults = (int)command.Parameters["@orderCount"].Value;
-                    employeeRecentOrderResponse.EmployeeRecentOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
+                    employeeRecentOrderResponse.EmployeeOrders = GetListOfEmployeeRecentOrder(recentEmployeeOrderDtos);
                     employeeRecentOrderResponse.PagingInfo = pagingInfo;
                 }
                 catch (Exception ex)
@@ -175,27 +175,27 @@ namespace IMS.DataLayer.Db
             }
             return employeeRecentOrderResponse;
         }
-        private static List<EmployeeRecentOrder> GetListOfEmployeeRecentOrder(List<RecentEmployeeOrderDto> recentEmployeeOrderDtos)
+        private static List<EmployeeOrder> GetListOfEmployeeRecentOrder(List<RecentEmployeeOrderDto> recentEmployeeOrderDtos)
         {
-            List<EmployeeRecentOrder> listOfEmployeeRecentOrders = null;
-            Dictionary<int, EmployeeRecentOrder> mapping = new Dictionary<int, EmployeeRecentOrder>();
+            List<EmployeeOrder> listOfEmployeeRecentOrders = null;
+            Dictionary<int, EmployeeOrder> mapping = new Dictionary<int, EmployeeOrder>();
             foreach (RecentEmployeeOrderDto order in recentEmployeeOrderDtos)
             {
                 if (mapping.ContainsKey(order.OrderId))
                 {
                     ItemQuantityMapping itemQuantityMapping = ConvertToItemQuantityMappingObject(order);
-                    mapping[order.OrderId].EmployeeOrder.EmployeeItemsQuantityList.Add(itemQuantityMapping);
+                    mapping[order.OrderId].EmployeeOrderDetails.EmployeeItemsQuantityList.Add(itemQuantityMapping);
                 }
                 else
                 {
-                    EmployeeRecentOrder employeeOrder = ConvertToEmployeeRecentOrderObject(order);
+                    EmployeeOrder employeeOrder = ConvertToEmployeeRecentOrderObject(order);
                     mapping.Add(order.OrderId, employeeOrder);
                 }
             }
             listOfEmployeeRecentOrders = mapping.Values.ToList();
             if (listOfEmployeeRecentOrders == null)
             {
-                return new List<EmployeeRecentOrder>();
+                return new List<EmployeeOrder>();
             }
             return listOfEmployeeRecentOrders;
         }
@@ -212,14 +212,14 @@ namespace IMS.DataLayer.Db
                 Quantity = order.ItemQuantity
             };
         }
-        private static EmployeeRecentOrder ConvertToEmployeeRecentOrderObject(RecentEmployeeOrderDto employeeOrderDto)
+        private static EmployeeOrder ConvertToEmployeeRecentOrderObject(RecentEmployeeOrderDto employeeOrderDto)
         {
             if (employeeOrderDto != null)
             {
-                return new EmployeeRecentOrder
+                return new EmployeeOrder
                 {
                     Employee = ConvertToEmployeeObject(employeeOrderDto),
-                    EmployeeOrder = ConvertToEmployeeOrderDetailsObject(employeeOrderDto)
+                    EmployeeOrderDetails = ConvertToEmployeeOrderDetailsObject(employeeOrderDto)
                 };
             }
             return null;

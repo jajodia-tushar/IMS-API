@@ -94,7 +94,6 @@ namespace IMS.Core.services
             }
             return deleteVendorOrderResponse;
         }
-
         private Response ValidateOrderId(int orderId)
         {
             Response deleteVendorOrderResponse = new Response();
@@ -112,20 +111,31 @@ namespace IMS.Core.services
             employeeOrdersResponse.Status = Status.Failure;
             try
             {
-                if(pageNumber<=0||pageSize<=0)
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
                 {
-                    employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
-                    return employeeOrdersResponse;
-                }
-                if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
-                {
-                    GetEmployeeResponse employeeResponse = await _employeeService.ValidateEmployee(employeeId);
-                    if (employeeResponse.Employee != null)
+                    if (pageNumber <= 0 || pageSize <= 0)
                     {
+                        employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                        return employeeOrdersResponse;
+                    }
+                    if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
+                    {
+                        GetEmployeeResponse employeeResponse = new GetEmployeeResponse();
+                        if (!String.IsNullOrEmpty(employeeId))
+                        {
+                            employeeResponse = await _employeeService.ValidateEmployee(employeeId);
+                            if (employeeResponse.Employee == null)
+                            {
+                                employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InValidId);
+                                return employeeOrdersResponse;
+                            }
+                        }
+                        employeeId = "";
                         int limit = pageSize;
                         int offset = (pageNumber - 1) * pageSize;
-                        employeeOrdersResponse = await _employeeOrderDbContext.GetEmployeeOrders(employeeId,limit,offset,startDate,endDate);
-                        if (employeeOrdersResponse.EmployeeOrders.Count !=0)
+                        employeeOrdersResponse = await _employeeOrderDbContext.GetEmployeeOrders(employeeId, limit, offset, startDate, endDate);
+                        if (employeeOrdersResponse.EmployeeOrders.Count != 0)
                         {
                             employeeOrdersResponse.Status = Status.Success;
                             employeeOrdersResponse.PagingInfo.PageNumber = pageNumber;
@@ -135,11 +145,14 @@ namespace IMS.Core.services
                         employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoOrdersYet);
                         return employeeOrdersResponse;
                     }
-                    employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InValidId);
+                    else
+                    {
+                        employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDate);
+                    }
                 }
                 else
                 {
-                    employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDate);
+                    employeeOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
                 }
             }
             catch (Exception exception)
@@ -207,9 +220,9 @@ namespace IMS.Core.services
             return placeEmployeeOrderResponse;
         }
 
-        public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
+        public async Task<EmployeeOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize)
         {
-            EmployeeRecentOrderResponse employeeRecentOrderResponse = new EmployeeRecentOrderResponse
+            EmployeeOrderResponse employeeRecentOrderResponse = new EmployeeOrderResponse
             {
                 Status = Status.Failure
             };
@@ -221,7 +234,15 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    employeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize, pageNumber);
+                    if (pageNumber <= 0)
+                    {
+                        pageNumber = 1;
+                    }
+                    if (pageSize <= 0)
+                    {
+                        pageSize = 10;
+                    }
+                    employeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize,pageNumber);.
                     if (employeeRecentOrderResponse != null)
                     {
                         employeeRecentOrderResponse.Status = Status.Success;

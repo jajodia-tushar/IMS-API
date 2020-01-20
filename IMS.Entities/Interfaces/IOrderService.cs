@@ -9,7 +9,7 @@ namespace IMS.Entities.Interfaces
     {
 
         Task<Response> Delete(int orderId);
-        Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize);
+        Task<EmployeeOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize);
         Task<EmployeeOrderResponse> GetEmployeeOrders(string employeeId, int pageNumber, int pageSize, string startDate, string endDate);
         Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder);
         Task<VendorOrderResponse> SaveVendorOrder(VendorOrder vendorOrder);

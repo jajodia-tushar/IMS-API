@@ -26,9 +26,6 @@ namespace IMS_API.Controllers
             _logger = logger;
         }
 
-
-
-
         /// <summary>
         /// Returns orders placed by an employee, returns null if no orders and if wrong employee id, returns failure
         /// </summary>
@@ -36,13 +33,22 @@ namespace IMS_API.Controllers
         /// <returns>entire list of employee orders along with the employee details and status</returns>
         /// <response code="200">Returns list of employee orders along with the employee details if employee id is valid otherwise it returns null and status failure</response>
         // GET: api/Orders/EmployeOrders/1126
-        [HttpGet("EmployeeOrders/{EmployeeId}", Name = "GetEmployeeOrderById")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        [HttpGet("EmployeeOrders", Name = "GetEmployeeOrders")]
         public async Task<EmployeeOrderResponse> GetEmployeeOrders(string employeeId,int pageNumber, int pageSize, string startDate, string endDate)
         {
             EmployeeOrderResponse emloyeeOrderResponse = null;
             try
             {
-                IMS.Entities.EmployeeOrderResponse employeeOrderResponseEntity = await _orderService.GetEmployeeOrders(employeeId, pageNumber,  pageSize, startDate, endDate);
+                IMS.Entities.EmployeeOrderResponse employeeOrderResponseEntity = new IMS.Entities.EmployeeOrderResponse();
+                if (String.IsNullOrEmpty(startDate)||String.IsNullOrEmpty(endDate))
+                {
+                    employeeOrderResponseEntity = await _orderService.GetEmployeeRecentOrders(pageNumber, pageSize);
+                }
+                else
+                {
+                    employeeOrderResponseEntity = await _orderService.GetEmployeeOrders(employeeId, pageNumber, pageSize, startDate, endDate);
+                }
                 emloyeeOrderResponse = EmployeeOrderTranslator.ToDataContractsObject(employeeOrderResponseEntity);
             }
             catch (Exception ex)
@@ -59,7 +65,6 @@ namespace IMS_API.Controllers
             }
             return emloyeeOrderResponse;
         }
-
 
         /// <summary>
         /// Returns order placed by the employee with date and order id set
@@ -91,54 +96,7 @@ namespace IMS_API.Controllers
             }
             return employeeOrderResposne;
         }
-        /// <summary>
-        /// Returns recent order placed by the employee with employee and employee order details
-        /// </summary>
-        /// <returns>List of employee recent order along with the status</returns>
-        /// <response code="200">Returns the employee recent order along with status success </response>
-        /// <response code="400">If Unable to show recent entries </response>
-        /// <response code="401">If token is Invalid</response>
-        /// <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
-        // GET: api/Order/EmployeeRecentOrderDetails
-        [Authorize(Roles = "Admin,SuperAdmin")]
-        [HttpGet("EmployeeRecentOrderDetails", Name = "GetEmployeeRecentOrderDetails")]
-        public async Task<EmployeeRecentOrderResponse> GetEmployeeRecentOrderDetails(int? pageNumber = null, int? pageSize = null)
-        {
-            EmployeeRecentOrderResponse dtoEmployeeRecentOrderResponse = null;
-            try
-            {
-                int currentPageNumber = pageNumber ?? 1;
-                int currentPageSize = pageSize ?? 10;
-                if (currentPageNumber <= 0 || currentPageSize <= 0)
-                {
-                    return new EmployeeRecentOrderResponse
-                    {
-                        Status = Status.Failure,
-                        Error = new Error
-                        {
-                            ErrorCode = Constants.ErrorCodes.BadRequest,
-                            ErrorMessage = Constants.ErrorMessages.InvalidPagingDetails
-                        }
-                    };
-                }
-                IMS.Entities.EmployeeRecentOrderResponse doEmployeeRecentOrderResponse = await _orderService.GetEmployeeRecentOrders(currentPageNumber, currentPageSize);
-                dtoEmployeeRecentOrderResponse = EmployeeOrderTranslator.ToDataContractsObject(doEmployeeRecentOrderResponse);
-            }
-            catch (Exception ex)
-            {
-                dtoEmployeeRecentOrderResponse = new EmployeeRecentOrderResponse()
-                {
-                    Status = Status.Failure,
-                    Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.ServerError,
-                        ErrorMessage = Constants.ErrorMessages.ServerError
-                    }
-                };
-                new Task(() => { _logger.LogException(ex,"GetEmployeeRecentOrderDetails", IMS.Entities.Severity.Critical,pageNumber+";"+pageSize, dtoEmployeeRecentOrderResponse); }).Start();
-            }
-            return dtoEmployeeRecentOrderResponse;
-        }
+
         /// <summary>
         /// Deletes the Vendor Order By OrderId
         /// </summary>
@@ -177,7 +135,6 @@ namespace IMS_API.Controllers
         /// <param name="vendorOrder">Here vendorOrder contains two objects named vendor and vendororderdetails</param>
         /// <returns>entire vendorOrder object along with status</returns>
         /// <response code="200">Returns VendorOrder object  if Vendororder is valid otherwise it returns null and status failure</response>
-
         // POST: api/order/VendorOrders
         [HttpPost("VendorOrders", Name = "PlaceVendorOrder")]
         public async Task<VendorOrderResponse> PlaceVendorOrder([FromBody] VendorOrder vendorOrder)
@@ -206,6 +163,7 @@ namespace IMS_API.Controllers
 
             return contractsVendorOrderResponse;
         }
+
         /// <summary>
         /// retrieves the List of vendororders.
         /// </summary>
@@ -291,6 +249,7 @@ namespace IMS_API.Controllers
             return dtoVendorsOrderResponse;
 
         }
+
         /// <summary>
         /// vendororder is updated and approved along this data transfer from vendororder to warehouse
         /// </summary>

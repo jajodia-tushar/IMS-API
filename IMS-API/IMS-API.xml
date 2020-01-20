@@ -90,16 +90,6 @@
             <returns>entire employee order along with the status</returns>
             <response code="200">Returns the employee order along with status success if it is placed, or failure incase it is not placed</response>
         </member>
-        <member name="M:IMS_API.Controllers.OrderController.GetEmployeeRecentOrderDetails(System.Nullable{System.Int32},System.Nullable{System.Int32})">
-            <summary>
-            Returns recent order placed by the employee with employee and employee order details
-            </summary>
-            <returns>List of employee recent order along with the status</returns>
-            <response code="200">Returns the employee recent order along with status success </response>
-            <response code="400">If Unable to show recent entries </response>
-            <response code="401">If token is Invalid</response>
-            <response code="403">If Username and Password credentials are not of Admin and SuperAdmin</response>
-        </member>
         <member name="M:IMS_API.Controllers.OrderController.Delete(System.Int32)">
             <summary>
             Deletes the Vendor Order By OrderId
