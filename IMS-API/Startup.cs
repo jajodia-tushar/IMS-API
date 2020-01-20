@@ -96,6 +96,7 @@ namespace IMS_API
             services.AddTransient<ILogsService, LogsService>();
             services.AddTransient<INotificationProvider, NotificationProvider>();
             services.AddTransient<IMailService, MailService>();
+            services.AddTransient<IEmployeeBulkOrderDbContext, EmployeeBulkOrderDbContext>();
         }
         public TokenValidationParameters CreateTokenValidationParameters()
         {

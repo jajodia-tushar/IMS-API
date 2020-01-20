@@ -16,7 +16,7 @@ namespace IMS.Core.services
 {
     public class OrderService : IOrderService
     {
-
+        private IEmployeeBulkOrderDbContext _employeeBulkOrderDbContext;
         private IVendorOrderDbContext _vendorOrderDbContext;
         private IEmployeeOrderDbContext _employeeOrderDbContext;
         private ITokenProvider _tokenProvider;
@@ -26,9 +26,9 @@ namespace IMS.Core.services
         private IVendorService _vendorService;
         private IMailService _mailService;
 
-        public OrderService(IVendorOrderDbContext vendorOrderDbContext, IEmployeeOrderDbContext employeeOrderDbContext, ITokenProvider tokenProvider, ILogManager logger, IHttpContextAccessor httpContextAccessor, IEmployeeService employeeService, IVendorService vendorService, IMailService mailService)
+        public OrderService(IVendorOrderDbContext vendorOrderDbContext, IEmployeeOrderDbContext employeeOrderDbContext, ITokenProvider tokenProvider, ILogManager logger, IHttpContextAccessor httpContextAccessor, IEmployeeService employeeService, IVendorService vendorService, IMailService mailService,IEmployeeBulkOrderDbContext employeeBulkOrderDbContext)
         {
-
+            _employeeBulkOrderDbContext = employeeBulkOrderDbContext;
             _vendorOrderDbContext = vendorOrderDbContext;
             _employeeOrderDbContext = employeeOrderDbContext;
             _tokenProvider = tokenProvider;
