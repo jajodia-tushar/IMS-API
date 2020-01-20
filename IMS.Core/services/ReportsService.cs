@@ -556,7 +556,6 @@ namespace IMS.Core.services
                         if (dateItemMapping != null)
                         {
                             dateWiseItemsConsumption.Status = Status.Success;
-                            dateItemMapping = FillDatesInTheRange(startDate, endDate,dateItemMapping);
                             dateWiseItemsConsumption.DateItemMapping = dateItemMapping;
                         }
                         else
@@ -593,30 +592,6 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(startDate + ";" + endDate, dateWiseItemsConsumption, "GetMostConsumedItems", dateWiseItemsConsumption.Status, severity, userId); }).Start();
             }
             return dateWiseItemsConsumption;
-        }
-
-        private List<DateItemsMapping> FillDatesInTheRange(string startDateString, string endDateString, List<DateItemsMapping> dateItemMappingList)
-        {
-            DateTime startDate = DateTime.ParseExact(startDateString, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
-            DateTime endDate = DateTime.ParseExact(endDateString, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
-            List<String> datesWithOrders = new List<String>();
-            foreach (DateItemsMapping dateItemMapping in dateItemMappingList)
-            {
-                datesWithOrders.Add(dateItemMapping.Date);
-            }
-            for (DateTime date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1))
-            {
-                string dateString = date.ToString("yyyy/MM/dd");
-                if (!datesWithOrders.Contains(dateString))
-                {
-                    dateItemMappingList.Add(new DateItemsMapping
-                    { Date = dateString,
-                      ItemQuantityMappings = null
-                    });
-                }
-            }
-            List<DateItemsMapping> sortedDateItemsMappingList = dateItemMappingList.OrderBy(o => o.Date).ToList();
-            return sortedDateItemsMappingList;
         }
     }
 }
