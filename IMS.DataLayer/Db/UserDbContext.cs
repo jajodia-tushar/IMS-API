@@ -432,9 +432,31 @@ namespace IMS.DataLayer.Dal
             return isRepeated;
         }
 
-        public Task<bool> UpdateUserPassword(int userId, string newPassword)
+        public async Task<bool> UpdateUserPassword(int userId, string newPassword)
         {
-            throw new NotImplementedException();
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddUser";
+                    command.Parameters.AddWithValue("@userid", userId);
+                    command.Parameters.AddWithValue("@newpassword",newPassword);
+                    int retValue = await command.ExecuteNonQueryAsync();
+                    if(retValue == 1)
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+                return false;
+            }
         }
     }
 }
