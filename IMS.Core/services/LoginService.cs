@@ -142,5 +142,14 @@ namespace IMS.Core.services
             return expirationTime;
         }
 
+        public Task<Response> UpdateUserPassword(int userId, string newPassword)
+        {
+            //401 Invalid token
+            //404 User not found
+            //validation on new password (new password don't match password strength )
+            //old not equal to new password
+            //200 update password in user table
+            throw new NotImplementedException();
+        }
     }
 }
