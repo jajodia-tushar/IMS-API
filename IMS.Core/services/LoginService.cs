@@ -3,6 +3,7 @@
 using IMS.DataLayer.Dal;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using IMS.TokenManagement;
@@ -142,14 +143,75 @@ namespace IMS.Core.services
             return expirationTime;
         }
 
-        public Task<Response> UpdateUserPassword(int userId, string newPassword)
+        public async Task<Response> UpdateUserPassword(int userId, string newPassword)
         {
-            //401 Invalid token
-            //404 User not found
-            //validation on new password (new password don't match password strength )
-            //old not equal to new password
-            //200 update password in user table
-            throw new NotImplementedException();
+            Response response = new Response()
+            {
+                Status = Status.Failure
+            };
+            int requestedUserId = -1;
+            try
+            {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User requestedUser = Utility.GetUserFromToken(token);
+                requestedUserId = requestedUser.Id;
+                User user = await _userDbContext.GetUserById(userId);
+                if (user != null)
+                {
+                    if (user.Password != newPassword)
+                    {
+                        try
+                        {
+                            Validators.UserValidator.CheckPasswordFormat(newPassword);
+                            newPassword = Utility.Hash(newPassword);
+                            if (await _userDbContext.UpdateUserPassword(userId, newPassword))
+                            {
+                                response.Status = Status.Success;
+                            }
+                            else
+                                throw new Exception();
+                        }
+                        catch(CustomException e)
+                        {
+                            response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                            new Task(() => { _logger.LogException(e, "UpdateUserPassword", Severity.Critical, userId + ";" + newPassword, response); }).Start();
+                        }
+                    }
+                    else
+                    {
+                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.NewPasswordShouldNotEqualToOldPassword);
+                    }
+                }
+                else
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.UserNotFound);
+                }
+            }
+            catch (CustomException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "UpdateUserPassword", Severity.Critical, userId + ";" + newPassword, response); }).Start();
+
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "UpdateUserPassword", Severity.Critical,userId+";"+newPassword, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(userId+";"+newPassword, response, "UpdateUserPassword", response.Status, severity,requestedUserId); }).Start();
+            }
+            return response;
         }
     }
 }
