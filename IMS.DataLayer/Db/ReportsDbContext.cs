@@ -397,7 +397,7 @@ namespace IMS.DataLayer.Db
             return itemQuantityMappings;
         }
 
-        public async Task<List<DateItemsMapping>> GetItemsConsumptionReports(string startDate, string endDate, int itemId)
+        public async Task<List<DateItemsMapping>> GetItemsConsumptionReports(string fromDate, string toDate, int itemId)
         {
             DbDataReader reader = null;
             List<DateItemsMapping> dateItemMapping = new List<DateItemsMapping>();
@@ -409,8 +409,8 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetItemsConsumptionReport";
-                    command.Parameters.AddWithValue("@fromDate", startDate);
-                    command.Parameters.AddWithValue("@toDate", endDate);
+                    command.Parameters.AddWithValue("@fromDate", fromDate);
+                    command.Parameters.AddWithValue("@toDate", toDate);
                     command.Parameters.AddWithValue("@itemId", itemId);
                     reader = await command.ExecuteReaderAsync();
                     string Date = "";

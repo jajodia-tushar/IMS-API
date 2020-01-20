@@ -538,7 +538,7 @@ namespace IMS.Core.services
             return dtoItemsAvailabilityResponse;
         }
 
-        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string startDate, string endDate, int itemId)
+        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate, int itemId)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
             int userId = -1;
@@ -550,9 +550,9 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
                     List<DateItemsMapping> dateItemMapping;
-                    if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
+                    if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate) && ReportsValidator.ValidateDate(fromDate, toDate))
                     {
-                        dateItemMapping = await _reportsDbContext.GetItemsConsumptionReports(startDate, endDate,itemId);
+                        dateItemMapping = await _reportsDbContext.GetItemsConsumptionReports(fromDate, toDate,itemId);
                         if (dateItemMapping != null)
                         {
                             dateWiseItemsConsumption.Status = Status.Success;
@@ -582,14 +582,14 @@ namespace IMS.Core.services
             {
                 dateWiseItemsConsumption.Status = Status.Failure;
                 dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetItemsConsumptionReports", Severity.High, startDate + ";" + endDate, dateWiseItemsConsumption); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetItemsConsumptionReports", Severity.High, fromDate + ";" + toDate, dateWiseItemsConsumption); }).Start();
             }
             finally
             {
                 Severity severity = Severity.High;
                 if (dateWiseItemsConsumption.Status == Status.Failure)
                     severity = Severity.High;
-                new Task(() => { _logger.Log(startDate + ";" + endDate, dateWiseItemsConsumption, "GetMostConsumedItems", dateWiseItemsConsumption.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(fromDate + ";" + toDate, dateWiseItemsConsumption, "GetMostConsumedItems", dateWiseItemsConsumption.Status, severity, userId); }).Start();
             }
             return dateWiseItemsConsumption;
         }
