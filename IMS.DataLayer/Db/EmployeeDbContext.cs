@@ -233,7 +233,7 @@ namespace IMS.DataLayer.Db
             }
             return isRepeated;
         }
-        }
+        
 
         public async Task<bool> CheckEmployeeIdAvailability(string employeeId)
         {

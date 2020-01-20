@@ -41,7 +41,7 @@ namespace IMS.Core.services
                 return response;
             }
 
-            int empId = -1;
+            int userId = -1;
             try
             {
                 bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
@@ -51,7 +51,7 @@ namespace IMS.Core.services
                 if (await _tokenProvider.IsValidToken(token))
                 {
                     User user = Utility.GetUserFromToken(token);
-                    empId = user.Id;
+                    userId = user.Id;
                     try
                     {
                         bool isEmployeeIdPresent = await employeeDbContext.CheckEmployeeIdAvailability(employeeId);
@@ -89,7 +89,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (response.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(employeeId, response, "CheckEmployeeIdAvailability", response.Status, severity, empId); }).Start();
+                new Task(() => { _logger.Log(employeeId, response, "CheckEmployeeIdAvailability", response.Status, severity, userId); }).Start();
             }
             return response;
         }
