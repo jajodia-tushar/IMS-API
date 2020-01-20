@@ -216,5 +216,31 @@ namespace IMS_API.Controllers
             }
             return contractEmployeeResponse;
         }
+
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        [HttpGet]
+        public async Task<Response> IsEmployeeIdExists(String employeeId)
+        {
+            Response dtoValidEmployeeId = null;
+            try
+            {
+                IMS.Entities.Response doValidEmployeeIdResponse = await employeeService.CheckEmployeeIdAvailability(employeeId);
+                dtoValidEmployeeId = Translator.ToDataContractsObject(doValidEmployeeIdResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoValidEmployeeId = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "IsEmployeeIdExists", IMS.Entities.Severity.Critical, employeeId, dtoValidEmployeeId); }).Start();
+            }
+            return dtoValidEmployeeId;
+        }
     }
 }

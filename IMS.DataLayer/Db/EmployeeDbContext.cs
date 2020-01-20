@@ -233,5 +233,29 @@ namespace IMS.DataLayer.Db
             }
             return isRepeated;
         }
+        }
+
+        public async Task<bool> CheckEmployeeIdAvailability(string employeeId)
+        {
+            DbDataReader reader = null;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spIsEmployeeIdPresent";
+                    command.Parameters.AddWithValue("@id", employeeId);
+                    reader = await command.ExecuteReaderAsync();
+                    return (reader.Read());
+                }
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
+             }
+        }
     }
 }
