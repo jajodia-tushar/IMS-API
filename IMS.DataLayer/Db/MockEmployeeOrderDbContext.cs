@@ -78,11 +78,12 @@ namespace IMS.DataLayer.Db
             throw new NotImplementedException();
         }
 
-        public Task<List<EmployeeOrderDetails>> GetOrdersByEmployeeId(string employeeId)
+        public Task<EmployeeOrderResponse> GetEmployeeOrders(string employeeId, int limit, int offset, string startDate, string endDate)
         {
             throw new NotImplementedException();
         }
-        public Task<EmployeeRecentOrderResponse> GetRecentEmployeeOrders(int pageSize, int pageNumber)
+
+        public Task<EmployeeOrderResponse> GetRecentEmployeeOrders(int pageSize, int pageNumber)
         {
             throw new NotImplementedException();
         }

@@ -171,7 +171,7 @@ namespace IMS.Core.Translators
                 if (doItemsAvailabilityResponse.Status.Equals(Entities.Status.Success))
                 {
                     dtoItemsAvailabilityResponse.ItemQuantityMappings = ToDataContractsObject(doItemsAvailabilityResponse.ItemQuantityMappings);
-                    dtoItemsAvailabilityResponse.pagingInfo = EmployeeOrderTranslator.ToDataContractsObject(doItemsAvailabilityResponse.pagingInfo);
+                    dtoItemsAvailabilityResponse.pagingInfo = Translator.ToDataContractsObject(doItemsAvailabilityResponse.pagingInfo);
                     dtoItemsAvailabilityResponse.Status = Contracts.Status.Success;
                 }
                 else
