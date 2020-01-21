@@ -538,7 +538,7 @@ namespace IMS.Core.services
             return dtoItemsAvailabilityResponse;
         }
 
-        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate, string itemId)
+        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate, string itemId,string pageNumber, string pageSize)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
             int userId = -1;
@@ -549,14 +549,17 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    List<DateItemsMapping> dateItemMapping;
                     if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate) && ReportsValidator.ValidateDate(fromDate, toDate))
                     {
-                        dateItemMapping = await _reportsDbContext.GetItemsConsumptionReports(fromDate, toDate,itemId);
-                        if (dateItemMapping != null)
+                        int limit = int.Parse(pageSize);
+                        int offset = (int.Parse(pageNumber) - 1) * int.Parse(pageSize);
+                        dateWiseItemsConsumption = await _reportsDbContext.GetItemsConsumptionReports(fromDate, toDate,itemId,limit,offset);
+                        if (dateWiseItemsConsumption.DateItemMapping != null)
                         {
                             dateWiseItemsConsumption.Status = Status.Success;
-                            dateWiseItemsConsumption.DateItemMapping = dateItemMapping;
+                            dateWiseItemsConsumption.pagingInfo.PageNumber = int.Parse(pageNumber);
+                            dateWiseItemsConsumption.pagingInfo.PageSize = int.Parse(pageSize);
+
                         }
                         else
                         {

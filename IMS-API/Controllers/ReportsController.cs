@@ -229,12 +229,12 @@ namespace IMS_API.Controllers
 
         [Route("GetItemConsumptionReports")]
         [HttpGet]
-        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate,string itemId)
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate,string itemId, string pageNumber, string pageSize)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = null;
             try
             {
-                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(fromDate, toDate,itemId);
+                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(fromDate, toDate,itemId,pageNumber,pageSize);
                 dateWiseItemsConsumption = ReportsTranslator.ToDataContractsObject(dateWiseItemsConsumptionEntity);
             }
             catch (Exception exception)
