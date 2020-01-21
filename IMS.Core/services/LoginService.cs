@@ -162,15 +162,16 @@ namespace IMS.Core.services
                 User requestedUser = Utility.GetUserFromToken(token);
                 requestedUserId = requestedUser.Id;
                 User user = await _userDbContext.GetUserById(userId);
+                var newHashPassword = Utility.Hash(newPassword);
                 if (user != null)
                 {
-                    if (user.Password != newPassword)
+                    if (user.Password != newHashPassword)
                     {
                         try
                         {
                             Validators.UserValidator.CheckPasswordFormat(newPassword);
-                            newPassword = Utility.Hash(newPassword);
-                            if (await _userDbContext.UpdateUserPassword(userId, newPassword))
+                            
+                            if (await _userDbContext.UpdateUserPassword(userId, newHashPassword))
                             {
                                 response.Status = Status.Success;
                             }

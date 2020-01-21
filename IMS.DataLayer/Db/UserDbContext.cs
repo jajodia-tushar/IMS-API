@@ -442,7 +442,7 @@ namespace IMS.DataLayer.Dal
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spAddUser";
+                    command.CommandText = "spUpdateUserPassword";
                     command.Parameters.AddWithValue("@userid", userId);
                     command.Parameters.AddWithValue("@newpassword",newPassword);
                     int retValue = await command.ExecuteNonQueryAsync();
