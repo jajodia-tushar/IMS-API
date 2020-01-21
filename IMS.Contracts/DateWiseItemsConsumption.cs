@@ -7,6 +7,5 @@ namespace IMS.Contracts
     public class DateWiseItemsConsumption : Response
     {
         public List<DateItemsMapping> DateItemMapping { get; set; }
-        public PagingInfo pagingInfo { get; set; }
     }
 }

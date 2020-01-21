@@ -397,7 +397,7 @@ namespace IMS.DataLayer.Db
             return itemQuantityMappings;
         }
 
-        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReports(string fromDate, string toDate, string itemId,int limit, int offset)
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReports(string fromDate, string toDate)
         {
             DbDataReader reader = null;
             DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
@@ -413,19 +413,12 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetItemsConsumptionReport";
                     command.Parameters.AddWithValue("@fromDate", fromDate);
                     command.Parameters.AddWithValue("@toDate", toDate);
-                    command.Parameters.AddWithValue("@itemId", int.Parse(itemId));
-                    command.Parameters.AddWithValue("@pagelimit", limit);
-                    command.Parameters.AddWithValue("@pageOffset", offset);
-                    command.Parameters.Add("@totalResults", MySqlDbType.Int32, 32);
-                    command.Parameters["@totalResults"].Direction = ParameterDirection.Output;
                     reader = await command.ExecuteReaderAsync();
                     string Date = "";
-                    
 
                     while (reader.Read())
                     {
                         Date = reader["Date"]?.ToString().Split(" ")[0];
-                    
                         List<ItemQuantityMapping> itemQuantityMapping = new List<ItemQuantityMapping>
                         {
                             new ItemQuantityMapping
@@ -445,15 +438,11 @@ namespace IMS.DataLayer.Db
                          });
                     }
                     reader.Close();
-                    command.ExecuteNonQuery();
-                    pagingInfo.TotalResults = (int) command.Parameters["@totalResults"].Value;
-                    dateWiseItemsConsumption.pagingInfo = pagingInfo;
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
-
 
                 var result = dateItemMapping.GroupBy(obj => obj.Date,
                     obj => obj.ItemQuantityMappings.FirstOrDefault(),
