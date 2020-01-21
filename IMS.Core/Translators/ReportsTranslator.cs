@@ -197,12 +197,13 @@ namespace IMS.Core.Translators
                     Contracts.Status.Failure,
                     Error = doDateWiseItemsConsumption.Error == null ? null :
                     Translator.ToDataContractsObject(doDateWiseItemsConsumption.Error),
-                    DateItemMapping = doDateWiseItemsConsumption.DateItemMapping == null ? null : ToDataContractsObject(doDateWiseItemsConsumption.DateItemMapping)
+                    DateItemMapping = doDateWiseItemsConsumption.DateItemMapping == null ? null : ToDataContractsObject(doDateWiseItemsConsumption.DateItemMapping),
+                    pagingInfo = Translator.ToDataContractsObject(doDateWiseItemsConsumption.pagingInfo)
                 };
             }
             return null;
         }
-
+       
         public static List<Contracts.DateItemsMapping> ToDataContractsObject(List<Entities.DateItemsMapping> dodateItemMapping)
         {
             List<Contracts.DateItemsMapping> dtoDateItemsMappinggs = new List<Contracts.DateItemsMapping>();
