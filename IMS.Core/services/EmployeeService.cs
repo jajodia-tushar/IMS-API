@@ -36,11 +36,6 @@ namespace IMS.Core.services
         {
             throw new NotImplementedException();
         }
-
-        public Task<EmployeeResponse> GetAllEmployees(int pageNumber,int pageSize)
-        {
-            throw new NotImplementedException();
-        }
         public Task<EmployeeResponse> Update(Employee employee)
         {
             throw new NotImplementedException();
@@ -140,6 +135,64 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(email, response, "CheckEmailAvailability", response.Status, severity, userID); }).Start();
             }
             return response;
+        }
+
+        public async Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int pageNumber, int pageSize)
+        {
+            EmployeeResponse employeeResponse = new EmployeeResponse();
+            employeeResponse.Error = new Error();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    if(pageNumber<=0||pageSize<=0)
+                    {
+                        pageNumber = 1;
+                        pageSize = 0;
+                    }
+                    if(String.IsNullOrEmpty(employeeId))
+                    {
+                        employeeId = "";
+                    }
+                    if(string.IsNullOrEmpty(employeeName))
+                    {
+                        employeeName = "";
+                    }
+                    int limit = pageSize;
+                    int offset = (pageNumber - 1) * pageSize;
+                    employeeResponse= await employeeDbContext.GetAllEmployees(employeeId, employeeName, limit, offset);
+                    employeeResponse.PagingInfo.PageNumber = pageNumber;
+                    employeeResponse.PagingInfo.PageSize = pageSize;
+                    if (employeeResponse.Employees.Count>0)
+                    {
+                        employeeResponse.Status = Status.Success;                      
+                    }
+                    else
+                    {
+                        employeeResponse.Status = Status.Failure;
+                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.NoEmployeesPresent);
+                    }
+                }
+                else
+                {
+                    employeeResponse.Status = Status.Failure;
+                    employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                new Task(() => { _logger.LogException(exception, "GetEmployees", IMS.Entities.Severity.Critical, "GetEmployees", employeeResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (employeeResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log("GetEmployees", employeeResponse, "GetEmployees", employeeResponse.Status, severity, userId); }).Start();
+            }
+            return employeeResponse;
         }
     }
 }

@@ -45,9 +45,10 @@ namespace IMS.DataLayer.Db
                 return employee;
             }
         }
-        public async Task<List<Employee>> GetAllEmployees()
+        public async Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int limit, int offset)
         {
-            List<Employee> employeesList = new List<Employee>();
+            EmployeeResponse employeesResponse = new EmployeeResponse() ;
+            employeesResponse.PagingInfo = new PagingInfo();
             DbDataReader reader = null;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
@@ -57,10 +58,15 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetAllEmployees";
+                    command.Parameters.AddWithValue("@Id", employeeId);
+                    command.Parameters.AddWithValue("@Name", employeeName);
+                    command.Parameters.AddWithValue("@lim", limit);
+                    command.Parameters.AddWithValue("@off", offset);
                     reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
-                        employeesList.Add(Extract(reader));
+                        employeesResponse.Employees.Add(Extract(reader));
+                        employeesResponse.PagingInfo.TotalResults = Convert.ToInt32(reader["TotalResults"]);
                     }
                 }
                 catch (Exception ex)
@@ -68,7 +74,7 @@ namespace IMS.DataLayer.Db
                     throw ex;
                 }
             }
-            return employeesList;
+            return employeesResponse;
         }
         public Employee Extract(DbDataReader reader)
         {

@@ -59,5 +59,10 @@ namespace IMS.Core.Translators
             }
             return null; 
         }
+
+        public static Contracts.EmployeeResponse ToDataContractsObject(Entities.EmployeeResponse entityEmployeeValidationResponse)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
