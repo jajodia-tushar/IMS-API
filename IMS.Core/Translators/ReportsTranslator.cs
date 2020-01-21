@@ -197,8 +197,7 @@ namespace IMS.Core.Translators
                     Contracts.Status.Failure,
                     Error = doDateWiseItemsConsumption.Error == null ? null :
                     Translator.ToDataContractsObject(doDateWiseItemsConsumption.Error),
-                    DateItemMapping = doDateWiseItemsConsumption.DateItemMapping == null ? null : ToDataContractsObject(doDateWiseItemsConsumption.DateItemMapping),
-                    pagingInfo = Translator.ToDataContractsObject(doDateWiseItemsConsumption.pagingInfo)
+                    DateItemMapping = doDateWiseItemsConsumption.DateItemMapping == null ? null : ToDataContractsObject(doDateWiseItemsConsumption.DateItemMapping)
                 };
             }
             return null;
