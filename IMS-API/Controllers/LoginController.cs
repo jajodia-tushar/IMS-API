@@ -7,6 +7,7 @@ using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -89,7 +90,9 @@ namespace IMS_API.Controllers
             return contractsResponse;
         }
 
-        [Route("api/[action]")]
+
+        [Route("api/Login/updateuserpassword/{userId:int}")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPatch]
         public async Task<Response> UpdateUserPassword(int userId, [FromBody] string newPassword)
         {
