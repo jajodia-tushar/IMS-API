@@ -1,5 +1,7 @@
 ﻿using IMS.Entities;
 using IMS.Entities.Exceptions;
+using IMS.Entities.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.Core
 {
@@ -74,6 +77,34 @@ namespace IMS.Core
 
 
             return Convert.ToBase64String(Encoding.Unicode.GetBytes(returnValue));
+        }
+
+        public static async Task<RequestData> GetRequestDataFromHeader(IHttpContextAccessor _httpContextAccessor, ITokenProvider _tokenProvider)
+        {
+            RequestData requestData = new RequestData
+            {
+                HasValidToken = false
+            };
+
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (isValidToken)
+                {
+                    requestData.User = Utility.GetUserFromToken(token);
+                    requestData.HasValidToken = true;
+                }
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                requestData.HasValidToken = false;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return requestData;
         }
     }
 }
