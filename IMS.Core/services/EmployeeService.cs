@@ -137,7 +137,7 @@ namespace IMS.Core.services
             return response;
         }
 
-        public async Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int pageNumber, int pageSize)
+        public async Task<EmployeeResponse> GetAllEmployees(string filter, int pageNumber, int pageSize)
         {
             EmployeeResponse employeeResponse = new EmployeeResponse();
             employeeResponse.Error = new Error();
@@ -159,17 +159,13 @@ namespace IMS.Core.services
                         pageNumber = 1;
                         pageSize = 10;
                     }
-                    if(String.IsNullOrEmpty(employeeId))
+                    if(String.IsNullOrEmpty(filter))
                     {
-                        employeeId = "";
-                    }
-                    if(string.IsNullOrEmpty(employeeName))
-                    {
-                        employeeName = "";
+                        filter = "";
                     }
                     int limit = pageSize;
                     int offset = (pageNumber - 1) * pageSize;
-                    employeeResponse= await employeeDbContext.GetAllEmployees(employeeId, employeeName, limit, offset);
+                    employeeResponse= await employeeDbContext.GetAllEmployees(filter, limit, offset);
                     employeeResponse.PagingInfo.PageNumber = pageNumber;
                     employeeResponse.PagingInfo.PageSize = pageSize;
                     if (employeeResponse.Employees.Count>0)

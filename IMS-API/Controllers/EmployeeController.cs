@@ -66,12 +66,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Employee Details of employees with status</response>
         // GET: api/
         [HttpGet]
-        public async Task<EmployeeResponse> Get(String employeeId, String employeeName,int pageNumber,int pageSize)
+        public async Task<EmployeeResponse> Get(String filter,int pageNumber,int pageSize)
         {
             EmployeeResponse contractsEmployeeValidationResponse = null;
             try
             {
-                IMS.Entities.EmployeeResponse entityEmployeeValidationResponse = await employeeService.GetAllEmployees(employeeId,employeeName,pageNumber,pageSize);
+                IMS.Entities.EmployeeResponse entityEmployeeValidationResponse = await employeeService.GetAllEmployees(filter,pageNumber,pageSize);
                 contractsEmployeeValidationResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeValidationResponse);
             }
             catch (Exception exception)
@@ -85,7 +85,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "GetEmployees", IMS.Entities.Severity.Critical, employeeId, contractsEmployeeValidationResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "GetEmployees", IMS.Entities.Severity.Critical, filter, contractsEmployeeValidationResponse); }).Start();
             }
             return contractsEmployeeValidationResponse;
         }
