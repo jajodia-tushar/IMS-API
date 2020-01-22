@@ -610,6 +610,7 @@ namespace IMS.Core.services
             }
             catch (Exception exception)
             {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical,"GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
             }
             finally
