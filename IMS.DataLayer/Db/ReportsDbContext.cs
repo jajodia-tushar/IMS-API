@@ -415,10 +415,10 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@toDate", toDate);
                     reader = await command.ExecuteReaderAsync();
                     string Date = "";
-
                     while (reader.Read())
                     {
                         Date = reader["Date"]?.ToString().Split(" ")[0];
+                        Date = Date.Substring(6, 4) + '/' + Date.Substring(0, 2) + '/' + Date.Substring(3, 2);
                         List<ItemQuantityMapping> itemQuantityMapping = new List<ItemQuantityMapping>
                         {
                             new ItemQuantityMapping
@@ -452,10 +452,8 @@ namespace IMS.DataLayer.Db
                         ItemQuantityMappings = g.ToList()
                     }).ToList();
 
-                dateItemMapping.GroupBy(x => x.Date,y=>y.ItemQuantityMappings);
 
-
-                dateWiseItemsConsumption.DateItemMapping =  result.OrderBy(obj => obj.Date).ToList();
+                dateWiseItemsConsumption.DateItemMapping =  result.OrderByDescending(obj => obj.Date).ToList();
 
                 return dateWiseItemsConsumption;
             }
