@@ -186,5 +186,48 @@ namespace IMS.Core.Translators
                 throw exception;
             }
         }
+
+        public static Contracts.DateWiseItemsConsumption ToDataContractsObject(Entities.DateWiseItemsConsumption doDateWiseItemsConsumption)
+        {
+            if (doDateWiseItemsConsumption != null)
+            {
+                return new Contracts.DateWiseItemsConsumption
+                {
+                    Status = doDateWiseItemsConsumption.Status == Entities.Status.Success ? Contracts.Status.Success :
+                    Contracts.Status.Failure,
+                    Error = doDateWiseItemsConsumption.Error == null ? null :
+                    Translator.ToDataContractsObject(doDateWiseItemsConsumption.Error),
+                    DateItemMapping = doDateWiseItemsConsumption.DateItemMapping == null ? null : ToDataContractsObject(doDateWiseItemsConsumption.DateItemMapping)
+                };
+            }
+            return null;
+        }
+       
+        public static List<Contracts.DateItemsMapping> ToDataContractsObject(List<Entities.DateItemsMapping> dodateItemMapping)
+        {
+            List<Contracts.DateItemsMapping> dtoDateItemsMappinggs = new List<Contracts.DateItemsMapping>();
+            if (dodateItemMapping != null)
+            {
+                foreach (var dateItemMapping in dodateItemMapping)
+                {
+                    dtoDateItemsMappinggs.Add(ToDataContractsObject(dateItemMapping));
+                }
+                return dtoDateItemsMappinggs;
+            }
+            return dtoDateItemsMappinggs;
+        }
+
+        public static Contracts.DateItemsMapping ToDataContractsObject(Entities.DateItemsMapping doDateItemMapping)
+        {
+            if (doDateItemMapping != null)
+            {
+                Contracts.DateItemsMapping dtoDateItemsMapping = new Contracts.DateItemsMapping();
+                dtoDateItemsMapping.Date = doDateItemMapping.Date;
+                dtoDateItemsMapping.ItemQuantityMappings =
+                    ToDataContractsObject(doDateItemMapping.ItemQuantityMappings);
+                return dtoDateItemsMapping;
+            }
+            return null;
+        }
     }
 }
