@@ -99,6 +99,7 @@ namespace IMS_API
             services.AddTransient<IAdminNotificationDbContext, AdminNotificationDbContext>();
 
             services.AddTransient<IAuditLogsDbContext, AuditLogDbContext>();
+            services.AddTransient<IEmployeeBulkOrderDbContext, EmployeeBulkOrderDbContext>();
             services.EnableSimpleProxy(p => p.AddInterceptor<AuditAttribute, AuditInterceptor>());
             services.AddTransientWithProxy<IItemService, ItemService>();
             services.AddTransientWithProxy<IShelfService, ShelfService>();
