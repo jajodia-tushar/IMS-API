@@ -48,6 +48,7 @@ namespace IMS.DataLayer.Db
         public async Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int limit, int offset)
         {
             EmployeeResponse employeesResponse = new EmployeeResponse() ;
+            employeesResponse.Employees = new List<Employee>();
             employeesResponse.PagingInfo = new PagingInfo();
             DbDataReader reader = null;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
@@ -66,7 +67,7 @@ namespace IMS.DataLayer.Db
                     while (reader.Read())
                     {
                         employeesResponse.Employees.Add(Extract(reader));
-                        employeesResponse.PagingInfo.TotalResults = Convert.ToInt32(reader["TotalResults"]);
+                        employeesResponse.PagingInfo.TotalResults = Convert.ToInt32(reader["totalEmployeesCount"]);
                     }
                 }
                 catch (Exception ex)

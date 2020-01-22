@@ -66,5 +66,10 @@ namespace IMS.DataLayer.Db
         {
             throw new NotImplementedException();
         }
+
+        public Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int limit, int offset)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

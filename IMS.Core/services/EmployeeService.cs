@@ -150,7 +150,7 @@ namespace IMS.Core.services
                     if(pageNumber<=0||pageSize<=0)
                     {
                         pageNumber = 1;
-                        pageSize = 0;
+                        pageSize = 10;
                     }
                     if(String.IsNullOrEmpty(employeeId))
                     {

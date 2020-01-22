@@ -12,6 +12,13 @@
             <returns>Details of Employee</returns>
             <response code="200">Returns Employee Details if employee id is valid otherwise it returns null with status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.EmployeeController.Get(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Retrieve the employees
+            </summary>
+            <returns>Details of Employees</returns>
+            <response code="200">Returns Employee Details of employees with status</response>
+        </member>
         <member name="M:IMS_API.Controllers.InventoryController.Get(System.String)">
             <summary>
             Retrieve Shelf Items and Shelf Details by Shelf Code
