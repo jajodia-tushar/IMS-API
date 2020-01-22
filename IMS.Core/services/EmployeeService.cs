@@ -200,7 +200,7 @@ namespace IMS.Core.services
                     employeeResponse = EmployeeValidator.EmployeeValidate(employee);
                     if (employeeResponse.Error == null)
                     {
-                        bool isRepeatedEmployeeDetails = await employeeDbContext.EmployeeDetailsRepititionCheck(employee);
+                        bool isRepeatedEmployeeDetails = await employeeDbContext.EmployeeDetailsRepetitionCheck(employee);
                         if (!isRepeatedEmployeeDetails)
                         {
                             string latestCreatedEmployeeId = await employeeDbContext.CreateEmployee(employee);

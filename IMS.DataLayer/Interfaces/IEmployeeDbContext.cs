@@ -15,6 +15,6 @@ namespace IMS.DataLayer.Interfaces
         Task<bool> CheckEmpEmailAvailability(string email);
         Task<bool> Delete(string employeeId, bool isHardDelete);
         Task<Employee> Update(Employee updatedEmployee);
-        Task<bool> EmployeeDetailsRepititionCheck(Employee employee);
+        Task<bool> EmployeeDetailsRepetitionCheck(Employee employee);
     }
 }

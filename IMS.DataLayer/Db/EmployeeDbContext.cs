@@ -206,7 +206,7 @@ namespace IMS.DataLayer.Db
             }
             return isDeleted;
         }
-        public async Task<bool> EmployeeDetailsRepititionCheck(Employee employee)
+        public async Task<bool> EmployeeDetailsRepetitionCheck(Employee employee)
         {
             bool isRepeated = false;
             DbDataReader reader = null;

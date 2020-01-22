@@ -74,7 +74,7 @@ namespace IMS.DataLayer.Db
             throw new NotImplementedException();
         }
 
-        public Task<bool> EmployeeDetailsRepititionCheck(Employee employee)
+        public Task<bool> EmployeeDetailsRepetitionCheck(Employee employee)
         {
             throw new NotImplementedException();
         }
