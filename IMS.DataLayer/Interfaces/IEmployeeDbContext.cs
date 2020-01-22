@@ -10,8 +10,11 @@ namespace IMS.DataLayer.Interfaces
     {
         Task<Employee> GetEmployeeById(string employeeId);
         Task<EmployeeResponse> GetAllEmployees(string filter, int limit, int offset);
-        Task<bool> CreateEmployee(Employee employee);
+        Task<string> CreateEmployee(Employee employee);
 
         Task<bool> CheckEmpEmailAvailability(string email);
+        Task<bool> Delete(string employeeId, bool isHardDelete);
+        Task<Employee> Update(Employee updatedEmployee);
+        Task<bool> EmployeeDetailsRepititionCheck(Employee employee);
     }
 }

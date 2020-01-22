@@ -86,6 +86,12 @@ namespace IMS.Core
             public const string InvalidPagingDetails = "The page number or page size is invalid";
             public const string DataAlreadyPresent = "Data is already present";
             public const string NoEmployeesPresent = "NoEmployeesPresent";
+            public const string EmployeesDataNotFound = "Employees Data Not Found";
+            public const string InvalidEmployeeDetails = "Invalid Employee Details";
+            public const string AlreadyPresentEmployee = "Employee Id or EmailId Is Already Present";
+            public const string EmployeeNotAdded = "Employee Not Added";
+            public const string InvalidEmployeeId = "Employee Id is not valid";
+            public const string EmployeeNotDeleted = "employee not deleted";
 
             public const string InvalidBulkRequestDate = "Order must be placed atleast Two days before Requirement Date.Please Contact Admin Team for further assistance";
         }
