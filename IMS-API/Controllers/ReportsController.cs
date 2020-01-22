@@ -226,5 +226,38 @@ namespace IMS_API.Controllers
             }
             return itemsAvailabilityResponse;
         }
+
+        /// <summary>
+        /// Get Per Day Consumption Report
+        /// </summary>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <returns>List Of Date with Item Quantity Mapping</returns>
+        /// <response code="200">Returns List Of Date With Item Quantity Mapping Within Date Range if Input is valid otherwise it returns status failure</response>
+        [Route("GetItemConsumptionReports")]
+        [HttpGet]
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate)
+        {
+            DateWiseItemsConsumption dateWiseItemsConsumption = null;
+            try
+            {
+                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(fromDate, toDate);
+                dateWiseItemsConsumption = ReportsTranslator.ToDataContractsObject(dateWiseItemsConsumptionEntity);
+            }
+            catch (Exception exception)
+            {
+                dateWiseItemsConsumption = new IMS.Contracts.DateWiseItemsConsumption()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetItemConsumptionReports", IMS.Entities.Severity.High, fromDate + ";" + toDate, dateWiseItemsConsumption); }).Start();
+            }
+            return dateWiseItemsConsumption;
+        }
     }
 }
