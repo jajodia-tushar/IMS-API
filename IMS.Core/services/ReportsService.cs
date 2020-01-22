@@ -537,5 +537,59 @@ namespace IMS.Core.services
             }
             return dtoItemsAvailabilityResponse;
         }
+
+        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate)
+        {
+            DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate) && ReportsValidator.ValidateDate(fromDate, toDate))
+                    {
+                        dateWiseItemsConsumption = await _reportsDbContext.GetItemsConsumptionReports(fromDate, toDate);
+                        if (dateWiseItemsConsumption.DateItemMapping != null)
+                        {
+                            dateWiseItemsConsumption.Status = Status.Success;
+                        }
+                        else
+                        {
+                            dateWiseItemsConsumption.Status = Status.Failure;
+                            dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                        }
+                        return dateWiseItemsConsumption;
+                    }
+                    else
+                    {
+                        dateWiseItemsConsumption.Status = Status.Failure;
+                        dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDate);
+                    }
+                    return dateWiseItemsConsumption;
+                }
+                else
+                {
+                    dateWiseItemsConsumption.Status = Status.Failure;
+                    dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                dateWiseItemsConsumption.Status = Status.Failure;
+                dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetItemsConsumptionReports", Severity.High, fromDate + ";" + toDate, dateWiseItemsConsumption); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.High;
+                if (dateWiseItemsConsumption.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log(fromDate + ";" + toDate, dateWiseItemsConsumption, "GetItemsConsumptionReports", dateWiseItemsConsumption.Status, severity, userId); }).Start();
+            }
+            return dateWiseItemsConsumption;
+        }
     }
 }

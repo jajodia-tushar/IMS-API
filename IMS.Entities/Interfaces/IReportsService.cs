@@ -13,5 +13,8 @@ namespace IMS.Entities.Interfaces
         Task<ItemsConsumptionReport> GetItemConsumptionStats(string startDate, string endDate);
         Task<StockStatusResponse> GetStockStatus(int pageNumber, int pageSize, string itemName);
         Task<ItemsAvailabilityResponse> GetItemsAvailability(string locationName, string locationCode, string colour,int pageNumber, int pageSize);
+
+        Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate);
+
     }
 }

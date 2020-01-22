@@ -45,7 +45,7 @@ namespace IMS.DataLayer.Db
                 return employee;
             }
         }
-        public async Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int limit, int offset)
+        public async Task<EmployeeResponse> GetAllEmployees(string filter, int limit, int offset)
         {
             EmployeeResponse employeesResponse = new EmployeeResponse() ;
             employeesResponse.Employees = new List<Employee>();
@@ -59,8 +59,7 @@ namespace IMS.DataLayer.Db
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetAllEmployees";
-                    command.Parameters.AddWithValue("@Id", employeeId);
-                    command.Parameters.AddWithValue("@Name", employeeName);
+                    command.Parameters.AddWithValue("@theFilter", filter);
                     command.Parameters.AddWithValue("@lim", limit);
                     command.Parameters.AddWithValue("@off", offset);
                     reader = await command.ExecuteReaderAsync();
