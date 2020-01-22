@@ -26,7 +26,7 @@ namespace IMS.Core.services
             this._tokenProvider = tokenProvider;
             this._httpContextAccessor = httpContextAccessor;
         }
-
+        [Audit("Added Vendor")]
         public async Task<VendorsResponse> AddVendor(Vendor vendor)
         {
             VendorsResponse vendorResponse = new VendorsResponse();
@@ -88,6 +88,7 @@ namespace IMS.Core.services
             return vendorResponse;
         }
 
+        [Audit("Deleted Vendor with Id")]
         public async Task<Response> DeleteVendor(int vendorId, bool isHardDelete)
         {
             Response deleteResponse = new Response();
@@ -242,6 +243,7 @@ namespace IMS.Core.services
             }
             return vendorResponse;
         }
+        [Audit("Updated Vendor")]
         public async Task<VendorsResponse> UpdateVendor(Vendor vendor)
         {
             VendorsResponse vendorResponse = new VendorsResponse();

@@ -76,7 +76,6 @@ namespace IMS_API
             services.AddTransient<IShelfDbContext,ShelfDbContext>();
             services.AddTransient<IInventoryService, InventoryService>();
             services.AddTransient<IInventoryDbContext, InventoryDbContext>();
-            services.AddTransient<IVendorService, VendorService>();
             services.AddTransient<IVendorDbContext, VendorDbContext>();
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
             services.AddTransient<IEmployeeOrderDbContext, EmployeeOrderDbContext>();
@@ -105,6 +104,7 @@ namespace IMS_API
             services.AddTransientWithProxy<IShelfService, ShelfService>();
             services.AddTransientWithProxy<IEmployeeService, EmployeeService>();
             services.AddTransientWithProxy<IUserService, UserService>();
+            services.AddTransientWithProxy<IVendorService, VendorService>();
             services.AddTransientWithProxy<IOrderService, OrderService>();
         }
         public TokenValidationParameters CreateTokenValidationParameters()
