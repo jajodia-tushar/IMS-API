@@ -59,5 +59,35 @@ namespace IMS.Core.Translators
             }
             return null; 
         }
+
+        public static Contracts.EmployeeResponse ToDataContractsObject(Entities.EmployeeResponse entityEmployeeResponse)
+        {
+            Contracts.EmployeeResponse employeeResponseContract = new Contracts.EmployeeResponse();
+            if (entityEmployeeResponse.Status == Entities.Status.Success)
+            {
+                employeeResponseContract.Status = Contracts.Status.Success;
+                employeeResponseContract.Employees = entityEmployeeResponse.Employees == null ? null: ToDataContractsObject(entityEmployeeResponse.Employees);
+                employeeResponseContract.PagingInfo = entityEmployeeResponse.PagingInfo == null ? null : Translator.ToDataContractsObject(entityEmployeeResponse.PagingInfo);
+            }
+            else
+            {
+                employeeResponseContract.Status = Contracts.Status.Failure;
+                employeeResponseContract.Error = Translator.ToDataContractsObject(entityEmployeeResponse.Error);
+            }
+            return employeeResponseContract;
+        }
+
+        public static List<Contracts.Employee> ToDataContractsObject(List<Entities.Employee> employeesEntity)
+        {
+            List<Contracts.Employee> employeesContract = new List<Contracts.Employee>();
+            if(employeesEntity!=null && employeesEntity.Count!=0)
+            {
+                foreach(Entities.Employee employeeEntity in employeesEntity)
+                {
+                    employeesContract.Add(ToDataContractsObject(employeeEntity));
+                }
+            }
+            return employeesContract;
+        }
     }
 }
