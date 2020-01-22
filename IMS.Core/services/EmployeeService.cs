@@ -152,6 +152,7 @@ namespace IMS.Core.services
                     if (pageNumber < 0 || pageSize < 0)
                     {
                         employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                        return employeeResponse;
                     }
                     if (pageNumber==0||pageSize==0)
                     {
