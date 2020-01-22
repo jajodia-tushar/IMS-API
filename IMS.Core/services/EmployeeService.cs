@@ -72,9 +72,9 @@ namespace IMS.Core.services
             }
             try
             {
-                string token= _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                 
-                if(await _tokenProvider.IsValidToken(token))
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+
+                if (await _tokenProvider.IsValidToken(token))
                 {
                     User user = Utility.GetUserFromToken(token);
                     userID = user.Id;
@@ -141,23 +141,23 @@ namespace IMS.Core.services
                         employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
                         return employeeResponse;
                     }
-                    if (pageNumber==0||pageSize==0)
+                    if (pageNumber == 0 || pageSize == 0)
                     {
                         pageNumber = 1;
                         pageSize = 10;
                     }
-                    if(String.IsNullOrEmpty(filter))
+                    if (String.IsNullOrEmpty(filter))
                     {
                         filter = "";
                     }
                     int limit = pageSize;
                     int offset = (pageNumber - 1) * pageSize;
-                    employeeResponse= await employeeDbContext.GetAllEmployees(filter, limit, offset);
+                    employeeResponse = await employeeDbContext.GetAllEmployees(filter, limit, offset);
                     employeeResponse.PagingInfo.PageNumber = pageNumber;
                     employeeResponse.PagingInfo.PageSize = pageSize;
-                    if (employeeResponse.Employees.Count>0)
+                    if (employeeResponse.Employees.Count > 0)
                     {
-                        employeeResponse.Status = Status.Success;                      
+                        employeeResponse.Status = Status.Success;
                     }
                     else
                     {
@@ -196,43 +196,34 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    try
+
+                    employeeResponse = EmployeeValidator.EmployeeValidate(employee);
+                    if (employeeResponse.Error == null)
                     {
-                        employeeResponse = EmployeeValidator.EmployeeValidate(employee);
-                        if (employeeResponse.Error == null)
+                        bool isRepeatedEmployeeDetails = await employeeDbContext.EmployeeDetailsRepititionCheck(employee);
+                        if (!isRepeatedEmployeeDetails)
                         {
-                            bool isRepeatedEmployeeDetails = await employeeDbContext.EmployeeDetailsRepititionCheck(employee);
-                            if (!isRepeatedEmployeeDetails)
+                            string latestCreatedEmployeeId = await employeeDbContext.CreateEmployee(employee);
+                            Employee createdEmployee = await employeeDbContext.GetEmployeeById(latestCreatedEmployeeId);
+                            if (createdEmployee.Id.Equals(employee.Id))
                             {
-                                string latestCreatedEmployeeId = await employeeDbContext.CreateEmployee(employee);
-                                Employee createdEmployee = await employeeDbContext.GetEmployeeById(latestCreatedEmployeeId);
-                                if (createdEmployee.Id.Equals(employee.Id))
-                                {
-                                    employeeResponse.Status = Status.Success;
-                                    List<Employee> createdEmployeeList = new List<Employee>();
-                                    createdEmployeeList.Add(createdEmployee);
-                                    employeeResponse.Employees = createdEmployeeList;
-                                }
-                                else
-                                {
-                                    employeeResponse.Status = Status.Failure;
-                                    employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.EmployeeNotAdded);
-                                }
-                                return employeeResponse;
+                                employeeResponse.Status = Status.Success;
+                                List<Employee> createdEmployeeList = new List<Employee>();
+                                createdEmployeeList.Add(createdEmployee);
+                                employeeResponse.Employees = createdEmployeeList;
                             }
                             else
                             {
                                 employeeResponse.Status = Status.Failure;
-                                employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.AlreadyPresentEmployee);
+                                employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.EmployeeNotAdded);
                             }
+                            return employeeResponse;
                         }
-                        return employeeResponse;
-                    }
-                    catch (Exception exception)
-                    {
-                        employeeResponse.Status = Status.Failure;
-                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "Add", Severity.High, employee, employeeResponse); }).Start();
+                        else
+                        {
+                            employeeResponse.Status = Status.Failure;
+                            employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.AlreadyPresentEmployee);
+                        }
                     }
                     return employeeResponse;
                 }
@@ -270,39 +261,31 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    try
+
+                    if (String.IsNullOrEmpty(id))
                     {
-                        if (String.IsNullOrEmpty(id))
+                        employeeResponse.Status = Status.Failure;
+                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidEmployeeId);
+                        return employeeResponse;
+                    }
+                    Employee isEmployeePresent = await employeeDbContext.GetEmployeeById(id);
+                    if (isEmployeePresent != null)
+                    {
+                        bool isDeleted = await employeeDbContext.Delete(id, isHardDelete);
+                        if (isDeleted)
                         {
-                            employeeResponse.Status = Status.Failure;
-                            employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidEmployeeId);
-                            return employeeResponse;
-                        }
-                        Employee isEmployeePresent = await employeeDbContext.GetEmployeeById(id);
-                        if (isEmployeePresent != null)
-                        {
-                            bool isDeleted = await employeeDbContext.Delete(id, isHardDelete);
-                            if (isDeleted)
-                            {
-                                employeeResponse.Status = Status.Success;
-                            }
-                            else
-                            {
-                                employeeResponse.Status = Status.Failure;
-                                employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.EmployeeNotDeleted);
-                            }
+                            employeeResponse.Status = Status.Success;
                         }
                         else
                         {
                             employeeResponse.Status = Status.Failure;
-                            employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidEmployeeId);
+                            employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.EmployeeNotDeleted);
                         }
                     }
-                    catch (Exception exception)
+                    else
                     {
                         employeeResponse.Status = Status.Failure;
-                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "Delete", Severity.High, id + ";" + isHardDelete, employeeResponse); }).Start();
+                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidEmployeeId);
                     }
                     return employeeResponse;
                 }
@@ -339,34 +322,27 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    try
-                    {
-                        if (string.IsNullOrEmpty(employee.Id) || string.IsNullOrEmpty(employee.Firstname) || string.IsNullOrEmpty(employee.Email))
-                        {
-                            employeeResponse.Status = Status.Failure;
-                            employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidEmployeeDetails);
-                            return employeeResponse;
-                        }
-                        Employee updatedEmployee = await employeeDbContext.Update(employee);
-                        if (updatedEmployee.Id.Equals(employee.Id) && updatedEmployee.Email.Equals(employee.Email) && updatedEmployee.ContactNumber.Equals(employee.ContactNumber))
-                        {
-                            employeeResponse.Status = Status.Success;
-                            List<Employee> updatedEmployeeList = new List<Employee>();
-                            updatedEmployeeList.Add(updatedEmployee);
-                            employeeResponse.Employees = updatedEmployeeList;
-                        }
-                        else
-                        {
-                            employeeResponse.Status = Status.Failure;
-                            employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.NotUpdated);
-                        }
-                    }
-                    catch (Exception exception)
+
+                    if (string.IsNullOrEmpty(employee.Id) || string.IsNullOrEmpty(employee.Firstname) || string.IsNullOrEmpty(employee.Email))
                     {
                         employeeResponse.Status = Status.Failure;
-                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "Update", Severity.Critical, employee, employeeResponse); }).Start();
+                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidEmployeeDetails);
+                        return employeeResponse;
                     }
+                    Employee updatedEmployee = await employeeDbContext.Update(employee);
+                    if (updatedEmployee.Id.Equals(employee.Id) && updatedEmployee.Email.Equals(employee.Email) && updatedEmployee.ContactNumber.Equals(employee.ContactNumber))
+                    {
+                        employeeResponse.Status = Status.Success;
+                        List<Employee> updatedEmployeeList = new List<Employee>();
+                        updatedEmployeeList.Add(updatedEmployee);
+                        employeeResponse.Employees = updatedEmployeeList;
+                    }
+                    else
+                    {
+                        employeeResponse.Status = Status.Failure;
+                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.NotUpdated);
+                    }
+
                     return employeeResponse;
                 }
                 else
