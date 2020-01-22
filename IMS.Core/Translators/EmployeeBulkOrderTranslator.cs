@@ -40,10 +40,9 @@ namespace IMS.Core.Translators
             if (entityBulkOrdersResponse.Status == Entities.Status.Success)
             {
                 contractBulkOrderResponse.Status = Contracts.Status.Success;
-                if (entityBulkOrdersResponse.EmployeeBulkOrders != null && entityBulkOrdersResponse.EmployeeBulkOrders.Count > 0)
-                {
-                    contractBulkOrderResponse.EmployeeBulkOrders = ToDataContractsObject(entityBulkOrdersResponse.EmployeeBulkOrders);
-                }
+                contractBulkOrderResponse.EmployeeBulkOrders = ToDataContractsObject(entityBulkOrdersResponse.EmployeeBulkOrders);
+                
+                contractBulkOrderResponse.PagingInfo = Translator.ToDataContractsObject(entityBulkOrdersResponse.PagingInfo);
 
             }
             else
