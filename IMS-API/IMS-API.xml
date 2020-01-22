@@ -197,6 +197,15 @@
             <returns>Location and Colour based Items list</returns>
             <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.ReportsController.GetItemsConsumptionReport(System.String,System.String)">
+            <summary>
+            Get Per Day Consumption Report
+            </summary>
+            <param name="fromDate"></param>
+            <param name="toDate"></param>
+            <returns>List Of Date with Item Quantity Mapping</returns>
+            <response code="200">Returns List Of Date With Item Quantity Mapping Within Date Range if Input is valid otherwise it returns status failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.RolesController.GetAllRoles">
             <summary>
             returns all roles

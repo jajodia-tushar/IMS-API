@@ -227,6 +227,13 @@ namespace IMS_API.Controllers
             return itemsAvailabilityResponse;
         }
 
+        /// <summary>
+        /// Get Per Day Consumption Report
+        /// </summary>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <returns>List Of Date with Item Quantity Mapping</returns>
+        /// <response code="200">Returns List Of Date With Item Quantity Mapping Within Date Range if Input is valid otherwise it returns status failure</response>
         [Route("GetItemConsumptionReports")]
         [HttpGet]
         public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate)

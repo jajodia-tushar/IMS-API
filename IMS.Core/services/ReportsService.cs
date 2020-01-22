@@ -587,7 +587,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.High;
                 if (dateWiseItemsConsumption.Status == Status.Failure)
                     severity = Severity.High;
-                new Task(() => { _logger.Log(fromDate + ";" + toDate, dateWiseItemsConsumption, "GetMostConsumedItems", dateWiseItemsConsumption.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(fromDate + ";" + toDate, dateWiseItemsConsumption, "GetItemsConsumptionReports", dateWiseItemsConsumption.Status, severity, userId); }).Start();
             }
             return dateWiseItemsConsumption;
         }
