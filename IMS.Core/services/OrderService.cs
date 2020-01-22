@@ -641,6 +641,10 @@ namespace IMS.Core.services
                 if (response.Status == Status.Failure)
                     severity = Severity.Critical;
                 new Task(() => { _logger.Log(employeeBulkOrder, response, "PlaceEmployeeBulkOrder", response.Status, severity, -1); }).Start();
+                if (response.Status == Status.Success)
+                {
+                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(employeeBulkOrder,BulkOrderRequestStatus.Pending); }).Start();
+                }
             }
             return response;
 
