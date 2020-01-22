@@ -59,6 +59,37 @@ namespace IMS_API.Controllers
             return contractsEmployeeValidationResponse;
         }
 
+        /// <summary>
+        /// Retrieve the employees
+        /// </summary>
+        /// <returns>Details of Employees</returns>
+        /// <response code="200">Returns Employee Details of employees with status</response>
+        // GET: api/
+        [HttpGet]
+        public async Task<EmployeeResponse> Get(String employeeId, String employeeName,int pageNumber,int pageSize)
+        {
+            EmployeeResponse contractsEmployeeValidationResponse = null;
+            try
+            {
+                IMS.Entities.EmployeeResponse entityEmployeeValidationResponse = await employeeService.GetAllEmployees(employeeId,employeeName,pageNumber,pageSize);
+                contractsEmployeeValidationResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeValidationResponse);
+            }
+            catch (Exception exception)
+            {
+                contractsEmployeeValidationResponse = new IMS.Contracts.EmployeeResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetEmployees", IMS.Entities.Severity.Critical, employeeId, contractsEmployeeValidationResponse); }).Start();
+            }
+            return contractsEmployeeValidationResponse;
+        }
+
         [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("Email")]
 

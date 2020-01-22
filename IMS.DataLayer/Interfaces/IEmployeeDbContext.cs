@@ -9,7 +9,7 @@ namespace IMS.DataLayer.Interfaces
     public interface IEmployeeDbContext
     {
         Task<Employee> GetEmployeeById(string employeeId);
-        Task<List<Employee>> GetAllEmployees();
+        Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int limit, int offset);
         Task<bool> CreateEmployee(Employee employee);
 
         Task<bool> CheckEmpEmailAvailability(string email);
