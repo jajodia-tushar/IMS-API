@@ -588,26 +588,12 @@ namespace IMS.Core.services
                 employeeBulkOrdersResponse.EmployeeBulkOrders = bulkOrdersResultFromDb.Item2;
                 
             }
-            catch (InvalidDateFormatException exception)
+            catch(CustomException exception)
             {
-                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
                 new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
             }
-            catch (RecordsNotFoundException exception)
-            {
-                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoOrdersYet);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
-            }
-            catch (InvalidPagingInfo exception)
-            {
-                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
-            }
-            catch (InvalidTokenException exception)
-            {
-                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
-            }
+           
             catch (Exception exception)
             {
                 employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
