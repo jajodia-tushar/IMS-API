@@ -565,14 +565,10 @@ namespace IMS.Core.services
             try
             {
 
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                userId = Utility.GetUserFromToken(token).Id;
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                userId = request.User.Id;
 
                 if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
                     throw new InvalidDateFormatException(Constants.ErrorMessages.InvalidDate);
