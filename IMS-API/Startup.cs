@@ -25,6 +25,9 @@ using Microsoft.AspNetCore.Http;
 using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using System.IdentityModel.Tokens.Jwt;
+using SimpleProxy.Extensions;
+using IMS.Entities;
+using IMS.Core;
 
 namespace IMS_API
 {
@@ -67,25 +70,20 @@ namespace IMS_API
             services.AddTransient<ILogDbContext, LogDbContext>();
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<ITokenDbContext, TokenDbContext>();
-            services.AddTransient<IEmployeeService, EmployeeService>();
             services.AddTransient<IEmployeeDbContext, EmployeeDbContext>();
             services.AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddTransient<IShelfService, ShelfService>();
             services.AddTransient<IShelfDbContext,ShelfDbContext>();
             services.AddTransient<IInventoryService, InventoryService>();
             services.AddTransient<IInventoryDbContext, InventoryDbContext>();
             services.AddTransient<IVendorService, VendorService>();
             services.AddTransient<IVendorDbContext, VendorDbContext>();
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
-            services.AddTransient<IOrderService,OrderService>();
             services.AddTransient<IEmployeeOrderDbContext, EmployeeOrderDbContext>();
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
             services.AddTransient<IReportsDbContext, ReportsDbContext>();
             services.AddTransient<IReportsService, ReportsService>();
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IItemService, ItemService>();
             services.AddTransient<IItemDbContext, ItemDbContext>();
             services.AddTransient<IVendorOrderDbContext, VendorOrderDbContext>();
             services.AddTransient<ITransferDbContext, TransferDbContext>();
@@ -100,6 +98,13 @@ namespace IMS_API
             services.AddTransient<IAdminNotificationService, AdminNotificationService>();
             services.AddTransient<IAdminNotificationDbContext, AdminNotificationDbContext>();
 
+            services.AddTransient<IAuditLogsDbContext, AuditLogDbContext>();
+            services.EnableSimpleProxy(p => p.AddInterceptor<AuditAttribute, AuditInterceptor>());
+            services.AddTransientWithProxy<IItemService, ItemService>();
+            services.AddTransientWithProxy<IShelfService, ShelfService>();
+            services.AddTransientWithProxy<IEmployeeService, EmployeeService>();
+            services.AddTransientWithProxy<IUserService, UserService>();
+            services.AddTransientWithProxy<IOrderService, OrderService>();
         }
         public TokenValidationParameters CreateTokenValidationParameters()
         {
