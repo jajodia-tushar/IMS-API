@@ -147,7 +147,13 @@ namespace IMS.Core.services
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 if (await _tokenProvider.IsValidToken(token))
                 {
-                    if(pageNumber<=0||pageSize<=0)
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    if (pageNumber < 0 || pageSize < 0)
+                    {
+                        employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                    }
+                    if (pageNumber==0||pageSize==0)
                     {
                         pageNumber = 1;
                         pageSize = 10;
@@ -183,6 +189,7 @@ namespace IMS.Core.services
             }
             catch (Exception exception)
             {
+                employeeResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "GetEmployees", IMS.Entities.Severity.Critical, "GetEmployees", employeeResponse); }).Start();
             }
             finally
