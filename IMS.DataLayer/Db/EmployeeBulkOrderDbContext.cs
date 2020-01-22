@@ -61,11 +61,11 @@ namespace IMS.DataLayer.Db
             {
                 EmployeeId = reader["EmployeeId"].ToString() ,
                 FirstName = reader["FirstName"].ToString() ,
-                LastName = reader["LastName"].ToString() ,
+                LastName = reader["LastName"]?.ToString() ,
                 Email = reader["Email"].ToString() ,
-                ContactNumber = reader["ContactNumber"].ToString() ,
-                TemporaryCardNumber = reader["TemporaryCardNumber"].ToString() ,
-                AccessCardNumber = reader["AccessCardNumber"].ToString() ,
+                ContactNumber = reader["ContactNumber"]?.ToString() ,
+                TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString() ,
+                AccessCardNumber = reader["AccessCardNumber"]?.ToString() ,
                 EmployeeStatus = (bool)reader["EmployeeStatus"] ,
                 BulkOrderId = (int)reader["BulkOrderId"] ,
                 CreatedOn = (DateTime)reader["CreatedOn"],
@@ -77,7 +77,7 @@ namespace IMS.DataLayer.Db
                 ItemQuantity = (int)reader["ItemQuantity"] ,
                 ItemIsActive = (bool)reader["ItemIsActive"] ,
                 ItemMaxLimit = (int)reader["ItemMaxLimit"] ,
-                ItemImageUrl = reader["ItemImageUrl"].ToString() ,
+                ItemImageUrl = reader["ItemImageUrl"]?.ToString() ,
 
             };
         }

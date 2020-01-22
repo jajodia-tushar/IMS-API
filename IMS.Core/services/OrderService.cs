@@ -557,10 +557,8 @@ namespace IMS.Core.services
                 TotalResults = 0
             };
             EmployeeBulkOrdersResponse employeeBulkOrdersResponse = new EmployeeBulkOrdersResponse() {
-                Error = new Error(),
                 Status = Status.Failure,
-                PagingInfo = pageInfo,
-                EmployeeBulkOrders = new List<EmployeeBulkOrder>()
+                PagingInfo = pageInfo
             };
             int userId = -1;
             
@@ -575,30 +573,40 @@ namespace IMS.Core.services
                 if (!isValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 userId = Utility.GetUserFromToken(token).Id;
-                if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
-                {
-                    employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
-                    return employeeBulkOrdersResponse;
-                }
-                if (currentPageNumber <= 0 || currentPageSize <= 0)
-                {
-                    employeeBulkOrdersResponse.Status = Status.Failure;
-                    employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
-                    return employeeBulkOrdersResponse;
-                }
-                Tuple<int,List<EmployeeBulkOrder>> bulkOrdersResultFromDb = await _employeeBulkOrderDbContext.GetAllEmployeeBulkOrders(currentPageNumber, currentPageSize, startDate, endDate);
-                var bulkOrders = bulkOrdersResultFromDb.Item2;
-                if (bulkOrders.Count > 0)
-                {
-                    pageInfo.TotalResults = bulkOrdersResultFromDb.Item1;
-                    employeeBulkOrdersResponse.Status = Status.Success;
-                    employeeBulkOrdersResponse.EmployeeBulkOrders = bulkOrders;
 
-                    return employeeBulkOrdersResponse;
-                }
-                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoOrdersYet);
-                return employeeBulkOrdersResponse;
+                if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
+                    throw new InvalidDateFormatException(Constants.ErrorMessages.InvalidDate);
+                if (currentPageNumber <= 0 || currentPageSize <= 0)
+                    throw new InvalidPagingInfo(Constants.ErrorMessages.InvalidPagingDetails);
+
+                Tuple<int,List<EmployeeBulkOrder>> bulkOrdersResultFromDb = await _employeeBulkOrderDbContext.GetAllEmployeeBulkOrders(currentPageNumber, currentPageSize, startDate, endDate);
+                if (bulkOrdersResultFromDb.Item2.Count < 0)
+                    throw new RecordsNotFoundException(Constants.ErrorMessages.RecordNotFound);
                 
+                pageInfo.TotalResults = bulkOrdersResultFromDb.Item1;
+                employeeBulkOrdersResponse.Status = Status.Success;
+                employeeBulkOrdersResponse.EmployeeBulkOrders = bulkOrdersResultFromDb.Item2;
+                
+            }
+            catch (InvalidDateFormatException exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
+            }
+            catch (RecordsNotFoundException exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoOrdersYet);
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
+            }
+            catch (InvalidPagingInfo exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
+            }
+            catch (InvalidTokenException exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical, "GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
             }
             catch (Exception exception)
             {
