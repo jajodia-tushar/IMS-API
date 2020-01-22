@@ -323,6 +323,33 @@ namespace IMS_API.Controllers
         {
             throw new NotImplementedException();
         }
+
+        [HttpGet("EmployeeBulkOrders", Name = "GetEmployeeBulkOrder")]
+        public async Task<EmployeeBulkOrdersResponse> GetAllEmployeeBulkOrders(int? pageNumber = null, int? pageSize = null, string fromDate=null, string toDate =null)
+        {            
+            EmployeeBulkOrdersResponse contractsBulkOrdersResponse = null;
+            try
+            {                
+                IMS.Entities.EmployeeBulkOrdersResponse entitiesResponse = await _orderService.GetEmployeeBulkOrders(pageNumber, pageSize, fromDate, toDate);
+                contractsBulkOrdersResponse = EmployeeBulkOrderTranslator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception e)
+            {
+
+                contractsBulkOrdersResponse = new EmployeeBulkOrdersResponse
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "GetAllEmployeeBulkOrders", IMS.Entities.Severity.Critical,"GET /EmployeeBulkOrders", contractsBulkOrdersResponse); }).Start();
+            }
+
+            return contractsBulkOrdersResponse;
+        }
         
     }
 }

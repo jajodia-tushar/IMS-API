@@ -545,5 +545,75 @@ namespace IMS.Core.services
                 return vendorOrderResponse;
             }
         }
+
+        public async Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrders(int? pageNumber, int? pageSize, string fromDate, string toDate)
+         {
+            int currentPageNumber = pageNumber ?? 1;
+            int currentPageSize = pageSize ?? 10;
+            var pageInfo = new PagingInfo()
+            {
+                PageNumber = currentPageNumber,
+                PageSize = currentPageSize,
+                TotalResults = 0
+            };
+            EmployeeBulkOrdersResponse employeeBulkOrdersResponse = new EmployeeBulkOrdersResponse() {
+                Error = new Error(),
+                Status = Status.Failure,
+                PagingInfo = pageInfo,
+                EmployeeBulkOrders = new List<EmployeeBulkOrder>()
+            };
+            int userId = -1;
+            
+            try
+            {
+
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                bool isValidToken = await _tokenProvider.IsValidToken(token);
+                if (!isValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                userId = Utility.GetUserFromToken(token).Id;
+                if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
+                {
+                    employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
+                    return employeeBulkOrdersResponse;
+                }
+                if (currentPageNumber <= 0 || currentPageSize <= 0)
+                {
+                    employeeBulkOrdersResponse.Status = Status.Failure;
+                    employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                    return employeeBulkOrdersResponse;
+                }
+                Tuple<int,List<EmployeeBulkOrder>> bulkOrdersResultFromDb = await _employeeBulkOrderDbContext.GetAllEmployeeBulkOrders(currentPageNumber, currentPageSize, startDate, endDate);
+                var bulkOrders = bulkOrdersResultFromDb.Item2;
+                if (bulkOrders.Count > 0)
+                {
+                    pageInfo.TotalResults = bulkOrdersResultFromDb.Item1;
+                    employeeBulkOrdersResponse.Status = Status.Success;
+                    employeeBulkOrdersResponse.EmployeeBulkOrders = bulkOrders;
+
+                    return employeeBulkOrdersResponse;
+                }
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.NoOrdersYet);
+                return employeeBulkOrdersResponse;
+                
+            }
+            catch (Exception exception)
+            {
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", IMS.Entities.Severity.Critical,"GET EmployeeBulkOrders/", employeeBulkOrdersResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (employeeBulkOrdersResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log("GET EmployeeBulkOrders/", employeeBulkOrdersResponse, "GetEmployeeBulkOrders", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
+            }
+            return employeeBulkOrdersResponse;
+        }
+
+
     }
 }
