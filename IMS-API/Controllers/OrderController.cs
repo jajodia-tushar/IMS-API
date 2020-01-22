@@ -258,18 +258,18 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns Success status  if Vendororder is approved otherwise it returns Error and status failure</response>
         // PUT: api/order/VendorOrders/PendingApprovals
         [HttpPut("VendorOrders/PendingApprovals", Name = "ApproveVendorOrder")]
-        public async Task<Response> ApproveVendorOrder([FromBody] VendorOrder vendorOrder)
+        public async Task<VendorOrderResponse> ApproveVendorOrder([FromBody] VendorOrder vendorOrder)
         {
-            Response contractsResponse = null;
+            var vendorOrderResponse = new VendorOrderResponse();
             try
             {
                 IMS.Entities.VendorOrder entitiesVendorOrder = VendorOrderTranslator.ToEntitiesObject(vendorOrder);
-                IMS.Entities.Response entitiesResponse = await _orderService.ApproveVendorOrder(entitiesVendorOrder);
-                contractsResponse = Translator.ToDataContractsObject(entitiesResponse);
+                IMS.Entities.VendorOrderResponse entitiesVendorOrderResponse = await _orderService.ApproveVendorOrder(entitiesVendorOrder);
+                vendorOrderResponse = VendorOrderTranslator.ToDataContractsObject(entitiesVendorOrderResponse);
             }
             catch (Exception e)
             {
-                contractsResponse = new Response
+                vendorOrderResponse = new VendorOrderResponse
                 {
                     Status = Status.Failure,
                     Error = new Error
@@ -278,12 +278,10 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", IMS.Entities.Severity.Critical, vendorOrder, contractsResponse); }).Start();
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", IMS.Entities.Severity.Critical, vendorOrder, vendorOrderResponse); }).Start();
 
             }
-
-            return contractsResponse;
-
+            return vendorOrderResponse;
         }
         /// <summary>
         /// Retrieves VendorOrder using orderId

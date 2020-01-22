@@ -465,7 +465,6 @@ namespace IMS.DataLayer.Db
         public async Task<bool> CheckUserEditedOrderBefore(int userId, int orderId)
         {
             DbDataReader reader = null;
-            var userEntryExists = false;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -477,18 +476,13 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@orderId", orderId);
                     command.Parameters.AddWithValue("@userId", userId);
                     reader = await command.ExecuteReaderAsync();
-                    if(reader.Read())
-                    {
-                        userEntryExists = true;
-                        return userEntryExists;
-                    }
+                    return reader.Read();
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
             }
-            return userEntryExists;
         }
     }
 }

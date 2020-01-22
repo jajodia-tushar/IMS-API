@@ -394,10 +394,10 @@ namespace IMS.Core.services
                 itemQtyPrice.TotalPrice = Math.Round(itemQtyPrice.Item.Rate * itemQtyPrice.Quantity, 2);
         }
 
-        public async Task<Response> ApproveVendorOrder(VendorOrder vendorOrder)
+        public async Task<VendorOrderResponse> ApproveVendorOrder(VendorOrder vendorOrder)
         {
-            var response = new Response();
-            response.Status = Status.Failure;
+            var vendorOrderResponse = new VendorOrderResponse();
+            vendorOrderResponse.Status = Status.Failure;
             int userId = -1;
             try
             {
@@ -410,27 +410,34 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                response =  await RestrictOrderApproval(vendorOrder, user);
+                var response =  await RestrictOrderApproval(vendorOrder, user);
+                if (response.Status.Equals(Status.Success))
+                {
+                    vendorOrderResponse = await GetVendorOrderByOrderId(vendorOrder.VendorOrderDetails.OrderId);
+                    return vendorOrderResponse;
+                }
+                vendorOrderResponse.Status = response.Status;
+                vendorOrderResponse.Error = response.Error;
             }
             catch (CustomException e)
             {
 
-                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+                vendorOrderResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, vendorOrderResponse); }).Start();
             }
             catch (Exception e)
             {
-                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+                vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, vendorOrderResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (response.Status == Status.Failure)
+                if (vendorOrderResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(vendorOrder, response, "Approving vendor order", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(vendorOrder, vendorOrderResponse, "ApproveVendorOrder", vendorOrderResponse.Status, severity, userId); }).Start();
             }
-            return response;
+            return vendorOrderResponse;
         }
 
         private async Task<Response> RestrictOrderApproval(VendorOrder vendorOrder, User user)
