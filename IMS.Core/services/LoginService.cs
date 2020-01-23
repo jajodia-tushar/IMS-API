@@ -152,29 +152,23 @@ namespace IMS.Core.services
             int requestedUserId = -1;
             try
             {
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User requestedUser = Utility.GetUserFromToken(token);
+                User requestedUser = request.User;
                 requestedUserId = requestedUser.Id;
                 User user = await _userDbContext.GetUserById(userId);
                 var newHashPassword = Utility.Hash(newPassword);
                 if (user != null)
                 {
-                    if (user.Password != newHashPassword)
+                    if (await IsOldPasswordRepeatAgain(userId,newPassword))
                     {
                         try
                         {
                             Validators.UserValidator.CheckPasswordFormat(newPassword);
                             
-                            if (await _userDbContext.UpdateUserPassword(userId, newHashPassword))
-                            {
-                                response.Status = Status.Success;
-                            }
+                            if (await _userDbContext.UpdateUserPassword(userId, newHashPassword,newPassword))
+                                    response.Status = Status.Success;
                             else
                                 throw new Exception();
                         }
@@ -213,6 +207,16 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(userId+";"+newPassword, response, "UpdateUserPassword", response.Status, severity,requestedUserId); }).Start();
             }
             return response;
+        }
+
+        private async Task<bool> IsOldPasswordRepeatAgain(int userId, string newPassword)
+        {
+            string oldPassword = await _userDbContext.GetOldPassword(userId);
+            if(oldPassword == null)
+                return true;
+            else if (oldPassword.Contains(newPassword) )
+                return false;
+            return true;
         }
     }
 }

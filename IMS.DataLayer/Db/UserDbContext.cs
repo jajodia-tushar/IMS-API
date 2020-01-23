@@ -432,7 +432,7 @@ namespace IMS.DataLayer.Dal
             return isRepeated;
         }
 
-        public async Task<bool> UpdateUserPassword(int userId, string newPassword)
+        public async Task<bool> UpdateUserPassword(int userId, string newHashPassword,string newPassword)
         {
             using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
@@ -444,7 +444,8 @@ namespace IMS.DataLayer.Dal
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spUpdateUserPassword";
                     command.Parameters.AddWithValue("@userid", userId);
-                    command.Parameters.AddWithValue("@newpassword",newPassword);
+                    command.Parameters.AddWithValue("@newpassword",newHashPassword);
+                    command.Parameters.AddWithValue("@oldpassword", newPassword);
                     int retValue = await command.ExecuteNonQueryAsync();
                     if(retValue == 1)
                     {
@@ -457,6 +458,28 @@ namespace IMS.DataLayer.Dal
                 }
                 return false;
             }
+        }
+        public async Task<string> GetOldPassword(int userId)
+        {
+            string oldPassword;
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetOldPasswordByUserId";
+                    command.Parameters.AddWithValue("@userid", userId);
+                    oldPassword = (string) await command.ExecuteScalarAsync(); 
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+                return oldPassword;
+            }
+           
         }
     }
 }

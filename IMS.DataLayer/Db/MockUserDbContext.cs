@@ -57,6 +57,11 @@ namespace IMS.DataLayer.Dal
 
             };
 
+        public Task<bool> AddNewPasswordAsOldPassword(int userId, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<User> ApproveAdmin(int userId)
         {
             throw new NotImplementedException();
@@ -91,6 +96,11 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
+        public Task<string> GetOldPassword(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public User GetUserByCredintials(string username, string password)
         {
             throw new NotImplementedException();
@@ -117,6 +127,11 @@ namespace IMS.DataLayer.Dal
         }
 
         public Task<bool> UpdateUserPassword(int userId, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateUserPassword(int userId, string newHashPassword, string newPassword)
         {
             throw new NotImplementedException();
         }
