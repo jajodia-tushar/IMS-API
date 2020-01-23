@@ -15,7 +15,6 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,SuperAdmin,Clerk")]
     public class ItemController : ControllerBase
     {
         private IItemService _itemService;
