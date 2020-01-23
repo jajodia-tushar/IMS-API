@@ -236,12 +236,12 @@ namespace IMS_API.Controllers
         /// <response code="200">Returns List Of Date With Item Quantity Mapping Within Date Range if Input is valid otherwise it returns status failure</response>
         [Route("GetItemConsumptionReports")]
         [HttpGet]
-        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(string fromDate, string toDate)
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReport(int pageNumber, int pageSize,string fromDate, string toDate)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = null;
             try
             {
-                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(fromDate, toDate);
+                IMS.Entities.DateWiseItemsConsumption dateWiseItemsConsumptionEntity = await _reportsService.GetItemConsumptionReports(pageNumber,pageSize,fromDate, toDate);
                 dateWiseItemsConsumption = ReportsTranslator.ToDataContractsObject(dateWiseItemsConsumptionEntity);
             }
             catch (Exception exception)

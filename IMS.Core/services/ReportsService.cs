@@ -538,7 +538,7 @@ namespace IMS.Core.services
             return dtoItemsAvailabilityResponse;
         }
 
-        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(string fromDate, string toDate)
+        public async Task<DateWiseItemsConsumption> GetItemConsumptionReports(int pageNumber, int pageSize,string fromDate, string toDate)
         {
             DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
             int userId = -1;
@@ -551,9 +551,23 @@ namespace IMS.Core.services
                     userId = user.Id;
                     if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate) && ReportsValidator.ValidateDate(fromDate, toDate))
                     {
-                        dateWiseItemsConsumption = await _reportsDbContext.GetItemsConsumptionReports(fromDate, toDate);
+                        if(pageNumber<0||pageSize<0)
+                        {
+                            dateWiseItemsConsumption.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                            return dateWiseItemsConsumption;
+                        }
+                        if(pageNumber==0||pageSize==0)
+                        {
+                            pageSize = 10;
+                            pageNumber = 1;
+                        }
+                        int limit = pageSize;
+                        int offset = (pageNumber - 1) * pageSize;
+                        dateWiseItemsConsumption = await _reportsDbContext.GetItemsConsumptionReports(limit,offset, fromDate, toDate);
                         if (dateWiseItemsConsumption.DateItemMapping != null)
                         {
+                            dateWiseItemsConsumption.PagingInfo.PageNumber = pageNumber;
+                            dateWiseItemsConsumption.PagingInfo.PageSize = pageSize;
                             dateWiseItemsConsumption.Status = Status.Success;
                         }
                         else

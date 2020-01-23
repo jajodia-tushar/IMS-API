@@ -7,5 +7,7 @@ namespace IMS.Contracts
     public class ItemsConsumptionReport:Response
     {
         public List<DateItemConsumption> ItemConsumptions { get; set; }
+        public PagingInfo PagingInfo { get; set; }
+
     }
 }
