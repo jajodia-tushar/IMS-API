@@ -178,6 +178,7 @@ namespace IMS.Core.services
             EmployeeOrderResponse placeEmployeeOrderResponse = new EmployeeOrderResponse();
             placeEmployeeOrderResponse.Error = new Error() { };
             placeEmployeeOrderResponse.Status = Status.Failure;
+            placeEmployeeOrderResponse.EmployeeOrders = new List<EmployeeOrder>();
             if (EmployeeOrderValidator.ValidateEmployeeOrder(employeeOrder) == false)
             {
                 placeEmployeeOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.MissingValues);
