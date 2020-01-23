@@ -63,6 +63,15 @@ namespace IMS.DataLayer.Db
         {
             throw new NotImplementedException();
         }
+        public Task<bool> CheckEmployeeIdAvailability(string employeeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> CreateEmployee(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<bool> Delete(string employeeId, bool isHardDelete)
         {
