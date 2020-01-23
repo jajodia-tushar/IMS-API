@@ -218,5 +218,36 @@ namespace IMS.DataLayer.Db
         {
             return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.QuantityOrdered));
         }
+
+        public async Task<EmployeeBulkOrder> GetOrderById(int orderId)
+        {
+            DbDataReader reader = null;
+            EmployeeBulkOrder order = null;
+            List<EmployeeBulkOrderDto> employeeBulkOrdersDto = new List<EmployeeBulkOrderDto>();
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetBulkOrderById";
+                    command.Parameters.AddWithValue("@orderid", orderId);
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        employeeBulkOrdersDto.Add(ReadValuesFromDbReader(reader));
+                    }
+                    if (employeeBulkOrdersDto.Count != 0)
+                        order = DtoToEntitiesBulkOrders(employeeBulkOrdersDto)[0];
+                }
+                catch(MySqlException e)
+                {
+                    throw e;
+                }
+            }
+            return order;
+        }
     }
 }

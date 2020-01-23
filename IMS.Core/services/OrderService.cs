@@ -649,5 +649,56 @@ namespace IMS.Core.services
             return response;
 
         }
+
+        public async Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrderById(int orderId)
+        {
+            
+            EmployeeBulkOrdersResponse employeeBulkOrdersResponse = new EmployeeBulkOrdersResponse()
+            {
+                Status = Status.Failure,
+            };
+            int userId = -1;
+
+            try
+            {
+
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                userId = request.User.Id;
+                if (orderId<=0)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
+                EmployeeBulkOrder order = await _employeeBulkOrderDbContext.GetOrderById(orderId);
+                if (order != null)
+                {
+                    employeeBulkOrdersResponse.EmployeeBulkOrders = new List<EmployeeBulkOrder>();
+                    employeeBulkOrdersResponse.EmployeeBulkOrders.Add(order);
+                    employeeBulkOrdersResponse.Status = Status.Success;
+                }
+                else
+                    employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotFound);
+                                    
+
+            }
+            catch (CustomException exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
+            }
+
+            catch (Exception exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (employeeBulkOrdersResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(orderId, employeeBulkOrdersResponse, "GetEmployeeBulkOrders", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
+            }
+            return employeeBulkOrdersResponse;
+        }
     }
 }
