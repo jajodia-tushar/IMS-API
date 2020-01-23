@@ -19,6 +19,30 @@
             <returns>Details of Employees</returns>
             <response code="200">Returns Employee Details of employees with status</response>
         </member>
+        <member name="M:IMS_API.Controllers.EmployeeController.Add(IMS.Contracts.Employee)">
+            <summary>
+            Creates A New Employee
+            </summary>
+            <param name="employee"></param>
+            <returns>Returns newly created Employee Data</returns>
+            <response code="200">Returns Employee if Employee is added successfully otherwise it returns null with status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.EmployeeController.Update(IMS.Contracts.Employee)">
+            <summary>
+            Update the Specific Employee
+            </summary>
+            <param name="employee"></param>
+            <returns>Returns updated employee data</returns>
+            <response code="200">Returns updated Employee data if employee is updated successfully otherwise it returns null with status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.EmployeeController.Delete(System.String,System.Boolean)">
+            <summary>
+            SoftDelete or HardDelete the specific Employee
+            </summary>
+            <param name="id">Id of that employee</param>
+            <param name="isHardDelete">Boolean value for hard delete or soft delete</param>
+            <response code="200">Returns Succeess if that employee is deleted successfully otherwise it returns null with status failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.InventoryController.Get(System.String)">
             <summary>
             Retrieve Shelf Items and Shelf Details by Shelf Code

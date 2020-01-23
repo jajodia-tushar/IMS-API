@@ -46,33 +46,40 @@ namespace IMS.DataLayer.Db
                }
             };
 
-        public Task<bool> CreateEmployee(Employee employee)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Employee>> GetAllEmployees()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Employee> GetEmployeeById(string employeeId)
-        {
-            throw new NotImplementedException();
-        }
-       
+        
 
         public Task<bool> CheckEmpEmailAvailability(string email)
         {
             throw new NotImplementedException();
         }
 
-        public Task<EmployeeResponse> GetAllEmployees(string employeeId, string employeeName, int limit, int offset)
+
+        public Task<EmployeeResponse> GetAllEmployees(string filter, int limit, int offset)
         {
             throw new NotImplementedException();
         }
 
-        public Task<EmployeeResponse> GetAllEmployees(string filter, int limit, int offset)
+        Task<string> IEmployeeDbContext.CreateEmployee(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Delete(string employeeId, bool isHardDelete)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Employee> Update(Employee updatedEmployee)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> EmployeeDetailsRepetitionCheck(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Employee> GetEmployeeById(string employeeId)
         {
             throw new NotImplementedException();
         }
