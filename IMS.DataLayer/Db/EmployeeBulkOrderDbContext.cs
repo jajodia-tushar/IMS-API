@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
@@ -174,6 +175,46 @@ namespace IMS.DataLayer.Db
                 MaxLimit = bulkOrderDto.ItemMaxLimit,
                 ImageUrl = bulkOrderDto.ItemImageUrl
             };
+        }
+        public async Task<bool> SaveOrder(EmployeeBulkOrder employeeBulkOrder)
+        {
+            DbDataReader reader = null;
+            bool isSaved = false;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddEmployeeBulkOrder";
+                    command.Parameters.AddWithValue("@employeeid", employeeBulkOrder.Employee.Id);
+                    command.Parameters.AddWithValue("@requirementdate", employeeBulkOrder.EmployeeBulkOrderDetails.RequirementDate);
+                    command.Parameters.AddWithValue("@reasonforrequirement", employeeBulkOrder.EmployeeBulkOrderDetails.ReasonForRequirement);
+                    string listOfItemIdQuantityPrice = ConvertToString(employeeBulkOrder.EmployeeBulkOrderDetails.EmployeeItemsQuantityList);
+                    command.Parameters.AddWithValue("@listof_itemid_qty", listOfItemIdQuantityPrice);
+                    reader = await command.ExecuteReaderAsync();
+                    int generatedOrderId = 0;
+                    if (reader.Read())
+                    {
+                        generatedOrderId = Convert.ToInt32(reader["generatedorderid"]);
+                        isSaved = true;
+                        employeeBulkOrder.BulkOrderId = generatedOrderId;
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    if (e.Number == (int)MySqlErrorCode.NoReferencedRow2)
+                        return isSaved;
+                    throw e;
+                }
+                return isSaved;
+            }
+        }
+        private static string ConvertToString(List<ItemQuantityMapping> orderItemDetails)
+        {
+            return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.Quantity));
         }
     }
 }

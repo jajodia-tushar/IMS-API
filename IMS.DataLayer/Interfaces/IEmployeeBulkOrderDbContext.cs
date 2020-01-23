@@ -9,5 +9,6 @@ namespace IMS.DataLayer.Interfaces
     public interface IEmployeeBulkOrderDbContext
     {
         Task<Tuple<int,List<EmployeeBulkOrder>>> GetAllEmployeeBulkOrders(int pageNumber, int pageSize,DateTime fromDate, DateTime endDate);
+        Task<bool> SaveOrder(EmployeeBulkOrder employeeBulkOrder);
     }
 }

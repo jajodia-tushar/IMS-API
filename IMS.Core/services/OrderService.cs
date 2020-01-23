@@ -606,5 +606,48 @@ namespace IMS.Core.services
         }
 
 
+        public async Task<EmployeeBulkOrdersResponse> PlaceEmployeeBulkOrder(EmployeeBulkOrder employeeBulkOrder)
+        {
+            EmployeeBulkOrdersResponse response = new EmployeeBulkOrdersResponse
+            {
+                Status = Status.Failure
+            };          
+            try
+            {
+                if (!EmployeeBulkOrderValidator.Validate(employeeBulkOrder))
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrder);
+                bool isOrderSaved = await _employeeBulkOrderDbContext.SaveOrder(employeeBulkOrder);
+                if (!isOrderSaved)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrder);
+                response.Status = Status.Success;
+                response.EmployeeBulkOrders = new List<EmployeeBulkOrder>();
+                response.EmployeeBulkOrders.Add(employeeBulkOrder);
+            }
+            catch (CustomException e)
+            {
+
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "PlaceEmployeeBulkOrder", Severity.Critical, employeeBulkOrder, response); }).Start();
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "PlaceEmployeeBulkOrder", Severity.Critical, employeeBulkOrder, response); }).Start();
+
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(employeeBulkOrder, response, "PlaceEmployeeBulkOrder", response.Status, severity, -1); }).Start();
+                if (response.Status == Status.Success)
+                {
+                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(employeeBulkOrder,BulkOrderRequestStatus.Pending); }).Start();
+                }
+            }
+            return response;
+
+        }
     }
 }

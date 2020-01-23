@@ -18,5 +18,6 @@ namespace IMS.Entities.Interfaces
         Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate);
         Task<VendorOrderResponse> GetVendorOrderByOrderId(int orderId);
         Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrders(int? pageNumber, int? pageSize, string fromDate, string toDate);
+        Task<EmployeeBulkOrdersResponse> PlaceEmployeeBulkOrder(EmployeeBulkOrder employeeBulkOrder);
     }
 }
