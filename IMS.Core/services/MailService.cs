@@ -70,7 +70,7 @@ namespace IMS.Core.services
                     <section style='margin-top: 40px;'>
                         <div class='container' style='width: 80%; margin-left: 10%;'>";
             emailBody += "<h2 style='margin-bottom: 10px;'>Hello, &nbsp" + name + "&nbsp</h2>";
-            emailBody += "<h4 style='margin: 0px;'>You have placed bulk order of &nbsp" + orderDetails.EmployeeItemsQuantityList.Count + "&nbsp items</h4><br>";
+            emailBody += "<h4 style='margin: 0px;'>You have placed bulk order of &nbsp" + orderDetails.ItemsQuantityList.Count + "&nbsp items</h4><br>";
             emailBody += "<h4 style='margin: 0px;'>Order Status:&nbsp" +orderStatus.ToString() + "&nbsp</h4><br>";
             emailBody += "<h4 style='margin: 0px;'>Reason For Requirement :&nbsp" + orderDetails.ReasonForRequirement + "&nbsp</h4><br>";
             emailBody += "<h4 style='margin: 0px;'>Requirement Date :&nbsp" + orderDetails.RequirementDate.ToString() + "&nbsp</h4><br>";
@@ -80,12 +80,12 @@ namespace IMS.Core.services
                                 <table style='border-collapse: collapse; border: 1px solid #d4c7c7; width: 100%;'>
                                     <tr>
                                         <th style='border: 1px solid #d4c7c7; padding: 15px;'>Item name</th>
-                                        <th style='border: 1px solid #d4c7c7; padding: 15px;'>Quantity</th>
+                                        <th style='border: 1px solid #d4c7c7; padding: 15px;'>Quantity Ordered</th>
                                     </tr>";
-            foreach (var employeeItemQuantity in orderDetails.EmployeeItemsQuantityList)
+            foreach (var employeeItemQuantity in orderDetails.ItemsQuantityList)
             {
                 emailBody += ("<tr><td style='border: 1px solid #d4c7c7; padding: 15px; text-align: center;'>" + employeeItemQuantity.Item.Name + "</td>");
-                emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>" + employeeItemQuantity.Quantity + "</td></tr>");
+                emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>" + employeeItemQuantity.QuantityOrdered + "</td></tr>");
             }
 
             emailBody += @"</table>

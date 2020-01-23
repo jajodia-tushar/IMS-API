@@ -16,29 +16,29 @@ namespace IMS.Core.Validators
             if (employee == null || string.IsNullOrEmpty(employee.Id))
                 return false;
             var orderDetails= employeeBulkOrder.EmployeeBulkOrderDetails;
-            if (orderDetails == null || string.IsNullOrEmpty(orderDetails.ReasonForRequirement)|| orderDetails.EmployeeItemsQuantityList == null)
+            if (orderDetails == null || string.IsNullOrEmpty(orderDetails.ReasonForRequirement)|| orderDetails.ItemsQuantityList == null)
                 return false;
             DateTime date = DateTime.Now.AddDays(2);
             DateTime minTime=new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, 0);
             if (orderDetails.RequirementDate < minTime)
                 throw new InvalidDateFormatException(Constants.ErrorMessages.InvalidBulkRequestDate);
-            var itemQuantityList = orderDetails.EmployeeItemsQuantityList;
-            if (!Validate(itemQuantityList))
+            var itemQuantityList = orderDetails.ItemsQuantityList;
+            if (!ValidatePlacedItems(itemQuantityList))
                 return false;
             return true; 
         }
-        public static bool Validate(List<ItemQuantityMapping> itemQuantityList)
+        public static bool ValidatePlacedItems(List<BulkOrderItemQuantityMapping> itemQuantityList)
         {
             if (itemQuantityList == null || itemQuantityList.Count == 0)
                 return false;
             foreach(var itemQuantityMapping in itemQuantityList)          
-                if (!Validate(itemQuantityMapping))
+                if (!ValidatePlacedItem(itemQuantityMapping))
                     return false;          
             return true;
         }
-        public static bool Validate(ItemQuantityMapping itemQuantityMapping)
+        public static bool ValidatePlacedItem(BulkOrderItemQuantityMapping itemQuantityMapping)
         {
-            if (itemQuantityMapping.Item == null || itemQuantityMapping.Item.Id <= 0 || itemQuantityMapping.Quantity <= 0)
+            if (itemQuantityMapping.Item == null || itemQuantityMapping.Item.Id <= 0 || itemQuantityMapping.QuantityOrdered <= 0)
                 return false;
             return true;
         }
