@@ -23,7 +23,8 @@ namespace IMS.DataLayer.Dto
         public int ItemId { get; set; }
         public string ItemName { get; set; }
         public bool ItemStatus { get; set; }
-        public int ItemQuantity { get; set; }
+        public int ItemQuantityOrdered { get; set; }
+        public int ItemQuantityUsed { get; set; }
         public bool ItemIsActive { get; set; }
         public int ItemMaxLimit { get; set; }
         public string ItemImageUrl { get; set; }
