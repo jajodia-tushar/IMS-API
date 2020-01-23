@@ -27,7 +27,7 @@ namespace IMS_API.Controllers
             var notificationResponse = new NotificationResponse();
             try
             {
-                var doNotificationResponse = await _adminNotificationService.GetAdminNotifications();
+                var doNotificationResponse = await _adminNotificationService.GetAdminNotificationsAsync();
                 notificationResponse = NotificationTranslator.ToDataContractObject(doNotificationResponse);
             }
             catch(Exception exception)
