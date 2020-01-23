@@ -1,4 +1,5 @@
 ﻿using IMS.Entities;
+using IMS.Entities.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,8 +16,12 @@ namespace IMS.Core.Validators
             if (employee == null || string.IsNullOrEmpty(employee.Id))
                 return false;
             var orderDetails= employeeBulkOrder.EmployeeBulkOrderDetails;
-            if (orderDetails == null || string.IsNullOrEmpty(orderDetails.ReasonForRequirement) || orderDetails.RequirementDate < DateTime.Now || orderDetails.EmployeeItemsQuantityList == null)
+            if (orderDetails == null || string.IsNullOrEmpty(orderDetails.ReasonForRequirement)|| orderDetails.EmployeeItemsQuantityList == null)
                 return false;
+            DateTime date = DateTime.Now.AddDays(2);
+            DateTime minTime=new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, 0);
+            if (orderDetails.RequirementDate < minTime)
+                throw new InvalidDateFormatException(Constants.ErrorMessages.InvalidBulkRequestDate);
             var itemQuantityList = orderDetails.EmployeeItemsQuantityList;
             if (!Validate(itemQuantityList))
                 return false;
