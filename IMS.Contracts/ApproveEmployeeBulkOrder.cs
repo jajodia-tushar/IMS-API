@@ -6,6 +6,6 @@ namespace IMS.Contracts
 {
     public class ApproveEmployeeBulkOrder:EmployeeBulkOrder
     {
-        List<ItemLocationQuantityMapping> ItemLocationQuantityMappings { get; set; }
+        public List<ItemLocationQuantityMapping> ItemLocationQuantityMappings { get; set; }
     }
 }

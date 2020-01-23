@@ -6,6 +6,6 @@ namespace IMS.Entities
 {
     public class ApproveEmployeeBulkOrder : EmployeeBulkOrder
     {
-        List<ItemLocationQuantityMapping> ItemLocationQuantityMappings { get; set; }
+        public List<ItemLocationQuantityMapping> ItemLocationQuantityMappings { get; set; }
     }
 }
