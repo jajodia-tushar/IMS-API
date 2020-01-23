@@ -117,5 +117,104 @@ namespace IMS_API.Controllers
             }
             return dtoValidEmailResponse;
         }
+        /// <summary>
+        /// Creates A New Employee
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns>Returns newly created Employee Data</returns>
+        /// <response code="200">Returns Employee if Employee is added successfully otherwise it returns null with status failure</response>
+        [HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<EmployeeResponse> Add([FromBody]  Employee employee)
+        {
+            EmployeeResponse contractEmployeeResponse = null;
+            try
+            {
+                IMS.Entities.Employee entityEmployeeRequest = EmployeeTranslator.ToEntitiesObject(employee);
+                IMS.Entities.EmployeeResponse entityEmployeeResponse = await employeeService.Add(entityEmployeeRequest);
+                contractEmployeeResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeResponse);
+                contractEmployeeResponse.PagingInfo = null;
+            }
+            catch (Exception exception)
+            {
+                contractEmployeeResponse = new IMS.Contracts.EmployeeResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Add", IMS.Entities.Severity.High, employee, contractEmployeeResponse); }).Start();
+            }
+            return contractEmployeeResponse;
+        }
+
+        /// <summary>
+        /// Update the Specific Employee
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns>Returns updated employee data</returns>
+        /// <response code="200">Returns updated Employee data if employee is updated successfully otherwise it returns null with status failure</response>
+        [HttpPut]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<EmployeeResponse> Update([FromBody] Employee employee)
+        {
+            EmployeeResponse contractEmployeeResponse = null;
+            try
+            {
+                IMS.Entities.Employee entityEmployeeRequest = EmployeeTranslator.ToEntitiesObject(employee);
+                IMS.Entities.EmployeeResponse entityEmployeeResponse = await employeeService.Update(entityEmployeeRequest);
+                contractEmployeeResponse = EmployeeTranslator.ToDataContractsObject(entityEmployeeResponse);
+                contractEmployeeResponse.PagingInfo = null;
+            }
+            catch (Exception exception)
+            {
+                contractEmployeeResponse = new IMS.Contracts.EmployeeResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.High, employee, contractEmployeeResponse); }).Start();
+            }
+            return contractEmployeeResponse;
+        }
+
+        /// <summary>
+        /// SoftDelete or HardDelete the specific Employee
+        /// </summary>
+        /// <param name="id">Id of that employee</param>
+        /// <param name="isHardDelete">Boolean value for hard delete or soft delete</param>
+        /// <response code="200">Returns Succeess if that employee is deleted successfully otherwise it returns null with status failure</response>
+        [HttpDelete]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<Response> Delete(string id, bool isHardDelete)
+        {
+            Response contractEmployeeResponse = null;
+            try
+            {
+                IMS.Entities.Response entityEmployeeResponse = await employeeService.Delete(id, isHardDelete);
+                contractEmployeeResponse = Translator.ToDataContractsObject(entityEmployeeResponse);
+            }
+            catch (Exception exception)
+            {
+                contractEmployeeResponse = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Delete", IMS.Entities.Severity.High, id + ";" + isHardDelete, contractEmployeeResponse); }).Start();
+            }
+            return contractEmployeeResponse;
+        }
     }
 }

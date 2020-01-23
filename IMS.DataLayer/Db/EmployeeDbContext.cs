@@ -90,37 +90,6 @@ namespace IMS.DataLayer.Db
                 IsActive = (bool)reader["IsActive"]
             };
         }
-        public async Task<bool> CreateEmployee(Employee employee)
-        {
-            bool isSuccess = false;
-            using (var connection =await  _dbConnectionProvider.GetConnection(Databases.IMS))
-            {
-                try
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spAddEmployee";
-                    command.Parameters.AddWithValue("@Id", employee.Id);
-                    command.Parameters.AddWithValue("@FirstName", employee.Firstname);
-                    command.Parameters.AddWithValue("@LastName", employee.Lastname);
-                    command.Parameters.AddWithValue("@EmailId", employee.Email);
-                    command.Parameters.AddWithValue("@MobileNumber", employee.ContactNumber);
-                    command.Parameters.AddWithValue("@TemporaryCardNumber", employee.TemporaryCardNumber);
-                    command.Parameters.AddWithValue("@AccessCardNumber", employee.AccessCardNumber);
-                    command.Parameters.AddWithValue("@IsActive", employee.IsActive);
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-                    if (rowsAffected > 0)
-                        isSuccess = true;
-                }
-                catch (Exception exception)
-                {
-                    throw exception;
-                }
-            }
-            return isSuccess;
-        }
-
         public async Task<bool> CheckEmpEmailAvailability(string email)
         {
             bool emailIdAlreadypresent = false;
@@ -148,6 +117,121 @@ namespace IMS.DataLayer.Db
                 }
             }
             return emailIdAlreadypresent;
+        }
+        public async Task<string> CreateEmployee(Employee employee)
+        {
+            DbDataReader reader = null;
+            string latestCreatedEmployeeId = null;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spAddEmployee";
+                    command.Parameters.AddWithValue("@Id", employee.Id);
+                    command.Parameters.AddWithValue("@FirstName", employee.Firstname);
+                    command.Parameters.AddWithValue("@LastName", employee.Lastname);
+                    command.Parameters.AddWithValue("@EmailId", employee.Email);
+                    command.Parameters.AddWithValue("@MobileNumber", employee.ContactNumber);
+                    command.Parameters.AddWithValue("@TemporaryCardNumber", employee.TemporaryCardNumber);
+                    command.Parameters.AddWithValue("@AccessCardNumber", employee.AccessCardNumber);
+                    command.Parameters.AddWithValue("@IsActive", employee.IsActive);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                        latestCreatedEmployeeId = (string)reader["Id"];
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return latestCreatedEmployeeId;
+        }
+        public async Task<Employee> Update(Employee updatedEmployee)
+        {
+            DbDataReader reader = null;
+            Employee employee = new Employee();
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spUpdateEmployee";
+                    command.Parameters.AddWithValue("@Id", updatedEmployee.Id);
+                    command.Parameters.AddWithValue("@FirstName", updatedEmployee.Firstname);
+                    command.Parameters.AddWithValue("@LastName", updatedEmployee.Lastname);
+                    command.Parameters.AddWithValue("@EmailId", updatedEmployee.Email);
+                    command.Parameters.AddWithValue("@MobileNumber", updatedEmployee.ContactNumber);
+                    command.Parameters.AddWithValue("@TemporaryCardNumber", updatedEmployee.TemporaryCardNumber);
+                    command.Parameters.AddWithValue("@AccessCardNumber", updatedEmployee.AccessCardNumber);
+                    command.Parameters.AddWithValue("@IsActive", updatedEmployee.IsActive);
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        employee = Extract(reader);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+                return employee;
+            }
+        }
+        public async Task<bool> Delete(string employeeId, bool isHardDelete)
+        {
+            bool isDeleted = false;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spDeleteEmployee";
+                    command.Parameters.AddWithValue("@employeeId", employeeId);
+                    command.Parameters.AddWithValue("@isHardDelete", isHardDelete);
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+                    if (rowsAffected > 0)
+                        isDeleted = true;
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return isDeleted;
+        }
+        public async Task<bool> EmployeeDetailsRepetitionCheck(Employee employee)
+        {
+            bool isRepeated = false;
+            DbDataReader reader = null;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spEmployeeDetailsRepititionCheck";
+                    command.Parameters.AddWithValue("@Id", employee.Id);
+                    command.Parameters.AddWithValue("@EmailId", employee.Email);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        isRepeated = Convert.ToBoolean(reader["isRepeated"]);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+            }
+            return isRepeated;
         }
     }
 }
