@@ -15,6 +15,7 @@ namespace IMS.Entities
     {
         Pending,
         Rejected,
-        Approved
+        Approved,
+        Cancelled
     }
 }

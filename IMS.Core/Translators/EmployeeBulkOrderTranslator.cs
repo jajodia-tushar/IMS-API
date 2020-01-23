@@ -30,8 +30,33 @@ namespace IMS.Core.Translators
                 RequirementDate = employeeBulkOrderDetails.RequirementDate,
                 BulkOrderRequestStatus = (Entities.BulkOrderRequestStatus)(employeeBulkOrderDetails.BulkOrderRequestStatus),
                 ReasonForRequirement = employeeBulkOrderDetails.ReasonForRequirement,
-                EmployeeItemsQuantityList = ShelfItemsTranslator.ToEntitiesObject(employeeBulkOrderDetails.EmployeeItemsQuantityList)
+                ItemsQuantityList = ToEntitiesObject(employeeBulkOrderDetails.ItemsQuantityList)
             };
+        }
+
+        public static List<Entities.BulkOrderItemQuantityMapping> ToEntitiesObject(List<Contracts.BulkOrderItemQuantityMapping> itemsQuantityList)
+        {
+            if (itemsQuantityList == null)
+                return null;
+            List<Entities.BulkOrderItemQuantityMapping> entitiesItemsQuantityList = new List<Entities.BulkOrderItemQuantityMapping>();
+            foreach(Contracts.BulkOrderItemQuantityMapping itemQuantity in itemsQuantityList)
+            {
+                entitiesItemsQuantityList.Add(ToEntitiesObject(itemQuantity));
+            }
+            return entitiesItemsQuantityList;
+        }
+
+        private static Entities.BulkOrderItemQuantityMapping ToEntitiesObject(Contracts.BulkOrderItemQuantityMapping itemQuantity)
+        {
+            if (itemQuantity == null)
+                return null;
+            return new Entities.BulkOrderItemQuantityMapping
+            {
+                Item = itemQuantity.Item==null?null:ItemTranslator.ToEntitiesObject(itemQuantity.Item),
+                QuantityOrdered=itemQuantity.QuantityOrdered,
+                QuantityUsed=itemQuantity.QuantityUsed
+            };
+
         }
 
         public static Contracts.EmployeeBulkOrdersResponse ToDataContractsObject(Entities.EmployeeBulkOrdersResponse entityBulkOrdersResponse)
@@ -88,7 +113,31 @@ namespace IMS.Core.Translators
                 RequirementDate = employeeBulkOrderDetails.RequirementDate,
                 BulkOrderRequestStatus = (Contracts.BulkOrderRequestStatus)(employeeBulkOrderDetails.BulkOrderRequestStatus),
                 ReasonForRequirement = employeeBulkOrderDetails.ReasonForRequirement,
-                EmployeeItemsQuantityList = ShelfItemsTranslator.ToDataContractsObject(employeeBulkOrderDetails.EmployeeItemsQuantityList)
+                ItemsQuantityList = ToDataContractsObject(employeeBulkOrderDetails.ItemsQuantityList)
+            };
+        }
+
+        public static List<Contracts.BulkOrderItemQuantityMapping> ToDataContractsObject(List<Entities.BulkOrderItemQuantityMapping> itemsQuantityList)
+        {
+            if (itemsQuantityList == null)
+                return null;
+            List<Contracts.BulkOrderItemQuantityMapping> contractsItemsQuantityList = new List<Contracts.BulkOrderItemQuantityMapping>();
+            foreach (Entities.BulkOrderItemQuantityMapping itemQuantity in itemsQuantityList)
+            {
+                contractsItemsQuantityList.Add(ToDataContractsObject(itemQuantity));
+            }
+            return contractsItemsQuantityList;
+        }
+
+        public static Contracts.BulkOrderItemQuantityMapping ToDataContractsObject(Entities.BulkOrderItemQuantityMapping itemQuantity)
+        {
+            if (itemQuantity == null)
+                return null;
+            return new Contracts.BulkOrderItemQuantityMapping
+            {
+                Item = itemQuantity.Item == null ? null : ItemTranslator.ToDataContractsObject(itemQuantity.Item),
+                QuantityOrdered = itemQuantity.QuantityOrdered,
+                QuantityUsed = itemQuantity.QuantityUsed
             };
         }
     }

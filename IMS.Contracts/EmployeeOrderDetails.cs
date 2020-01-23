@@ -9,6 +9,6 @@ namespace IMS.Contracts
         public int OrderId { get; set; } 
         public DateTime Date { get; set; }
         public Shelf Shelf{ get; set; }
-        public List<ItemQuantityMapping> EmployeeItemsQuantityList { get; set; }
+        public List<BulkOrderItemQuantityMapping> ItemsQuantityList { get; set; }
     }
 }
