@@ -13,6 +13,6 @@ namespace IMS.Contracts
         [JsonConverter(typeof(StringEnumConverter))]
         public BulkOrderRequestStatus BulkOrderRequestStatus { get; set; }
         public string ReasonForRequirement { get; set; }
-        public List<ItemQuantityMapping> EmployeeItemsQuantityList { get; set; }
+        public List<BulkOrderItemQuantityMapping> ItemsQuantityList { get; set; }
     }
 }

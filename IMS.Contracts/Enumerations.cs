@@ -15,7 +15,8 @@ namespace IMS.Contracts
     {
         Pending,
         Rejected,
-        Approved
+        Approved,
+        Cancelled
     }
 
     public enum RequestStatus

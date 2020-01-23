@@ -60,5 +60,7 @@ namespace IMS.Core.Translators
             }
             return entityItemQuantityList;
         }
+
+        
     }
 }

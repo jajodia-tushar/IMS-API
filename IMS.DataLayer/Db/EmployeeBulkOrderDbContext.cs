@@ -75,7 +75,8 @@ namespace IMS.DataLayer.Db
                 ReasonForRequirement = reader["ReasonForRequirement"].ToString() ,
                 ItemId = (int)reader["ItemId"] ,
                 ItemName = reader["ItemName"].ToString() ,
-                ItemQuantity = (int)reader["ItemQuantity"] ,
+                ItemQuantityOrdered = (int)reader["ItemQuantityOrdered"] ,
+                ItemQuantityUsed = (int)reader["ItemQuantityUsed"],
                 ItemIsActive = (bool)reader["ItemIsActive"] ,
                 ItemMaxLimit = (int)reader["ItemMaxLimit"] ,
                 ItemImageUrl = reader["ItemImageUrl"]?.ToString() ,
@@ -92,13 +93,13 @@ namespace IMS.DataLayer.Db
             {
                 if (mapping.ContainsKey(bulkOrderDto.BulkOrderId))
                 {
-                    ItemQuantityMapping itemQtyMapping = DtoToItemQuantityMapping(bulkOrderDto);
-                    mapping[bulkOrderDto.BulkOrderId].EmployeeBulkOrderDetails.EmployeeItemsQuantityList.Add(itemQtyMapping);
+                    BulkOrderItemQuantityMapping itemQtyMapping = DtoToItemQuantityMapping(bulkOrderDto);
+                    mapping[bulkOrderDto.BulkOrderId].EmployeeBulkOrderDetails.ItemsQuantityList.Add(itemQtyMapping);
                 }
                 else
                 {
                     EmployeeBulkOrder employeeBulkOrder = ToEmployeeBulkOrder(bulkOrderDto);
-                    employeeBulkOrder.EmployeeBulkOrderDetails.EmployeeItemsQuantityList.Add(DtoToItemQuantityMapping(bulkOrderDto));
+                    employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList.Add(DtoToItemQuantityMapping(bulkOrderDto));
                     mapping.Add(bulkOrderDto.BulkOrderId, employeeBulkOrder);
                 }
             }
@@ -129,7 +130,7 @@ namespace IMS.DataLayer.Db
                 RequirementDate = bulkOrderDto.RequirementDate,
                 ReasonForRequirement = bulkOrderDto.ReasonForRequirement,
                 BulkOrderRequestStatus = StringToBulkOrderRequestStatus(bulkOrderDto.RequestStatus),
-                EmployeeItemsQuantityList = new List<ItemQuantityMapping>()
+                ItemsQuantityList = new List<BulkOrderItemQuantityMapping>()
             };
 
         }
@@ -155,12 +156,13 @@ namespace IMS.DataLayer.Db
             };
         }
 
-        private ItemQuantityMapping DtoToItemQuantityMapping(EmployeeBulkOrderDto bulkOrderDto)
+        private BulkOrderItemQuantityMapping DtoToItemQuantityMapping(EmployeeBulkOrderDto bulkOrderDto)
         {
-            return new ItemQuantityMapping
+            return new BulkOrderItemQuantityMapping
             {
                 Item = DtoToItem(bulkOrderDto),
-                Quantity = bulkOrderDto.ItemQuantity
+                QuantityOrdered = bulkOrderDto.ItemQuantityOrdered,
+                QuantityUsed = bulkOrderDto.ItemQuantityUsed
             };
         }
 
@@ -192,7 +194,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@employeeid", employeeBulkOrder.Employee.Id);
                     command.Parameters.AddWithValue("@requirementdate", employeeBulkOrder.EmployeeBulkOrderDetails.RequirementDate);
                     command.Parameters.AddWithValue("@reasonforrequirement", employeeBulkOrder.EmployeeBulkOrderDetails.ReasonForRequirement);
-                    string listOfItemIdQuantityPrice = ConvertToString(employeeBulkOrder.EmployeeBulkOrderDetails.EmployeeItemsQuantityList);
+                    string listOfItemIdQuantityPrice = ConvertToString(employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList);
                     command.Parameters.AddWithValue("@listof_itemid_qty", listOfItemIdQuantityPrice);
                     reader = await command.ExecuteReaderAsync();
                     int generatedOrderId = 0;
@@ -212,9 +214,9 @@ namespace IMS.DataLayer.Db
                 return isSaved;
             }
         }
-        private static string ConvertToString(List<ItemQuantityMapping> orderItemDetails)
+        private static string ConvertToString(List<BulkOrderItemQuantityMapping> orderItemDetails)
         {
-            return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.Quantity));
+            return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.QuantityOrdered));
         }
     }
 }
