@@ -31,70 +31,7 @@ namespace IMS.Core.services
         
         
 
-        public async Task<Response> CheckEmployeeIdAvailability(string employeeId)
-        {
-            Response response=new Response();
-            if (String.IsNullOrEmpty(employeeId))
-            {
-                response.Status = Status.Failure;
-                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest,Constants.ErrorMessages.InValidId);
-                return response;
-            }
-
-            int userId = -1;
-            try
-            {
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
-                {
-                    User user = Utility.GetUserFromToken(token);
-                    userId = user.Id;
-                    try
-                    {
-                        bool isEmployeeIdPresent = await employeeDbContext.CheckEmployeeIdAvailability(employeeId);
-                        if (!isEmployeeIdPresent)
-                        {
-                            response.Status = Status.Success;
-                            response.Error = null;
-                        }
-                        else
-                        {
-                            throw new EmployeeIdAlreadyExists("Employee Id Already Exists");
-                        }
-                    }
-                    catch (CustomException e)
-                    {
-                        response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                        new Task(() => { _logger.LogException(e, "CheckEmployeeIdAvailability", Severity.Critical, employeeId, response); }).Start();
-                    }
-                }
-                else
-                {
-                    response.Status = Status.Failure;
-                    response.Error =
-                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
-                        Constants.ErrorMessages.InvalidToken);
-                }
-            }
-            catch (Exception e)
-            {
-                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(e, "CheckEmployeeIdAvailability", Severity.Critical, employeeId, response); }).Start();
-            }
-            finally
-            {
-                Severity severity = Severity.No;
-                if (response.Status == Status.Failure)
-                    severity = Severity.Critical;
-                new Task(() => { _logger.Log(employeeId, response, "CheckEmployeeIdAvailability", response.Status, severity, userId); }).Start();
-            }
-            return response;
-        }
-  
-
+        
        
 
         
@@ -194,6 +131,71 @@ namespace IMS.Core.services
             }
             return response;
         }
+
+        public async Task<Response> CheckEmployeeIdAvailability(string employeeId)
+        {
+            Response response = new Response();
+            int userId = 0;
+            if (String.IsNullOrEmpty(employeeId))
+            {
+                response.Status = Status.Failure;
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InValidId);
+                return response;
+            }
+
+            
+            try
+            {
+                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
+                if (!isTokenPresentInHeader)
+                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    try
+                    {
+                        bool isEmployeeIdPresent = await employeeDbContext.CheckEmployeeIdAvailability(employeeId);
+                        if (!isEmployeeIdPresent)
+                        {
+                            response.Status = Status.Success;
+                            response.Error = null;
+                        }
+                        else
+                        {
+                            throw new EmployeeIdAlreadyExists("Employee Id Already Exists");
+                        }
+                    }
+                    catch (CustomException e)
+                    {
+                        response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                        new Task(() => { _logger.LogException(e, "CheckEmployeeIdAvailability", Severity.Critical, employeeId, response); }).Start();
+                    }
+                }
+                else
+                {
+                    response.Status = Status.Failure;
+                    response.Error =
+                        Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
+                        Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "CheckEmployeeIdAvailability", Severity.Critical, employeeId, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(employeeId, response, "CheckEmployeeIdAvailability", response.Status, severity, userId); }).Start();
+            }
+            return response;
+        }
+
 
         public async Task<EmployeeResponse> GetAllEmployees(string filter, int pageNumber, int pageSize)
         {

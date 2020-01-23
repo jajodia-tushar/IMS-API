@@ -60,6 +60,9 @@ namespace IMS.DataLayer.Db
         }
 
         Task<string> IEmployeeDbContext.CreateEmployee(Employee employee)
+        {
+            throw new NotImplementedException();
+        }
         public Task<bool> CheckEmployeeIdAvailability(string employeeId)
         {
             throw new NotImplementedException();

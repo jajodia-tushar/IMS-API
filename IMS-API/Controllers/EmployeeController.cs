@@ -218,7 +218,7 @@ namespace IMS_API.Controllers
         }
 
         [Authorize(Roles = "Admin,SuperAdmin")]
-        [HttpGet]
+        [HttpGet("IdExists")]
         public async Task<Response> IsEmployeeIdExists(String employeeId)
         {
             Response dtoValidEmployeeId = null;
