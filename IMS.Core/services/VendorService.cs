@@ -39,35 +39,31 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     vendorResponse.Vendors = new List<Vendor>();
                     userId = user.Id;
-                    try
+                    if (VendorValidator.Validate(vendor))
                     {
-                        if (VendorValidator.Validate(vendor))
+                        if (await _vendorDbContext.IsVendorPresent(vendor))
                         {
-                            if(await _vendorDbContext.IsVendorPresent(vendor))
-                            {
-                                vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnprocessableEntity,Constants.ErrorMessages.DataAlreadyPresent);
-                            }
+                            vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnprocessableEntity, Constants.ErrorMessages.DataAlreadyPresent);
+                        }
+                        else
+                        {
                             vendor = await _vendorDbContext.AddVendor(vendor);
                             if (vendor != null)
                             {
                                 vendorResponse.Status = Status.Success;
                                 vendorResponse.Vendors.Add(vendor);
                             }
-                            return vendorResponse;
                         }
-                        else
-                        {
-                            vendorResponse.Status = Status.Failure;
-                            vendorResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.NotFound,
-                                ErrorMessage = Constants.ErrorMessages.MissingValues
-                            };
-                        }
+                        return vendorResponse;
                     }
-                    catch (Exception exception)
+                    else
                     {
-                        throw exception;
+                        vendorResponse.Status = Status.Failure;
+                        vendorResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.MissingValues
+                        };
                     }
                 }
                 else
@@ -103,40 +99,31 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    try
+                    if (vendorId > 0)
                     {
-                        if (vendorId > 0)
+                        bool isDeleted = await _vendorDbContext.DeleteVendor(vendorId, isHardDelete);
+                        if (isDeleted == true)
                         {
-                            bool isDeleted = await _vendorDbContext.DeleteVendor(vendorId,isHardDelete);
-                            if (isDeleted==true)
-                            {
-                                deleteResponse.Status = Status.Success;
-                            }
-                            else
-                            {
-                                deleteResponse.Error = new Error()
-                                {
-                                    ErrorCode = Constants.ErrorCodes.NotFound,
-                                    ErrorMessage = Constants.ErrorMessages.UnableToFetch
-                                };
-                            }
-                            return deleteResponse;
+                            deleteResponse.Status = Status.Success;
                         }
                         else
                         {
-                            deleteResponse.Status = Status.Failure;
                             deleteResponse.Error = new Error()
                             {
                                 ErrorCode = Constants.ErrorCodes.NotFound,
-                                ErrorMessage = Constants.ErrorMessages.InValidId
+                                ErrorMessage = Constants.ErrorMessages.RecordNotFound
                             };
                         }
+                        return deleteResponse;
                     }
-                    catch (Exception exception)
+                    else
                     {
                         deleteResponse.Status = Status.Failure;
-                        deleteResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "Deletevendor", Severity.Medium, vendorId, deleteResponse); }).Start();
+                        deleteResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.InValidId
+                        };
                     }
                 }
                 else
@@ -172,22 +159,15 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     vendorResponse.Vendors = new List<Vendor>();
                     userId = user.Id;
-                    try
+                    vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
+                    if (vendorId > 0)
                     {
-                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
-                        if (vendorId > 0)
+                        Vendor vendor = await _vendorDbContext.GetVendorById(vendorId);
+                        if (vendor != null)
                         {
-                            Vendor vendor = await _vendorDbContext.GetVendorById(vendorId);
-                            if (vendor != null)
-                            {
-                                vendorResponse.Status = Status.Success;
-                                vendorResponse.Vendors.Add(vendor);
-                            }
+                            vendorResponse.Status = Status.Success;
+                            vendorResponse.Vendors.Add(vendor);
                         }
-                    }
-                    catch (Exception exception)
-                    {
-                        throw exception;
                     }
                 }
                 else
@@ -274,33 +254,28 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     vendorResponse.Vendors = new List<Vendor>();
                     userId = user.Id;
-                    try
+                    if (VendorValidator.Validate(vendor))
                     {
-                        if(VendorValidator.Validate(vendor))
+                        vendor = await _vendorDbContext.UpdateVendor(vendor);
+                        if (vendor != null)
                         {
-                            vendor= await _vendorDbContext.UpdateVendor(vendor);
-                            if (vendor != null)
-                            {
-                                vendorResponse.Status = Status.Success;
-                                vendorResponse.Vendors.Add(vendor);
-                            }
-                            return vendorResponse;
+                            vendorResponse.Status = Status.Success;
+                            vendorResponse.Vendors.Add(vendor);
                         }
                         else
                         {
-                            vendorResponse.Status = Status.Failure;
-                            vendorResponse.Error = new Error()
-                            {
-                                ErrorCode = Constants.ErrorCodes.NotFound,
-                                ErrorMessage = Constants.ErrorMessages.MissingValues
-                            };
+                            vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
                         }
+                        return vendorResponse;
                     }
-                    catch (Exception exception)
+                    else
                     {
                         vendorResponse.Status = Status.Failure;
-                        vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "UpdateVendor", Severity.Medium, vendor, vendorResponse); }).Start();
+                        vendorResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.MissingValues
+                        };
                     }
                 }
                 else
