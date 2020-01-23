@@ -18,7 +18,6 @@ namespace IMS.Core
         private ITokenProvider _tokenProvider;
         private IHttpContextAccessor _httpContextAccessor;
         private IAuditLogsDbContext _auditLogsDbContext;
-        //private IItemDbContext _itemDbContext;
         public AuditInterceptor(IAuditLogsDbContext auditLogsDbContext, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
         {
             _auditLogsDbContext = auditLogsDbContext;
