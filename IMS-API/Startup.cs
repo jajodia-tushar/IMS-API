@@ -99,6 +99,7 @@ namespace IMS_API
 
             services.AddTransient<IAuditLogsDbContext, AuditLogDbContext>();
             services.AddTransient<IEmployeeBulkOrderDbContext, EmployeeBulkOrderDbContext>();
+            services.AddTransient<IActivityLogDbContext, ActivityLogDbContext>();
             services.EnableSimpleProxy(p => p.AddInterceptor<AuditAttribute, AuditInterceptor>());
             services.AddTransientWithProxy<IItemService, ItemService>();
             services.AddTransientWithProxy<IShelfService, ShelfService>();
@@ -106,6 +107,7 @@ namespace IMS_API
             services.AddTransientWithProxy<IUserService, UserService>();
             services.AddTransientWithProxy<IVendorService, VendorService>();
             services.AddTransientWithProxy<IOrderService, OrderService>();
+
         }
         public TokenValidationParameters CreateTokenValidationParameters()
         {
