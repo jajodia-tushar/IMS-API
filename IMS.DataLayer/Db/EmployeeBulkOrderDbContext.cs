@@ -75,7 +75,8 @@ namespace IMS.DataLayer.Db
                 ReasonForRequirement = reader["ReasonForRequirement"].ToString() ,
                 ItemId = (int)reader["ItemId"] ,
                 ItemName = reader["ItemName"].ToString() ,
-                ItemQuantity = (int)reader["ItemQuantity"] ,
+                ItemQuantityOrdered = (int)reader["ItemQuantityOrdered"] ,
+                ItemQuantityUsed = (int)reader["ItemQuantityUsed"],
                 ItemIsActive = (bool)reader["ItemIsActive"] ,
                 ItemMaxLimit = (int)reader["ItemMaxLimit"] ,
                 ItemImageUrl = reader["ItemImageUrl"]?.ToString() ,
@@ -92,13 +93,13 @@ namespace IMS.DataLayer.Db
             {
                 if (mapping.ContainsKey(bulkOrderDto.BulkOrderId))
                 {
-                    ItemQuantityMapping itemQtyMapping = DtoToItemQuantityMapping(bulkOrderDto);
-                    mapping[bulkOrderDto.BulkOrderId].EmployeeBulkOrderDetails.EmployeeItemsQuantityList.Add(itemQtyMapping);
+                    BulkOrderItemQuantityMapping itemQtyMapping = DtoToItemQuantityMapping(bulkOrderDto);
+                    mapping[bulkOrderDto.BulkOrderId].EmployeeBulkOrderDetails.ItemsQuantityList.Add(itemQtyMapping);
                 }
                 else
                 {
                     EmployeeBulkOrder employeeBulkOrder = ToEmployeeBulkOrder(bulkOrderDto);
-                    employeeBulkOrder.EmployeeBulkOrderDetails.EmployeeItemsQuantityList.Add(DtoToItemQuantityMapping(bulkOrderDto));
+                    employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList.Add(DtoToItemQuantityMapping(bulkOrderDto));
                     mapping.Add(bulkOrderDto.BulkOrderId, employeeBulkOrder);
                 }
             }
@@ -129,7 +130,7 @@ namespace IMS.DataLayer.Db
                 RequirementDate = bulkOrderDto.RequirementDate,
                 ReasonForRequirement = bulkOrderDto.ReasonForRequirement,
                 BulkOrderRequestStatus = StringToBulkOrderRequestStatus(bulkOrderDto.RequestStatus),
-                EmployeeItemsQuantityList = new List<ItemQuantityMapping>()
+                ItemsQuantityList = new List<BulkOrderItemQuantityMapping>()
             };
 
         }
@@ -155,12 +156,13 @@ namespace IMS.DataLayer.Db
             };
         }
 
-        private ItemQuantityMapping DtoToItemQuantityMapping(EmployeeBulkOrderDto bulkOrderDto)
+        private BulkOrderItemQuantityMapping DtoToItemQuantityMapping(EmployeeBulkOrderDto bulkOrderDto)
         {
-            return new ItemQuantityMapping
+            return new BulkOrderItemQuantityMapping
             {
                 Item = DtoToItem(bulkOrderDto),
-                Quantity = bulkOrderDto.ItemQuantity
+                QuantityOrdered = bulkOrderDto.ItemQuantityOrdered,
+                QuantityUsed = bulkOrderDto.ItemQuantityUsed
             };
         }
 
