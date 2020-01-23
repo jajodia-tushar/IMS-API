@@ -192,7 +192,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@employeeid", employeeBulkOrder.Employee.Id);
                     command.Parameters.AddWithValue("@requirementdate", employeeBulkOrder.EmployeeBulkOrderDetails.RequirementDate);
                     command.Parameters.AddWithValue("@reasonforrequirement", employeeBulkOrder.EmployeeBulkOrderDetails.ReasonForRequirement);
-                    string listOfItemIdQuantityPrice = ConvertToString(employeeBulkOrder.EmployeeBulkOrderDetails.EmployeeItemsQuantityList);
+                    string listOfItemIdQuantityPrice = ConvertToString(employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList);
                     command.Parameters.AddWithValue("@listof_itemid_qty", listOfItemIdQuantityPrice);
                     reader = await command.ExecuteReaderAsync();
                     int generatedOrderId = 0;
@@ -212,9 +212,9 @@ namespace IMS.DataLayer.Db
                 return isSaved;
             }
         }
-        private static string ConvertToString(List<ItemQuantityMapping> orderItemDetails)
+        private static string ConvertToString(List<BulkOrderItemQuantityMapping> orderItemDetails)
         {
-            return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.Quantity));
+            return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.QuantityOrdered));
         }
     }
 }
