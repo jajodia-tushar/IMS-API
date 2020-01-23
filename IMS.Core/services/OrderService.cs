@@ -524,7 +524,14 @@ namespace IMS.Core.services
                         throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
-                    vendorOrderResponse.VendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
+                    var vendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
+                    if (vendorOrder != null && vendorOrder.VendorOrderDetails!=null)
+                    {
+                        vendorOrderResponse.VendorOrder = vendorOrder;
+                        vendorOrderResponse.Status = Status.Success;
+                        return vendorOrderResponse;
+                    }
+                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidOrderId);
                 }
                 catch (CustomException e)
                 {
