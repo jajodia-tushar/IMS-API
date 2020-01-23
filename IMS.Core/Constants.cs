@@ -86,6 +86,8 @@ namespace IMS.Core
             public const string InvalidPagingDetails = "The page number or page size is invalid";
             public const string DataAlreadyPresent = "Data is already present";
             public const string NoEmployeesPresent = "NoEmployeesPresent";
+
+            public const string InvalidBulkRequestDate = "Order must be placed atleast Two days before Requirement Date.Please Contact Admin Team for further assistance";
         }
 
         public static class ErrorCodes

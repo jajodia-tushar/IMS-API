@@ -321,7 +321,52 @@ namespace IMS_API.Controllers
         [HttpPost("EmployeeBulkOrders", Name ="CreateEmployeeBulkOrder")]
         public async Task<EmployeeBulkOrdersResponse> PlaceEmployeeBulkOrder([FromBody] EmployeeBulkOrder employeeBulkOrder)
         {
-            throw new NotImplementedException();
+            EmployeeBulkOrdersResponse contractsEmployeeBulkOrdersResponse = null;
+            try
+            {
+                IMS.Entities.EmployeeBulkOrder entitiesEmployeeBulkOrder = EmployeeBulkOrderTranslator.ToEntitiesObject(employeeBulkOrder);
+                IMS.Entities.EmployeeBulkOrdersResponse entitiesEmployeeBulkOrdersResponse = await _orderService.PlaceEmployeeBulkOrder(entitiesEmployeeBulkOrder);
+                contractsEmployeeBulkOrdersResponse = EmployeeBulkOrderTranslator.ToDataContractsObject(entitiesEmployeeBulkOrdersResponse);
+            }
+            catch (Exception e)
+            {
+                contractsEmployeeBulkOrdersResponse.Status = Status.Failure;
+                contractsEmployeeBulkOrdersResponse.Error = new Error()
+                {
+                    ErrorCode = Constants.ErrorCodes.ServerError,
+                    ErrorMessage = Constants.ErrorMessages.ServerError
+                };
+                new Task(() => { _logger.LogException(e, "CreateEmployeeBulkOrder", IMS.Entities.Severity.Critical, employeeBulkOrder, contractsEmployeeBulkOrdersResponse); }).Start();
+            }
+
+            return contractsEmployeeBulkOrdersResponse;
+        }
+
+        [HttpGet("EmployeeBulkOrders", Name = "GetEmployeeBulkOrder")]
+        public async Task<EmployeeBulkOrdersResponse> GetAllEmployeeBulkOrders(int? pageNumber = null, int? pageSize = null, string fromDate=null, string toDate =null)
+        {            
+            EmployeeBulkOrdersResponse contractsBulkOrdersResponse = null;
+            try
+            {                
+                IMS.Entities.EmployeeBulkOrdersResponse entitiesResponse = await _orderService.GetEmployeeBulkOrders(pageNumber, pageSize, fromDate, toDate);
+                contractsBulkOrdersResponse = EmployeeBulkOrderTranslator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception e)
+            {
+
+                contractsBulkOrdersResponse = new EmployeeBulkOrdersResponse
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "GetAllEmployeeBulkOrders", IMS.Entities.Severity.Critical,"GET /EmployeeBulkOrders", contractsBulkOrdersResponse); }).Start();
+            }
+
+            return contractsBulkOrdersResponse;
         }
         
     }
