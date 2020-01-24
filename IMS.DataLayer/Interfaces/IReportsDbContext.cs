@@ -19,5 +19,6 @@ namespace IMS.DataLayer.Interfaces
         Task<ItemsAvailabilityResponse> GetWarehouseAvailability(string colour, int pageNumber, int pageSize);
         Task<ItemsAvailabilityResponse> GetShelfAvailability(int id, string colour, int pageNumber, int pageSize);
         Task<DateWiseItemsConsumption> GetItemsConsumptionReports(int limit, int offset,string fromDate, string toDate);
+        Task<ItemConsumptionDetailsResponse> GetDateWiseItemConsumptionDetails(string startDate, string endDate, int limit, int offset);
     }
 }
