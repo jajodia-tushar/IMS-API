@@ -85,6 +85,7 @@ namespace IMS.Core.services
             return shelfResponse;
         }
 
+        [Audit("Added Shelf","Shelf")]
         public async Task< ShelfResponse> AddShelf(Shelf shelf)
         {
             ShelfResponse shelfResponse = new ShelfResponse();
@@ -119,6 +120,7 @@ namespace IMS.Core.services
             
         }
 
+        [Audit("Deleted Shelf With ShelfCode","Shelf")]
         public async Task<ShelfResponse> Delete(string shelfCode)
         {
             ShelfResponse shelfResponse = new ShelfResponse();

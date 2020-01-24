@@ -143,6 +143,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
+        [Audit("Added Item","Item")]
         public async Task<ItemResponse> AddItem(Item item)
         {
             ItemResponse itemResponse = new ItemResponse();
@@ -206,6 +207,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
+        [Audit("Deleted Item Id","Item")]
         public async Task<ItemResponse> Delete(int id,bool isHardDelete)
         {
             ItemResponse itemResponse = new ItemResponse();
@@ -275,6 +277,7 @@ namespace IMS.Core.services
             return itemResponse;
         }
 
+        [Audit("Updated Item","Item")]
         public async Task<ItemResponse> UpdateItem(Item item)
         {
             ItemResponse itemResponse = new ItemResponse();
