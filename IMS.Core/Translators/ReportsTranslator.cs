@@ -193,6 +193,8 @@ namespace IMS.Core.Translators
             {
                 return new Contracts.DateWiseItemsConsumption
                 {
+                    PagingInfo = doDateWiseItemsConsumption.PagingInfo==null?null:
+                    Translator.ToDataContractsObject(doDateWiseItemsConsumption.PagingInfo),
                     Status = doDateWiseItemsConsumption.Status == Entities.Status.Success ? Contracts.Status.Success :
                     Contracts.Status.Failure,
                     Error = doDateWiseItemsConsumption.Error == null ? null :

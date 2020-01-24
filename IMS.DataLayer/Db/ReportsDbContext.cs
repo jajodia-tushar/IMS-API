@@ -397,12 +397,12 @@ namespace IMS.DataLayer.Db
             return itemQuantityMappings;
         }
 
-        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReports(string fromDate, string toDate)
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReports(int limit, int offset,string fromDate, string toDate)
         {
             DbDataReader reader = null;
             DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
             List<DateItemsMapping> dateItemMapping = new List<DateItemsMapping>();
-            PagingInfo pagingInfo = new PagingInfo();
+            dateWiseItemsConsumption.PagingInfo = new PagingInfo();
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -410,15 +410,19 @@ namespace IMS.DataLayer.Db
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetItemsConsumptionReport";
+                    command.CommandText = "spGetItemsConsumptionReports";
                     command.Parameters.AddWithValue("@fromDate", fromDate);
+                    command.Parameters.AddWithValue("@pageLimit", limit);
+                    command.Parameters.AddWithValue("@pageOffset", offset);
                     command.Parameters.AddWithValue("@toDate", toDate);
+                    command.Parameters.Add("@totalResults", MySqlDbType.Int32, 32);
+                    command.Parameters["@totalResults"].Direction = ParameterDirection.Output;
                     reader = await command.ExecuteReaderAsync();
                     string Date = "";
                     while (reader.Read())
                     {
                         Date = reader["Date"]?.ToString().Split(" ")[0];
-                        Date = Date.Substring(6, 4) + '/' + Date.Substring(0, 2) + '/' + Date.Substring(3, 2);
+                        //Date = Date.Substring(6, 4) + '/' + Date.Substring(0, 2) + '/' + Date.Substring(3, 2);
                         List<ItemQuantityMapping> itemQuantityMapping = new List<ItemQuantityMapping>
                         {
                             new ItemQuantityMapping
@@ -438,12 +442,13 @@ namespace IMS.DataLayer.Db
                          });
                     }
                     reader.Close();
+                    await command.ExecuteNonQueryAsync();
+                    dateWiseItemsConsumption.PagingInfo.TotalResults = (int)command.Parameters["@totalResults"].Value;
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
-
                 var result = dateItemMapping.GroupBy(obj => obj.Date,
                     obj => obj.ItemQuantityMappings.FirstOrDefault(),
                     (key, g) => new DateItemsMapping

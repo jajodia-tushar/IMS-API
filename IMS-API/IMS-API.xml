@@ -221,7 +221,7 @@
             <returns>Location and Colour based Items list</returns>
             <response code="200">Returns Location and colour based items list count if input is valid otherwise it returns status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetItemsConsumptionReport(System.String,System.String)">
+        <member name="M:IMS_API.Controllers.ReportsController.GetItemsConsumptionReport(System.Int32,System.Int32,System.String,System.String)">
             <summary>
             Get Per Day Consumption Report
             </summary>
