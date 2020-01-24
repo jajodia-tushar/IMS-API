@@ -81,5 +81,41 @@ namespace IMS.Core.Validators
 
 
         }
+
+        public static bool isEmployeeBulkOrderReturnValid(EmployeeBulkOrder employeeBulkOrder, EmployeeBulkOrder DbEmployeeBulkOrder)
+        {
+            return (IsQuantityUsedLessThanOrdered(employeeBulkOrder) &&
+            IsQuantityUsedLessThanPreviousQuantityUsed(employeeBulkOrder,DbEmployeeBulkOrder) &&
+            IsItemCountEqual(employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList, DbEmployeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList));
+        }
+
+        private static bool IsItemCountEqual(List<BulkOrderItemQuantityMapping> previousItemsQuantityList, List<BulkOrderItemQuantityMapping> newItemsQuantityList)
+        {
+            if (previousItemsQuantityList.Count != newItemsQuantityList.Count)
+                return false;
+            return true;
+        }
+
+        private static bool IsQuantityUsedLessThanPreviousQuantityUsed(EmployeeBulkOrder employeeBulkOrder, EmployeeBulkOrder DbEmployeeBulkOrder)
+        {
+            List<BulkOrderItemQuantityMapping> previousItemMapping = employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
+            List<BulkOrderItemQuantityMapping> newItemMapping = DbEmployeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
+            for (int index=0; index<previousItemMapping.Count; index++)
+            {
+                if (previousItemMapping[index].QuantityUsed < newItemMapping[index].QuantityUsed)
+                    return false;
+            }
+            return true;
+        }
+
+        private static Boolean IsQuantityUsedLessThanOrdered(EmployeeBulkOrder employeeBulkOrder)
+        {
+            foreach (var item in employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList)
+            {
+                if (item.QuantityOrdered < item.QuantityUsed)
+                    return false;
+            }
+            return true;
+        }
     }
 }

@@ -38,6 +38,8 @@ namespace IMS.Core
             public const string InValidId = "Invalid Id";
             public const string NoOrdersYet = "No orders to display";
             public const string UnableToPlaceOrder = "Unable to place order, check entered fields";
+            public const string InvalidOrderReturnDetails = "Invalid order return details were supplied";
+            public const string OrderIdDoesNotMatch = "OrderId in payload Is Different";
             public const string MissingValues = "Missing entries";
             public const string NoVendorsYet = "No Vendors To Display";
 

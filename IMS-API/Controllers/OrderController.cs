@@ -420,5 +420,32 @@ namespace IMS_API.Controllers
             return contractsApproveBulkOrderResponse;
         }
 
+        [HttpPut("EmployeeBulkOrders/{orderId}/return", Name = "ReturnEmployeeBulkOrderById")]
+        public async Task<EmployeeBulkOrdersResponse> ReturnBulkOrderById(int orderId, [FromBody] EmployeeBulkOrder employeeBulkOrder)
+        {
+            EmployeeBulkOrdersResponse contractsBulkOrderResponse = null;
+            try
+            {
+                IMS.Entities.EmployeeBulkOrder entitiesEmployeeBulkOrder = EmployeeBulkOrderTranslator.ToEntitiesObject(employeeBulkOrder);
+                IMS.Entities.EmployeeBulkOrdersResponse entitiesResponse = await _orderService.ReturnOrderItems(orderId, entitiesEmployeeBulkOrder);
+                contractsBulkOrderResponse = EmployeeBulkOrderTranslator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception e)
+            {
+
+                contractsBulkOrderResponse = new EmployeeBulkOrdersResponse
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, "GET /EmployeeBulkOrders", contractsBulkOrderResponse); }).Start();
+            }
+
+            return contractsBulkOrderResponse;
+        }
     }
 }

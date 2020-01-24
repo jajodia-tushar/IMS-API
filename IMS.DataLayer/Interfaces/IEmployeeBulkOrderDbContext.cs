@@ -12,5 +12,6 @@ namespace IMS.DataLayer.Interfaces
         Task<bool> SaveOrder(EmployeeBulkOrder employeeBulkOrder);
         Task<EmployeeBulkOrder> GetOrderById(int orderId);
         Task<bool> ApproveOrder(ApproveEmployeeBulkOrder requestedApproveEmployeeBulkOrder);
+        Task<EmployeeBulkOrder> ReturnOrderItems (int orderId, List<BulkOrderItemQuantityMapping> changedItems);
     }
 }

@@ -21,5 +21,6 @@ namespace IMS.Entities.Interfaces
         Task<EmployeeBulkOrdersResponse> PlaceEmployeeBulkOrder(EmployeeBulkOrder employeeBulkOrder);
         Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrderById(int orderid);
         Task<ApproveBulkOrderResponse> ApproveEmployeeBulkOrder(int orderid, ApproveEmployeeBulkOrder approveEmployeeBulkOrder);
+        Task<EmployeeBulkOrdersResponse> ReturnOrderItems(int orderId, EmployeeBulkOrder employeeBulkOrder);
     }
 }
