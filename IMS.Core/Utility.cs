@@ -140,7 +140,6 @@ namespace IMS.Core
             {
                 fs.Close();
             }
-            return Convert.ToBase64String(Encoding.Unicode.GetBytes(returnValue));
         }
 
         public static async Task<RequestData> GetRequestDataFromHeader(IHttpContextAccessor _httpContextAccessor, ITokenProvider _tokenProvider)
