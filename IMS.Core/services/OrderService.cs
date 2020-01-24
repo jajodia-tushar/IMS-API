@@ -50,6 +50,13 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
+                    bool hasUserEditedBefore = await _vendorOrderDbContext.CheckUserEditedOrderBefore(userId, orderId);
+                    if (hasUserEditedBefore)
+                    {
+                        deleteVendorOrderResponse.Status = Status.Failure;
+                        deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.UnAuthorized);
+
+                    }
                     try
                     {
                         deleteVendorOrderResponse = ValidateOrderId(orderId);
@@ -62,6 +69,7 @@ namespace IMS.Core.services
                             {
                                 deleteVendorOrderResponse.Status = Status.Failure;
                                 deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotDeleted);
+                                return deleteVendorOrderResponse;
                             }
                         }
                     }
