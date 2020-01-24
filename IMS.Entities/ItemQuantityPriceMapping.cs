@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IMS.Entities
 {
+    [Serializable]
     public class ItemQuantityPriceMapping
     {
         public Item Item { get; set; }

@@ -14,7 +14,7 @@ namespace IMS.Entities.Interfaces
         Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder);
         Task<VendorOrderResponse> SaveVendorOrder(VendorOrder vendorOrder);
         Task<VendorsOrderResponse> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, string fromDate, string toDate);
-        Task<Response> ApproveVendorOrder(VendorOrder vendorOrder);
+        Task<VendorOrderResponse> ApproveVendorOrder(VendorOrder vendorOrder);
         Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate);
         Task<VendorOrderResponse> GetVendorOrderByOrderId(int orderId);
         Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrders(int? pageNumber, int? pageSize, string fromDate, string toDate);

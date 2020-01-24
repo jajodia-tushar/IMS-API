@@ -5,7 +5,11 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -63,8 +67,6 @@ namespace IMS.Core
             string returnValue = null;
             if (string.IsNullOrEmpty(text.Trim()))
                 throw new CustomException();
-
-
             if (!String.IsNullOrEmpty(text))
             {
                 using (MD5 md5Hash = MD5.Create())
@@ -73,10 +75,71 @@ namespace IMS.Core
                     returnValue = Convert.ToBase64String(data);
                 }
             }
-
-
-
             return Convert.ToBase64String(Encoding.Unicode.GetBytes(returnValue));
+        }
+
+        public static String GenerateKey(Object sourceObject)
+        {
+            String hashString;
+            if (sourceObject == null)
+            {
+                throw new ArgumentNullException("Null as parameter is not allowed");
+            }
+            else
+            {
+                try
+                {
+                    hashString = ComputeHash(ObjectToByteArray(sourceObject));
+                    return hashString;
+                }
+                catch (AmbiguousMatchException ame)
+                {
+                    throw new ApplicationException("Could not definitely decide if object is serializable.Message:"+ame.Message);
+                }
+            }
+        }
+
+        private static string ComputeHash(byte[] objectAsBytes)
+        {
+            MD5 md5 = new MD5CryptoServiceProvider();
+            try
+            {
+                byte[] result = md5.ComputeHash(objectAsBytes);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < result.Length; i++)
+                {
+                    sb.Append(result[i].ToString("X2"));
+                }
+                return sb.ToString();
+            }
+            catch (ArgumentNullException ane)
+            {
+                return null;
+            }
+        }
+
+        private static readonly Object locker = new Object();
+
+        private static byte[] ObjectToByteArray(Object objectToSerialize)
+        {
+            MemoryStream fs = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                lock (locker)
+                {
+                    formatter.Serialize(fs, objectToSerialize);
+                }
+                return fs.ToArray();
+            }
+            catch (SerializationException se)
+            {
+                return null;
+            }
+            finally
+            {
+                fs.Close();
+            }
         }
 
         public static async Task<RequestData> GetRequestDataFromHeader(IHttpContextAccessor _httpContextAccessor, ITokenProvider _tokenProvider)

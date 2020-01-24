@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +50,13 @@ namespace IMS.Core.services
                 {
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
+                    bool hasUserEditedBefore = await _vendorOrderDbContext.CheckUserEditedOrderBefore(userId, orderId);
+                    if (hasUserEditedBefore)
+                    {
+                        deleteVendorOrderResponse.Status = Status.Failure;
+                        deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.UnAuthorized);
+
+                    }
                     try
                     {
                         deleteVendorOrderResponse = ValidateOrderId(orderId);
@@ -61,6 +69,7 @@ namespace IMS.Core.services
                             {
                                 deleteVendorOrderResponse.Status = Status.Failure;
                                 deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotDeleted);
+                                return deleteVendorOrderResponse;
                             }
                         }
                     }
@@ -171,8 +180,6 @@ namespace IMS.Core.services
             }
             return employeeOrdersResponse;
         }
-
-
         public async Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder)
         {
             EmployeeOrderResponse placeEmployeeOrderResponse = new EmployeeOrderResponse();
@@ -395,16 +402,13 @@ namespace IMS.Core.services
                 itemQtyPrice.TotalPrice = Math.Round(itemQtyPrice.Item.Rate * itemQtyPrice.Quantity, 2);
         }
 
-        public async Task<Response> ApproveVendorOrder(VendorOrder vendorOrder)
+        public async Task<VendorOrderResponse> ApproveVendorOrder(VendorOrder vendorOrder)
         {
-            Response response = new Response
-            {
-                Status = Status.Failure
-            };
+            var vendorOrderResponse = new VendorOrderResponse();
+            vendorOrderResponse.Status = Status.Failure;
             int userId = -1;
             try
             {
-
                 bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
                 if (!isTokenPresentInHeader)
                     throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
@@ -414,42 +418,111 @@ namespace IMS.Core.services
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User user = Utility.GetUserFromToken(token);
                 userId = user.Id;
-                if (VendorOrderValidator.ValidateApproveRequest(vendorOrder))
+                var response =  await RestrictOrderApproval(vendorOrder, user);
+                if (response.Status.Equals(Status.Success))
                 {
-
-                    bool isOrderApproved = await _vendorOrderDbContext.ApproveOrder(vendorOrder);
-                    if (isOrderApproved)
-                    {
-                        response.Status = Status.Success;
-
-                    }
-                    else
-                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+                    vendorOrderResponse = await GetVendorOrderByOrderId(vendorOrder.VendorOrderDetails.OrderId);
+                    return vendorOrderResponse;
                 }
-                else
-                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+                vendorOrderResponse.Status = response.Status;
+                vendorOrderResponse.Error = response.Error;
             }
-
             catch (CustomException e)
             {
 
-                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+                vendorOrderResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, vendorOrderResponse); }).Start();
             }
             catch (Exception e)
             {
-                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, response); }).Start();
+                vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "ApproveVendorOrder", Severity.Critical, vendorOrder, vendorOrderResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
-                if (response.Status == Status.Failure)
+                if (vendorOrderResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(vendorOrder, response, "Approving vendor order", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(vendorOrder, vendorOrderResponse, "ApproveVendorOrder", vendorOrderResponse.Status, severity, userId); }).Start();
             }
-            return response;
+            return vendorOrderResponse;
+        }
 
+        private async Task<Response> RestrictOrderApproval(VendorOrder vendorOrder, User user)
+        {
+            try
+            {
+                var response = new Response();
+                response.Status = Status.Failure;
+                if (user.Role.Id.Equals(4))
+                    return await ApproveOrder(vendorOrder);
+                else if (user.Role.Id.Equals(1))
+                {
+                    bool hasUserEditedBefore = await _vendorOrderDbContext.CheckUserEditedOrderBefore(user.Id, vendorOrder.VendorOrderDetails.OrderId);
+                    bool isOrderEdited = await CheckOrderEdited(vendorOrder);
+                    if (!isOrderEdited)
+                    {
+                        if (!hasUserEditedBefore)
+                            return await ApproveOrder(vendorOrder);
+                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.AlreadyEdited);
+                        return response;
+                    }
+                    if (!hasUserEditedBefore)
+                        return await EditOrder(vendorOrder, user);
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.AlreadyEdited);
+                    return response;
+                }
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.UnAuthorized);
+                return response;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
+        }
+
+        private async Task<Response> EditOrder(VendorOrder vendorOrder, User user)
+        {
+            var response = new Response();
+            response.Status = Status.Failure;
+            bool isOrderEdited = await _vendorOrderDbContext.EditOrder(vendorOrder, user);
+            if (isOrderEdited)
+            {
+                response.Status = Status.Success;
+                return response;
+            }
+            response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+            return response;
+        }
+
+        private async Task<Response> ApproveOrder(VendorOrder vendorOrder)
+        {
+            var response = new Response();
+            response.Status = Status.Failure;
+            bool isOrderApproved = await _vendorOrderDbContext.ApproveOrder(vendorOrder);
+            if (isOrderApproved)
+            {
+                response.Status = Status.Success;
+                return response;
+            }
+            response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidOrder);
+            return response;
+        }
+
+        //returns true if order is edited
+        private async Task<bool> CheckOrderEdited(VendorOrder vendorOrder)
+        {
+            try
+            {
+                VendorOrderResponse vendorOrderResponse = await GetVendorOrderByOrderId(vendorOrder.VendorOrderDetails.OrderId);
+                string originalDataHash = Utility.GenerateKey(vendorOrderResponse.VendorOrder);
+                string editedDataHash = Utility.GenerateKey(vendorOrder);
+                return originalDataHash != editedDataHash;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
         }
 
         public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, string fromDate, string toDate)
@@ -512,6 +585,7 @@ namespace IMS.Core.services
             {
                 var vendorOrderResponse = new VendorOrderResponse();
                 vendorOrderResponse.Status = Status.Failure;
+                vendorOrderResponse.CanEdit = false;
                 int userId = -1;
                 try
                 {
@@ -525,13 +599,14 @@ namespace IMS.Core.services
                     User user = Utility.GetUserFromToken(token);
                     userId = user.Id;
                     var vendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
-                    if (vendorOrder != null && vendorOrder.VendorOrderDetails!=null)
+                    if (vendorOrder.VendorOrderDetails != null)
                     {
                         vendorOrderResponse.VendorOrder = vendorOrder;
-                        vendorOrderResponse.Status = Status.Success;
+                        vendorOrderResponse.CanEdit = !await _vendorOrderDbContext.CheckUserEditedOrderBefore(user.Id, orderId);
                         return vendorOrderResponse;
                     }
-                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidOrderId);
+                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotFount);
+                    return vendorOrderResponse;
                 }
                 catch (CustomException e)
                 {

@@ -26,13 +26,12 @@ namespace IMS.Core.Translators
                 return new Entities.VendorOrderDetails
                 {
                     OrderId = dtoVendorOrderDetails.OrderId,
-                    IsApproved = dtoVendorOrderDetails.IsApproved,
                     RecievedBy = dtoVendorOrderDetails.RecievedBy,
                     SubmittedTo = dtoVendorOrderDetails.SubmittedTo,
                     TaxableAmount = dtoVendorOrderDetails.TaxableAmount,
                     InvoiceNumber = dtoVendorOrderDetails.InvoiceNumber,
-                    InvoiceImageUrl = dtoVendorOrderDetails.InvoiceImageUrl,
-                    ChallanImageUrl = dtoVendorOrderDetails.ChallanImageUrl,
+                    InvoiceImageUrl = dtoVendorOrderDetails.InvoiceImageUrl == null ? "" : dtoVendorOrderDetails.InvoiceImageUrl,
+                    ChallanImageUrl = dtoVendorOrderDetails.ChallanImageUrl == null ? "" : dtoVendorOrderDetails.ChallanImageUrl,
                     ChallanNumber = dtoVendorOrderDetails.ChallanNumber,
                     Date = dtoVendorOrderDetails.Date,
                     OrderItemDetails = dtoVendorOrderDetails.OrderItemDetails == null ? null : ToEntitiesObject(dtoVendorOrderDetails.OrderItemDetails)
@@ -106,7 +105,8 @@ namespace IMS.Core.Translators
                 {
                     Status = doVendorOrderResponse.Status == Entities.Status.Success ? Contracts.Status.Success : Contracts.Status.Failure,
                     Error = doVendorOrderResponse.Error == null ? null : Translator.ToDataContractsObject(doVendorOrderResponse.Error),
-                    VendorOrder = doVendorOrderResponse.VendorOrder == null ? null : ToDataContractsObject(doVendorOrderResponse.VendorOrder)
+                    VendorOrder = doVendorOrderResponse.VendorOrder == null ? null : ToDataContractsObject(doVendorOrderResponse.VendorOrder),
+                    CanEdit = doVendorOrderResponse.CanEdit == false ? false : true
                 };
             return null;
         }

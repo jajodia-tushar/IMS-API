@@ -66,7 +66,8 @@ namespace IMS.Core
             public const string DateFormatInvalid = "Given Date Format is Invalid";
             public const string NoItemsInStore = "No items in store";
             public const string UnableToShowStockStatus = "Sorry, Unable to show stock status";
-            public static string LocationNotfound = "No Location found on given Input";
+            public const string LocationNotfound = "No Location found on given Input";
+            public const string AlreadyEdited = "Cannot Edit Order Again";
             public const string EmailFormatError = "Invalid Email Format";
             public const string EmptyLogList = "No Log history found ";
             public const string UserDetailsMissing = "Fields Cannot be Empty";
@@ -84,6 +85,7 @@ namespace IMS.Core
             public const string InvalidPageNumber = "Page Number is Invalid";
             public const string InvalidEmailId = "Invalid Email Id";
             public const string InvalidPagingDetails = "The page number or page size is invalid";
+            public const string OrderNotFount = "No Order Found on this OrderId";
             public const string DataAlreadyPresent = "Data is already present";
             public const string NoEmployeesPresent = "NoEmployeesPresent";
             public const string EmployeesDataNotFound = "Employees Data Not Found";

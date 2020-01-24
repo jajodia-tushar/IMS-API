@@ -4,6 +4,7 @@ using System.Text;
 
 namespace IMS.Entities
 {
+    [Serializable]
     public class Vendor
     {
         public int Id { get; set; }
