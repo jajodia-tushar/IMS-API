@@ -605,5 +605,60 @@ namespace IMS.Core.services
             }
             return dateWiseItemsConsumption;
         }
+        public async Task<ItemConsumptionDetailsResponse> GetDateWiseItemConsumptionDetails(string startDate, string endDate, int pageNumber, int pageSize)
+        {
+            ItemConsumptionDetailsResponse itemConsumptionResponse = new ItemConsumptionDetailsResponse();
+            int userId = -1;
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    if (pageSize <= 0 || pageNumber <= 0)
+                    {
+                        itemConsumptionResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                        return itemConsumptionResponse;
+                    }
+                    int limit = pageSize;
+                    int offset = (pageNumber - 1) * pageSize;
+                    itemConsumptionResponse = await _reportsDbContext.GetDateWiseItemConsumptionDetails(startDate, endDate, limit, offset);
+                    if (itemConsumptionResponse.DateWiseItemConsumptionDetails != null && itemConsumptionResponse.DateWiseItemConsumptionDetails.Count>0)
+                    {
+                        itemConsumptionResponse.PagingInfo.PageNumber = pageNumber;
+                        itemConsumptionResponse.PagingInfo.PageSize = pageSize;
+                        itemConsumptionResponse.Status = Status.Success;
+                    }
+                    else
+                    {
+                        itemConsumptionResponse.Status = Status.Failure;
+                        itemConsumptionResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.RecordNotFound
+                        };
+                    }
+                }
+                else
+                {
+                    itemConsumptionResponse.Status = Status.Failure;
+                    itemConsumptionResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                itemConsumptionResponse.Status = Status.Failure;
+                itemConsumptionResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.UnableToShowStockStatus);
+                new Task(() => { _logger.LogException(exception, "GetItemCosumptionDetails", Severity.Medium, "GetItemCosumptionDetails", itemConsumptionResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (itemConsumptionResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log("GetItemCosumptionDetails", itemConsumptionResponse, "GetItemCosumptionDetails", itemConsumptionResponse.Status, severity, userId); }).Start();
+            }
+            return itemConsumptionResponse;
+        }
     }
 }

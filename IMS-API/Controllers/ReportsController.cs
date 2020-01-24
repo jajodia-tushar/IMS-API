@@ -259,5 +259,37 @@ namespace IMS_API.Controllers
             }
             return dateWiseItemsConsumption;
         }
+        /// <summary>
+        /// Retrieve datewise item consumption details between a given date range
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns>Datewise item consumption count</returns>
+        /// <response code="200">Returns datewise item consumption details if input is valid otherwise it returns status failure</response>
+        [Route("GetDateWiseItemConsumptionDetails")]
+        [HttpGet]
+        public async Task<ItemConsumptionDetailsResponse> GetDateWiseItemConsumptionDetails(string startDate, string endDate, int pageNumber, int pageSize)
+        {
+            ItemConsumptionDetailsResponse itemConsumptionDetailsReport = null;
+            try
+            {
+                IMS.Entities.ItemConsumptionDetailsResponse itemConsumptionDetailsReportEntity = await _reportsService.GetDateWiseItemConsumptionDetails(startDate, endDate, pageNumber, pageSize);
+                itemConsumptionDetailsReport = ReportsTranslator.ToDataContractsObject(itemConsumptionDetailsReportEntity);
+            }
+            catch (Exception exception)
+            {
+                itemConsumptionDetailsReport = new IMS.Contracts.ItemConsumptionDetailsResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetDateWiseItemConsumptionDetails", IMS.Entities.Severity.High, startDate + ";" + endDate, itemConsumptionDetailsReport); }).Start();
+            }
+            return itemConsumptionDetailsReport;
+        }
     }
 }

@@ -231,5 +231,36 @@ namespace IMS.Core.Translators
             }
             return null;
         }
+        public static Contracts.ItemConsumptionDetailsResponse ToDataContractsObject(Entities.ItemConsumptionDetailsResponse itemConsumptionDetailsReportEntity)
+        {
+            var contractItemConsumptionReport = new Contracts.ItemConsumptionDetailsResponse();
+            if (itemConsumptionDetailsReportEntity.Status == Entities.Status.Success)
+            {
+                contractItemConsumptionReport.Status = Contracts.Status.Success;
+                contractItemConsumptionReport.PagingInfo = itemConsumptionDetailsReportEntity.PagingInfo == null ? null : Translator.ToDataContractsObject(itemConsumptionDetailsReportEntity.PagingInfo);
+                contractItemConsumptionReport.DateWiseItemConsumptionDetails = itemConsumptionDetailsReportEntity.DateWiseItemConsumptionDetails == null ? null : ToDataContractsObject(itemConsumptionDetailsReportEntity.DateWiseItemConsumptionDetails);
+            }
+            else
+            {
+                contractItemConsumptionReport.Status = Contracts.Status.Failure;
+                contractItemConsumptionReport.Error = Translator.ToDataContractsObject(itemConsumptionDetailsReportEntity.Error);
+            }
+            return contractItemConsumptionReport;
+        }
+        public static List<Contracts.DateWiseItemConsumptionDetails> ToDataContractsObject(List<Entities.DateWiseItemConsumptionDetails> dateWiseItemConsumptionDetails)
+        {
+            List<Contracts.DateWiseItemConsumptionDetails> dateWiseItemConsumptionDetailsContract = new List<Contracts.DateWiseItemConsumptionDetails>();
+            if (dateWiseItemConsumptionDetails != null)
+            {
+                foreach (Entities.DateWiseItemConsumptionDetails dateWiseItemConsumptionDetailEntity in dateWiseItemConsumptionDetails)
+                {
+                    Contracts.DateWiseItemConsumptionDetails dateWiseItemConsumptionDetailContract = new Contracts.DateWiseItemConsumptionDetails();
+                    dateWiseItemConsumptionDetailContract.Item = dateWiseItemConsumptionDetailEntity.Item == null ? null : ItemTranslator.ToDataContractsObject(dateWiseItemConsumptionDetailEntity.Item);
+                    dateWiseItemConsumptionDetailContract.DateItemConsumptions = dateWiseItemConsumptionDetailEntity.Item == null ? null : ToDataContractsObject(dateWiseItemConsumptionDetailEntity.DateItemConsumptions);
+                    dateWiseItemConsumptionDetailsContract.Add(dateWiseItemConsumptionDetailContract);
+                }
+            }
+            return dateWiseItemConsumptionDetailsContract;
+        }
     }
 }

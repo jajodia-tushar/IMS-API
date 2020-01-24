@@ -461,8 +461,95 @@ namespace IMS.DataLayer.Db
                 dateWiseItemsConsumption.DateItemMapping =  result.OrderByDescending(obj => obj.Date).ToList();
 
                 return dateWiseItemsConsumption;
+            }          
+        }
+        public async Task<ItemConsumptionDetailsResponse> GetDateWiseItemConsumptionDetails(string startDate, string endDate, int limit, int offset)
+        {
+            ItemConsumptionDetailsResponse itemsAvailabilityResponse = new ItemConsumptionDetailsResponse();
+            itemsAvailabilityResponse.PagingInfo = new PagingInfo();
+            Dictionary<int, List<DateItemConsumption>> itemConsumption = new Dictionary<int, List<DateItemConsumption>>();
+            try
+            {
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@startDate", startDate);
+                    command.Parameters.AddWithValue("@endDate", endDate);
+                    command.Parameters.AddWithValue("@pageLimit", limit);
+                    command.Parameters.AddWithValue("@pageOffset", offset);
+                    command.Parameters.Add("@x", MySqlDbType.Int32, 32);
+                    command.Parameters["@x"].Direction = ParameterDirection.Output;
+                    command.CommandText = "spGetItemsConsumptionDetailsInDateRange";
+                    DbDataReader reader = await command.ExecuteReaderAsync();
+                    itemsAvailabilityResponse.DateWiseItemConsumptionDetails = ExtractDictionary(reader);
+                    reader.Close();
+                    await command.ExecuteNonQueryAsync();
+                    itemsAvailabilityResponse.PagingInfo.TotalResults = (int)command.Parameters["@x"].Value;
+                };
             }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            return itemsAvailabilityResponse;
+        }
 
+        private List<DateWiseItemConsumptionDetails> ExtractDictionary(DbDataReader reader)
+        {
+            int id;
+            int totalConsumption;
+            string Date;
+            Dictionary<int, List<DateItemConsumption>> itemConsumption = new Dictionary<int, List<DateItemConsumption>>();
+            List<Item> items = new List<Item>();
+            while (reader.Read())
+            {
+                id = (int)reader["ItemId"];
+                if (!(items.Select(x => x.Id).Distinct().Contains(id)))
+                {
+                    items.Add(Extract(reader));
+                    itemConsumption.Add(id, new List<DateItemConsumption>());
+                    totalConsumption = Convert.ToInt32(reader["Total"]);
+                    Date = reader["Date"]?.ToString();
+                    if (itemConsumption.ContainsKey(id))
+                    {
+                        itemConsumption[id].Add(new DateItemConsumption() { Date = Date, ItemsConsumptionCount = totalConsumption });
+                    }
+                }
+                else
+                {
+                    totalConsumption = Convert.ToInt32(reader["Total"]);
+                    Date = reader["Date"]?.ToString();
+                    if (itemConsumption.ContainsKey(id))
+                    {
+                        itemConsumption[id].Add(new DateItemConsumption() { Date = Date, ItemsConsumptionCount = totalConsumption });
+                    }
+                }
+            }
+            return ConvertToList(itemConsumption, items); ;
+        }
+
+        public List<DateWiseItemConsumptionDetails> ConvertToList(Dictionary<int, List<DateItemConsumption>> itemConsumption, List<Item> items)
+        {
+            List<DateWiseItemConsumptionDetails> consumptionList = new List<DateWiseItemConsumptionDetails>();
+            foreach (Item item in items)
+            {
+                DateWiseItemConsumptionDetails consumption = new DateWiseItemConsumptionDetails();
+                consumption.Item = item;
+                consumption.DateItemConsumptions = new List<DateItemConsumption>();
+                List<DateItemConsumption> dateItemConsumption = new List<DateItemConsumption>();
+                if (itemConsumption.ContainsKey(item.Id))
+                {
+                    dateItemConsumption = itemConsumption[item.Id];
+                    foreach (DateItemConsumption iterator in dateItemConsumption)
+                    {
+                        consumption.DateItemConsumptions.Add(iterator);
+                    }
+                }
+                consumptionList.Add(consumption);
+            }
+            return consumptionList;
         }
     }
 }
