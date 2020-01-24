@@ -39,7 +39,7 @@ namespace IMS.Core.services
             _vendorService = vendorService;
             _mailService = mailService;
         }
-        [Audit("Deleted Vendor Order With Id")]
+        [Audit("Deleted Vendor Order With Id","Order")]
         public async Task<Response> Delete(int orderId)
         {
             Response deleteVendorOrderResponse = new Response();
@@ -284,7 +284,7 @@ namespace IMS.Core.services
             return employeeRecentOrderResponse;
         }
         //vendororders
-        [Audit("Added Vendor order With Id")]
+        [Audit("Added Vendor order With Id","Order")]
         public async Task<VendorOrderResponse> SaveVendorOrder(VendorOrder vendorOrder)
         {
             VendorOrderResponse response = new VendorOrderResponse
@@ -403,7 +403,7 @@ namespace IMS.Core.services
                 itemQtyPrice.TotalPrice = Math.Round(itemQtyPrice.Item.Rate * itemQtyPrice.Quantity, 2);
         }
 
-        [Audit("Approved Vendor Order With Id")]
+        [Audit("Approved Vendor Order With Id","Order")]
         public async Task<Response> ApproveVendorOrder(VendorOrder vendorOrder)
         {
             var vendorOrderResponse = new VendorOrderResponse();

@@ -81,7 +81,7 @@ namespace IMS.Core.services
 
             return usersResponse;
         }
-        [Audit("Deleted User with Id")]
+        [Audit("Deleted User with Id","User")]
         public async Task<Response> DeleteUser(int userId, bool isHardDelete)
         {
             Response deleteUserResponse = new Response();
@@ -239,7 +239,7 @@ namespace IMS.Core.services
             return usersResponse;
         }
 
-        [Audit("Updated User")]
+        [Audit("Updated User","User")]
         public async Task<UsersResponse> UpdateUser(User user)
         {
             UsersResponse userResponse = new UsersResponse();
@@ -308,7 +308,7 @@ namespace IMS.Core.services
             return userResponse;
         }
 
-        [Audit("Added User")]
+        [Audit("Added User","User")]
         public async Task<UsersResponse> AddUser(User newUser)
         {
             UsersResponse response = new UsersResponse

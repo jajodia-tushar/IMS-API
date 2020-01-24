@@ -15,7 +15,7 @@ namespace IMS.DataLayer.Db
         {
             _dbProvider = dbConnectionProvider;
         }
-        public async void AddAuditLogs(string username, string action, string details, string performedOn, string remarks)
+        public async void AddAuditLogs(string username, string action, string details, string performedOn, string remarks, string className)
         {
             using (var connection = await _dbProvider.GetConnection(Databases.LOGGING))
             {
@@ -30,6 +30,7 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@details", details);
                     command.Parameters.AddWithValue("@performedOn", performedOn);
                     command.Parameters.AddWithValue("@remarks", remarks);
+                    command.Parameters.AddWithValue("@className", className);
                     await command.ExecuteNonQueryAsync();
                 }
                 catch (Exception exception)

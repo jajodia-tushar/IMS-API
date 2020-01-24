@@ -30,6 +30,7 @@ namespace IMS.Core
         public void AfterInvoke(InvocationContext invocationContext, object methodResult)
         {
             var attribute = invocationContext.GetAttributeFromMethod<AuditAttribute>();
+            var processName = attribute.ProcessName;
             var className = attribute.ClassName;
             string status = GetStatus(methodResult);
             if (status.Equals("Success"))
@@ -46,8 +47,8 @@ namespace IMS.Core
                     performedOn = GetOrderId(parameterValue);
                 else
                     performedOn = GetNameFromRequest(parameterValue);
-                string details = userName + " " + className +" "+ performedOn;
-                _auditLogsDbContext.AddAuditLogs(userName, action, details, performedOn, null);
+                string details = userName + " " + processName +" "+ performedOn;
+                _auditLogsDbContext.AddAuditLogs(userName, action, details, performedOn, null,className);
             }
         }
         private string GetOrderId(object obj)

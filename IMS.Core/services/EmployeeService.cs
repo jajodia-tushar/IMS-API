@@ -258,7 +258,7 @@ namespace IMS.Core.services
             }
             return employeeResponse;
         }
-        [Audit("Added Employee")]
+        [Audit("Added Employee","Employee")]
         public async Task<EmployeeResponse> Add(Employee employee)
         {
             EmployeeResponse employeeResponse = new EmployeeResponse();
@@ -324,7 +324,7 @@ namespace IMS.Core.services
             return employeeResponse;
         }
 
-        [Audit("Deleted Employee With Id")]
+        [Audit("Deleted Employee With Id","Employee")]
         public async Task<Response> Delete(string id, bool isHardDelete)
         {
             Response employeeResponse = new Response();
@@ -386,7 +386,7 @@ namespace IMS.Core.services
             }
             return employeeResponse;
         }
-        [Audit("Updated Employee")]
+        [Audit("Updated Employee","Employee")]
         public async Task<EmployeeResponse> Update(Employee employee)
         {
             EmployeeResponse employeeResponse = new EmployeeResponse();
