@@ -623,7 +623,7 @@ namespace IMS.Core.services
                     int limit = pageSize;
                     int offset = (pageNumber - 1) * pageSize;
                     itemConsumptionResponse = await _reportsDbContext.GetDateWiseItemConsumptionDetails(startDate, endDate, limit, offset);
-                    if (itemConsumptionResponse.DateWiseItemConsumptionDetails != null)
+                    if (itemConsumptionResponse.DateWiseItemConsumptionDetails != null && itemConsumptionResponse.DateWiseItemConsumptionDetails.Count>0)
                     {
                         itemConsumptionResponse.PagingInfo.PageNumber = pageNumber;
                         itemConsumptionResponse.PagingInfo.PageSize = pageSize;
