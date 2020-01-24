@@ -404,7 +404,7 @@ namespace IMS.Core.services
         }
 
         [Audit("Approved Vendor Order With Id","Order")]
-        public async Task<Response> ApproveVendorOrder(VendorOrder vendorOrder)
+        public async Task<VendorOrderResponse> ApproveVendorOrder(VendorOrder vendorOrder)
         {
             var vendorOrderResponse = new VendorOrderResponse();
             vendorOrderResponse.Status = Status.Failure;
