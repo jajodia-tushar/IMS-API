@@ -6,6 +6,7 @@ using IMS.Contracts;
 using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,7 @@ namespace IMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class NotificationController : ControllerBase
     {
         private IAdminNotificationService _adminNotificationService;
