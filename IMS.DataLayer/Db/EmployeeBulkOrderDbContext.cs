@@ -1,6 +1,7 @@
 ﻿using IMS.DataLayer.Dto;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -248,6 +249,75 @@ namespace IMS.DataLayer.Db
                 }
             }
             return order;
+        }
+
+        public async Task<bool> ApproveOrder(ApproveEmployeeBulkOrder requestedApproveEmployeeBulkOrder)
+        {
+            bool isApproved = false;
+            DbDataReader reader = null;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetAllShelves";
+                    reader = await command.ExecuteReaderAsync();
+                    Dictionary<string, int> locationNameLocationIdMapping = new Dictionary<string, int>();
+                    locationNameLocationIdMapping.Add("warehouse", 0);
+                    while (reader.Read())
+                    {
+                        locationNameLocationIdMapping.Add(reader["Name"]?.ToString()?.ToLower(), (int)reader["Id"]);
+                    }
+                    command.Dispose();
+                    command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spApproveBulkOrder";
+                    command.Parameters.AddWithValue("@orderid", requestedApproveEmployeeBulkOrder.BulkOrderId);
+                    string listof_itemid_locationid_quantity = ConvertToListOfItemIdLocationIdQuantity(locationNameLocationIdMapping, requestedApproveEmployeeBulkOrder.ItemLocationQuantityMappings);
+                    command.Parameters.AddWithValue("@listof_itemid_locationid_quantity", listof_itemid_locationid_quantity);
+                    reader = await command.ExecuteReaderAsync();
+                    if(reader.Read())
+                    {
+                        isApproved = (bool)reader["isapproved"];
+                    }
+
+                    return isApproved;
+                }
+                catch(CustomException e)
+                {
+                    throw e;
+                }
+                catch (MySqlException e)
+                {
+                    throw e;
+                }
+                return isApproved;
+            }
+        }
+
+        private string ConvertToListOfItemIdLocationIdQuantity(Dictionary<string, int> locationNameLocationIdMapping, List<ItemLocationQuantityMapping> itemLocationQuantityMappings)
+        {
+            string result = "";
+            foreach(ItemLocationQuantityMapping itemLocationQuantityMapping in itemLocationQuantityMappings)
+            {
+                int itemId = itemLocationQuantityMapping.Item.Id;
+                foreach(LocationQuantityMapping locationQuantityMapping in itemLocationQuantityMapping.LocationQuantityMappings)
+                {
+                    
+                    string locationName = locationQuantityMapping.Location.ToLower();
+                    if (locationNameLocationIdMapping.ContainsKey(locationName))
+                    {
+                        result+=string.Concat(itemId + "," + locationNameLocationIdMapping[locationName] + "," + locationQuantityMapping.Quantity + ";");
+
+                     }
+                    else
+                        throw new InvalidOrderException();
+              }
+            }
+            return result;
         }
     }
 }
