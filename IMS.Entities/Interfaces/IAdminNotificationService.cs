@@ -7,6 +7,6 @@ namespace IMS.Entities.Interfaces
 {
     public interface IAdminNotificationService
     {
-        Task<NotificationResponse> GetAdminNotificationsAsync();
+        Task<NotificationResponse> GetAdminNotificationsAsync(int currentPageNumber, int currentPageSize);
     }
 }

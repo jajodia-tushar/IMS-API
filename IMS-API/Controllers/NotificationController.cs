@@ -22,12 +22,26 @@ namespace IMS_API.Controllers
         }
         // GET: api/Notification
         [HttpGet]
-        public async Task<NotificationResponse> Get()
+        public async Task<NotificationResponse> Get(int? pageNumber, int? pageSize)
         {
             var notificationResponse = new NotificationResponse();
             try
             {
-                var doNotificationResponse = await _adminNotificationService.GetAdminNotificationsAsync();
+                int currentPageNumber = pageNumber ?? 1;
+                int currentPageSize = pageSize ?? 10;
+                if (currentPageNumber <= 0 || currentPageSize <= 0)
+                {
+                    return new NotificationResponse()
+                    {
+                        Status = Status.Failure,
+                        Error = new Error
+                        {
+                            ErrorCode = Constants.ErrorCodes.BadRequest,
+                            ErrorMessage = Constants.ErrorMessages.InvalidRequest
+                        }
+                    };
+                }
+                var doNotificationResponse = await _adminNotificationService.GetAdminNotificationsAsync(currentPageNumber, currentPageSize);
                 notificationResponse = NotificationTranslator.ToDataContractObject(doNotificationResponse);
             }
             catch(Exception exception)

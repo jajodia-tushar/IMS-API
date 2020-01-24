@@ -23,6 +23,7 @@ namespace IMS.Core.Translators
                     dtoNotificationResponse.Status = Contracts.Status.Failure;
                     dtoNotificationResponse.Error = doNotificationResponse.Error == null ? null : Translator.ToDataContractsObject(doNotificationResponse.Error);
                 }
+                dtoNotificationResponse.PagingInfo = Translator.ToDataContractsObject(doNotificationResponse.PagingInfo);
                 return dtoNotificationResponse;
             }
             catch(Exception exception)

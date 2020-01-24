@@ -25,10 +25,17 @@ namespace IMS.Core.services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<NotificationResponse> GetAdminNotificationsAsync()
+        public async Task<NotificationResponse> GetAdminNotificationsAsync(int currentPageNumber, int currentPageSize)
         {
-            var notificationResponse = new NotificationResponse();
-            notificationResponse.Status = Status.Failure;
+            var notificationResponse = new NotificationResponse()
+            {
+                Status = Status.Failure,
+                PagingInfo = new PagingInfo()
+                {
+                    PageNumber = currentPageNumber,
+                    PageSize = currentPageSize,
+                }
+            };
             int userId = -1;
 
             try
@@ -37,10 +44,11 @@ namespace IMS.Core.services
                 if (!request.HasValidToken)
                     throw new InvalidTokenException();
                 userId = request.User.Id;
-                var notifications = await _adminNotificationDbContext.GetAdminNotifications();
-                if(notifications!=null && notifications.Count > 0)
+                var doNotificationResponse = await _adminNotificationDbContext.GetAdminNotifications(currentPageNumber, currentPageSize);
+                notificationResponse.PagingInfo.TotalResults = doNotificationResponse.PagingInfo.TotalResults;
+                if (doNotificationResponse.Notifications!=null && doNotificationResponse.Notifications.Count > 0)
                 {
-                    notificationResponse.Notifications = notifications;
+                    notificationResponse.Notifications = doNotificationResponse.Notifications;
                     notificationResponse.Status = Status.Success;
                     return notificationResponse;
                 }

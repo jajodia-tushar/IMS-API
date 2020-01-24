@@ -8,6 +8,6 @@ namespace IMS.DataLayer.Interfaces
 {
     public interface IAdminNotificationDbContext
     {
-        Task<List<Notification>> GetAdminNotifications();
+        Task<NotificationResponse> GetAdminNotifications(int currentPageNumber, int currentPageSize);
     }
 }

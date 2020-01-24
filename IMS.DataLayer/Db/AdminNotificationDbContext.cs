@@ -16,18 +16,24 @@ namespace IMS.DataLayer.Db
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
-        public async Task<List<Notification>> GetAdminNotifications()
+        public async Task<NotificationResponse> GetAdminNotifications(int pageNumber, int pageSize)
         {
+            var notificationResponse = new NotificationResponse();
             var notifications = new List<Notification>();
             DbDataReader reader = null;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
+                    int lim = pageSize;
+                    int off = (pageNumber - 1) * pageSize;
+                    int totalResults = 0;
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetNotifications";
+                    command.Parameters.AddWithValue("@lim", lim);
+                    command.Parameters.AddWithValue("@off", off);
                     reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
@@ -40,8 +46,15 @@ namespace IMS.DataLayer.Db
                             LastModified = (DateTime)reader["LastModified"]
                         };
                         notifications.Add(notification);
+                        totalResults = Convert.ToInt32(reader["totalResult"]);
                     }
-                    return notifications;
+                    notificationResponse.Notifications = notifications;
+                    notificationResponse.PagingInfo = new PagingInfo()
+                    {
+                        TotalResults = totalResults
+                    };
+
+                    return notificationResponse;
                 }
                 catch (Exception ex)
                 {
