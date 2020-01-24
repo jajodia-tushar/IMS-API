@@ -18,15 +18,15 @@ namespace IMS.Core.services
         private ILogManager _logger;
         private IHttpContextAccessor _httpContextAccessor;
         private ITokenProvider _tokenProvider;
-        private IActivityLogDbContext _activityLogDbContext;
+        private IAuditLogsDbContext _auditLogsDbContext;
 
-        public LogsService(IActivityLogDbContext activityLogDbContext,ILogDbContext logDbContext,ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
+        public LogsService(IAuditLogsDbContext auditLogsDbContext,ILogDbContext logDbContext,ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
         {
             _logDbContext = logDbContext;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _tokenProvider = tokenProvider;
-            _activityLogDbContext = activityLogDbContext;
+            _auditLogsDbContext = auditLogsDbContext;
         }
         public async Task<LogsResponse> GetLogsRecord()
         {
@@ -83,7 +83,7 @@ namespace IMS.Core.services
                 {
                     throw new InvalidPagingInfo(Constants.ErrorMessages.InvalidPagingDetails);
                 }
-                Tuple<int, List<ActivityLogs>> activityLogs = await _activityLogDbContext.GetActivityLogs(currentPageNumber, currentPageSize, startDate, endDate);
+                Tuple<int, List<ActivityLogs>> activityLogs = await _auditLogsDbContext.GetActivityLogs(currentPageNumber, currentPageSize, startDate, endDate);
                 if (activityLogs.Item2.Count < 0)
                 {
                     throw new RecordsNotFoundException(Constants.ErrorMessages.ActivityLogsNotPresent);
