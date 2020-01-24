@@ -94,7 +94,7 @@ namespace IMS.Core
             public const string EmployeeNotDeleted = "employee not deleted";
             public const string InvalidBulkRequestDate = "Order must be placed atleast Two days before Requirement Date.Please Contact Admin Team for further assistance";
             public const string OrderNotFound = "Order not found for this Id";
-            public const string NoNotification = "Notifications Not found";
+            public const string NoNotification = "Notifications not found";
         }
 
         public static class ErrorCodes

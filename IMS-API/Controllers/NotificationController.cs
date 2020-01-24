@@ -39,7 +39,7 @@ namespace IMS_API.Controllers
                         Error = new Error
                         {
                             ErrorCode = Constants.ErrorCodes.BadRequest,
-                            ErrorMessage = Constants.ErrorMessages.InvalidRequest
+                            ErrorMessage = Constants.ErrorMessages.InvalidPagingDetails
                         }
                     };
                 }
