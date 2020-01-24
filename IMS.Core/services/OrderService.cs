@@ -605,6 +605,7 @@ namespace IMS.Core.services
                     {
                         vendorOrderResponse.VendorOrder = vendorOrder;
                         vendorOrderResponse.CanEdit = !await _vendorOrderDbContext.CheckUserEditedOrderBefore(user.Id, orderId);
+                        vendorOrderResponse.Status = Status.Success;
                         return vendorOrderResponse;
                     }
                     vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotFount);
