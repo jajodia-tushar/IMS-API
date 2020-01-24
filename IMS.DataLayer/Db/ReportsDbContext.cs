@@ -410,7 +410,7 @@ namespace IMS.DataLayer.Db
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "test_procedure";
+                    command.CommandText = "spGetItemsConsumptionReports";
                     command.Parameters.AddWithValue("@fromDate", fromDate);
                     command.Parameters.AddWithValue("@pageLimit", limit);
                     command.Parameters.AddWithValue("@pageOffset", offset);
