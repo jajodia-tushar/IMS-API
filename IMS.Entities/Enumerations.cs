@@ -18,4 +18,18 @@ namespace IMS.Entities
         Approved,
         Cancelled
     }
+    public enum RequestStatus
+    {
+        Pending,
+        Rejected,
+        Approved,
+        Edited
+    }
+
+    public enum RequestType
+    {
+        VendorOrder,
+        BulkOrder,
+        UserModification
+    }
 }

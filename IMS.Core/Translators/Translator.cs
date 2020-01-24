@@ -30,6 +30,7 @@ namespace IMS.Core.Translators
                 ErrorMessage = error.ErrorMessage
             };
         }
+
         public static Contracts.PagingInfo ToDataContractsObject(Entities.PagingInfo pagingInfo)
         {
             if (pagingInfo != null)
