@@ -84,7 +84,7 @@ namespace IMS.Core.services
                     throw new InvalidPagingInfo(Constants.ErrorMessages.InvalidPagingDetails);
                 }
                 Tuple<int, List<ActivityLogs>> activityLogs = await _auditLogsDbContext.GetActivityLogs(currentPageNumber, currentPageSize, startDate, endDate);
-                if (activityLogs.Item2.Count < 0)
+                if (activityLogs.Item2.Count == 0)
                 {
                     throw new RecordsNotFoundException(Constants.ErrorMessages.ActivityLogsNotPresent);
                 }
