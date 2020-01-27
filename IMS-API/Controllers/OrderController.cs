@@ -366,6 +366,11 @@ namespace IMS_API.Controllers
 
             return contractsBulkOrdersResponse;
         }
+        /// <summary>
+        /// Get all EmployeeBulkOrders
+        /// </summary>
+        /// <returns>EmployeeBulkOrdersResponse</returns>
+        /// <response code="200">Returns Status Success if BulkOrders were found</response>
         [HttpGet("EmployeeBulkOrders/{orderId}", Name = "GetEmployeeBulkOrderById")]
         public async Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrderById(int orderid)
         {
@@ -392,6 +397,7 @@ namespace IMS_API.Controllers
 
             return contractsBulkOrderResponse;
         }
+
         [HttpPut("EmployeeBulkOrders/{orderId}/Approve", Name = "ApproveEmployeeBulkOrder")]
         public async Task<ApproveBulkOrderResponse> ApproveEmployeeBulkOrder(int orderid, [FromBody] ApproveEmployeeBulkOrder approveEmployeeBulkOrder)
         {
@@ -420,6 +426,11 @@ namespace IMS_API.Controllers
             return contractsApproveBulkOrderResponse;
         }
 
+        /// <summary>
+        /// Return Employee Bulk Order
+        /// </summary>
+        /// <returns>EmployeeBulkOrdersResponse</returns>
+        /// <response code="200">Returns Status Success if order return was successfull</response>
         [HttpPut("EmployeeBulkOrders/{orderId}/return", Name = "ReturnEmployeeBulkOrderById")]
         public async Task<EmployeeBulkOrdersResponse> ReturnBulkOrderById(int orderId, [FromBody] EmployeeBulkOrder employeeBulkOrder)
         {

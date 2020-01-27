@@ -886,13 +886,13 @@ namespace IMS.Core.services
             catch (CustomException exception)
             {
                 employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
-                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, employeeBulkOrder, employeeBulkOrdersResponse); }).Start();
             }
 
             catch (Exception exception)
             {
                 employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, employeeBulkOrder, employeeBulkOrdersResponse); }).Start();
             }
             finally
             {

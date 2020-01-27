@@ -219,7 +219,7 @@ namespace IMS.DataLayer.Db
         public async Task<EmployeeBulkOrder> CancelOrReturnOrderItems(EmployeeBulkOrder employeeBulkOrder)
         {
             DbDataReader reader = null;
-            EmployeeBulkOrder updatedEmployeeBulkOrder = new EmployeeBulkOrder();
+            EmployeeBulkOrder updatedEmployeeBulkOrder = null;
             List<EmployeeBulkOrderDto> employeeBulkOrderDto = new List<EmployeeBulkOrderDto>();
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             { 
