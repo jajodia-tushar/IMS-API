@@ -405,8 +405,8 @@ namespace IMS.Core.services
             {
                 RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                 if (!request.HasValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = request.User;
+                    throw new InvalidTokenException();
+                var user = request.User;
                 userId = user.Id;
                 var response =  await RestrictOrderApproval(vendorOrder, user);
                 if (response.Status.Equals(Status.Success))
@@ -535,8 +535,8 @@ namespace IMS.Core.services
             {
                 RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                 if (!request.HasValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = request.User;
+                    throw new InvalidTokenException();
+                var user = request.User;
                 userId = user.Id;
                 var vendorResponse = await _vendorService.GetVendorById(vendorId);
                 if (vendorResponse.Status.Equals(Status.Failure))
@@ -585,8 +585,8 @@ namespace IMS.Core.services
                 {
                     RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                     if (!request.HasValidToken)
-                        throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                    User user = request.User;
+                        throw new InvalidTokenException();
+                    var user = request.User;
                     userId = user.Id;
                     var vendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
                     if (vendorOrder.VendorOrderDetails != null)
