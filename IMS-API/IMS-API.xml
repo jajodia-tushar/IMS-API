@@ -165,12 +165,36 @@
             <returns>Response</returns>
             <response code="200">Returns Status Success if vendorOrder is found on the given orderId</response>
         </member>
+        <member name="M:IMS_API.Controllers.OrderController.PlaceEmployeeBulkOrder(IMS.Contracts.EmployeeBulkOrder)">
+            <summary>
+            creating bulk order
+            </summary>
+            <param name="employeeBulkOrder">Here employeeBulkOrder contains related to entire Bulk order details</param>
+            <returns>Response</returns>
+            <response code="200">Returns Success status and entire object if employeeBulkOrder is Created otherwise it returns Error and status failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.OrderController.GetEmployeeBulkOrderById(System.Int32)">
             <summary>
             Get all EmployeeBulkOrders
             </summary>
             <returns>EmployeeBulkOrdersResponse</returns>
             <response code="200">Returns Status Success if BulkOrders were found</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.ApproveEmployeeBulkOrder(System.Int32,IMS.Contracts.ApproveEmployeeBulkOrder)">
+            <summary>
+            creating bulk order
+            </summary>
+            <param name="approveEmployeeBulkOrder">Here approveEmployeeBulkOrder contains related to entire Bulk order details and location to reduce item quantities</param>
+            <returns>Response</returns>
+            <response code="200">Returns Success status and entire object if employeeBulkOrder is APproved otherwise it returns Error and status failure</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.RejectEmployeeBulkOrder(System.Int32)">
+            <summary>
+            creating bulk order
+            </summary>
+            <param name="orderId">Here orderid To reject</param>
+            <returns>Response</returns>
+            <response code="200">Returns Success status  if order is Rejected otherwise it returns Error and status failure</response>
         </member>
         <member name="M:IMS_API.Controllers.OrderController.ReturnBulkOrderById(System.Int32,IMS.Contracts.EmployeeBulkOrder)">
             <summary>

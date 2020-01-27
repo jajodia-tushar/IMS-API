@@ -169,7 +169,7 @@ namespace IMS.Core.services
                 {
                     email.ToAddress = "preddy@tavisca.com";
                     email.Body = GenerateApprovedBulkOrderHTMLTemplateForAdmin(user,order, approveEmployeeBulkOrder.ItemLocationQuantityMappings,order.Employee);
-                    email.Subject = "Approved Order Id#:"+order.BulkOrderId;
+                    email.Subject = "Approved Order Id#:"+order.BulkOrderId+" "+"Receipt";
                     return await _notificationProvider.SendEmail(email);
                 }
                 return false;
@@ -226,7 +226,7 @@ namespace IMS.Core.services
                                 <h5>Please drop an email to admin@tavisca.com to report if this transaction was not authorized by you.</h5>
                             </div>
                             <div class='regards-text' style='margin-bottom: 50px;'>
-                                <h5>Regards, <br> Tavisca Admin Team</h5>
+                                <h5>Regards, <br> Tavisca IMS </h5>
                             </div>
                         </div>
                     </section>";
