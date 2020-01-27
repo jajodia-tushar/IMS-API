@@ -165,6 +165,20 @@
             <returns>Response</returns>
             <response code="200">Returns Status Success if vendorOrder is found on the given orderId</response>
         </member>
+        <member name="M:IMS_API.Controllers.OrderController.GetEmployeeBulkOrderById(System.Int32)">
+            <summary>
+            Get all EmployeeBulkOrders
+            </summary>
+            <returns>EmployeeBulkOrdersResponse</returns>
+            <response code="200">Returns Status Success if BulkOrders were found</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.ReturnBulkOrderById(System.Int32,IMS.Contracts.EmployeeBulkOrder)">
+            <summary>
+            Return Employee Bulk Order
+            </summary>
+            <returns>EmployeeBulkOrdersResponse</returns>
+            <response code="200">Returns Status Success if order return was successfull</response>
+        </member>
         <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
             <summary>
             Retrieve RAG(Red, Amber, Green) status of every inventory location

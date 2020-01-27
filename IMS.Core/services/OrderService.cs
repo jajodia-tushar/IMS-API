@@ -854,5 +854,54 @@ namespace IMS.Core.services
 
             return response;
         }
+
+        public async Task<EmployeeBulkOrdersResponse> ReturnOrderItems(int orderId, EmployeeBulkOrder employeeBulkOrder)
+        {
+            EmployeeBulkOrdersResponse employeeBulkOrdersResponse = new EmployeeBulkOrdersResponse()
+            {
+                Status = Status.Failure,
+                EmployeeBulkOrders = new List<EmployeeBulkOrder>()
+        };
+            int userId = -1;
+            try
+            {
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                userId = request.User.Id;
+                if (orderId <= 0)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
+                EmployeeBulkOrder orderFromDb = await _employeeBulkOrderDbContext.GetOrderById(orderId);
+
+                if (orderFromDb == null)
+                    throw new InvalidOrderException(Constants.ErrorMessages.OrderNotFound);
+                if (employeeBulkOrder.BulkOrderId!=orderId)
+                    throw new InvalidOrderException(Constants.ErrorMessages.OrderIdDoesNotMatch);
+                if (!EmployeeBulkOrderValidator.isEmployeeBulkOrderReturnValid(employeeBulkOrder, orderFromDb))
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderReturnDetails);
+
+                employeeBulkOrdersResponse.EmployeeBulkOrders.Add(await _employeeBulkOrderDbContext.CancelOrReturnOrderItems(employeeBulkOrder));
+                employeeBulkOrdersResponse.Status = Status.Success;
+            }
+            catch (CustomException exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
+                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, employeeBulkOrder, employeeBulkOrdersResponse); }).Start();
+            }
+
+            catch (Exception exception)
+            {
+                employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, employeeBulkOrder, employeeBulkOrdersResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (employeeBulkOrdersResponse.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(employeeBulkOrder, employeeBulkOrdersResponse, "ReturnOrderItems", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
+            }
+            return employeeBulkOrdersResponse;
+        }
     }
 }

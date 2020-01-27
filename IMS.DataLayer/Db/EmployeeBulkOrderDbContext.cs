@@ -215,6 +215,35 @@ namespace IMS.DataLayer.Db
                 return isSaved;
             }
         }
+
+        public async Task<EmployeeBulkOrder> CancelOrReturnOrderItems(EmployeeBulkOrder employeeBulkOrder)
+        {
+            DbDataReader reader = null;
+            EmployeeBulkOrder updatedEmployeeBulkOrder = null;
+            List<EmployeeBulkOrderDto> employeeBulkOrderDto = new List<EmployeeBulkOrderDto>();
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            { 
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandType = CommandType.StoredProcedure;
+                command.CommandText = "spReturnOrCancelBulkOrder";
+                var itemsQuantityList = employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
+                string itemIdQuantityUsedConcatList = string.Join(";", itemsQuantityList.Select(p => p.Item.Id + "," + p.QuantityUsed));
+                command.Parameters.AddWithValue("@listof_itemid_qty", itemIdQuantityUsedConcatList);
+                command.Parameters.AddWithValue("@order_status", employeeBulkOrder.EmployeeBulkOrderDetails.BulkOrderRequestStatus.ToString());
+                command.Parameters.AddWithValue("@bulkorderid", employeeBulkOrder.BulkOrderId);
+                reader = await command.ExecuteReaderAsync();
+                while (reader.Read())
+                {
+                    employeeBulkOrderDto.Add(ReadValuesFromDbReader(reader));
+                }
+                if (employeeBulkOrderDto.Count != 0)
+                    updatedEmployeeBulkOrder = DtoToEntitiesBulkOrders(employeeBulkOrderDto)[0];
+                return updatedEmployeeBulkOrder;
+
+            }
+        }
+
         private static string ConvertToString(List<BulkOrderItemQuantityMapping> orderItemDetails)
         {
             return string.Join(";", orderItemDetails.Select(p => p.Item.Id + "," + p.QuantityOrdered));
