@@ -122,11 +122,36 @@ namespace IMS_API.Controllers
             return dtoShelfResponse;
         }
 
-        // PUT: api/Shelf/5
-        [HttpPut("{id}")]
-        public void put(int id)
+        /// <summary>
+        /// Update the Specific Shelf
+        /// </summary>
+        /// <param name="shelf"></param>
+        /// <returns>Returns Updated Shelf</returns>
+        /// <response code="200">Returns Updated Shelf if Shlef is updated successfully otherwise it returns null with status failure</response>
+        [HttpPut]
+        public async Task<ShelfResponse> Update(Shelf shelf)
         {
-           
+            ShelfResponse contractsShelfResponse = new ShelfResponse();
+            try
+            {
+                IMS.Entities.Shelf entityShelfRequest = ShelfTranslator.ToEntitiesObject(shelf);
+                IMS.Entities.ShelfResponse entityShelfResponse = await _shelfService.Update(entityShelfRequest);
+                contractsShelfResponse = ShelfTranslator.ToDataContractsObject(entityShelfResponse);
+            }
+            catch(Exception exception)
+            {
+                contractsShelfResponse = new IMS.Contracts.ShelfResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Update", IMS.Entities.Severity.High, shelf, contractsShelfResponse); }).Start();
+            }
+            return contractsShelfResponse;
         }
 
         /// <summary>

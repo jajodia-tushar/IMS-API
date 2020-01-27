@@ -169,5 +169,10 @@ namespace IMS.Core
             }
             return requestData;
         }
+
+        internal static Task<RequestData> GetRequestDataFromHeader(object httpContextAccessor, object tokenProvider)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -166,6 +166,45 @@ namespace IMS.DataLayer
             
             return isShelfPresentByCode;
         }
+        
+        public async Task<Shelf> UpdateShelf(Shelf updatedShelf)
+        {
+            DbDataReader reader = null;
+            Shelf shelf = new Shelf();
+            using (var connection = await _dbProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spUpdateShelf";
+                    command.Parameters.AddWithValue("@id", updatedShelf.Id);
+                    command.Parameters.AddWithValue("@name", updatedShelf.Name);
+                    command.Parameters.AddWithValue("@isActive", updatedShelf.IsActive);
+                    command.Parameters.AddWithValue("@code", updatedShelf.Code);
+                    reader = await command.ExecuteReaderAsync();
+                    while (reader.Read())
+                    {
+                        shelf = ReadValuesFromDatabase(reader);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw exception;
+                }
+                return shelf;
+            }
+        }
 
+        private Shelf ReadValuesFromDatabase(DbDataReader reader)
+        {
+            Shelf shelf = new Shelf();
+            shelf.Id = (int)reader["Id"];
+            shelf.Name = reader["Name"]?.ToString();
+            shelf.IsActive = (bool)reader["IsActive"];
+            shelf.Code = reader["Code"]?.ToString();
+            return shelf;
+        }
     }
 }
