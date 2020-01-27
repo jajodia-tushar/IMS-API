@@ -855,6 +855,61 @@ namespace IMS.Core.services
             return response;
         }
 
+        public async Task<Response> RejectEmployeeBulkOrder(int orderId)
+        {
+            Response response = new Response
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            EmployeeBulkOrder orderFromDatabase = null;
+            try
+            {
+
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                userId = request.User.Id;
+                if (orderId <= 0)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
+                orderFromDatabase = await _employeeBulkOrderDbContext.GetOrderById(orderId);
+                if (orderFromDatabase == null)
+                    throw new InvalidOrderException(Constants.ErrorMessages.OrderNotFound);
+                 if (orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus != BulkOrderRequestStatus.Pending)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderToReject);
+                bool isRejected = await _employeeBulkOrderDbContext.RejectOrder(orderId);
+                if (!isRejected)
+                    throw new InvalidOrderException(Constants.ErrorMessages.OrderNotFound);
+                response.Status = Status.Success;
+ 
+            }
+            catch (CustomException exception)
+            {
+                response.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
+                new Task(() => { _logger.LogException(exception, "RejectBulkOrder", IMS.Entities.Severity.Critical, orderId, response); }).Start();
+            }
+
+            catch (Exception exception)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "RejectBulkOrder", IMS.Entities.Severity.Critical, orderId, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(orderId, response, "RejectBulkOrder", response.Status, severity, userId); }).Start();
+                if (response.Status == Status.Success)
+                {
+                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(orderFromDatabase, BulkOrderRequestStatus.Rejected); }).Start();
+                }
+            }
+
+
+            return response;
+        }
+
         public async Task<EmployeeBulkOrdersResponse> ReturnOrderItems(int orderId, EmployeeBulkOrder employeeBulkOrder)
         {
             EmployeeBulkOrdersResponse employeeBulkOrdersResponse = new EmployeeBulkOrdersResponse()

@@ -425,6 +425,33 @@ namespace IMS_API.Controllers
 
             return contractsApproveBulkOrderResponse;
         }
+        [HttpPut("EmployeeBulkOrders/{orderId}/Reject", Name = "RejectEmployeeBulkOrder")]
+        public async Task<Response> RejectEmployeeBulkOrder(int orderId)
+        {
+            Response response = null;
+            try
+            {
+                
+                IMS.Entities.Response entitiesResponse = await _orderService.RejectEmployeeBulkOrder(orderId);
+                response = Translator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception e)
+            {
+
+                response = new Response
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(e, "RejectEmployeeBulkOrder", IMS.Entities.Severity.Critical, orderId, response); }).Start();
+            }
+
+            return response;
+        }
 
         /// <summary>
         /// Return Employee Bulk Order
