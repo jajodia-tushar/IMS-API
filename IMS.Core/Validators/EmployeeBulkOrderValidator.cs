@@ -118,8 +118,8 @@ namespace IMS.Core.Validators
 
         private static bool IsQuantityUsedLessThanPreviousQuantityUsed(EmployeeBulkOrder employeeBulkOrder, EmployeeBulkOrder DbEmployeeBulkOrder)
         {
-            List<BulkOrderItemQuantityMapping> previousItemMapping = employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
-            List<BulkOrderItemQuantityMapping> newItemMapping = DbEmployeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
+            List<BulkOrderItemQuantityMapping> newItemMapping = employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
+            List<BulkOrderItemQuantityMapping> previousItemMapping = DbEmployeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
             for (int index=0; index<previousItemMapping.Count; index++)
             {
                 if (previousItemMapping[index].QuantityUsed < newItemMapping[index].QuantityUsed)
