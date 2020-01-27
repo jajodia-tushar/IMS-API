@@ -9,5 +9,6 @@ namespace IMS.Entities.Interfaces
     {
         Task<bool> SendEmployeeOrderReciept(EmployeeOrder employeeOrder);
         Task<bool> SendEmployeeBulkOrderReciept(EmployeeBulkOrder employeeBulkOrder, BulkOrderRequestStatus orderStatus);
+        Task<bool> SendApprovedBulkOrderToLoggedInUser(int loggedInUserId, EmployeeBulkOrder order, ApproveEmployeeBulkOrder approveEmployeeBulkOrder);
     }
 }

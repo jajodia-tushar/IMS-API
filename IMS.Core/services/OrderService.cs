@@ -848,6 +848,7 @@ namespace IMS.Core.services
                 if (response.Status == Status.Success)
                 {
                     new Task(() => { _mailService.SendEmployeeBulkOrderReciept(orderFromDatabase, BulkOrderRequestStatus.Approved); }).Start();
+                    new Task(() => { _mailService.SendApprovedBulkOrderToLoggedInUser(userId, orderFromDatabase, requestedApproveEmployeeBulkOrder); }).Start();
                 }
             }
 
