@@ -161,7 +161,7 @@ namespace IMS.Core.services
                 var newHashPassword = Utility.Hash(newPassword);
                 if (user != null)
                 {
-                    if (await _userDbContext.IsOldPasswordRepeatAgain(userId, newHashPassword) == false)
+                    if (await _userDbContext.IsOldPasswordRepeatAgain(userId, newHashPassword) == false && user.Password != newHashPassword)
                     {
                         try
                         {

@@ -97,7 +97,6 @@ namespace IMS.Core
             public const string InvalidEmployeeId = "Employee Id is not valid";
             public const string EmployeeNotDeleted = "employee not deleted";
 
-            public const string InvalidBulkRequestDate = "Order must be placed atleast Two days before Requirement Date.Please Contact Admin Team for further assistance";
             public const string UserNotFound = "User Not Found";
             public const string NewPasswordShouldNotEqualToOldPassword = "New Password Should Not Equal To Old Password";
             public const string PasswordNotUpdated = "Password Not Updated";
