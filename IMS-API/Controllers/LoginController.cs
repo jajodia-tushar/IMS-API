@@ -94,12 +94,13 @@ namespace IMS_API.Controllers
         [Route("api/Login/updateuserpassword/{userId:int}")]
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPatch]
-        public async Task<Response> UpdateUserPassword(int userId, [FromBody] string newPassword)
+        public async Task<Response> UpdateUserPassword(int userId, [FromBody] ChangePasswordDetails changePasswordDetails)
         {
             IMS.Contracts.Response contractsResponse = null;
             try
             {
-                IMS.Entities.Response response = await _loginService.UpdateUserPassword(userId,newPassword);
+                IMS.Entities.ChangePasswordDetails doChangePasswordDetails = LoginTranslator.ToEntitiesObject(changePasswordDetails);
+                IMS.Entities.Response response = await _loginService.UpdateUserPassword(userId,doChangePasswordDetails);
                 contractsResponse = Translator.ToDataContractsObject(response);
 
             }
@@ -114,7 +115,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(exception, "UpdateUserPassword", IMS.Entities.Severity.Critical,userId+";"+newPassword, contractsResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "UpdateUserPassword", IMS.Entities.Severity.Critical,userId, contractsResponse); }).Start();
             }
             return contractsResponse;
         }

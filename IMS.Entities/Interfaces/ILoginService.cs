@@ -12,6 +12,6 @@ namespace IMS.Entities.Interfaces
         Task<LoginResponse> Login(LoginRequest loginRequest);
 
         Task<Response> Logout();
-        Task<Response> UpdateUserPassword(int userId, string newPassword);
+        Task<Response> UpdateUserPassword(int userId, ChangePasswordDetails changePasswordDetails);
     }
 }
