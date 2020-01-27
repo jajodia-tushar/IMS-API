@@ -453,7 +453,7 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(e, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, "GET /EmployeeBulkOrders", contractsBulkOrderResponse); }).Start();
+                new Task(() => { _logger.LogException(e, "ReturnBulkOrderById", IMS.Entities.Severity.Critical, employeeBulkOrder, contractsBulkOrderResponse); }).Start();
             }
 
             return contractsBulkOrderResponse;
