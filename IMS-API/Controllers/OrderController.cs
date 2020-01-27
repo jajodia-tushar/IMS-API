@@ -392,7 +392,7 @@ namespace IMS_API.Controllers
 
             return contractsBulkOrderResponse;
         }
-        [HttpPost("EmployeeBulkOrders/{orderId}/Approve", Name = "ApproveEmployeeBulkOrder")]
+        [HttpPut("EmployeeBulkOrders/{orderId}/Approve", Name = "ApproveEmployeeBulkOrder")]
         public async Task<ApproveBulkOrderResponse> ApproveEmployeeBulkOrder(int orderid, [FromBody] ApproveEmployeeBulkOrder approveEmployeeBulkOrder)
         {
             ApproveBulkOrderResponse contractsApproveBulkOrderResponse = null;

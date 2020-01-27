@@ -290,11 +290,11 @@ namespace IMS.DataLayer.Db
                 {
                     throw e;
                 }
-                catch (MySqlException e)
+                catch (Exception e)
                 {
                     throw e;
                 }
-                return isApproved;
+                
             }
         }
 

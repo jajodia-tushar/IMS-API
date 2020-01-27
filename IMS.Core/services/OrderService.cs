@@ -801,12 +801,8 @@ namespace IMS.Core.services
             {
                 Status = Status.Failure
             };
-            int userId = -1;
-            //validate token
-            //get order from db
-            //verify status
-            //call db to change state and transfer object
-            //
+            int userId = -1;            
+            EmployeeBulkOrder orderFromDatabase = null;
             try
             {
 
@@ -816,35 +812,43 @@ namespace IMS.Core.services
                 userId = request.User.Id;
                 if (orderId <= 0)
                     throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
-                EmployeeBulkOrder orderFromDatabase = await _employeeBulkOrderDbContext.GetOrderById(orderId);
+                 orderFromDatabase = await _employeeBulkOrderDbContext.GetOrderById(orderId);
                 if (orderFromDatabase == null)
                     throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
-                if (orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus != BulkOrderRequestStatus.Pending)
-                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderToApprove);
                 if (!EmployeeBulkOrderValidator.ValidateToApprove(requestedApproveEmployeeBulkOrder, orderFromDatabase))
                     throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrder);
+                if (orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus != BulkOrderRequestStatus.Pending)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderToApprove);
+              
                 bool isApproved = await _employeeBulkOrderDbContext.ApproveOrder(requestedApproveEmployeeBulkOrder);
-                
+                if (!isApproved)
+                    throw new InvalidOrderException(Constants.ErrorMessages.ItemsUnavailability);
+                response.Status = Status.Success;
+                response.ApproveEmployeeBulkOrder = requestedApproveEmployeeBulkOrder;
 
 
             }
             catch (CustomException exception)
             {
                 response.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, orderId, response); }).Start();
+                new Task(() => { _logger.LogException(exception, "ApproveBulkOrder", IMS.Entities.Severity.Critical, requestedApproveEmployeeBulkOrder, response); }).Start();
             }
 
             catch (Exception exception)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, orderId, response); }).Start();
+                new Task(() => { _logger.LogException(exception, "ApproveBulkOrder", IMS.Entities.Severity.Critical, requestedApproveEmployeeBulkOrder, response); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (response.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(requestedApproveEmployeeBulkOrder, response, "GetEmployeeBulkOrders", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(requestedApproveEmployeeBulkOrder, response, "ApproveBulkOrder", response.Status, severity, userId); }).Start();
+                if (response.Status == Status.Success)
+                {
+                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(orderFromDatabase, BulkOrderRequestStatus.Approved); }).Start();
+                }
             }
 
 

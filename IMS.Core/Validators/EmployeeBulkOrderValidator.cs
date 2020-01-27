@@ -75,7 +75,7 @@ namespace IMS.Core.Validators
                 if (itemIdQuantityFromDB[itemIdFromRequest] != quantityAsignedForItemFromRequest)
                     return false;               
             }
-            return false;
+            return true;
 
 
         }

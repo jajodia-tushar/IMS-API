@@ -100,7 +100,11 @@ namespace IMS.Core
             public const string NoNotification = "Notifications not found";
 =======
             public const string InvalidOrderToApprove = "Order should  be in Pending state to Approve";
+<<<<<<< HEAD
 >>>>>>> implementation completed
+=======
+            public const string ItemsUnavailability = "Items are Unavailable To Approve";
+>>>>>>> mail service added
         }
 
         public static class ErrorCodes
