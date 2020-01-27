@@ -167,7 +167,7 @@ namespace IMS.Core.services
                 var user = await _userDbContext.GetUserById(loggedInUserId);
                 if (user!=null)
                 {
-                    email.ToAddress = user.Email;
+                    email.ToAddress = "preddy@tavisca.com";
                     email.Body = GenerateApprovedBulkOrderHTMLTemplateForAdmin(user,order, approveEmployeeBulkOrder.ItemLocationQuantityMappings,order.Employee);
                     email.Subject = "Approved Order Id#:"+order.BulkOrderId;
                     return await _notificationProvider.SendEmail(email);
@@ -193,11 +193,13 @@ namespace IMS.Core.services
                     <section style='margin-top: 40px;'>
                         <div class='container' style='width: 80%; margin-left: 10%;'>";
             emailBody += "<h2 style='margin-bottom: 10px;'>Hello, &nbsp" + LoggedInUser.Firstname+" "+LoggedInUser.Lastname + "&nbsp</h2>";
-            emailBody += "<h3 style='margin: 0px;'>You have Approved bulkorder of Id:# &nbsp" + order.BulkOrderId + "&nbsp</h3>";
-            emailBody += "<h3 style='margin: 0px;'>Order Details &nbsp</h3>";
-            emailBody += "<h5 style='margin: 0px;'>EmployeeId: &nbsp" + employee.Id+ "&nbsp</h5>";
-            emailBody += "<h5 style='margin: 0px;'>Employee Name: &nbsp" + employee.Firstname+" "+employee.Lastname + "&nbsp</h5>";
-            emailBody += "<h5 style='margin: 0px;'>Employee EmaildId: &nbsp" + employee.Email + "&nbsp</h5>";
+            emailBody += "<h3 style='margin: 0px;'>You have Approved bulkorder of Id:# " + order.BulkOrderId + "&nbsp</h3><br>";
+            emailBody += "<h3 style='margin: 0px;'>Order Details &nbsp</h3><br>";
+            emailBody += "<h5 style='margin: 0px;'>EmployeeId: &nbsp" + employee.Id+ "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>Employee Name: &nbsp" + employee.Firstname+" "+employee.Lastname + "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>Employee EmaildId: &nbsp" + employee.Email + "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>Reason for Requirement: &nbsp" + order.EmployeeBulkOrderDetails.ReasonForRequirement + "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>RequirementDate: &nbsp" + order.EmployeeBulkOrderDetails.ReasonForRequirement.ToString() + "&nbsp</h5><br>";
             emailBody += "<h3 style='margin: 0px;'>Item Details &nbsp</h3>";
             emailBody += @"<div class='item-table' style='margin-top: 40px;'>
                                 <table style='border-collapse: collapse; border: 1px solid #d4c7c7; width: 100%;'>
@@ -209,7 +211,7 @@ namespace IMS.Core.services
             foreach (BulkOrderItemQuantityMapping itemQunatity in order.EmployeeBulkOrderDetails.ItemsQuantityList)
             {
                 emailBody += ("<tr><td style='border: 1px solid #d4c7c7; padding: 15px; text-align: center;'>" + itemQunatity.Item.Name + "</td>");
-                emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>" + itemQunatity.QuantityOrdered + "</td></tr>");
+                emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>" + itemQunatity.QuantityOrdered + "</td>");
                 string locationQuantity = "";
                 List<LocationQuantityMapping> locationQuantityMappings = getLocationQuantity[itemQunatity.Item.Id];
                 foreach (LocationQuantityMapping locationQuantityMapping in locationQuantityMappings)

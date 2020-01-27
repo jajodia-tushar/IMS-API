@@ -314,8 +314,14 @@ namespace IMS_API.Controllers
             return dtoVendorOrderResponse;
         }
 
-        
 
+        /// <summary>
+        /// creating bulk order
+        /// </summary>
+        /// <param name="employeeBulkOrder">Here employeeBulkOrder contains related to entire Bulk order details</param>
+        /// <returns>Response</returns>
+        /// <response code="200">Returns Success status and entire object if employeeBulkOrder is Created otherwise it returns Error and status failure</response>
+        // POST: api/order/EmployeeBulkOrders
         [HttpPost("EmployeeBulkOrders", Name ="CreateEmployeeBulkOrder")]
         public async Task<EmployeeBulkOrdersResponse> PlaceEmployeeBulkOrder([FromBody] EmployeeBulkOrder employeeBulkOrder)
         {
@@ -397,6 +403,13 @@ namespace IMS_API.Controllers
 
             return contractsBulkOrderResponse;
         }
+        /// <summary>
+        /// creating bulk order
+        /// </summary>
+        /// <param name="approveEmployeeBulkOrder">Here approveEmployeeBulkOrder contains related to entire Bulk order details and location to reduce item quantities</param>
+        /// <returns>Response</returns>
+        /// <response code="200">Returns Success status and entire object if employeeBulkOrder is APproved otherwise it returns Error and status failure</response>
+        // PUT: api/order/EmployeeBulkOrders/{orderId}/Approve
 
         [HttpPut("EmployeeBulkOrders/{orderId}/Approve", Name = "ApproveEmployeeBulkOrder")]
         public async Task<ApproveBulkOrderResponse> ApproveEmployeeBulkOrder(int orderid, [FromBody] ApproveEmployeeBulkOrder approveEmployeeBulkOrder)
@@ -425,6 +438,14 @@ namespace IMS_API.Controllers
 
             return contractsApproveBulkOrderResponse;
         }
+        /// <summary>
+        /// creating bulk order
+        /// </summary>
+        /// <param name="orderId">Here orderid To reject</param>
+        /// <returns>Response</returns>
+        /// <response code="200">Returns Success status  if order is Rejected otherwise it returns Error and status failure</response>
+        // PUT: api/order/EmployeeBulkOrders/{orderId}/Approve
+
         [HttpPut("EmployeeBulkOrders/{orderId}/Reject", Name = "RejectEmployeeBulkOrder")]
         public async Task<Response> RejectEmployeeBulkOrder(int orderId)
         {
