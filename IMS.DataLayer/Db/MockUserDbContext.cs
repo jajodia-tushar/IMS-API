@@ -96,10 +96,6 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
-        public Task<string> GetOldPassword(int userId)
-        {
-            throw new NotImplementedException();
-        }
 
         public User GetUserByCredintials(string username, string password)
         {
@@ -112,6 +108,11 @@ namespace IMS.DataLayer.Dal
         }
 
         public List<User> GetUsersByRole(string roleName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsOldPasswordRepeatAgain(int userId, string newPassword)
         {
             throw new NotImplementedException();
         }
@@ -131,10 +132,7 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateUserPassword(int userId, string newHashPassword, string newPassword)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         Task<User> IUserDbContext.GetUserByCredintials(string username, string password)
         {

@@ -161,13 +161,13 @@ namespace IMS.Core.services
                 var newHashPassword = Utility.Hash(newPassword);
                 if (user != null)
                 {
-                    if (await IsOldPasswordRepeatAgain(userId,newPassword))
+                    if (await _userDbContext.IsOldPasswordRepeatAgain(userId, newHashPassword) == false)
                     {
                         try
                         {
                             Validators.UserValidator.CheckPasswordFormat(newPassword);
                             
-                            if (await _userDbContext.UpdateUserPassword(userId, newHashPassword,newPassword))
+                            if (await _userDbContext.UpdateUserPassword(userId, newHashPassword))
                                     response.Status = Status.Success;
                             else
                                 throw new Exception();
@@ -209,7 +209,7 @@ namespace IMS.Core.services
             return response;
         }
 
-        private async Task<bool> IsOldPasswordRepeatAgain(int userId, string newPassword)
+        /*private async Task<bool> IsOldPasswordRepeatAgain(int userId, string newPassword)
         {
             string oldPassword = await _userDbContext.GetOldPassword(userId);
             if(oldPassword == null)
@@ -217,6 +217,6 @@ namespace IMS.Core.services
             else if (oldPassword.Contains(newPassword) )
                 return false;
             return true;
-        }
+        }*/
     }
 }

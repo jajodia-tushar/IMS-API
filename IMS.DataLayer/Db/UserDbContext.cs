@@ -432,7 +432,7 @@ namespace IMS.DataLayer.Dal
             return isRepeated;
         }
 
-        public async Task<bool> UpdateUserPassword(int userId, string newHashPassword,string newPassword)
+        public async Task<bool> UpdateUserPassword(int userId, string newPassword)
         {
             using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
@@ -444,12 +444,11 @@ namespace IMS.DataLayer.Dal
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spUpdateUserPassword";
                     command.Parameters.AddWithValue("@userid", userId);
-                    command.Parameters.AddWithValue("@newpassword",newHashPassword);
-                    command.Parameters.AddWithValue("@oldpassword", newPassword);
+                    command.Parameters.AddWithValue("@newpassword",newPassword);
                     int retValue = await command.ExecuteNonQueryAsync();
                     if(retValue == 1)
                     {
-                        return true;
+                       return true;
                     }
                 }
                 catch (Exception exception)
@@ -459,9 +458,9 @@ namespace IMS.DataLayer.Dal
                 return false;
             }
         }
-        public async Task<string> GetOldPassword(int userId)
+        public async Task<bool> IsOldPasswordRepeatAgain(int userId,string newPassword)
         {
-            string oldPassword;
+            DbDataReader reader = null;
             using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -469,17 +468,22 @@ namespace IMS.DataLayer.Dal
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "spGetOldPasswordByUserId";
+                    command.CommandText = "spIsOldPasswordRepeatAgain";
                     command.Parameters.AddWithValue("@userid", userId);
-                    oldPassword = (string) await command.ExecuteScalarAsync(); 
+                    command.Parameters.AddWithValue("@newpassword", newPassword);
+                    int? val = (int?) await command.ExecuteScalarAsync();
+                    if(val == 1)
+                    {
+                        return true;
+                    }
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
-                return oldPassword;
+               
             }
-           
+            return false;
         }
     }
 }
