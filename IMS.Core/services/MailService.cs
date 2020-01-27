@@ -1,4 +1,5 @@
-﻿using IMS.Entities;
+﻿using IMS.DataLayer.Interfaces;
+using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using System;
@@ -13,11 +14,13 @@ namespace IMS.Core.services
         private INotificationProvider _notificationProvider;
         private IEmployeeService _employeeService;
         private ILogManager _logger;
-        public MailService(INotificationProvider notificationProvider, IEmployeeService employeeService, ILogManager logger)
+        private IUserDbContext _userDbContext;
+        public MailService(INotificationProvider notificationProvider, IEmployeeService employeeService, ILogManager logger,IUserDbContext userDbContext)
         {
             this._notificationProvider = notificationProvider;
             this._employeeService = employeeService;
             this._logger = logger;
+            this._userDbContext = userDbContext;
 
         }
         public async Task<bool> SendEmployeeOrderReciept(EmployeeOrder employeeOrder)
@@ -140,6 +143,90 @@ namespace IMS.Core.services
                             </div>
                             <div class='regards-text' style='margin-bottom: 50px;'>
                                 <h5>Regards, <br> Tavisca Admin Team</h5>
+                            </div>
+                        </div>
+                    </section>";
+
+            emailBody += @"<footer style='position: fixed; bottom: 0;color: #fff; background-color: #222437; width: 100%; text-align: center; height: 30px;'> 
+                            <div class='footer-text' style='padding-top: 9px; font-size: small;'>";
+
+            emailBody += "&copy; Tavisca Solutions Pvt. Ltd " + DateTime.Today.ToString("yyyy") + " All Rights Reserved";
+
+            emailBody += @"</div>
+                    </footer>
+               </body>";
+
+            return emailBody;
+        }
+
+        public async Task<bool> SendApprovedBulkOrderToLoggedInUser(int loggedInUserId,EmployeeBulkOrder order, ApproveEmployeeBulkOrder approveEmployeeBulkOrder)
+        {
+            try
+            {
+                var email = new Email();
+                var user = await _userDbContext.GetUserById(loggedInUserId);
+                if (user!=null)
+                {
+                    email.ToAddress = "preddy@tavisca.com";
+                    email.Body = GenerateApprovedBulkOrderHTMLTemplateForAdmin(user,order, approveEmployeeBulkOrder.ItemLocationQuantityMappings,order.Employee);
+                    email.Subject = "Approved Order Id#:"+order.BulkOrderId+" "+"Receipt";
+                    return await _notificationProvider.SendEmail(email);
+                }
+                return false;
+            }
+            catch (Exception exception)
+            {
+                new Task(() => { _logger.LogException(exception, "SendApprovedBulkOrderToLoggedInUser", IMS.Entities.Severity.Critical, approveEmployeeBulkOrder, false); }).Start();
+                throw exception;
+            }
+        }
+
+        private string GenerateApprovedBulkOrderHTMLTemplateForAdmin(User LoggedInUser,EmployeeBulkOrder order, List<ItemLocationQuantityMapping> itemLocationQuantityMapping, Employee employee)
+        {
+            Dictionary<int, List<LocationQuantityMapping>> getLocationQuantity = new Dictionary<int, List<LocationQuantityMapping>>();
+            foreach(ItemLocationQuantityMapping itemlocationQuantity in itemLocationQuantityMapping)
+            {
+                getLocationQuantity.Add(itemlocationQuantity.Item.Id, itemlocationQuantity.LocationQuantityMappings);
+            }
+            string emailBody = @"
+                <body style='padding : 0px; margin: 0px;font-family: sans-serif;'>
+                    <section style='margin-top: 40px;'>
+                        <div class='container' style='width: 80%; margin-left: 10%;'>";
+            emailBody += "<h2 style='margin-bottom: 10px;'>Hello, &nbsp" + LoggedInUser.Firstname+" "+LoggedInUser.Lastname + "&nbsp</h2>";
+            emailBody += "<h3 style='margin: 0px;'>You have Approved bulkorder of Id:# " + order.BulkOrderId + "&nbsp</h3><br>";
+            emailBody += "<h3 style='margin: 0px;'>Order Details &nbsp</h3><br>";
+            emailBody += "<h5 style='margin: 0px;'>EmployeeId: &nbsp" + employee.Id+ "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>Employee Name: &nbsp" + employee.Firstname+" "+employee.Lastname + "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>Employee EmaildId: &nbsp" + employee.Email + "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>Reason for Requirement: &nbsp" + order.EmployeeBulkOrderDetails.ReasonForRequirement + "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>RequirementDate: &nbsp" + order.EmployeeBulkOrderDetails.ReasonForRequirement.ToString() + "&nbsp</h5><br>";
+            emailBody += "<h3 style='margin: 0px;'>Item Details &nbsp</h3>";
+            emailBody += @"<div class='item-table' style='margin-top: 40px;'>
+                                <table style='border-collapse: collapse; border: 1px solid #d4c7c7; width: 100%;'>
+                                    <tr>
+                                        <th style='border: 1px solid #d4c7c7; padding: 15px;'>Item name</th>
+                                        <th style='border: 1px solid #d4c7c7; padding: 15px;'>Total Quantity</th>
+                                        <th style='border: 1px solid #d4c7c7; padding: 15px;'>Quantity Assigned To Location</th>
+                                    </tr>";
+            foreach (BulkOrderItemQuantityMapping itemQunatity in order.EmployeeBulkOrderDetails.ItemsQuantityList)
+            {
+                emailBody += ("<tr><td style='border: 1px solid #d4c7c7; padding: 15px; text-align: center;'>" + itemQunatity.Item.Name + "</td>");
+                emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>" + itemQunatity.QuantityOrdered + "</td>");
+                string locationQuantity = "";
+                List<LocationQuantityMapping> locationQuantityMappings = getLocationQuantity[itemQunatity.Item.Id];
+                foreach (LocationQuantityMapping locationQuantityMapping in locationQuantityMappings)
+                    locationQuantity += locationQuantityMapping.Location + ":" + locationQuantityMapping.Quantity + "<br>";
+                emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>"+ locationQuantity+"</td></tr>");
+
+            }
+
+            emailBody += @"</table>
+                            </div>
+                            <div class='report-text' style='margin-top: 30px; margin-bottom: 30px;'>
+                                <h5>Please drop an email to admin@tavisca.com to report if this transaction was not authorized by you.</h5>
+                            </div>
+                            <div class='regards-text' style='margin-bottom: 50px;'>
+                                <h5>Regards, <br> Tavisca IMS </h5>
                             </div>
                         </div>
                     </section>";
