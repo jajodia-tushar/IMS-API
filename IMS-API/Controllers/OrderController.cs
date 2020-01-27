@@ -510,21 +510,20 @@ namespace IMS_API.Controllers
         /// <summary>
         /// Cancel Employee Bulk Order
         /// </summary>
-        /// <returns>EmployeeBulkOrdersResponse</returns>
+        /// <returns>Response</returns>
         /// <response code="200">Returns Status Success if order cancel was successfull</response>
         [HttpPut("EmployeeBulkOrders/{orderId}/Cancel", Name = "CancelEmployeeBulkOrder")]
-        public async Task<EmployeeBulkOrdersResponse> CancelEmployeeBulkOrder(int orderid)
+        public async Task<Response> CancelEmployeeBulkOrder(int orderid)
         {
-            IMS.Contracts.EmployeeBulkOrdersResponse contractsBulkOrderResponse = null;
+            IMS.Contracts.Response response = null;
             try
             {
-                IMS.Entities.EmployeeBulkOrdersResponse entitiesResponse = await _orderService.CancelEmployeeBulkOrder(orderid);
-                contractsBulkOrderResponse = EmployeeBulkOrderTranslator.ToDataContractsObject(entitiesResponse);
+                IMS.Entities.Response entitiesResponse = await _orderService.CancelEmployeeBulkOrder(orderid);
+                response = Translator.ToDataContractsObject(entitiesResponse);
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-
-                contractsBulkOrderResponse = new EmployeeBulkOrdersResponse
+                response = new Response
                 {
                     Status = Status.Failure,
                     Error = new Error
@@ -533,10 +532,10 @@ namespace IMS_API.Controllers
                         ErrorMessage = Constants.ErrorMessages.ServerError
                     }
                 };
-                new Task(() => { _logger.LogException(e, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, orderid, contractsBulkOrderResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, orderid, response); }).Start();
             }
 
-            return contractsBulkOrderResponse;
+            return response;
         }
 
     }

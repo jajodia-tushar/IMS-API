@@ -207,7 +207,7 @@
             <summary>
             Cancel Employee Bulk Order
             </summary>
-            <returns>EmployeeBulkOrdersResponse</returns>
+            <returns>Response</returns>
             <response code="200">Returns Status Success if order cancel was successfull</response>
         </member>
         <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">

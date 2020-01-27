@@ -960,12 +960,11 @@ namespace IMS.Core.services
             return employeeBulkOrdersResponse;
         }
 
-        public async Task<EmployeeBulkOrdersResponse> CancelEmployeeBulkOrder(int orderId)
+        public async Task<Response> CancelEmployeeBulkOrder(int orderId)
         {
-            EmployeeBulkOrdersResponse response = new EmployeeBulkOrdersResponse
+            Response response = new Response
             {
-                Status = Status.Failure,
-                EmployeeBulkOrders = new List<EmployeeBulkOrder>()
+                Status = Status.Failure
             };
             int userId = -1;
             EmployeeBulkOrder orderFromDatabase = null;
@@ -984,7 +983,7 @@ namespace IMS.Core.services
                     throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderStatus);
 
                 UpdateBulkOrderStatusAndUsedQuantity(orderFromDatabase);
-                response.EmployeeBulkOrders.Add(await _employeeBulkOrderDbContext.CancelOrReturnOrderItems(orderFromDatabase));
+                await _employeeBulkOrderDbContext.CancelOrReturnOrderItems(orderFromDatabase);
                 response.Status = Status.Success;
             }
             catch (CustomException exception)
@@ -1005,7 +1004,7 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log("PUT api/order/EmployeeBulkOrders/" + orderId+"/Cancel", response, "ApproveBulkOrder", response.Status, severity, userId); }).Start();
                 if (response.Status == Status.Success)
                 {
-                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(response.EmployeeBulkOrders[0], BulkOrderRequestStatus.Cancelled); }).Start();
+                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(orderFromDatabase, BulkOrderRequestStatus.Cancelled); }).Start();
                 }
             }
             return response;
