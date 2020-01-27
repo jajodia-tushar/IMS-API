@@ -13,7 +13,7 @@ namespace IMS.DataLayer.Interfaces
         Task<bool> Save(VendorOrder vendorOrder);
         Task<VendorOrdersDto> GetVendorOrders(bool isApproved, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
         Task<bool> ApproveOrder(VendorOrder vendorOrder);
-        Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
+        Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate);
         Task<VendorOrder> GetVendorOrdersByOrderId(int orderId);
         Task<bool> EditOrder(VendorOrder vendorOrder, User user);
         Task<bool> CheckUserEditedOrderBefore(int userId, int orderId);

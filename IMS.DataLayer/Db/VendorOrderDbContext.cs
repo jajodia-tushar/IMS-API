@@ -336,10 +336,11 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
         {
+            var vendorsOrderResponse = new VendorsOrderResponse();
             DbDataReader reader = null;
-            var VendorOrders = new List<VendorOrder>();
+            int totalResults=0;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -355,6 +356,8 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", off);
                     command.Parameters.AddWithValue("@startDate", startDate);
                     command.Parameters.AddWithValue("@endDate", endDate);
+                    command.Parameters.Add("@totalResults", MySqlDbType.Int32, 32);
+                    command.Parameters["@totalResults"].Direction = ParameterDirection.Output;
                     reader = await command.ExecuteReaderAsync();
                     List<VendorOrderDto> VendorOrderDtos = new List<VendorOrderDto>();
                     while (reader.Read())
@@ -363,14 +366,18 @@ namespace IMS.DataLayer.Db
                         VendorOrderDtos.Add(vendorOrderDto);
 
                     }
-                    VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
+                    vendorsOrderResponse.VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
+                    reader.Close();
+                    await command.ExecuteNonQueryAsync();
+                    totalResults = (int)command.Parameters["@totalResults"].Value;
+                    vendorsOrderResponse.PagingInfo = new PagingInfo { TotalResults = totalResults };
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
             }
-            return VendorOrders;
+            return vendorsOrderResponse;
         }
 
         public async Task<bool> EditOrder(VendorOrder vendorOrder, User user)

@@ -531,6 +531,12 @@ namespace IMS.Core.services
         {
             var response = new VendorsOrderResponse();
             response.Status = Status.Failure;
+            response.PagingInfo = new PagingInfo()
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalResults = 0
+            };
             if (ReportsValidator.InitializeAndValidateDates(fromDate, toDate, out var startDate, out var endDate) == false)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidDate);
@@ -554,13 +560,15 @@ namespace IMS.Core.services
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
                     return response;
                 }
-                response.VendorOrders = await _vendorOrderDbContext.GetVendorOrdersByVendorId(vendorId, pageNumber, pageSize, startDate, endDate);
-                if (response.VendorOrders.Count < 1)
+                var vendorsOrderResponse = await _vendorOrderDbContext.GetVendorOrdersByVendorId(vendorId, pageNumber, pageSize, startDate, endDate);
+                if (vendorsOrderResponse.VendorOrders!=null && vendorsOrderResponse.VendorOrders.Count > 0)
                 {
-                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
+                    response.Status = Status.Success;
+                    response.VendorOrders = vendorsOrderResponse.VendorOrders;
+                    response.PagingInfo.TotalResults = vendorsOrderResponse.PagingInfo.TotalResults;
                     return response;
                 }
-                response.Status = Status.Success;
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
             }
             catch (CustomException e)
             {
