@@ -45,6 +45,8 @@ namespace IMS.Core.Validators
 
         public static bool ValidateToApprove(ApproveEmployeeBulkOrder orderFromRequest, EmployeeBulkOrder orderFromDatabase)
         {
+            if (orderFromRequest == null)
+                return false;
             if (orderFromDatabase.BulkOrderId != orderFromRequest.BulkOrderId)
                 return false;
             if (orderFromRequest == null||orderFromRequest.ItemLocationQuantityMappings==null)

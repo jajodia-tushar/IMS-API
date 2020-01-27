@@ -208,7 +208,7 @@ namespace IMS.DataLayer.Db
                 }
                 catch (MySqlException e)
                 {
-                    if (e.Number == (int)MySqlErrorCode.NoReferencedRow2)
+                    if (e.Number == (int)MySqlErrorCode.NoReferencedRow2||e.Number==(int)MySqlErrorCode.DuplicateKeyEntry)
                         return isSaved;
                     throw e;
                 }
