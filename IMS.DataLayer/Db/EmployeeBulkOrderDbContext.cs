@@ -216,7 +216,7 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<EmployeeBulkOrder> CancelOrReturnOrderItems(int orderId, List<BulkOrderItemQuantityMapping> changedItems)
+        public async Task<EmployeeBulkOrder> CancelOrReturnOrderItems(EmployeeBulkOrder employeeBulkOrder)
         {
             DbDataReader reader = null;
             EmployeeBulkOrder updatedEmployeeBulkOrder = new EmployeeBulkOrder();
@@ -226,10 +226,12 @@ namespace IMS.DataLayer.Db
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandType = CommandType.StoredProcedure;
-                command.CommandText = "spBulkOrderReturnAndUpdateWarehouse";
-                string itemIdQuantityUsedConcatList = string.Join(";", changedItems.Select(p => p.Item.Id + "," + p.QuantityUsed));
+                command.CommandText = "spReturnOrCancelBulkOrder";
+                var itemsQuantityList = employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList;
+                string itemIdQuantityUsedConcatList = string.Join(";", itemsQuantityList.Select(p => p.Item.Id + "," + p.QuantityUsed));
                 command.Parameters.AddWithValue("@listof_itemid_qty", itemIdQuantityUsedConcatList);
-                command.Parameters.AddWithValue("@bulkorderid", orderId);
+                command.Parameters.AddWithValue("@order_status", employeeBulkOrder.EmployeeBulkOrderDetails.BulkOrderRequestStatus.ToString());
+                command.Parameters.AddWithValue("@bulkorderid", employeeBulkOrder.BulkOrderId);
                 reader = await command.ExecuteReaderAsync();
                 while (reader.Read())
                 {

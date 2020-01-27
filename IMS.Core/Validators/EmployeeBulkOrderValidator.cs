@@ -81,12 +81,32 @@ namespace IMS.Core.Validators
 
 
         }
-
-        public static bool isEmployeeBulkOrderReturnValid(EmployeeBulkOrder employeeBulkOrder, EmployeeBulkOrder DbEmployeeBulkOrder)
+        
+        public static bool isEmployeeBulkOrderReturnValid(EmployeeBulkOrder employeeBulkOrder, EmployeeBulkOrder dbEmployeeBulkOrder)
         {
             return (IsQuantityUsedLessThanOrdered(employeeBulkOrder) &&
-            IsQuantityUsedLessThanPreviousQuantityUsed(employeeBulkOrder,DbEmployeeBulkOrder) &&
-            IsItemCountEqual(employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList, DbEmployeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList));
+                IsOrderUsedQuantityNonNegative(employeeBulkOrder) &&
+            IsQuantityUsedLessThanPreviousQuantityUsed(employeeBulkOrder,dbEmployeeBulkOrder) &&
+            IsOrderStatusValid(employeeBulkOrder,dbEmployeeBulkOrder)&&
+            IsItemCountEqual(employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList, dbEmployeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList));
+        }
+
+        private static bool IsOrderUsedQuantityNonNegative(EmployeeBulkOrder employeeBulkOrder)
+        {
+            foreach(var item in employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList)
+            {
+                if (item.QuantityUsed < 0)
+                    return false;
+            }
+            return true;
+        }
+
+        private static bool IsOrderStatusValid(EmployeeBulkOrder employeeBulkOrder, EmployeeBulkOrder dbEmployeeBulkOrder)
+        {
+            if (employeeBulkOrder.EmployeeBulkOrderDetails.BulkOrderRequestStatus == Entities.BulkOrderRequestStatus.Approved &&
+                employeeBulkOrder.EmployeeBulkOrderDetails.BulkOrderRequestStatus == dbEmployeeBulkOrder.EmployeeBulkOrderDetails.BulkOrderRequestStatus)
+                return true;
+            return false;
         }
 
         private static bool IsItemCountEqual(List<BulkOrderItemQuantityMapping> previousItemsQuantityList, List<BulkOrderItemQuantityMapping> newItemsQuantityList)

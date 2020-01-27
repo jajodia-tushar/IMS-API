@@ -880,7 +880,7 @@ namespace IMS.Core.services
                 if (!EmployeeBulkOrderValidator.isEmployeeBulkOrderReturnValid(employeeBulkOrder, orderFromDb))
                     throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderReturnDetails);
 
-                employeeBulkOrdersResponse.EmployeeBulkOrders.Add(await _employeeBulkOrderDbContext.ReturnOrderItems(orderId,employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList));
+                employeeBulkOrdersResponse.EmployeeBulkOrders.Add(await _employeeBulkOrderDbContext.CancelOrReturnOrderItems(employeeBulkOrder));
                 employeeBulkOrdersResponse.Status = Status.Success;
             }
             catch (CustomException exception)
@@ -899,7 +899,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (employeeBulkOrdersResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(orderId, employeeBulkOrdersResponse, "ReturnOrderItems", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(employeeBulkOrder, employeeBulkOrdersResponse, "ReturnOrderItems", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
             }
             return employeeBulkOrdersResponse;
         }

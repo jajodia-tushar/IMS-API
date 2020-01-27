@@ -11,7 +11,7 @@ namespace IMS.DataLayer.Interfaces
         Task<Tuple<int,List<EmployeeBulkOrder>>> GetAllEmployeeBulkOrders(int pageNumber, int pageSize,DateTime fromDate, DateTime endDate);
         Task<bool> SaveOrder(EmployeeBulkOrder employeeBulkOrder);
         Task<EmployeeBulkOrder> GetOrderById(int orderId);
-        Task<EmployeeBulkOrder> CancelOrReturnOrderItems (int orderId, List<BulkOrderItemQuantityMapping> changedItems);
+        Task<EmployeeBulkOrder> CancelOrReturnOrderItems (EmployeeBulkOrder employeeBulkOrder);
         Task<bool> ApproveOrder(ApproveEmployeeBulkOrder requestedApproveEmployeeBulkOrder);
     }
 }
