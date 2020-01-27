@@ -137,5 +137,12 @@ namespace IMS.Core.Validators
             }
             return true;
         }
+
+        public static bool ValidateToCancel(EmployeeBulkOrder orderFromDatabase)
+        {
+            if (orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus != BulkOrderRequestStatus.Approved)
+                return false;
+            return true;
+        }
     }
 }
