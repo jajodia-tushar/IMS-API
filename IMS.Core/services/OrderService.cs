@@ -886,20 +886,20 @@ namespace IMS.Core.services
             catch (CustomException exception)
             {
                 employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
             }
 
             catch (Exception exception)
             {
                 employeeBulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrderById", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "ReturnOrderItems", IMS.Entities.Severity.Critical, orderId, employeeBulkOrdersResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (employeeBulkOrdersResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(orderId, employeeBulkOrdersResponse, "GetEmployeeBulkOrders", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log(orderId, employeeBulkOrdersResponse, "ReturnOrderItems", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
             }
             return employeeBulkOrdersResponse;
         }

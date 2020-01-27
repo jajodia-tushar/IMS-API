@@ -216,7 +216,7 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<EmployeeBulkOrder> ReturnOrderItems(int orderId, List<BulkOrderItemQuantityMapping> changedItems)
+        public async Task<EmployeeBulkOrder> CancelOrReturnOrderItems(int orderId, List<BulkOrderItemQuantityMapping> changedItems)
         {
             DbDataReader reader = null;
             EmployeeBulkOrder updatedEmployeeBulkOrder = new EmployeeBulkOrder();
