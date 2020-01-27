@@ -964,7 +964,8 @@ namespace IMS.Core.services
         {
             EmployeeBulkOrdersResponse response = new EmployeeBulkOrdersResponse
             {
-                Status = Status.Failure
+                Status = Status.Failure,
+                EmployeeBulkOrders = new List<EmployeeBulkOrder>()
             };
             int userId = -1;
             EmployeeBulkOrder orderFromDatabase = null;
@@ -979,38 +980,38 @@ namespace IMS.Core.services
                 orderFromDatabase = await _employeeBulkOrderDbContext.GetOrderById(orderId);
                 if (orderFromDatabase == null)
                     throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
-                if (!EmployeeBulkOrderValidator.ValidateToCancel(orderFromDatabase))
-                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrder);
+                if (orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus != BulkOrderRequestStatus.Approved)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderStatus);
 
-                UpdateEmployeeBulkOrdetails(orderFromDatabase);
+                UpdateBulkOrderStatusAndUsedQuantity(orderFromDatabase);
                 response.EmployeeBulkOrders.Add(await _employeeBulkOrderDbContext.CancelOrReturnOrderItems(orderFromDatabase));
                 response.Status = Status.Success;
             }
             catch (CustomException exception)
             {
                 response.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
-                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, "PUT api/order/EmployeeBulkOrders/" + orderId, response); }).Start();
+                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, "PUT api/order/EmployeeBulkOrders/" + orderId + "/Cancel", response); }).Start();
             }
-
             catch (Exception exception)
             {
                 response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, "PUT api/order/EmployeeBulkOrders/" + orderId, response); }).Start();
+                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, "PUT api/order/EmployeeBulkOrders/" + orderId + "/Cancel", response); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (response.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log("PUT api/order/EmployeeBulkOrders/" + orderId, response, "ApproveBulkOrder", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log("PUT api/order/EmployeeBulkOrders/" + orderId+"/Cancel", response, "ApproveBulkOrder", response.Status, severity, userId); }).Start();
                 if (response.Status == Status.Success)
                 {
-                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(orderFromDatabase, BulkOrderRequestStatus.Cancelled); }).Start();
+                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(response.EmployeeBulkOrders[0], BulkOrderRequestStatus.Cancelled); }).Start();
                 }
             }
+            return response;
         }
 
-        private void UpdateEmployeeBulkOrdetails(EmployeeBulkOrder orderFromDatabase)
+        private void UpdateBulkOrderStatusAndUsedQuantity(EmployeeBulkOrder orderFromDatabase)
         {
             orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus = BulkOrderRequestStatus.Cancelled;
             foreach(var item in orderFromDatabase.EmployeeBulkOrderDetails.ItemsQuantityList)

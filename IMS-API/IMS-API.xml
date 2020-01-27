@@ -198,10 +198,17 @@
         </member>
         <member name="M:IMS_API.Controllers.OrderController.ReturnBulkOrderById(System.Int32,IMS.Contracts.EmployeeBulkOrder)">
             <summary>
-            Return Employee Bulk Order
+            Return Employee Bulk Order Items
             </summary>
             <returns>EmployeeBulkOrdersResponse</returns>
             <response code="200">Returns Status Success if order return was successfull</response>
+        </member>
+        <member name="M:IMS_API.Controllers.OrderController.CancelEmployeeBulkOrder(System.Int32)">
+            <summary>
+            Cancel Employee Bulk Order
+            </summary>
+            <returns>EmployeeBulkOrdersResponse</returns>
+            <response code="200">Returns Status Success if order cancel was successfull</response>
         </member>
         <member name="M:IMS_API.Controllers.ReportsController.GetRAGStatus">
             <summary>

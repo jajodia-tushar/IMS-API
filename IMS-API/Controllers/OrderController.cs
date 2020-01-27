@@ -475,7 +475,7 @@ namespace IMS_API.Controllers
         }
 
         /// <summary>
-        /// Return Employee Bulk Order
+        /// Return Employee Bulk Order Items
         /// </summary>
         /// <returns>EmployeeBulkOrdersResponse</returns>
         /// <response code="200">Returns Status Success if order return was successfull</response>
@@ -506,6 +506,12 @@ namespace IMS_API.Controllers
 
             return contractsBulkOrderResponse;
         }
+
+        /// <summary>
+        /// Cancel Employee Bulk Order
+        /// </summary>
+        /// <returns>EmployeeBulkOrdersResponse</returns>
+        /// <response code="200">Returns Status Success if order cancel was successfull</response>
         [HttpPut("EmployeeBulkOrders/{orderId}/Cancel", Name = "CancelEmployeeBulkOrder")]
         public async Task<EmployeeBulkOrdersResponse> CancelEmployeeBulkOrder(int orderid)
         {
