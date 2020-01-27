@@ -208,15 +208,5 @@ namespace IMS.Core.services
             }
             return response;
         }
-
-        /*private async Task<bool> IsOldPasswordRepeatAgain(int userId, string newPassword)
-        {
-            string oldPassword = await _userDbContext.GetOldPassword(userId);
-            if(oldPassword == null)
-                return true;
-            else if (oldPassword.Contains(newPassword) )
-                return false;
-            return true;
-        }*/
     }
 }
