@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace IMS.DataLayer.Db
 {
-    public class EmployeeBulkOrderDbContext:IEmployeeBulkOrderDbContext
+    public class EmployeeBulkOrderDbContext : IEmployeeBulkOrderDbContext
     {
         private IDbConnectionProvider _dbConnectionProvider;
         public EmployeeBulkOrderDbContext(IDbConnectionProvider dbConnectionProvider)
@@ -28,7 +28,7 @@ namespace IMS.DataLayer.Db
             List<EmployeeBulkOrderDto> employeeBulkOrdersDto = new List<EmployeeBulkOrderDto>();
             int limit = pageSize;
             int offset = (pageNumber - 1) * pageSize;
-            int totalResuls=0;
+            int totalResuls = 0;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 connection.Open();
@@ -54,33 +54,33 @@ namespace IMS.DataLayer.Db
                     totalResuls = Convert.ToInt32(out_recordCount.Value);
             }
             employeeBulkOrders = DtoToEntitiesBulkOrders(employeeBulkOrdersDto);
-            return Tuple.Create<int,List<EmployeeBulkOrder>>(totalResuls,employeeBulkOrders);
+            return Tuple.Create<int, List<EmployeeBulkOrder>>(totalResuls, employeeBulkOrders);
         }
-        
+
         private EmployeeBulkOrderDto ReadValuesFromDbReader(DbDataReader reader)
         {
             return new EmployeeBulkOrderDto()
             {
-                EmployeeId = reader["EmployeeId"].ToString() ,
-                FirstName = reader["FirstName"].ToString() ,
-                LastName = reader["LastName"]?.ToString() ,
-                Email = reader["Email"].ToString() ,
-                ContactNumber = reader["ContactNumber"]?.ToString() ,
-                TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString() ,
-                AccessCardNumber = reader["AccessCardNumber"]?.ToString() ,
-                EmployeeStatus = (bool)reader["EmployeeStatus"] ,
-                BulkOrderId = (int)reader["BulkOrderId"] ,
+                EmployeeId = reader["EmployeeId"].ToString(),
+                FirstName = reader["FirstName"].ToString(),
+                LastName = reader["LastName"]?.ToString(),
+                Email = reader["Email"].ToString(),
+                ContactNumber = reader["ContactNumber"]?.ToString(),
+                TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString(),
+                AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
+                EmployeeStatus = (bool)reader["EmployeeStatus"],
+                BulkOrderId = (int)reader["BulkOrderId"],
                 CreatedOn = (DateTime)reader["CreatedOn"],
                 RequirementDate = (DateTime)reader["RequirementDate"],
                 RequestStatus = reader["RequestStatus"].ToString(),
-                ReasonForRequirement = reader["ReasonForRequirement"].ToString() ,
-                ItemId = (int)reader["ItemId"] ,
-                ItemName = reader["ItemName"].ToString() ,
-                ItemQuantityOrdered = (int)reader["ItemQuantityOrdered"] ,
+                ReasonForRequirement = reader["ReasonForRequirement"].ToString(),
+                ItemId = (int)reader["ItemId"],
+                ItemName = reader["ItemName"].ToString(),
+                ItemQuantityOrdered = (int)reader["ItemQuantityOrdered"],
                 ItemQuantityUsed = (int)reader["ItemQuantityUsed"],
-                ItemIsActive = (bool)reader["ItemIsActive"] ,
-                ItemMaxLimit = (int)reader["ItemMaxLimit"] ,
-                ItemImageUrl = reader["ItemImageUrl"]?.ToString() ,
+                ItemIsActive = (bool)reader["ItemIsActive"],
+                ItemMaxLimit = (int)reader["ItemMaxLimit"],
+                ItemImageUrl = reader["ItemImageUrl"]?.ToString(),
 
             };
         }
@@ -208,7 +208,7 @@ namespace IMS.DataLayer.Db
                 }
                 catch (MySqlException e)
                 {
-                    if (e.Number == (int)MySqlErrorCode.NoReferencedRow2||e.Number==(int)MySqlErrorCode.DuplicateKeyEntry)
+                    if (e.Number == (int)MySqlErrorCode.NoReferencedRow2 || e.Number == (int)MySqlErrorCode.DuplicateKeyEntry)
                         return isSaved;
                     throw e;
                 }
@@ -272,7 +272,7 @@ namespace IMS.DataLayer.Db
                     if (employeeBulkOrdersDto.Count != 0)
                         order = DtoToEntitiesBulkOrders(employeeBulkOrdersDto)[0];
                 }
-                catch(MySqlException e)
+                catch (MySqlException e)
                 {
                     throw e;
                 }
@@ -308,14 +308,14 @@ namespace IMS.DataLayer.Db
                     string listof_itemid_locationid_quantity = ConvertToListOfItemIdLocationIdQuantity(locationNameLocationIdMapping, requestedApproveEmployeeBulkOrder.ItemLocationQuantityMappings);
                     command.Parameters.AddWithValue("@listof_itemid_locationid_quantity", listof_itemid_locationid_quantity);
                     reader = await command.ExecuteReaderAsync();
-                    if(reader.Read())
+                    if (reader.Read())
                     {
                         isApproved = (bool)reader["isapproved"];
                     }
 
                     return isApproved;
                 }
-                catch(CustomException e)
+                catch (CustomException e)
                 {
                     throw e;
                 }
@@ -323,30 +323,58 @@ namespace IMS.DataLayer.Db
                 {
                     throw e;
                 }
-                
+
             }
         }
 
         private string ConvertToListOfItemIdLocationIdQuantity(Dictionary<string, int> locationNameLocationIdMapping, List<ItemLocationQuantityMapping> itemLocationQuantityMappings)
         {
             string result = "";
-            foreach(ItemLocationQuantityMapping itemLocationQuantityMapping in itemLocationQuantityMappings)
+            foreach (ItemLocationQuantityMapping itemLocationQuantityMapping in itemLocationQuantityMappings)
             {
                 int itemId = itemLocationQuantityMapping.Item.Id;
-                foreach(LocationQuantityMapping locationQuantityMapping in itemLocationQuantityMapping.LocationQuantityMappings)
+                foreach (LocationQuantityMapping locationQuantityMapping in itemLocationQuantityMapping.LocationQuantityMappings)
                 {
-                    
+
                     string locationName = locationQuantityMapping.Location.ToLower();
                     if (locationNameLocationIdMapping.ContainsKey(locationName))
                     {
-                        result+=string.Concat(itemId + "," + locationNameLocationIdMapping[locationName] + "," + locationQuantityMapping.Quantity + ";");
+                        result += string.Concat(itemId + "," + locationNameLocationIdMapping[locationName] + "," + locationQuantityMapping.Quantity + ";");
 
-                     }
+                    }
                     else
                         throw new InvalidOrderException();
-              }
+                }
             }
             return result;
+        }
+
+        public async Task<bool> RejectOrder(int orderId)
+        {
+            bool isRejected = false;
+            DbDataReader reader = null;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spRejectBulkOrder";
+                    command.Parameters.AddWithValue("@orderid", orderId);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        isRejected = (bool)reader["isrejected"];
+                    }
+
+                    return isRejected;
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
         }
     }
 }

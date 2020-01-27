@@ -13,5 +13,6 @@ namespace IMS.DataLayer.Interfaces
         Task<EmployeeBulkOrder> GetOrderById(int orderId);
         Task<EmployeeBulkOrder> CancelOrReturnOrderItems (EmployeeBulkOrder employeeBulkOrder);
         Task<bool> ApproveOrder(ApproveEmployeeBulkOrder requestedApproveEmployeeBulkOrder);
+        Task<bool> RejectOrder(int orderId);
     }
 }
