@@ -11,5 +11,6 @@ namespace IMS.Entities.Interfaces
         Task<ShelfResponse> GetShelfByShelfCode(string id);
         Task<ShelfResponse> AddShelf(IMS.Entities.Shelf shelf);
         Task<ShelfResponse> Delete(string shelfCode);
+        Task<ShelfResponse> Update(Shelf shelf);
     }
 }

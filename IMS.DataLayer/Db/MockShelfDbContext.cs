@@ -90,5 +90,11 @@ namespace IMS.DataLayer.Db
             
             return shelf.IsActive ;
         }
+
+        public Task<Shelf> UpdateShelf(Shelf shelf)
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }

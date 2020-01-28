@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using IMS.Core.Validators;
 using IMS.DataLayer;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace IMS.Core.services
 {
@@ -13,11 +16,15 @@ namespace IMS.Core.services
     {
         private IShelfDbContext _shelfDbContext;
         private ILogManager _logger;
+        private ITokenProvider _tokenProvider;
+        private IHttpContextAccessor _httpContextAccessor;
 
-        public ShelfService(IShelfDbContext shelfDbContext, ILogManager logger)
+        public ShelfService(IShelfDbContext shelfDbContext, ILogManager logger, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
         {
             _shelfDbContext = shelfDbContext;
             _logger = logger;
+            _tokenProvider = tokenProvider;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ShelfResponse> GetShelfList()
         {
@@ -151,6 +158,60 @@ namespace IMS.Core.services
                 shelfResponse.Status = Status.Failure;
                 shelfResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "Delete", Severity.High, shelfCode, shelfResponse); }).Start();
+            }
+            return shelfResponse;
+        }
+
+        [Audit("Updated Shelf With Shelf Code","Shelf")]
+        public async Task<ShelfResponse> Update(Shelf shelf)
+        {
+            ShelfResponse shelfResponse = new ShelfResponse();
+            int userId = -1;
+            try
+            {
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                userId = request.User.Id;
+                Response validatorResponse = ShelfValidator.ValidateShelf(shelf);
+                if(validatorResponse.Error == null)
+                {
+                    Shelf updatedShelf = await _shelfDbContext.UpdateShelf(shelf);
+                    if (updatedShelf != null)
+                    {
+                        shelfResponse.Status = Status.Success;
+                        shelfResponse.Shelves = new List<Shelf>() { updatedShelf };
+                    }
+                    else
+                    {
+                        shelfResponse.Status = Status.Failure;
+                        shelfResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.ShelfNotUpdated);
+                    }
+                }
+                else
+                {
+                    shelfResponse.Error = validatorResponse.Error;
+                    shelfResponse.Status = Status.Failure;
+                }
+            }
+            catch(CustomException exception)
+            {
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
+                new Task(() => { _logger.LogException(exception, "Update Shelf", IMS.Entities.Severity.Critical,shelf, shelfResponse); }).Start();
+            }
+            catch(Exception exception)
+            {
+                shelfResponse.Status = Status.Failure;
+                shelfResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Update Shelf", IMS.Entities.Severity.Critical, shelf, shelfResponse); }).Start();
+            }
+            finally{
+                Severity severity = Severity.No;
+                if (shelfResponse.Status == Status.Failure)
+                    severity = Severity.High;
+
+                new Task(() => { _logger.Log(shelf, shelfResponse, "Update Shelf", shelfResponse.Status, severity, userId); }).Start();
             }
             return shelfResponse;
         }

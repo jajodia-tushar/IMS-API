@@ -345,6 +345,14 @@
             <response code="200">Returns shelves List </response>
             <response code="400">If shelf is Already present </response>
         </member>
+        <member name="M:IMS_API.Controllers.ShelfController.Update(IMS.Contracts.Shelf)">
+            <summary>
+            Update the Specific Shelf
+            </summary>
+            <param name="shelf"></param>
+            <returns>Returns Updated Shelf</returns>
+            <response code="200">Returns Updated Shelf if Shlef is updated successfully otherwise it returns null with status failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.ShelfController.DeleteShelfByShelfCode(System.String)">
             <summary>
             Deleting Shelf by it's Code and return List of remaining shelves
