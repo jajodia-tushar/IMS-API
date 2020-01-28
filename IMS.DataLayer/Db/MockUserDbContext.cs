@@ -112,7 +112,7 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsOldPasswordRepeatAgain(int userId, string newPassword)
+        public Task<bool> IsNewPasswordRepeated(int userId, string newPassword)
         {
             throw new NotImplementedException();
         }

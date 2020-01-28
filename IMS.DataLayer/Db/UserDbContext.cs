@@ -458,7 +458,7 @@ namespace IMS.DataLayer.Dal
                 return false;
             }
         }
-        public async Task<bool> IsOldPasswordRepeatAgain(int userId,string newPassword)
+        public async Task<bool> IsNewPasswordRepeated(int userId,string newPassword)
         {
             DbDataReader reader = null;
             using (var connection = await _dbProvider.GetConnection(Databases.IMS))
