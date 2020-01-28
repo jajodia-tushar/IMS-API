@@ -168,28 +168,7 @@ namespace IMS.Core.services
                 {
                     if(requestedUserId == userId)
                     {
-                        try
-                        {
-                            Validators.UserValidator.CheckPasswordFormat(changePasswordDetails.NewPassword);
-                            var hashNewPassword = Utility.Hash(changePasswordDetails.NewPassword);
-                            if (await _userDbContext.IsNewPasswordRepeated(requestedUserId, hashNewPassword) == false && user.Password != hashNewPassword)
-                            {
-                                if (await _userDbContext.UpdateUserPassword(requestedUserId, hashNewPassword))
-                                    response.Status = Status.Success;
-                                else
-                                    throw new Exception();
-                            }
-                            else
-                            {
-                                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict,
-                                    Constants.ErrorMessages.NewPasswordShouldNotEqualToOldPassword);
-                            }
-                        }
-                        catch (CustomException e)
-                        {
-                            response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                            new Task(() => { _logger.LogException(e, "UpdateUserPassword", Severity.Critical, requestedUserId, response); }).Start();
-                        }
+                        await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
                     }
                     else
                     {
@@ -209,32 +188,10 @@ namespace IMS.Core.services
                     }
                     if(userByOldPassword.Password == user.Password && requestedUserId == userId)
                     {
-                        try
-                        {
-                            Validators.UserValidator.CheckPasswordFormat(changePasswordDetails.NewPassword);
-                            var hashNewPassword = Utility.Hash(changePasswordDetails.NewPassword);
-                            if(await _userDbContext.IsNewPasswordRepeated(userByOldPassword.Id,hashNewPassword) == false && user.Password != hashNewPassword)
-                            {
-                                if (await _userDbContext.UpdateUserPassword(userByOldPassword.Id, hashNewPassword))
-                                    response.Status = Status.Success;
-                                else
-                                    throw new Exception();
-                            }
-                            else
-                            {
-                                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, 
-                                    Constants.ErrorMessages.NewPasswordShouldNotEqualToOldPassword);
-                            }
-                        }
-                        catch(CustomException e)
-                        {
-                            response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
-                            new Task(() => { _logger.LogException(e, "UpdateUserPassword", Severity.Critical,requestedUserId, response); }).Start();
-                        }
+                        await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
                     }
                     else
                     {
-                        // unauthorized user // can't change the password
                         response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
                                    Constants.ErrorMessages.UnAuthorized);
                     }
@@ -259,6 +216,24 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(userId, response, "UpdateUserPassword", response.Status, severity, requestedUserId); }).Start();
             }
             return response;
+        }
+
+        private async Task UpdatePassword(ChangePasswordDetails changePasswordDetails, Response response, int requestedUserId, User user)
+        {
+            Validators.UserValidator.CheckPasswordFormat(changePasswordDetails.NewPassword);
+            var hashNewPassword = Utility.Hash(changePasswordDetails.NewPassword);
+            if (await _userDbContext.IsNewpasswordRepeated(requestedUserId, hashNewPassword) == false && user.Password != hashNewPassword)
+            {
+                if (await _userDbContext.UpdateUserPassword(requestedUserId, hashNewPassword))
+                    response.Status = Status.Success;
+                else
+                    throw new Exception();
+            }
+            else
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict,
+                    Constants.ErrorMessages.NewPasswordShouldNotEqualToOldPassword);
+            }
         }
     }
 }

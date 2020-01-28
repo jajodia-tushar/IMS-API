@@ -92,7 +92,7 @@ namespace IMS_API.Controllers
 
 
         [Route("api/Login/updateuserpassword/{userId:int}")]
-        [Authorize(Roles = "Admin,SuperAdmin")]
+        [Authorize(Roles = "Admin,SuperAdmin,Clerk")]
         [HttpPatch]
         public async Task<Response> UpdateUserPassword(int userId, [FromBody] ChangePasswordDetails changePasswordDetails)
         {

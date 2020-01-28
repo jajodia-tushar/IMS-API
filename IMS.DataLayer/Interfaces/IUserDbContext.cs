@@ -22,6 +22,6 @@ namespace IMS.DataLayer.Interfaces
         Task<bool> CheckEmailAvailability(string emailId);
         Task<bool> DeleteUser(int userId, bool isHardDelete);
         Task<bool> UpdateUserPassword(int userId, string newPassword);
-        Task<bool> IsNewPasswordRepeated(int userId,string newPassword);
+        Task<bool> IsNewpasswordRepeated(int userId,string newPassword);
     }
 }

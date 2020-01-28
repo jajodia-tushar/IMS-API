@@ -458,9 +458,9 @@ namespace IMS.DataLayer.Dal
                 return false;
             }
         }
-        public async Task<bool> IsNewPasswordRepeated(int userId,string newPassword)
+        public async Task<bool> IsNewpasswordRepeated(int userId,string newPassword)
         {
-            DbDataReader reader = null;
+            bool isRepeated = false;
             using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -471,19 +471,14 @@ namespace IMS.DataLayer.Dal
                     command.CommandText = "spIsOldPasswordRepeatAgain";
                     command.Parameters.AddWithValue("@userid", userId);
                     command.Parameters.AddWithValue("@newpassword", newPassword);
-                    int? val = (int?) await command.ExecuteScalarAsync();
-                    if(val == 1)
-                    {
-                        return true;
-                    }
+                    isRepeated =(bool) await command.ExecuteScalarAsync();
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
-               
+                return isRepeated;
             }
-            return false;
         }
     }
 }
