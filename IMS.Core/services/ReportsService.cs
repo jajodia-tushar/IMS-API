@@ -371,7 +371,7 @@ namespace IMS.Core.services
             List<DateItemConsumption> sortedDateItemConsumptionList = dateItemConsumptionList.OrderBy(o => o.Date).ToList();
             return sortedDateItemConsumptionList;
         }
-        public async Task<StockStatusResponse> GetStockStatus(int pageNumber, int pageSize, string itemName)
+        public async Task<StockStatusResponse> GetStockStatus(int pageNumber, int pageSize, string itemName,string itemIds)
         {
             StockStatusResponse stockStatusResponse = new StockStatusResponse();
             int userId = -1;
@@ -405,6 +405,29 @@ namespace IMS.Core.services
                                 PageSize = pageSize
                             };
                             stockStatusResponse.StockStatusList = await ToListFromDictionary(stockStatus);
+                            if (!String.IsNullOrEmpty(itemIds))
+                            {
+                                List<int> itemsId = new List<int>();
+                                string[] itemIdsList = itemIds.Split(",");
+                                foreach (string itemId in itemIdsList)
+                                {
+                                    try
+                                    {
+                                        itemsId.Add(Convert.ToInt32(itemId));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        stockStatusResponse.Status = Status.Failure;
+                                        stockStatusResponse.Error = new Error()
+                                        {
+                                            ErrorCode = Constants.ErrorCodes.NotFound,
+                                            ErrorMessage = Constants.ErrorMessages.InvalidItemId
+                                        };
+                                        return stockStatusResponse;
+                                    }
+                                }
+                                stockStatusResponse.StockStatusList = stockStatusResponse.StockStatusList.Where(o => itemsId.Contains(o.Item.Id)).ToList();
+                            }
                         }
                         else
                         {
