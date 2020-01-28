@@ -122,7 +122,16 @@ namespace IMS_API
                
                 SignatureValidator = delegate (string token, TokenValidationParameters parameters)
                 {
-                    var jwt = new JwtSecurityToken(token);
+                    JwtSecurityToken jwt = null;
+                    try
+                    {
+                         jwt = new JwtSecurityToken(token);
+                        
+                    }
+                    catch(Exception e)
+                    {
+
+                    }
 
                     return jwt;
                 },
