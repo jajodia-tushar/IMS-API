@@ -41,6 +41,7 @@ namespace IMS.Core
                 string userName = user.Firstname + " " + user.Lastname;
                 string action = invocationContext.GetExecutingMethodName();
                 var parameterValue = invocationContext.GetParameterValue(0);
+                string remarks = FindRemarks(invocationContext, processName);
                 if (action.ToLower().Contains("delete"))
                     performedOn = parameterValue.ToString();
                 else if (action.ToLower().Equals("placeemployeeorder") || action.ToLower().Equals("savevendororder") || action.ToLower().Equals("approvevendororder"))
@@ -50,6 +51,23 @@ namespace IMS.Core
                 string details = userName + " " + processName +" "+ performedOn;
                 _auditLogsDbContext.AddAuditLogs(userName, action, details, performedOn, null,className);
             }
+        }
+        private string FindRemarks(InvocationContext invocationContext, string processName)
+        {
+            string remarks = "";
+            if(processName.ToLower().Contains("reject") || processName.ToLower().Contains("Deleted Vendor Order"))
+            {
+                remarks = invocationContext.GetParameterValue(1).ToString();
+            }
+            else if (processName.ToLower().Contains("delete"))
+            {
+                remarks = invocationContext.GetParameterValue(2).ToString();
+            }
+            else if (processName.ToLower().Contains("update"))
+            {
+                remarks = invocationContext.GetParameterValue(1).ToString();
+            }
+            return remarks;
         }
         private string GetOrderId(object obj)
         {
