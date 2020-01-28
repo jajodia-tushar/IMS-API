@@ -106,6 +106,7 @@ namespace IMS_API
             services.AddTransientWithProxy<IUserService, UserService>();
             services.AddTransientWithProxy<IVendorService, VendorService>();
             services.AddTransientWithProxy<IOrderService, OrderService>();
+
         }
         public TokenValidationParameters CreateTokenValidationParameters()
         {

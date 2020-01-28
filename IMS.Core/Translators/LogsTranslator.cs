@@ -54,5 +54,52 @@ namespace IMS.Core.Translators
             }
             return dtoLog;
         }
+
+        public static ActivityLogsResponse ToDataContractsObject(ActivityLogsReponse doActivityLogsReponse)
+        {
+            Contracts.ActivityLogsResponse dtoActivityLogSresponse = new ActivityLogsResponse();
+            if(doActivityLogsReponse.Status == Entities.Status.Success)
+            {
+                dtoActivityLogSresponse.Status = Contracts.Status.Success;
+                dtoActivityLogSresponse.ActivityLogRecords = ToDataContractsObject(doActivityLogsReponse.ActivityLogRecords);
+                dtoActivityLogSresponse.PagingInfo = Translator.ToDataContractsObject(doActivityLogsReponse.PagingInfo);
+            }
+            else
+            {
+                dtoActivityLogSresponse.Status = Contracts.Status.Failure;
+                dtoActivityLogSresponse.Error = Translator.ToDataContractsObject(doActivityLogsReponse.Error);
+            }
+            return dtoActivityLogSresponse;
+        }
+
+        private static List<Contracts.ActivityLogs> ToDataContractsObject(List<Entities.ActivityLogs> doActivityLogRecords)
+        {
+            List<Contracts.ActivityLogs> dtoActivityLogRecords = new List<Contracts.ActivityLogs>();
+            if(doActivityLogRecords!=null || doActivityLogRecords.Count != 0)
+            {
+                foreach(var activityLogRecord in doActivityLogRecords)
+                {
+                    dtoActivityLogRecords.Add(ToDataContractsObject(activityLogRecord));
+                }
+            }
+            return dtoActivityLogRecords;
+        }
+
+        private static Contracts.ActivityLogs ToDataContractsObject(Entities.ActivityLogs doActivityLogRecord)
+        {
+            if (doActivityLogRecord != null)
+            {
+                return new Contracts.ActivityLogs()
+                {
+                    UserName = doActivityLogRecord.UserName,
+                    Action = doActivityLogRecord.Action,
+                    Details = doActivityLogRecord.Details,
+                    PerformedOn = doActivityLogRecord.PerformedOn,
+                    CreatedOn = doActivityLogRecord.CreatedOn,
+                    Remarks = doActivityLogRecord.Remarks
+                };   
+            }
+            return null;
+        }
     }
 }

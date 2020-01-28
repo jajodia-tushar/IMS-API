@@ -8,5 +8,6 @@ namespace IMS.Entities.Interfaces
     public interface ILogsService
     {
        Task<LogsResponse> GetLogsRecord();
+        Task<ActivityLogsReponse> GetActivityLogs(int?pageNumber,int ? pageSize, string fromDate, string toDate);
     }
 }

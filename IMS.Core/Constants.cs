@@ -104,6 +104,7 @@ namespace IMS.Core
             public const string ItemsUnavailability = "Items are Unavailable To Approve";
             public const string InvalidOrderToReject = "Order should  be in Pending state to Reject";
 
+            public const string ActivityLogsNotPresent = "No Activity Logs Present";
         }
 
         public static class ErrorCodes
