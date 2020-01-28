@@ -23,5 +23,6 @@ namespace IMS.Entities.Interfaces
         Task<ApproveBulkOrderResponse> ApproveEmployeeBulkOrder(int orderid, ApproveEmployeeBulkOrder approveEmployeeBulkOrder);
         Task<Response> RejectEmployeeBulkOrder(int orderId);
         Task<EmployeeBulkOrdersResponse> ReturnOrderItems(int orderId, EmployeeBulkOrder employeeBulkOrder);
+        Task<Response> CancelEmployeeBulkOrder(int orderid);
     }
 }

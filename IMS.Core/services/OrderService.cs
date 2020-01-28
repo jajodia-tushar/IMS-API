@@ -27,7 +27,7 @@ namespace IMS.Core.services
         private IVendorService _vendorService;
         private IMailService _mailService;
 
-        public OrderService(IVendorOrderDbContext vendorOrderDbContext, IEmployeeOrderDbContext employeeOrderDbContext, ITokenProvider tokenProvider, ILogManager logger, IHttpContextAccessor httpContextAccessor, IEmployeeService employeeService, IVendorService vendorService, IMailService mailService,IEmployeeBulkOrderDbContext employeeBulkOrderDbContext)
+        public OrderService(IVendorOrderDbContext vendorOrderDbContext, IEmployeeOrderDbContext employeeOrderDbContext, ITokenProvider tokenProvider, ILogManager logger, IHttpContextAccessor httpContextAccessor, IEmployeeService employeeService, IVendorService vendorService, IMailService mailService, IEmployeeBulkOrderDbContext employeeBulkOrderDbContext)
         {
             _employeeBulkOrderDbContext = employeeBulkOrderDbContext;
             _vendorOrderDbContext = vendorOrderDbContext;
@@ -39,7 +39,7 @@ namespace IMS.Core.services
             _vendorService = vendorService;
             _mailService = mailService;
         }
-        [Audit("Deleted Vendor Order With Id","Order")]
+        [Audit("Deleted Vendor Order With Id", "Order")]
         public async Task<Response> Delete(int orderId)
         {
             Response deleteVendorOrderResponse = new Response();
@@ -403,7 +403,7 @@ namespace IMS.Core.services
                 itemQtyPrice.TotalPrice = Math.Round(itemQtyPrice.Item.Rate * itemQtyPrice.Quantity, 2);
         }
 
-        [Audit("Approved Vendor Order With Id","Order")]
+        [Audit("Approved Vendor Order With Id", "Order")]
         public async Task<VendorOrderResponse> ApproveVendorOrder(VendorOrder vendorOrder)
         {
             var vendorOrderResponse = new VendorOrderResponse();
@@ -641,7 +641,7 @@ namespace IMS.Core.services
         }
 
         public async Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrders(int? pageNumber, int? pageSize, string fromDate, string toDate)
-         {
+        {
             int currentPageNumber = pageNumber ?? 1;
             int currentPageSize = pageSize ?? 10;
             var pageInfo = new PagingInfo()
@@ -958,6 +958,65 @@ namespace IMS.Core.services
                 new Task(() => { _logger.Log(employeeBulkOrder, employeeBulkOrdersResponse, "ReturnOrderItems", employeeBulkOrdersResponse.Status, severity, userId); }).Start();
             }
             return employeeBulkOrdersResponse;
+        }
+
+        public async Task<Response> CancelEmployeeBulkOrder(int orderId)
+        {
+            Response response = new Response
+            {
+                Status = Status.Failure
+            };
+            int userId = -1;
+            EmployeeBulkOrder orderFromDatabase = null;
+            try
+            {
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                userId = request.User.Id;
+                if (orderId <= 0)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
+                orderFromDatabase = await _employeeBulkOrderDbContext.GetOrderById(orderId);
+                if (orderFromDatabase == null)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderId);
+                if (orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus != BulkOrderRequestStatus.Approved)
+                    throw new InvalidOrderException(Constants.ErrorMessages.InvalidOrderStatus);
+
+                UpdateBulkOrderStatusAndUsedQuantity(orderFromDatabase);
+                await _employeeBulkOrderDbContext.CancelOrReturnOrderItems(orderFromDatabase);
+                response.Status = Status.Success;
+            }
+            catch (CustomException exception)
+            {
+                response.Error = Utility.ErrorGenerator(exception.ErrorCode, exception.ErrorMessage);
+                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, "PUT api/order/EmployeeBulkOrders/" + orderId + "/Cancel", response); }).Start();
+            }
+            catch (Exception exception)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, "PUT api/order/EmployeeBulkOrders/" + orderId + "/Cancel", response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log("PUT api/order/EmployeeBulkOrders/" + orderId+"/Cancel", response, "CancelEmployeeBulkOrder", response.Status, severity, userId); }).Start();
+                if (response.Status == Status.Success)
+                {
+                    new Task(() => { _mailService.SendEmployeeBulkOrderReciept(orderFromDatabase, BulkOrderRequestStatus.Cancelled); }).Start();
+                }
+            }
+            return response;
+        }
+
+        private void UpdateBulkOrderStatusAndUsedQuantity(EmployeeBulkOrder orderFromDatabase)
+        {
+            orderFromDatabase.EmployeeBulkOrderDetails.BulkOrderRequestStatus = BulkOrderRequestStatus.Cancelled;
+            foreach(var item in orderFromDatabase.EmployeeBulkOrderDetails.ItemsQuantityList)
+            {
+                item.QuantityUsed = 0;
+            }
         }
     }
 }

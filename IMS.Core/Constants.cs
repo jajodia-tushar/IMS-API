@@ -100,6 +100,7 @@ namespace IMS.Core
             public const string OrderNotFound = "Order not found for this Id";
             public const string NoNotification = "Notifications not found";
             public const string InvalidOrderToApprove = "Order should  be in Pending state to Approve";
+            public const string InvalidOrderStatus = "Order Status Not appropriate for this action";
             public const string ItemsUnavailability = "Items are Unavailable To Approve";
             public const string InvalidOrderToReject = "Order should  be in Pending state to Reject";
 

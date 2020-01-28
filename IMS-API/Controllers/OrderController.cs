@@ -475,7 +475,7 @@ namespace IMS_API.Controllers
         }
 
         /// <summary>
-        /// Return Employee Bulk Order
+        /// Return Employee Bulk Order Items
         /// </summary>
         /// <returns>EmployeeBulkOrdersResponse</returns>
         /// <response code="200">Returns Status Success if order return was successfull</response>
@@ -506,5 +506,37 @@ namespace IMS_API.Controllers
 
             return contractsBulkOrderResponse;
         }
+
+        /// <summary>
+        /// Cancel Employee Bulk Order
+        /// </summary>
+        /// <returns>Response</returns>
+        /// <response code="200">Returns Status Success if order cancel was successfull</response>
+        [HttpPut("EmployeeBulkOrders/{orderId}/Cancel", Name = "CancelEmployeeBulkOrder")]
+        public async Task<Response> CancelEmployeeBulkOrder(int orderid)
+        {
+            IMS.Contracts.Response response = null;
+            try
+            {
+                IMS.Entities.Response entitiesResponse = await _orderService.CancelEmployeeBulkOrder(orderid);
+                response = Translator.ToDataContractsObject(entitiesResponse);
+            }
+            catch (Exception exception)
+            {
+                response = new Response
+                {
+                    Status = Status.Failure,
+                    Error = new Error
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "CancelEmployeeBulkOrder", IMS.Entities.Severity.Critical, orderid, response); }).Start();
+            }
+
+            return response;
+        }
+
     }
 }
