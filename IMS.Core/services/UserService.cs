@@ -192,7 +192,7 @@ namespace IMS.Core.services
             try
             {
                 RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
-                if (request.HasValidToken)
+                if (!request.HasValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
                 User requestedUser = request.User;
                 userId = requestedUser.Id;
