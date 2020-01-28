@@ -158,35 +158,30 @@ namespace IMS.Core.services
                 User requestedUser = request.User;
                 requestedUserId = requestedUser.Id;
                 User user = await _userDbContext.GetUserById(userId);
-                if(user == null)
+                if(requestedUserId != userId || user == null)
                 {
-                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound,
-                                   Constants.ErrorMessages.UserNotFound);
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,Constants.ErrorMessages.UnAuthorized);
                     return response;
-                }
-                if(requestedUserId == userId && user.IsDefaultPasswordChanged == false)
-                {
-                    await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
-                }
-                else if(requestedUserId == userId && user.IsDefaultPasswordChanged == true)
-                {
-                    var hashOldPassword = Utility.Hash(changePasswordDetails.OldPassword);
-                    User userByOldPassword = await _userDbContext.GetUserByCredintials(user.Username, hashOldPassword);
-                    if (userByOldPassword == null || userByOldPassword.Password != user.Password)
-                    {
-                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
-                                   Constants.ErrorMessages.UserNotFoundByOldPassword);
-                        return response;
-                    }
-                    else
-                    {
-                        await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
-                    }
                 }
                 else
                 {
-                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
-                               Constants.ErrorMessages.UnAuthorized);
+                    if (user.IsDefaultPasswordChanged == false)
+                        await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
+                    else
+                    {
+                        var hashOldPassword = Utility.Hash(changePasswordDetails.OldPassword);
+                        User userByOldPassword = await _userDbContext.GetUserByCredintials(user.Username, hashOldPassword);
+                        if (userByOldPassword == null || userByOldPassword.Password != user.Password)
+                        {
+                            response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
+                                       Constants.ErrorMessages.UserNotFoundByOldPassword);
+                            return response;
+                        }
+                        else
+                        {
+                            await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
+                        }
+                    }
                 }
             }
             catch (CustomException e)
