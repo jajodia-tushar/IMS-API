@@ -336,11 +336,10 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<VendorsOrderResponse> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        public async Task<List<VendorOrder>> GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
         {
-            var vendorsOrderResponse = new VendorsOrderResponse();
             DbDataReader reader = null;
-            int totalResults=0;
+            var VendorOrders = new List<VendorOrder>();
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -356,8 +355,6 @@ namespace IMS.DataLayer.Db
                     command.Parameters.AddWithValue("@off", off);
                     command.Parameters.AddWithValue("@startDate", startDate);
                     command.Parameters.AddWithValue("@endDate", endDate);
-                    command.Parameters.Add("@totalResults", MySqlDbType.Int32, 32);
-                    command.Parameters["@totalResults"].Direction = ParameterDirection.Output;
                     reader = await command.ExecuteReaderAsync();
                     List<VendorOrderDto> VendorOrderDtos = new List<VendorOrderDto>();
                     while (reader.Read())
@@ -366,18 +363,14 @@ namespace IMS.DataLayer.Db
                         VendorOrderDtos.Add(vendorOrderDto);
 
                     }
-                    vendorsOrderResponse.VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
-                    reader.Close();
-                    await command.ExecuteNonQueryAsync();
-                    totalResults = (int)command.Parameters["@totalResults"].Value;
-                    vendorsOrderResponse.PagingInfo = new PagingInfo { TotalResults = totalResults };
+                    VendorOrders = ConvertToListOfVendorOrders(VendorOrderDtos);
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
             }
-            return vendorsOrderResponse;
+            return VendorOrders;
         }
 
         public async Task<bool> EditOrder(VendorOrder vendorOrder, User user)
@@ -489,6 +482,42 @@ namespace IMS.DataLayer.Db
                 {
                     throw exception;
                 }
+            }
+        }
+
+        Task<VendorsOrderResponse> IVendorOrderDbContext.GetVendorOrdersByVendorId(int vendorId, int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<string> GetLastOrderModifiedUser(int orderId)
+        {
+            try
+            {
+                string lastModifiedBy=null;
+                DbDataReader reader = null;
+                var user = new User();
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetLastOrderModifiedUser";
+                    command.Parameters.AddWithValue("@orderId", orderId);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        user.Firstname = reader["FirstName"]?.ToString();
+                        user.Lastname  =reader["LastName"]?.ToString();
+                    }
+                }
+                if(!String.IsNullOrEmpty(user.Firstname) && !String.IsNullOrEmpty(user.Lastname))
+                    lastModifiedBy = user.Firstname + " " + user.Lastname;
+                return lastModifiedBy;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
             }
         }
     }

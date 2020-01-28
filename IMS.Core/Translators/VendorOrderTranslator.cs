@@ -106,7 +106,8 @@ namespace IMS.Core.Translators
                     Status = doVendorOrderResponse.Status == Entities.Status.Success ? Contracts.Status.Success : Contracts.Status.Failure,
                     Error = doVendorOrderResponse.Error == null ? null : Translator.ToDataContractsObject(doVendorOrderResponse.Error),
                     VendorOrder = doVendorOrderResponse.VendorOrder == null ? null : ToDataContractsObject(doVendorOrderResponse.VendorOrder),
-                    CanEdit = doVendorOrderResponse.CanEdit == false ? false : true
+                    CanEdit = doVendorOrderResponse.CanEdit == false ? false : true,
+                    LastModifiedBy = doVendorOrderResponse.LastModifiedBy
                 };
             return null;
         }
