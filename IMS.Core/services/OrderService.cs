@@ -1001,7 +1001,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (response.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log("PUT api/order/EmployeeBulkOrders/" + orderId+"/Cancel", response, "ApproveBulkOrder", response.Status, severity, userId); }).Start();
+                new Task(() => { _logger.Log("PUT api/order/EmployeeBulkOrders/" + orderId+"/Cancel", response, "CancelEmployeeBulkOrder", response.Status, severity, userId); }).Start();
                 if (response.Status == Status.Success)
                 {
                     new Task(() => { _mailService.SendEmployeeBulkOrderReciept(orderFromDatabase, BulkOrderRequestStatus.Cancelled); }).Start();
