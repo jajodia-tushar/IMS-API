@@ -36,14 +36,10 @@ namespace IMS.Core.services
             int requestedUserId = -1;
             try
             {
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User requestedUser = Utility.GetUserFromToken(token);
+                User requestedUser =request.User;
                 requestedUserId = requestedUser.Id;
                 response.Roles = await _roleDbContext.GetAccessibleRoles(requestedUser.Role);
                 response.Status = Status.Success;
