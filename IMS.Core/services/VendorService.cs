@@ -88,6 +88,60 @@ namespace IMS.Core.services
             return vendorResponse;
         }
 
+        public async Task<Response> CheckUniqueness(string name, string pan, string gst, string mobile, string cin)
+        {
+            Response uniquenessResponse = new Response();
+            int userId = -1;
+            Vendor vendor = new Vendor();
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                if (await _tokenProvider.IsValidToken(token))
+                {
+                    User user = Utility.GetUserFromToken(token);
+                    userId = user.Id;
+                    vendor.Name = name ?? "";
+                    vendor.PAN = pan ?? "";
+                    vendor.CompanyIdentificationNumber = cin ?? "";
+                    vendor.ContactNumber = mobile ?? "";
+                    vendor.GST = gst ?? "";
+                    bool isUnique = await _vendorDbContext.IsVendorPresent(vendor);
+                    if (isUnique == false)
+                    {
+                        uniquenessResponse.Status = Status.Success;
+                    }
+                    else
+                    {
+                        uniquenessResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.DataAlreadyPresent
+                        };
+                    }
+                    return uniquenessResponse;
+                }
+                else
+                {
+                    uniquenessResponse.Status = Status.Failure;
+                    uniquenessResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                uniquenessResponse.Status = Status.Failure;
+                uniquenessResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Check vendor unique", Severity.Medium, vendor, uniquenessResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (uniquenessResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log(vendor, uniquenessResponse, "Check vendor unique", uniquenessResponse.Status, severity, userId); }).Start();
+            }
+            return uniquenessResponse;
+        }
+
         [Audit("Deleted Vendor with Id","Vendor")]
         public async Task<Response> DeleteVendor(int vendorId, bool isHardDelete)
         {

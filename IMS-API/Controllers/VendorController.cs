@@ -184,5 +184,39 @@ namespace IMS_API.Controllers
             }
             return deleteVendor;
         }
+        // GET: api/
+        /// <summary>
+        /// Check vendor detail uniqueness 
+        /// </summary>
+        /// <param name="name">takes the name to be checked for uniqueness</param>
+        /// <param name="pan">takes the pan to be checked for uniqueness</param>
+        /// <param name="cin">takes the cin to be checked for uniqueness</param>
+        /// <param name="mobile">takes the mobile to be checked for uniqueness</param>
+        /// <param name="gst">takes the gst to be checked for uniqueness</param>
+        /// <returns>the response of uniqueness vendor</returns>
+        [HttpGet("IsUnique",Name = "IsCheckUnique(string name, string pan, string gst, string mobile,string cin)")]
+        public async Task<Response> IsCheckUnique(string name, string pan, string gst, string mobile,string cin)
+        {
+            Response contractCheckDetailUniqueness = null;
+            try
+            {
+                IMS.Entities.Response entityVendorUniquenessResponse = await _vendorService.CheckUniqueness(name,pan,gst,mobile,cin);
+                contractCheckDetailUniqueness = Translator.ToDataContractsObject(entityVendorUniquenessResponse);
+            }
+            catch (Exception exception)
+            {
+                contractCheckDetailUniqueness = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "Get", IMS.Entities.Severity.High, "checking uniqueness", contractCheckDetailUniqueness); }).Start();
+            }
+            return contractCheckDetailUniqueness;
+        }
     }
 }

@@ -474,5 +474,16 @@
             <returns>deletion status</returns>
             <response code="200">deletion status</response>
         </member>
+        <member name="M:IMS_API.Controllers.VendorController.IsCheckUnique(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Check vendor detail uniqueness 
+            </summary>
+            <param name="name">takes the name to be checked for uniqueness</param>
+            <param name="pan">takes the pan to be checked for uniqueness</param>
+            <param name="cin">takes the cin to be checked for uniqueness</param>
+            <param name="mobile">takes the mobile to be checked for uniqueness</param>
+            <param name="gst">takes the gst to be checked for uniqueness</param>
+            <returns>the response of uniqueness vendor</returns>
+        </member>
     </members>
 </doc>
