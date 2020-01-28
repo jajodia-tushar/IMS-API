@@ -164,37 +164,29 @@ namespace IMS.Core.services
                                    Constants.ErrorMessages.UserNotFound);
                     return response;
                 }
-                if(user.IsDefaultPasswordChanged == false)
+                if(requestedUserId == userId && user.IsDefaultPasswordChanged == false)
                 {
-                    if(requestedUserId == userId)
-                    {
-                        await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
-                    }
-                    else
-                    {
-                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
-                                   Constants.ErrorMessages.UnAuthorized);
-                    }
+                    await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
                 }
-                else
+                else if(requestedUserId == userId && user.IsDefaultPasswordChanged == true)
                 {
                     var hashOldPassword = Utility.Hash(changePasswordDetails.OldPassword);
                     User userByOldPassword = await _userDbContext.GetUserByCredintials(user.Username, hashOldPassword);
-                    if(userByOldPassword == null)
+                    if (userByOldPassword == null || userByOldPassword.Password != user.Password)
                     {
                         response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
                                    Constants.ErrorMessages.UserNotFoundByOldPassword);
                         return response;
                     }
-                    if(userByOldPassword.Password == user.Password && requestedUserId == userId)
+                    else
                     {
                         await UpdatePassword(changePasswordDetails, response, requestedUserId, user);
                     }
-                    else
-                    {
-                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
-                                   Constants.ErrorMessages.UnAuthorized);
-                    }
+                }
+                else
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,
+                               Constants.ErrorMessages.UnAuthorized);
                 }
             }
             catch (CustomException e)
