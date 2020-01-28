@@ -46,10 +46,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user =request.User;
                     userId = user.Id;
                     bool hasUserEditedBefore = await _vendorOrderDbContext.CheckUserEditedOrderBefore(userId, orderId);
                     if (hasUserEditedBefore)
@@ -121,8 +121,8 @@ namespace IMS.Core.services
             employeeOrdersResponse.Status = Status.Failure;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
                     if (pageNumber <= 0 || pageSize <= 0)
                     {
@@ -241,10 +241,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     if (pageNumber <= 0)
                     {
@@ -295,14 +295,10 @@ namespace IMS.Core.services
             try
             {
 
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = Utility.GetUserFromToken(token);
+                User user = request.User;
                 userId = user.Id;
                 if (VendorOrderValidator.ValidatePlacedOrder(vendorOrder))
                 {
@@ -353,14 +349,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = Utility.GetUserFromToken(token);
+                User user = request.User;
                 userId = user.Id;
                 VendorOrdersDto vendorOrdersDto = await _vendorOrderDbContext.GetVendorOrders(isApproved, pageNumber, pageSize, startDate, endDate);
                 response.VendorOrders = vendorOrdersDto.VendorOrders;
@@ -411,14 +403,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = Utility.GetUserFromToken(token);
+                User user = request.User;
                 userId = user.Id;
                 var response =  await RestrictOrderApproval(vendorOrder, user);
                 if (response.Status.Equals(Status.Success))
@@ -545,14 +533,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                if (!isTokenPresentInHeader)
-                    throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                bool isValidToken = await _tokenProvider.IsValidToken(token);
-                if (!isValidToken)
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
                     throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = Utility.GetUserFromToken(token);
+                User user = request.User;
                 userId = user.Id;
                 var vendorResponse = await _vendorService.GetVendorById(vendorId);
                 if (vendorResponse.Status.Equals(Status.Failure))
@@ -599,14 +583,10 @@ namespace IMS.Core.services
                 int userId = -1;
                 try
                 {
-                    bool isTokenPresentInHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ").Length > 1;
-                    if (!isTokenPresentInHeader)
-                        throw new InvalidTokenException(Constants.ErrorMessages.NoToken);
-                    string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                    bool isValidToken = await _tokenProvider.IsValidToken(token);
-                    if (!isValidToken)
+                    RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                    if (!request.HasValidToken)
                         throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     var vendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
                     if (vendorOrder.VendorOrderDetails != null)
