@@ -109,8 +109,6 @@ namespace IMS.Core
             public const string InvalidOrderToReject = "Order should  be in Pending state to Reject";
             public const string UserNotFoundByOldPassword = "Old Password is Incorrect";
 
-            public const string OrderNotFound = "Order not found for this Id";
-            public const string NoNotification = "Notifications not found";
             public const string InvalidShelfDetails = "Shelf Code Or Shelf Name Is Empty";
             public const string ShelfCodeAlreadyPresent = "Shelf Code Already Present";
             public const string ShelfNotUpdated = "Shelf Details Not Updated";
