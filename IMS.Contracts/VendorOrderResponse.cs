@@ -8,5 +8,6 @@ namespace IMS.Contracts
     {
         public VendorOrder VendorOrder { get; set; }
         public bool CanEdit { get; set; }
+        public string LastModifiedBy { get; set; }
     }
 }

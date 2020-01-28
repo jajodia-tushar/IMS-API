@@ -613,6 +613,7 @@ namespace IMS.Core.services
                     {
                         vendorOrderResponse.VendorOrder = vendorOrder;
                         vendorOrderResponse.CanEdit = !await _vendorOrderDbContext.CheckUserEditedOrderBefore(user.Id, orderId);
+                        vendorOrderResponse.LastModifiedBy = await GetLastOrderModifiedUser(vendorOrder);
                         vendorOrderResponse.Status = Status.Success;
                         return vendorOrderResponse;
                     }
@@ -637,6 +638,21 @@ namespace IMS.Core.services
                     new Task(() => { _logger.Log(orderId, vendorOrderResponse, "GetVendorOrderByOrderId", vendorOrderResponse.Status, severity, userId); }).Start();
                 }
                 return vendorOrderResponse;
+            }
+        }
+
+        private async Task<string> GetLastOrderModifiedUser(VendorOrder vendorOrder)
+        {
+            try
+            {
+                string lastModifiedName = await _vendorOrderDbContext.GetLastOrderModifiedUser(vendorOrder.VendorOrderDetails.OrderId);
+                if (String.IsNullOrEmpty(lastModifiedName))
+                    lastModifiedName = vendorOrder.VendorOrderDetails.RecievedBy;
+                return lastModifiedName;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
             }
         }
 

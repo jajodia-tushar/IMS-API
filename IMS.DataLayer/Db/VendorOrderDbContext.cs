@@ -340,7 +340,7 @@ namespace IMS.DataLayer.Db
         {
             var vendorsOrderResponse = new VendorsOrderResponse();
             DbDataReader reader = null;
-            int totalResults=0;
+            int totalResults = 0;
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -489,6 +489,37 @@ namespace IMS.DataLayer.Db
                 {
                     throw exception;
                 }
+            }
+        }
+
+        public async Task<string> GetLastOrderModifiedUser(int orderId)
+        {
+            try
+            {
+                string lastModifiedBy=null;
+                DbDataReader reader = null;
+                var user = new User();
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "spGetLastOrderModifiedUser";
+                    command.Parameters.AddWithValue("@orderId", orderId);
+                    reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        user.Firstname = reader["FirstName"]?.ToString();
+                        user.Lastname  =reader["LastName"]?.ToString();
+                    }
+                }
+                if(!String.IsNullOrEmpty(user.Firstname) && !String.IsNullOrEmpty(user.Lastname))
+                    lastModifiedBy = user.Firstname + " " + user.Lastname;
+                return lastModifiedBy;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
             }
         }
     }
