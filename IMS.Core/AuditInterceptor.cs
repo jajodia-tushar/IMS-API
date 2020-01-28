@@ -41,7 +41,7 @@ namespace IMS.Core
                 string userName = user.Firstname + " " + user.Lastname;
                 string action = invocationContext.GetExecutingMethodName();
                 var parameterValue = invocationContext.GetParameterValue(0);
-                string remarks = FindRemarks(invocationContext, processName);
+                //string remarks = FindRemarks(invocationContext, processName);
                 if (action.ToLower().Contains("delete"))
                     performedOn = parameterValue.ToString();
                 else if (action.ToLower().Equals("placeemployeeorder") || action.ToLower().Equals("savevendororder") || action.ToLower().Equals("approvevendororder"))
