@@ -31,10 +31,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     try
                     {
