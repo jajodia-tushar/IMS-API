@@ -57,11 +57,6 @@ namespace IMS.DataLayer.Dal
 
             };
 
-        public Task<bool> AddNewPasswordAsOldPassword(int userId, string newPassword)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<User> ApproveAdmin(int userId)
         {
             throw new NotImplementedException();
