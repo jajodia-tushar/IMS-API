@@ -75,6 +75,7 @@ namespace IMS.Core.services
             emailBody += "<h2 style='margin-bottom: 10px;'>Hello, &nbsp" + name + "&nbsp</h2>";
             emailBody += "<h4 style='margin: 0px;'>You have placed bulk order of &nbsp" + orderDetails.ItemsQuantityList.Count + "&nbsp items</h4><br>";
             emailBody += "<h4 style='margin: 0px;'>Order Status:&nbsp" +orderStatus.ToString() + "&nbsp</h4><br>";
+           
             emailBody += "<h4 style='margin: 0px;'>Reason For Requirement :&nbsp" + orderDetails.ReasonForRequirement + "&nbsp</h4><br>";
             emailBody += "<h4 style='margin: 0px;'>Requirement Date :&nbsp" + orderDetails.RequirementDate.ToString() + "&nbsp</h4><br>";
             emailBody += "<h3 style='margin: 0px;'>Item Details&nbsp</h4>";
@@ -91,9 +92,11 @@ namespace IMS.Core.services
                 emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>" + employeeItemQuantity.QuantityOrdered + "</td></tr>");
             }
 
+
             emailBody += @"</table>
-                            </div>
-                            <div class='report-text' style='margin-top: 30px; margin-bottom: 30px;'>
+                            </div><br>";
+            emailBody+= "<h4 style='margin: 0px;'>" + GetMessage(orderStatus)+ "&nbsp</h4>";
+            emailBody += @"<div class='report-text' style='margin-top: 30px; margin-bottom: 30px;'>
                                 <h5>Please drop an email to admin@tavisca.com to report if this transaction was not authorized by you.</h5>
                             </div>
                             <div class='regards-text' style='margin-bottom: 50px;'>
@@ -114,6 +117,17 @@ namespace IMS.Core.services
             return emailBody;
         }
 
+        private string GetMessage(BulkOrderRequestStatus orderStatus)
+        {
+            switch(orderStatus)
+            {
+                case BulkOrderRequestStatus.Pending:return "You will get Notification after the Approval of order by Admin Team.";
+                case BulkOrderRequestStatus.Rejected:return "Please Contact Admin Team for further assistance.";
+                case BulkOrderRequestStatus.Approved:return "Please collect items from Admin Team.";
+                case BulkOrderRequestStatus.Cancelled:return "If you have already taken the items, please return it immediately, ignore this message if you have already returned them.";
+                default:return "";
+            }
+        }
 
         public string GenerateEmployeeOrderHTMLTemplate(List<ItemQuantityMapping> employeeItemsQuantityList, string name)
         {
