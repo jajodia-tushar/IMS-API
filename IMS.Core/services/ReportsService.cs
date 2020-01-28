@@ -42,10 +42,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     DateTime startDate = new DateTime();
                     DateTime endDate = new DateTime();
@@ -152,10 +152,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     List<ItemQuantityMapping> itemQuantityMappings;
                     try
@@ -300,10 +300,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     List<DateItemConsumption> dateItemConsumption;
                     if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
@@ -377,10 +377,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     if(pageSize<=0||pageNumber<=0)
                     {
                         stockStatusResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
@@ -544,10 +544,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     if (!string.IsNullOrEmpty(fromDate) && !string.IsNullOrEmpty(toDate) && ReportsValidator.ValidateDate(fromDate, toDate))
                     {
@@ -611,10 +611,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     if (pageSize <= 0 || pageNumber <= 0)
                     {
                         itemConsumptionResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
