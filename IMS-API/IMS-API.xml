@@ -247,7 +247,7 @@
             <returns>Datewise item consumption count</returns>
             <response code="200">Returns datewise item consumption count if input is valid otherwise it returns status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.ReportsController.GetStockStatus(System.Int32,System.Int32,System.String)">
+        <member name="M:IMS_API.Controllers.ReportsController.GetStockStatus(System.Int32,System.Int32,System.String,System.String)">
             <summary>
             Retrieve the stock status at any given point of time
             </summary>
