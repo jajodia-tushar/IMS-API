@@ -61,7 +61,7 @@ namespace IMS.Core.services
         {
             int currentPageNumber = pageNumber ?? 1;
             int currentPageSize = pageSize ?? 10;
-            var pagingInfo = new PagingInfo();
+            PagingInfo pagingInfo = null;
             ActivityLogsReponse activityLogsReponse = new ActivityLogsReponse()
             {
                 Status = Status.Failure,
@@ -88,9 +88,13 @@ namespace IMS.Core.services
                 {
                     throw new RecordsNotFoundException(Constants.ErrorMessages.ActivityLogsNotPresent);
                 }
-                pagingInfo.PageNumber = currentPageNumber;
-                pagingInfo.PageSize = currentPageSize;
-                pagingInfo.TotalResults = activityLogs.Item1;
+                pagingInfo = new PagingInfo()
+                {
+                    PageNumber = currentPageNumber,
+                    PageSize = currentPageSize,
+                    TotalResults = activityLogs.Item1
+                };
+                activityLogsReponse.PagingInfo = pagingInfo;
                 activityLogsReponse.Status = Status.Success;
                 activityLogsReponse.ActivityLogRecords = activityLogs.Item2;
             }
