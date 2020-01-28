@@ -42,16 +42,24 @@ namespace IMS.Core
                 string action = invocationContext.GetExecutingMethodName();
                 var parameterValue = invocationContext.GetParameterValue(0);
                 //string remarks = FindRemarks(invocationContext, processName);
-                if (action.ToLower().Contains("delete"))
-                    performedOn = parameterValue.ToString();
-                else if (action.ToLower().Equals("placeemployeeorder") || action.ToLower().Equals("savevendororder") || action.ToLower().Equals("approvevendororder"))
-                    performedOn = GetOrderId(parameterValue);
-                else
-                    performedOn = GetNameFromRequest(parameterValue);
+                performedOn = GetPerformedOn(action, parameterValue);
                 string details = userName + " " + processName +" "+ performedOn;
                 _auditLogsDbContext.AddAuditLogs(userName, action, details, performedOn, null,className);
             }
         }
+
+        private string GetPerformedOn(string action, object parameterValue)
+        {
+            string performedOn = "";
+            if (action.ToLower().Contains("delete") || action.Contains("ApproveEmployeeBulkOrder") || action.ToLower().Contains("reject") || action.ToLower().Contains("cancel"))
+                performedOn = parameterValue.ToString();
+            else if (action.ToLower().Equals("placeemployeeorder") || action.ToLower().Equals("savevendororder") || action.ToLower().Equals("approvevendororder"))
+                performedOn = GetOrderId(parameterValue);
+            else
+                performedOn = GetNameFromRequest(parameterValue);
+            return performedOn;
+        }
+
         private string FindRemarks(InvocationContext invocationContext, string processName)
         {
             string remarks = "";

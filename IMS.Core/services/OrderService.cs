@@ -791,6 +791,7 @@ namespace IMS.Core.services
             return employeeBulkOrdersResponse;
         }
 
+        [Audit("Approved Employee Bulk Order With Id","Order")]
         public async Task<ApproveBulkOrderResponse> ApproveEmployeeBulkOrder(int orderId, ApproveEmployeeBulkOrder requestedApproveEmployeeBulkOrder)
         {
             ApproveBulkOrderResponse response = new ApproveBulkOrderResponse
@@ -852,6 +853,7 @@ namespace IMS.Core.services
             return response;
         }
 
+        [Audit("Rejected Employee Bulk Order With Id","Order")]
         public async Task<Response> RejectEmployeeBulkOrder(int orderId)
         {
             Response response = new Response
@@ -956,6 +958,7 @@ namespace IMS.Core.services
             return employeeBulkOrdersResponse;
         }
 
+        [Audit("Cancelled Employee Bulk Order With Id","Order")]
         public async Task<Response> CancelEmployeeBulkOrder(int orderId)
         {
             Response response = new Response
