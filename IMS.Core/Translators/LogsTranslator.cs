@@ -87,17 +87,19 @@ namespace IMS.Core.Translators
 
         private static Contracts.ActivityLogs ToDataContractsObject(Entities.ActivityLogs doActivityLogRecord)
         {
-            Contracts.ActivityLogs dtoActivityLogRecord = new Contracts.ActivityLogs();
             if (doActivityLogRecord != null)
             {
-                dtoActivityLogRecord.UserName = doActivityLogRecord.UserName;
-                dtoActivityLogRecord.Action = doActivityLogRecord.Action;
-                dtoActivityLogRecord.Details = doActivityLogRecord.Details;
-                dtoActivityLogRecord.PerformedOn = doActivityLogRecord.PerformedOn;
-                dtoActivityLogRecord.CreatedOn = doActivityLogRecord.CreatedOn;
-                dtoActivityLogRecord.Remarks = doActivityLogRecord.Remarks;
+                return new Contracts.ActivityLogs()
+                {
+                    UserName = doActivityLogRecord.UserName,
+                    Action = doActivityLogRecord.Action,
+                    Details = doActivityLogRecord.Details,
+                    PerformedOn = doActivityLogRecord.PerformedOn,
+                    CreatedOn = doActivityLogRecord.CreatedOn,
+                    Remarks = doActivityLogRecord.Remarks
+                };   
             }
-            return dtoActivityLogRecord;
+            return null;
         }
     }
 }
