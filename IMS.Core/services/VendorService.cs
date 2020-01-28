@@ -33,12 +33,12 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
-                    vendorResponse.Vendors = new List<Vendor>();
+                    User user = request.User;
                     userId = user.Id;
+                    vendorResponse.Vendors = new List<Vendor>();
                     if (VendorValidator.Validate(vendor))
                     {
                         if (await _vendorDbContext.IsVendorPresent(vendor))
@@ -88,6 +88,60 @@ namespace IMS.Core.services
             return vendorResponse;
         }
 
+        public async Task<Response> CheckUniqueness(string name, string pan, string gst, string mobile, string cin)
+        {
+            Response uniquenessResponse = new Response();
+            int userId = -1;
+            Vendor vendor = new Vendor();
+            try
+            {
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
+                {
+                    User user = request.User;
+                    userId = user.Id;
+                    vendor.Name = name ?? "";
+                    vendor.PAN = pan ?? "";
+                    vendor.CompanyIdentificationNumber = cin ?? "";
+                    vendor.ContactNumber = mobile ?? "";
+                    vendor.GST = gst ?? "";
+                    bool isUnique = await _vendorDbContext.IsVendorPresent(vendor);
+                    if (isUnique == false)
+                    {
+                        uniquenessResponse.Status = Status.Success;
+                    }
+                    else
+                    {
+                        uniquenessResponse.Error = new Error()
+                        {
+                            ErrorCode = Constants.ErrorCodes.NotFound,
+                            ErrorMessage = Constants.ErrorMessages.DataAlreadyPresent
+                        };
+                    }
+                    return uniquenessResponse;
+                }
+                else
+                {
+                    uniquenessResponse.Status = Status.Failure;
+                    uniquenessResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                uniquenessResponse.Status = Status.Failure;
+                uniquenessResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "Check vendor unique", Severity.Medium, vendor, uniquenessResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (uniquenessResponse.Status == Status.Failure)
+                    severity = Severity.Medium;
+                new Task(() => { _logger.Log(vendor, uniquenessResponse, "Check vendor unique", uniquenessResponse.Status, severity, userId); }).Start();
+            }
+            return uniquenessResponse;
+        }
+
         [Audit("Deleted Vendor with Id","Vendor")]
         public async Task<Response> DeleteVendor(int vendorId, bool isHardDelete)
         {
@@ -95,10 +149,10 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
                     if (vendorId > 0)
                     {
@@ -154,12 +208,12 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
-                    vendorResponse.Vendors = new List<Vendor>();
+                    User user = request.User;
                     userId = user.Id;
+                    vendorResponse.Vendors = new List<Vendor>();
                     vendorResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
                     if (vendorId > 0)
                     {
@@ -198,12 +252,12 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
+                    User user = request.User;
                     userId = user.Id;
-                    if(String.IsNullOrEmpty(name))
+                    if (String.IsNullOrEmpty(name))
                         name = "";
                     if (pageSize <= 0 || pageNumber <= 0)
                     {
@@ -250,12 +304,12 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                if (await _tokenProvider.IsValidToken(token))
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
                 {
-                    User user = Utility.GetUserFromToken(token);
-                    vendorResponse.Vendors = new List<Vendor>();
+                    User user = request.User;
                     userId = user.Id;
+                    vendorResponse.Vendors = new List<Vendor>();
                     if (VendorValidator.Validate(vendor))
                     {
                         vendor = await _vendorDbContext.UpdateVendor(vendor);
