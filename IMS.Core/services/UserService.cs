@@ -78,7 +78,7 @@ namespace IMS.Core.services
             return usersResponse;
         }
         [Audit("Deleted User with Id","User")]
-        public async Task<Response> DeleteUser(int userId, bool isHardDelete)
+        public async Task<Response> DeleteUser(int userIdToBeDeleted, bool isHardDelete)
         {
             Response deleteUserResponse = new Response();
             try
@@ -86,23 +86,22 @@ namespace IMS.Core.services
                 RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                 if (request.HasValidToken)
                 {
-                    User user = request.User;
-                    try
+                    User requestedUser = request.User;
+                    if(requestedUser.Id==userIdToBeDeleted)
                     {
-                        deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
-                        if (userId > 0)
+                        deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.UnAuthorized);
+                        return deleteUserResponse;
+                    }
+                    if (userIdToBeDeleted > 0)
+                    {
+                        bool isDeleted = await _userDbContext.DeleteUser(userIdToBeDeleted, isHardDelete);
+                        if (isDeleted)
                         {
-                            bool isDeleted= await _userDbContext.DeleteUser(userId,isHardDelete);
-                            if(isDeleted)
-                            {
-                                deleteUserResponse.Status = Status.Success;
-                            }
+                            deleteUserResponse.Status = Status.Success;
+                            return deleteUserResponse;
                         }
                     }
-                    catch (Exception exception)
-                    {
-                        new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium, userId, deleteUserResponse); }).Start();
-                    }
+                    deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InValidId);
                 }
                 else
                 {
@@ -114,14 +113,14 @@ namespace IMS.Core.services
             {
                 deleteUserResponse.Status = Status.Failure;
                 deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium, userId, deleteUserResponse); }).Start();
+                new Task(() => { _logger.LogException(exception, "DeleteUser", IMS.Entities.Severity.Medium, userIdToBeDeleted, deleteUserResponse); }).Start();
             }
             finally
             {
                 Severity severity = Severity.No;
                 if (deleteUserResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(userId, deleteUserResponse, "DeleteUser",deleteUserResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(userIdToBeDeleted, deleteUserResponse, "DeleteUser",deleteUserResponse.Status, severity, -1); }).Start();
             }
             return deleteUserResponse;
         }
@@ -232,7 +231,7 @@ namespace IMS.Core.services
         }
 
         [Audit("Updated User","User")]
-        public async Task<UsersResponse> UpdateUser(User user)
+        public async Task<UsersResponse> UpdateUser(User user,string remark)
         {
             UsersResponse userResponse = new UsersResponse();
             userResponse.Status = Status.Failure;

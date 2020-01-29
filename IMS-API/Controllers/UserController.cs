@@ -90,17 +90,18 @@ namespace IMS_API.Controllers
         /// returns updated user
         /// </summary>
         /// <param name="user">Takes the user to be updated</param>
+        /// <param name="remark">Takes a remark saying why the changes have been made</param>
         /// <returns>Updated user</returns>
         /// <response code="200">Returns the updated user</response>
         [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpPut(Name = "UpdateUser(User user)")]
-        public async Task<UsersResponse> UpdateUser(User user)
+        public async Task<UsersResponse> UpdateUser(User user,string remark)
         {
             UsersResponse contractUsersResponse = null;
             try
             {
                 IMS.Entities.User userEntity = UserTranslator.ToEntitiesObject(user);
-                IMS.Entities.UsersResponse entityUsersResponse = await _userService.UpdateUser(userEntity);
+                IMS.Entities.UsersResponse entityUsersResponse = await _userService.UpdateUser(userEntity,remark);
                 contractUsersResponse = UserTranslator.ToDataContractsObject(entityUsersResponse);
             }
             catch (Exception exception)

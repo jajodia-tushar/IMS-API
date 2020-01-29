@@ -393,11 +393,12 @@
             <returns>all users </returns>
             <response code="200">Returns users with status</response>
         </member>
-        <member name="M:IMS_API.Controllers.UserController.UpdateUser(IMS.Contracts.User)">
+        <member name="M:IMS_API.Controllers.UserController.UpdateUser(IMS.Contracts.User,System.String)">
             <summary>
             returns updated user
             </summary>
             <param name="user">Takes the user to be updated</param>
+            <param name="remark">Takes a remark saying why the changes have been made</param>
             <returns>Updated user</returns>
             <response code="200">Returns the updated user</response>
         </member>
