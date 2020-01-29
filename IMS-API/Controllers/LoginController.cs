@@ -7,6 +7,7 @@ using IMS.Core;
 using IMS.Core.Translators;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -88,7 +89,36 @@ namespace IMS_API.Controllers
             }
             return contractsResponse;
         }
-        
-       
+
+
+        [Route("api/Login/updateuserpassword/{userId:int}")]
+        [Authorize(Roles = "Admin,SuperAdmin,Clerk")]
+        [HttpPatch]
+        public async Task<Response> UpdateUserPassword(int userId, [FromBody] ChangePasswordDetails changePasswordDetails)
+        {
+            IMS.Contracts.Response contractsResponse = null;
+            try
+            {
+                IMS.Entities.ChangePasswordDetails doChangePasswordDetails = LoginTranslator.ToEntitiesObject(changePasswordDetails);
+                IMS.Entities.Response response = await _loginService.UpdateUserPassword(userId,doChangePasswordDetails);
+                contractsResponse = Translator.ToDataContractsObject(response);
+
+            }
+            catch (Exception exception)
+            {
+                contractsResponse = new IMS.Contracts.Response()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "UpdateUserPassword", IMS.Entities.Severity.Critical,userId, contractsResponse); }).Start();
+            }
+            return contractsResponse;
+        }
+
     }
 }

@@ -91,6 +91,7 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
+
         public User GetUserByCredintials(string username, string password)
         {
             throw new NotImplementedException();
@@ -106,6 +107,11 @@ namespace IMS.DataLayer.Dal
             throw new NotImplementedException();
         }
 
+        public Task<bool> IsNewpasswordRepeated(int userId, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<bool> Save(User newUser, int isApproved, int isActive)
         {
             throw new NotImplementedException();
@@ -115,6 +121,13 @@ namespace IMS.DataLayer.Dal
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> UpdateUserPassword(int userId, string newPassword)
+        {
+            throw new NotImplementedException();
+        }
+
+        
 
         Task<User> IUserDbContext.GetUserByCredintials(string username, string password)
         {

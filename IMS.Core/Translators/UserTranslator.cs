@@ -20,6 +20,7 @@ namespace IMS.Core.Translators
                     Firstname = user.Firstname,
                     Lastname = user.Lastname,
                     Email = user.Email,
+                    IsDefaultPasswordChanged=user.IsDefaultPasswordChanged,
                     Role = RoleTranslator.ToDataContractsObject(user.Role)
                 };
             }

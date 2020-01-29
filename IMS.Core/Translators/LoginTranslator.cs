@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using IMS.Contracts;
+using IMS.Entities;
 
 namespace IMS.Core.Translators
 {
@@ -31,6 +33,15 @@ namespace IMS.Core.Translators
                 Username = contractsLoginRequest.Username,
                 Password = contractsLoginRequest.Password
 
+            };
+        }
+
+        public static Entities.ChangePasswordDetails ToEntitiesObject(Contracts.ChangePasswordDetails contractsChangePasswordDetails)
+        {
+            return new Entities.ChangePasswordDetails()
+            {
+                OldPassword = contractsChangePasswordDetails.OldPassword,
+                NewPassword = contractsChangePasswordDetails.NewPassword
             };
         }
     }

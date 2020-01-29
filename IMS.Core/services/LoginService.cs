@@ -3,6 +3,7 @@
 using IMS.DataLayer.Dal;
 using IMS.DataLayer.Interfaces;
 using IMS.Entities;
+using IMS.Entities.Exceptions;
 using IMS.Entities.Interfaces;
 using IMS.Logging;
 using IMS.TokenManagement;
@@ -142,5 +143,69 @@ namespace IMS.Core.services
             return expirationTime;
         }
 
+        public async Task<Response> UpdateUserPassword(int userId, ChangePasswordDetails changePasswordDetails)
+        {
+            Response response = new Response()
+            {
+                Status = Status.Failure
+            };
+            int requestedUserId = -1;
+            try
+            {
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
+                User requestedUser = request.User;
+                requestedUserId = requestedUser.Id;
+                User user = await _userDbContext.GetUserById(userId);
+                if(requestedUserId != userId || user == null)
+                {
+                    response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized,Constants.ErrorMessages.UnAuthorized);
+                    return response;
+                }
+                else
+                {
+                    if (user.IsDefaultPasswordChanged == true)
+                    {
+                        var hashOldPassword = Utility.Hash(changePasswordDetails.OldPassword);
+                        User userByOldPassword = await _userDbContext.GetUserByCredintials(user.Username, hashOldPassword);
+                        if (userByOldPassword == null || userByOldPassword.Password != user.Password)
+                        {
+                            response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.IncorrectOldPassword);
+                            return response;
+                        }
+                    }
+                    Validators.UserValidator.CheckPasswordFormat(changePasswordDetails.NewPassword);
+                    var hashNewPassword = Utility.Hash(changePasswordDetails.NewPassword);
+                    if (await _userDbContext.IsNewpasswordRepeated(requestedUserId, hashNewPassword))
+                    {
+                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.Conflict, Constants.ErrorMessages.NewPasswordRepeated);
+                        return response;
+                    }
+                    if (!await _userDbContext.UpdateUserPassword(requestedUserId, hashNewPassword))
+                        throw new Exception();
+                    response.Status = Status.Success;
+                }
+            }
+            catch (CustomException e)
+            {
+                response.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                new Task(() => { _logger.LogException(e, "UpdateUserPassword", Severity.Critical, requestedUserId, response); }).Start();
+
+            }
+            catch (Exception e)
+            {
+                response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(e, "UpdateUserPassword", Severity.Critical,requestedUserId, response); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.No;
+                if (response.Status == Status.Failure)
+                    severity = Severity.Critical;
+                new Task(() => { _logger.Log(userId, response, "UpdateUserPassword", response.Status, severity, requestedUserId); }).Start();
+            }
+            return response;
+        }
     }
 }
