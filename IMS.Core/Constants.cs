@@ -98,7 +98,7 @@ namespace IMS.Core
             public const string EmployeeNotDeleted = "employee not deleted";
 
             public const string UserNotFound = "User Not Found";
-            public const string NewPasswordShouldNotEqualToOldPassword = "New Password Should Not Equal To Old Password";
+            public const string NewPasswordRepeated = "New Password Should Not Equal To Old Password";
             public const string PasswordNotUpdated = "Password Not Updated";
             public const string InvalidBulkRequestDate = "Order must be placed atleast Two days before Requirement Date.Please Contact Admin Team for further assistance";
             public const string OrderNotFound = "Order not found for this Id";
@@ -107,7 +107,7 @@ namespace IMS.Core
             public const string InvalidOrderStatus = "Order Status Not appropriate for this action";
             public const string ItemsUnavailability = "Items are Unavailable To Approve";
             public const string InvalidOrderToReject = "Order should  be in Pending state to Reject";
-            public const string UserNotFoundByOldPassword = "Old Password is Incorrect";
+            public const string IncorrectOldPassword = "Old Password is Incorrect";
 
             public const string InvalidShelfDetails = "Shelf Code Or Shelf Name Is Empty";
             public const string ShelfCodeAlreadyPresent = "Shelf Code Already Present";
