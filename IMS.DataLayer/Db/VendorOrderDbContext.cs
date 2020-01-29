@@ -447,7 +447,6 @@ namespace IMS.DataLayer.Db
         public async Task<VendorOrder> GetVendorOrdersByOrderId(int orderId)
         {
             DbDataReader reader = null;
-            var vendorOrder = new VendorOrder();
             using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
@@ -458,15 +457,16 @@ namespace IMS.DataLayer.Db
                     command.CommandText = "spGetVendorOrderByOrderId";
                     command.Parameters.AddWithValue("@orderId", orderId);
                     reader = await command.ExecuteReaderAsync();
+                    var vendorOrderDtoList = new List<VendorOrderDto>();
                     while (reader.Read())
-                        vendorOrder = ConvertToVendorOrderObject(Extract(reader));
+                        vendorOrderDtoList.Add(Extract(reader));
+                    return ConvertToListOfVendorOrders(vendorOrderDtoList)[0];
                 }
                 catch (Exception exception)
                 {
                     throw exception;
                 }
             }
-            return vendorOrder;
         }
 
         public async Task<bool> CheckUserEditedOrderBefore(int userId, int orderId)
