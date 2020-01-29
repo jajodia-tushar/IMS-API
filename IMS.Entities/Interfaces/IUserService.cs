@@ -11,10 +11,10 @@ namespace IMS.Entities.Interfaces
         Task<UsersResponse> GetAllUsers();
         Task<UsersResponse> GetAllPendingAdminApprovals();
         Task<UsersResponse> AddUser(User user);
-        Task<UsersResponse> UpdateUser(User userEntity);
+        Task<UsersResponse> UpdateUser(User userEntity,string remark);
         Task<UsersResponse> ApproveAdmin(int userId);
 
-        Task<Response> DeleteUser(int userId, bool isHardDelete);
+        Task<Response> DeleteUser(int userIdToBeDeleted, bool isHardDelete);
         Task<Response> CheckUsernameAvailability(string username);
         Task<Response> CheckEmailAvailability(string emailId);
     }
