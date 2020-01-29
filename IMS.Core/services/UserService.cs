@@ -80,14 +80,16 @@ namespace IMS.Core.services
         [Audit("Deleted User with Id","User")]
         public async Task<Response> DeleteUser(int userIdToBeDeleted, bool isHardDelete)
         {
+            User requestedUser = new User() ;
+            requestedUser.Id = -1;
             Response deleteUserResponse = new Response();
             try
             {
                 RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                 if (request.HasValidToken)
                 {
-                    User requestedUser = request.User;
-                    if(requestedUser.Id==userIdToBeDeleted)
+                    requestedUser =  request.User;
+                    if (requestedUser.Id==userIdToBeDeleted)
                     {
                         deleteUserResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.UnAuthorized);
                         return deleteUserResponse;
@@ -120,7 +122,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (deleteUserResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(userIdToBeDeleted, deleteUserResponse, "DeleteUser",deleteUserResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(userIdToBeDeleted, deleteUserResponse, "DeleteUser",deleteUserResponse.Status, severity,requestedUser.Id ); }).Start();
             }
             return deleteUserResponse;
         }
@@ -177,7 +179,7 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (usersResponse.Status == Status.Failure)
                     severity = Severity.Critical;
-                new Task(() => { _logger.Log(roleName, usersResponse, "Get Users By Role Name", usersResponse.Status, severity, -1); }).Start();
+                new Task(() => { _logger.Log(roleName, usersResponse, "Get Users By Role Name", usersResponse.Status, severity, userId); }).Start();
             }
             return usersResponse;
         }
