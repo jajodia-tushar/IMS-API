@@ -40,7 +40,7 @@ namespace IMS.Core.services
             _mailService = mailService;
         }
         [Audit("Deleted Vendor Order With Id", "Order")]
-        public async Task<Response> Delete(int orderId)
+        public async Task<Response> Delete(int orderId,string remark)
         {
             Response deleteVendorOrderResponse = new Response();
             int userId = -1;
@@ -854,7 +854,7 @@ namespace IMS.Core.services
         }
 
         [Audit("Rejected Employee Bulk Order With Id","Order")]
-        public async Task<Response> RejectEmployeeBulkOrder(int orderId)
+        public async Task<Response> RejectEmployeeBulkOrder(int orderId,string remark)
         {
             Response response = new Response
             {

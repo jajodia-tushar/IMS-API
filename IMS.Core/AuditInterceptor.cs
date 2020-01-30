@@ -41,10 +41,10 @@ namespace IMS.Core
                 string userName = user.Firstname + " " + user.Lastname;
                 string action = invocationContext.GetExecutingMethodName();
                 var parameterValue = invocationContext.GetParameterValue(0);
-                //string remarks = FindRemarks(invocationContext, processName);
+                string remarks = FindRemarks(invocationContext, processName,className);
                 performedOn = GetPerformedOn(action, parameterValue);
                 string details = userName + " " + processName +" "+ performedOn;
-                _auditLogsDbContext.AddAuditLogs(userName, action, details, performedOn, null,className);
+                _auditLogsDbContext.AddAuditLogs(userName, action, details, performedOn, remarks,className);
             }
         }
 
@@ -60,20 +60,25 @@ namespace IMS.Core
             return performedOn;
         }
 
-        private string FindRemarks(InvocationContext invocationContext, string processName)
+        private string FindRemarks(InvocationContext invocationContext, string processName, string className)
         {
             string remarks = "";
-            if(processName.ToLower().Contains("reject") || processName.ToLower().Contains("Deleted Vendor Order"))
+            object remarksObject = "";
+            if (className.ToLower().Equals("user") || className.ToLower().Equals("order"))
             {
-                remarks = invocationContext.GetParameterValue(1).ToString();
-            }
-            else if (processName.ToLower().Contains("delete"))
-            {
-                remarks = invocationContext.GetParameterValue(2).ToString();
-            }
-            else if (processName.ToLower().Contains("update"))
-            {
-                remarks = invocationContext.GetParameterValue(1).ToString();
+                if (processName.ToLower().Contains("reject") || processName.ToLower().Contains("deleted vendor order"))
+                {
+                    remarksObject = invocationContext.GetParameterValue(1) ?? "";
+                }
+                else if (processName.ToLower().Contains("delete"))
+                {
+                    remarksObject = invocationContext.GetParameterValue(2) ?? "";
+                }
+                else if (processName.ToLower().Contains("update"))
+                {
+                    remarksObject = invocationContext.GetParameterValue(1) ?? "";
+                }
+                remarks = remarksObject.ToString();
             }
             return remarks;
         }

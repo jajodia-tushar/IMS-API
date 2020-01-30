@@ -8,7 +8,7 @@ namespace IMS.Entities.Interfaces
     public interface IOrderService
     {
 
-        Task<Response> Delete(int orderId);
+        Task<Response> Delete(int orderId,string remark);
         Task<EmployeeOrderResponse> GetEmployeeRecentOrders(int pageNumber, int pageSize);
         Task<EmployeeOrderResponse> GetEmployeeOrders(string employeeId, int pageNumber, int pageSize, string startDate, string endDate);
         Task<EmployeeOrderResponse> PlaceEmployeeOrder(EmployeeOrder employeeOrder);
@@ -21,7 +21,7 @@ namespace IMS.Entities.Interfaces
         Task<EmployeeBulkOrdersResponse> PlaceEmployeeBulkOrder(EmployeeBulkOrder employeeBulkOrder);
         Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrderById(int orderid);
         Task<ApproveBulkOrderResponse> ApproveEmployeeBulkOrder(int orderid, ApproveEmployeeBulkOrder approveEmployeeBulkOrder);
-        Task<Response> RejectEmployeeBulkOrder(int orderId);
+        Task<Response> RejectEmployeeBulkOrder(int orderId,string remark);
         Task<EmployeeBulkOrdersResponse> ReturnOrderItems(int orderId, EmployeeBulkOrder employeeBulkOrder);
         Task<Response> CancelEmployeeBulkOrder(int orderid);
     }

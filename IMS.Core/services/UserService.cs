@@ -78,7 +78,7 @@ namespace IMS.Core.services
             return usersResponse;
         }
         [Audit("Deleted User with Id","User")]
-        public async Task<Response> DeleteUser(int userIdToBeDeleted, bool isHardDelete)
+        public async Task<Response> DeleteUser(int userIdToBeDeleted, bool isHardDelete,string remark)
         {
             User requestedUser = new User() ;
             requestedUser.Id = -1;

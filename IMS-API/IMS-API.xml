@@ -121,11 +121,12 @@
             <returns>entire employee order along with the status</returns>
             <response code="200">Returns the employee order along with status success if it is placed, or failure incase it is not placed</response>
         </member>
-        <member name="M:IMS_API.Controllers.OrderController.Delete(System.Int32)">
+        <member name="M:IMS_API.Controllers.OrderController.Delete(System.Int32,System.String)">
             <summary>
             Deletes the Vendor Order By OrderId
             </summary>
             <param name="orderId">'Order Id of that Particular Order</param>
+            <param name="remark">Takes a remark saying why the changes have been made</param>
             <response code="200">Returns status success if order is successfully deleted otherwise returns failure if order is not deleted</response>
         </member>
         <member name="M:IMS_API.Controllers.OrderController.PlaceVendorOrder(IMS.Contracts.VendorOrder)">
@@ -188,13 +189,14 @@
             <returns>Response</returns>
             <response code="200">Returns Success status and entire object if employeeBulkOrder is APproved otherwise it returns Error and status failure</response>
         </member>
-        <member name="M:IMS_API.Controllers.OrderController.RejectEmployeeBulkOrder(System.Int32)">
+        <member name="M:IMS_API.Controllers.OrderController.RejectEmployeeBulkOrder(System.Int32,System.String)">
             <summary>
             creating bulk order
             </summary>
             <param name="orderId">Here orderid To reject</param>
             <returns>Response</returns>
             <response code="200">Returns Success status  if order is Rejected otherwise it returns Error and status failure</response>
+            <param name="remark">Takes a remark saying why the changes have been made</param>
         </member>
         <member name="M:IMS_API.Controllers.OrderController.ReturnBulkOrderById(System.Int32,IMS.Contracts.EmployeeBulkOrder)">
             <summary>
@@ -425,12 +427,13 @@
             <returns>Updated user</returns>
             <response code="200">Returns the approved user</response>
         </member>
-        <member name="M:IMS_API.Controllers.UserController.Delete(System.Int32,System.Boolean)">
+        <member name="M:IMS_API.Controllers.UserController.Delete(System.Int32,System.Boolean,System.String)">
             <summary>
             returns deletion status
             </summary>
             <param name="userId">Takes the id of the user to be deleted</param>
             <param name="isHardDelete">Values 1 or 0 corresponds to whether the deletion is a hard delete or a soft delete</param>
+            <param name="remark">Takes a remark saying why the changes have been made</param>
             <returns>deletion status</returns>
             <response code="200">deletion status</response>
         </member>
