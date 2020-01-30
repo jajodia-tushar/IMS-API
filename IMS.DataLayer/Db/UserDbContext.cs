@@ -445,12 +445,19 @@ namespace IMS.DataLayer.Dal
                     command.CommandText = "spUpdateUserPassword";
                     command.Parameters.AddWithValue("@userid", userId);
                     command.Parameters.AddWithValue("@newpassword",newPassword);
-                    await command.ExecuteNonQueryAsync();
-                       return true;
+                    try
+                    {
+                        await command.ExecuteNonQueryAsync();
+                        return true;
+                    }
+                    catch(Exception e)
+                    {
+                        return false;
+                    }
                 }
                 catch (Exception exception)
                 {
-                    return false;
+                    throw exception;
                 }
             }
         }
