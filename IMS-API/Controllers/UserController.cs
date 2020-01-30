@@ -222,16 +222,17 @@ namespace IMS_API.Controllers
         /// </summary>
         /// <param name="userId">Takes the id of the user to be deleted</param>
         /// <param name="isHardDelete">Values 1 or 0 corresponds to whether the deletion is a hard delete or a soft delete</param>
+        /// <param name="remark">Takes a remark saying why the changes have been made</param>
         /// <returns>deletion status</returns>
         /// <response code="200">deletion status</response>
         [Authorize(Roles="SuperAdmin")]
         [HttpDelete("{userId}",Name = "Delete(int UserId")]
-        public async Task<Response> Delete(int userId,bool isHardDelete)
+        public async Task<Response> Delete(int userId,bool isHardDelete,string remark)
         {
             Response contractDeleteUsersResponse = null;
             try
             {
-                IMS.Entities.Response deleteUserResponse = await _userService.DeleteUser(userId, isHardDelete);
+                IMS.Entities.Response deleteUserResponse = await _userService.DeleteUser(userId, isHardDelete,remark);
                 contractDeleteUsersResponse = Translator.ToDataContractsObject(deleteUserResponse);
             }
             catch (Exception exception)
