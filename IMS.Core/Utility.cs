@@ -17,9 +17,9 @@ using System.Threading.Tasks;
 
 namespace IMS.Core
 {
-    public static class Utility
+    public class Utility
     {
-        public static User GetUserFromToken(string accessToken)
+        public virtual User GetUserFromToken(string accessToken)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace IMS.Core
                 }
                 catch (AmbiguousMatchException ame)
                 {
-                    throw new ApplicationException("Could not definitely decide if object is serializable.Message:"+ame.Message);
+                    throw new ApplicationException("Could not definitely decide if object is serializable.Message:" + ame.Message);
                 }
             }
         }
@@ -144,24 +144,29 @@ namespace IMS.Core
 
         public static async Task<RequestData> GetRequestDataFromHeader(IHttpContextAccessor _httpContextAccessor, ITokenProvider _tokenProvider)
         {
-            RequestData requestData = new RequestData
+            Utility utility = new Utility();
+            RequestData requestData = new RequestData()
             {
-                HasValidToken = false
+                HasValidToken = false,
+                User = new User()
             };
-
+            string token;
             try
             {
-                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                try
+                {
+                    token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+                }
+                catch (Exception e)
+                {
+                    token = "";
+                }
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (isValidToken)
                 {
-                    requestData.User = Utility.GetUserFromToken(token);
+                    requestData.User = utility.GetUserFromToken(token) ?? new User();
                     requestData.HasValidToken = true;
                 }
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                requestData.HasValidToken = false;
             }
             catch (Exception e)
             {
