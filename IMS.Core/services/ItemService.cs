@@ -301,7 +301,7 @@ namespace IMS.Core.services
                         if (updatedItem.Id.Equals(item.Id) && updatedItem.Name.Equals(item.Name) && updatedItem.MaxLimit.Equals(item.MaxLimit))
                         {
                             itemResponse.Status = Status.Success;
-                            itemResponse.Items = await _itemDbContext.GetAllItems();
+                            itemResponse.Items = new List<Item>() { updatedItem };
                         }
                         else
                         {
