@@ -445,17 +445,13 @@ namespace IMS.DataLayer.Dal
                     command.CommandText = "spUpdateUserPassword";
                     command.Parameters.AddWithValue("@userid", userId);
                     command.Parameters.AddWithValue("@newpassword",newPassword);
-                    int retValue = await command.ExecuteNonQueryAsync();
-                    if(retValue == 1)
-                    {
+                    await command.ExecuteNonQueryAsync();
                        return true;
-                    }
                 }
                 catch (Exception exception)
                 {
-                    throw exception;
+                    return false;
                 }
-                return false;
             }
         }
         public async Task<bool> IsNewpasswordRepeated(int userId,string newPassword)

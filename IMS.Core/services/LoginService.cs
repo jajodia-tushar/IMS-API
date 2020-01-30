@@ -184,7 +184,10 @@ namespace IMS.Core.services
                         return response;
                     }
                     if (!await _userDbContext.UpdateUserPassword(requestedUserId, hashNewPassword))
-                        throw new Exception();
+                    {
+                        response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.PasswordNotUpdated);
+                        return response;
+                    }
                     response.Status = Status.Success;
                 }
             }
