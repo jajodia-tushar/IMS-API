@@ -101,15 +101,16 @@ namespace IMS_API.Controllers
         /// Deletes the Vendor Order By OrderId
         /// </summary>
         /// <param name="orderId">'Order Id of that Particular Order</param>
+        /// <param name="remark">Takes a remark saying why the changes have been made</param>
         /// <response code="200">Returns status success if order is successfully deleted otherwise returns failure if order is not deleted</response>
         [Route("VendorOrder/{orderId}")]
         [HttpDelete]
-        public async Task<Response> Delete(int orderId)
+        public async Task<Response> Delete(int orderId,string remark)
         {
             Response deleteVendorOrderResponse = null;
             try
             {
-                IMS.Entities.Response entityDeleteVendorOrderResponse = await _orderService.Delete(orderId);
+                IMS.Entities.Response entityDeleteVendorOrderResponse = await _orderService.Delete(orderId,remark);
                 deleteVendorOrderResponse = Translator.ToDataContractsObject(entityDeleteVendorOrderResponse);
             }
             catch (Exception exception)
@@ -444,16 +445,17 @@ namespace IMS_API.Controllers
         /// <param name="orderId">Here orderid To reject</param>
         /// <returns>Response</returns>
         /// <response code="200">Returns Success status  if order is Rejected otherwise it returns Error and status failure</response>
+        /// <param name="remark">Takes a remark saying why the changes have been made</param>
         // PUT: api/order/EmployeeBulkOrders/{orderId}/Approve
 
         [HttpPut("EmployeeBulkOrders/{orderId}/Reject", Name = "RejectEmployeeBulkOrder")]
-        public async Task<Response> RejectEmployeeBulkOrder(int orderId)
+        public async Task<Response> RejectEmployeeBulkOrder(int orderId,string remark)
         {
             Response response = null;
             try
             {
                 
-                IMS.Entities.Response entitiesResponse = await _orderService.RejectEmployeeBulkOrder(orderId);
+                IMS.Entities.Response entitiesResponse = await _orderService.RejectEmployeeBulkOrder(orderId,remark);
                 response = Translator.ToDataContractsObject(entitiesResponse);
             }
             catch (Exception e)
