@@ -29,7 +29,6 @@ namespace IMS.Core
         }
         public void AfterInvoke(InvocationContext invocationContext, object methodResult)
         {
-            Utility utility = new Utility();
             var attribute = invocationContext.GetAttributeFromMethod<AuditAttribute>();
             var processName = attribute.ProcessName;
             var className = attribute.ClassName;
@@ -38,7 +37,7 @@ namespace IMS.Core
             {
                 string performedOn = "";
                 string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                User user = utility.GetUserFromToken(token);
+                User user = Utility.GetUserFromToken(token);
                 string userName = user.Firstname + " " + user.Lastname;
                 string action = invocationContext.GetExecutingMethodName();
                 var parameterValue = invocationContext.GetParameterValue(0);

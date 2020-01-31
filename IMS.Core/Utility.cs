@@ -17,9 +17,9 @@ using System.Threading.Tasks;
 
 namespace IMS.Core
 {
-    public class Utility
+    public static class Utility
     {
-        public virtual User GetUserFromToken(string accessToken)
+        public static User GetUserFromToken(string accessToken)
         {
             try
             {
@@ -144,29 +144,24 @@ namespace IMS.Core
 
         public static async Task<RequestData> GetRequestDataFromHeader(IHttpContextAccessor _httpContextAccessor, ITokenProvider _tokenProvider)
         {
-            Utility utility = new Utility();
-            RequestData requestData = new RequestData()
+            RequestData requestData = new RequestData
             {
-                HasValidToken = false,
-                User = new User()
+                HasValidToken = false
             };
-            string token;
+
             try
             {
-                try
-                {
-                    token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
-                }
-                catch (Exception e)
-                {
-                    token = "";
-                }
+                string token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
                 bool isValidToken = await _tokenProvider.IsValidToken(token);
                 if (isValidToken)
                 {
-                    requestData.User = utility.GetUserFromToken(token) ?? new User();
+                    requestData.User = Utility.GetUserFromToken(token);
                     requestData.HasValidToken = true;
                 }
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                requestData.HasValidToken = false;
             }
             catch (Exception e)
             {
