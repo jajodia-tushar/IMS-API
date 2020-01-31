@@ -65,7 +65,7 @@ namespace IMS.Core.services
             Shelf Shelf =await _shelfDbContext.GetShelfByShelfCode(shelfCode);
             try
             {
-                if (Shelf == null)
+                if (Shelf == null || Shelf.Code == null)
                 {
                     shelfResponse.Status = Status.Failure;
                     shelfResponse.Error = new Error()
@@ -73,10 +73,8 @@ namespace IMS.Core.services
                         ErrorCode = Constants.ErrorCodes.NotFound,
                         ErrorMessage = Constants.ErrorMessages.InvalidShelfCode
                     };
-                    
-
                 }
-                if (Shelf != null)
+                else
                 {
                     shelfResponse.Status = Status.Success;
                     shelfResponse.Shelves = new List<Shelf> { Shelf };
