@@ -22,7 +22,6 @@ namespace IMS.UnitTesting.CoreTests
         public Mock<ITokenProvider> _moqTokenProvider;
         public Mock<ILogManager> _moqLogManager;
         public Mock<IHttpContextAccessor> _moqHttpContextAccessor;
-        public Mock<Utility> _moqUtility;
 
         public RoleServiceTests()
         {
@@ -30,7 +29,10 @@ namespace IMS.UnitTesting.CoreTests
             _moqTokenProvider = new Mock<ITokenProvider>();
             _moqLogManager = new Mock<ILogManager>();
             _moqHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            _moqUtility = new Mock<Utility>();
+            _moqTokenProvider.Setup(t => t.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
+            _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
         }
 
         [Fact]
@@ -38,7 +40,6 @@ namespace IMS.UnitTesting.CoreTests
         {
             _moqRoleDbContext.Setup(m =>m.GetAccessibleRoles(new Role() { Id = 1, Name = "Admin" })).Returns(GetAllRolesForRoleId1());
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             var roleServiceObject = new RoleService(_moqRoleDbContext.Object, _moqTokenProvider.Object,_moqLogManager.Object, _moqHttpContextAccessor.Object);
             var resultant = await roleServiceObject.GetAllRoles();
             Assert.Equal(Status.Success, resultant.Status);
@@ -49,7 +50,6 @@ namespace IMS.UnitTesting.CoreTests
         {
             _moqRoleDbContext.Setup(m => m.GetAccessibleRoles(new Role() { Id = 1, Name = "Admin" })).Returns(GetAllRolesForRoleId1());
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(false));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             var roleServiceObject = new RoleService(_moqRoleDbContext.Object, _moqTokenProvider.Object, _moqLogManager.Object, _moqHttpContextAccessor.Object);
             var resultant = await roleServiceObject.GetAllRoles();
             Assert.Equal(Status.Failure, resultant.Status);
