@@ -43,6 +43,17 @@ namespace IMS.UnitTesting.CoreTests
             Assert.Equal(Status.Success, resultant.Status);
         }
 
+        [Fact]
+        public async void GetAllRoles_Should_Return_Error_When_Token_Is_Invalid()
+        {
+            var _moqUtility = new Mock<Utility>();
+            _moqRoleDbContext.Setup(m => m.GetAccessibleRoles(new Role() { Id = 1, Name = "Admin" })).Returns(GetAllRolesForRoleId1());
+            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(false));
+            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
+            var roleServiceObject = new RoleService(_moqRoleDbContext.Object, _moqTokenProvider.Object, _moqLogManager.Object, _moqHttpContextAccessor.Object);
+            var resultant = await roleServiceObject.GetAllRoles();
+            Assert.Equal(Status.Failure, resultant.Status);
+        }
         private async Task<List<Role>> GetAllRolesForRoleId1()
         {
             return new List<Role>()
