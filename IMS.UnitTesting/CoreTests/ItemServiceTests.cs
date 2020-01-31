@@ -22,7 +22,6 @@ namespace IMS.UnitTesting.CoreTests
         public Mock<ITokenProvider> _moqTokenProvider;
         public Mock<ILogManager> _moqLogManager;
         public Mock<IHttpContextAccessor> _moqHttpContextAccessor;
-        public Mock<Utility> _moqUtility;
 
         public ItemServiceTests()
         {
@@ -30,7 +29,10 @@ namespace IMS.UnitTesting.CoreTests
             _moqTokenProvider = new Mock<ITokenProvider>();
             _moqLogManager = new Mock<ILogManager>();
             _moqHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            _moqUtility = new Mock<Utility>();
+            _moqTokenProvider.Setup(t => t.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
+            _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
         }
 
         [Fact]
@@ -38,7 +40,6 @@ namespace IMS.UnitTesting.CoreTests
         {
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetAllItemsList());
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var resultant = await itemServiceObject.GetAllItems();
             Assert.Equal(Status.Success, resultant.Status);
@@ -49,7 +50,6 @@ namespace IMS.UnitTesting.CoreTests
         {
             List<Item> _items = new List<Item>();
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(Task.FromResult(_items));
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var resultant = await itemServiceObject.GetAllItems();
@@ -62,7 +62,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void GetItemById_Should_Return_Status_Success_And_Valid_Item_When_Item_Id_Is_Present_In_Database()
         {
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             _moqItemDbContext.Setup(m => m.GetItemById(3)).Returns(Task.FromResult(GetOneItem()));
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var resultant = await itemServiceObject.GetItemById(3);
@@ -74,7 +73,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void GetItemById_Should_Return_Error_And_Status_Failure_When_Item_Id_Is_Not_Present()
         {
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             Item item = new Item();
             _moqItemDbContext.Setup(m => m.GetItemById(3)).Returns(Task.FromResult(item));
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
@@ -88,7 +86,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void AddItem_Should_Return_Error_And_Status_Failure_When_Item_Name_Is_Null()
         {
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var resultant = await itemServiceObject.AddItem(new Item() { Name = "", MaxLimit = 4 });
             Assert.Equal(Status.Failure, resultant.Status);
@@ -98,7 +95,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void AddItem_Should_Return_Success_When_Item_Details_Is_Valid()
         {
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             _moqItemDbContext.Setup(m => m.AddItem(It.Is<Item>(r => r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(3));
             _moqItemDbContext.Setup(m => m.GetItemById(3)).Returns(Task.FromResult(GetOneItem()));
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
@@ -112,7 +108,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void Delete_Method_Should_Return_Status_Failure_When_Item_Is_Not_Deleted()
         {
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             _moqItemDbContext.Setup(m => m.Delete(3, false)).Returns(Task.FromResult(false));
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
@@ -125,7 +120,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void Update_Item_Should_Return_Success_After_Updating_Valid_Details()
         {
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             _moqItemDbContext.Setup(m => m.UpdateItem(It.Is<Item>(r => r.Id.Equals(3) && r.Name.Equals("Bag1") && r.MaxLimit.Equals(5)))).Returns(Task.FromResult(GetOneItem()));
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetAllItemsList());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
@@ -138,7 +132,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void Update_Item_Should_Return_Status_Failure_When_Updating_Item_Details_Is_Not_Valid()
         {
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var resultant = await itemServiceObject.UpdateItem(new Item() { Id = 3, Name = "", MaxLimit = 5 });
             Assert.Equal(Status.Failure, resultant.Status);
