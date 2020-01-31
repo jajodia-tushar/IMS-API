@@ -22,6 +22,7 @@ namespace IMS.UnitTesting.CoreTests
         public Mock<ITokenProvider> _moqTokenProvider;
         public Mock<ILogManager> _moqLogManager;
         public Mock<IHttpContextAccessor> _moqHttpContextAccessor;
+        public Mock<Utility> _moqUtility;
 
         public RoleServiceTests()
         {
@@ -29,12 +30,12 @@ namespace IMS.UnitTesting.CoreTests
             _moqTokenProvider = new Mock<ITokenProvider>();
             _moqLogManager = new Mock<ILogManager>();
             _moqHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            _moqUtility = new Mock<Utility>();
         }
 
         [Fact]
         public async void GetAllRoles_Should_Return_Valid_Response_And_Return_All_Roles()
         {
-            var _moqUtility = new Mock<Utility>();
             _moqRoleDbContext.Setup(m =>m.GetAccessibleRoles(new Role() { Id = 1, Name = "Admin" })).Returns(GetAllRolesForRoleId1());
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
@@ -46,7 +47,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void GetAllRoles_Should_Return_Error_When_Token_Is_Invalid()
         {
-            var _moqUtility = new Mock<Utility>();
             _moqRoleDbContext.Setup(m => m.GetAccessibleRoles(new Role() { Id = 1, Name = "Admin" })).Returns(GetAllRolesForRoleId1());
             _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(false));
             _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
