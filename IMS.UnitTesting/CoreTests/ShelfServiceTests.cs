@@ -43,7 +43,7 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void Return_Shelf_When_Shelf_Id_Is_Valid()
         {
-            _moqShelfDbContext.Setup(p => p.GetShelfByShelfCode("A")).Returns(Task.FromResult(GetShelfByCode()));
+            _moqShelfDbContext.Setup(p => p.GetShelfByShelfCode("A")).Returns(Task.FromResult(GetShelf()));
             var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.GetShelfByShelfCode("A");
             Assert.Equal(Status.Success, resultant.Status);
@@ -113,8 +113,19 @@ namespace IMS.UnitTesting.CoreTests
             var resultant = await shelfServiceObject.Delete("A");
             Assert.Equal(Status.Failure, resultant.Status);
         }
-    
-       
+        [Fact]
+        public async void Return_Success_When_Shelf_Updated()
+        {
+            _moqTokenProvider.Setup(t => t.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
+            _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
+            _moqShelfDbContext.Setup(p => p.UpdateShelf(It.Is<Shelf>(r => r.Name.Equals("First Floor") && r.Code.Equals("A") && r.IsActive.Equals(true)))).Returns(Task.FromResult(GetShelf()));
+            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
+            var resultant =await shelfServiceObject.Update(new Shelf { Name ="First Floor", Code ="A", IsActive = true});
+            Assert.Equal(Status.Success, resultant.Status);
+        }
+
         private List<Shelf> GetNewShelf()
         {
             return new List<Shelf>()
@@ -158,7 +169,7 @@ namespace IMS.UnitTesting.CoreTests
             return Task.FromResult(shelves);
         }
 
-        Shelf GetShelfByCode()
+        Shelf GetShelf()
         {
             return new Shelf()
             { 
