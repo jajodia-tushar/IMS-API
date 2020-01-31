@@ -57,7 +57,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void GetVendorById_Should_Return_Error_When_Id_Is_Invalid()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(false));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.GetVendorById(0);
             Assert.Equal(Status.Failure, resultant.Status);
@@ -65,7 +64,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void GetVendorById_Should_Return_Vendor_When_Id_Is_Valid()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqVendorDbContext.Setup(m => m.GetVendorById(1)).Returns(GetAllVendorById1);
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.GetVendorById(1);
@@ -74,7 +72,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void UpdateVendor_Should_Return_UpdatedVendor_When_Request_Is_Valid()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqVendorDbContext.Setup(m => m.UpdateVendor(It.IsAny<Vendor>())).Returns(GetAllVendorById1());
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.UpdateVendor(GetValidVendor());
@@ -83,7 +80,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void UpdateVendor_Should_Return_Error_When_Request_Is_InValid()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.UpdateVendor(new Vendor());
             Assert.Equal(Status.Failure, resultant.Status);
@@ -91,7 +87,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void AddVendor_Should_Return_Success_When_Request_Is_Valid()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqVendorDbContext.Setup(m => m.UpdateVendor(It.IsAny<Vendor>())).Returns(GetAllVendorById1());
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.AddVendor(GetValidVendor());
@@ -100,7 +95,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void AddVendor_Should_Return_Error_When_Request_Is_InValid()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.AddVendor(new Vendor() { Id = 0 });
             Assert.Equal(Status.Failure, resultant.Status);
@@ -108,7 +102,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void IsVendorUnique_Should_Return_Success_When_Vendor_Is_Unique()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqVendorDbContext.Setup(m => m.IsVendorPresent(GetValidVendor())).Returns(Task.FromResult(true));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.AddVendor(GetValidVendor());
@@ -117,7 +110,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void IsVendorUnique_Should_Return_Error_When_Vendor_Is_Present_In_Database()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqVendorDbContext.Setup(m => m.IsVendorPresent(It.IsAny<Vendor>())).Returns(Task.FromResult(false));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.AddVendor(new Vendor() { Id = 0 });
@@ -126,7 +118,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void DeleteVendor_Should_Return_Success_When_Vendor_Is_Deleted()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqVendorDbContext.Setup(m => m.DeleteVendor(It.IsAny<int>(),It.IsAny<bool>())).Returns(Task.FromResult(true));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.DeleteVendor(1,true);
@@ -135,7 +126,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void DeleteVendor_Should_Return_Error_When_Vendor_Is_Not_Deleted()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             _moqVendorDbContext.Setup(m => m.DeleteVendor(It.IsAny<int>(),It.IsAny<bool>())).Returns(Task.FromResult(false));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.DeleteVendor(1, true);
@@ -144,7 +134,6 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void DeleteVendor_Should_Return_Error_When_Vendor_Id_Is_InValid()
         {
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             var vendorServiceObject = new VendorService(_moqVendorDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await vendorServiceObject.DeleteVendor(0, true);
             Assert.Equal(Status.Failure, resultant.Status);
