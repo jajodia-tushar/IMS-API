@@ -95,8 +95,6 @@ namespace IMS.UnitTesting.CoreTests
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var resultant = await itemServiceObject.AddItem(new Item() { Name = "", MaxLimit = 4 });
             Assert.Equal(Status.Failure, resultant.Status);
-            Assert.Equal(Constants.ErrorCodes.BadRequest, resultant.Error.ErrorCode);
-            Assert.Equal(Constants.ErrorMessages.InvalidItemsDetails, resultant.Error.ErrorMessage);
         }
 
         [Fact]
@@ -110,20 +108,6 @@ namespace IMS.UnitTesting.CoreTests
             _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
             var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var resultant = await itemServiceObject.AddItem(new Item() { Name = "Bag1", MaxLimit = 5 });
-            Assert.Equal(Status.Success, resultant.Status);
-            Assert.NotNull(resultant.Items);
-        }
-
-        [Fact]
-        public async void Delete_Method_Should_Return_Status_Success_When_Item_Is_Deleted_Correct()
-        {
-            var _moqUtility = new Mock<Utility>();
-            _moqTokenProvider.Setup(m => m.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _moqUtility.Setup(m => m.GetUserFromToken(It.IsAny<string>())).Returns(new User());
-            _moqItemDbContext.Setup(m => m.Delete(2, false)).Returns(Task.FromResult(true));
-            _moqItemDbContext.Setup(m => m.GetAllItems()).Returns(GetItems());
-            var itemServiceObject = new ItemService(_moqItemDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
-            var resultant = await itemServiceObject.Delete(2, false);
             Assert.Equal(Status.Success, resultant.Status);
             Assert.NotNull(resultant.Items);
         }
