@@ -87,7 +87,6 @@ namespace IMS.Core
             public const string InvalidPageNumber = "Page Number is Invalid";
             public const string InvalidEmailId = "Invalid Email Id";
             public const string InvalidPagingDetails = "The page number or page size is invalid";
-            public const string OrderNotFount = "No Order Found on this OrderId";
             public const string DataAlreadyPresent = "Data is already present";
             public const string NoEmployeesPresent = "NoEmployeesPresent";
             public const string EmployeesDataNotFound = "Employees Data Not Found";

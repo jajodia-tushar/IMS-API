@@ -368,7 +368,7 @@ namespace IMS.Core.services
                     PageSize = pageSize,
                     TotalResults = vendorOrdersDto.TotalRecords
                 };
-                if (response.VendorOrders.Count < 1)
+                if (response.VendorOrders!=null && response.VendorOrders.Count < 1)
                 {
                     response.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ResourceNotFound, Constants.ErrorMessages.RecordNotFound);
                     return response;
@@ -595,7 +595,7 @@ namespace IMS.Core.services
                     var user = request.User;
                     userId = user.Id;
                     var vendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
-                    if (vendorOrder.VendorOrderDetails != null)
+                    if (vendorOrder!=null && vendorOrder.VendorOrderDetails != null)
                     {
                         vendorOrderResponse.VendorOrder = vendorOrder;
                         vendorOrderResponse.CanEdit = !await _vendorOrderDbContext.CheckUserEditedOrderBefore(user.Id, orderId);
@@ -603,7 +603,7 @@ namespace IMS.Core.services
                         vendorOrderResponse.Status = Status.Success;
                         return vendorOrderResponse;
                     }
-                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotFount);
+                    vendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.OrderNotFound);
                     return vendorOrderResponse;
                 }
                 catch (CustomException e)
