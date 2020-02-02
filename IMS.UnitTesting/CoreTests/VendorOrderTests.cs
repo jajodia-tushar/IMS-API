@@ -84,6 +84,38 @@ namespace IMS.UnitTesting.CoreTests
             Assert.Equal(Constants.ErrorMessages.OrderNotFound, vendorOrder.Error.ErrorMessage);
         }
 
+        [Fact]
+        public async void Returns_Success_If_OrderId_Is_Found()
+        {
+            int orderId = 1;
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(GetVendorOrderByOrderId(orderId));
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(29, orderId)).Returns(Task.FromResult(false));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult("Name"));
+            var vendorOrder = await _orderService.GetVendorOrderByOrderId(orderId);
+            Assert.Equal(Status.Success, vendorOrder.Status);
+        }
+
+        [Fact]
+        public async void Recieved_By_Returned_For_LastModifiedBy_If_Order_Not_Modified()
+        {
+            int orderId = 1;
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(GetVendorOrderByOrderId(orderId));
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(29, orderId)).Returns(Task.FromResult(false));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult(""));
+            var vendorOrderResponse = await _orderService.GetVendorOrderByOrderId(orderId);
+            Assert.Equal("Rakesh Kumar",vendorOrderResponse.LastModifiedBy);
+        }
+
+        [Fact]
+        public async void Last_Modified_User_Returned_For_If_Order_Is_Modified()
+        {
+            int orderId = 1;
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(GetVendorOrderByOrderId(orderId));
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(29, orderId)).Returns(Task.FromResult(false));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult("Ekta Singh"));
+            var vendorOrderResponse = await _orderService.GetVendorOrderByOrderId(orderId);
+            Assert.Equal("Ekta Singh", vendorOrderResponse.LastModifiedBy);
+        }
         private async Task<VendorOrder> GetVendorOrderByOrderId(int orderId)
         {
             VendorOrder vendorOrder = null;
@@ -131,7 +163,7 @@ namespace IMS.UnitTesting.CoreTests
                 Date = new DateTime(),
                 InvoiceImageUrl = "asdf",
                 InvoiceNumber = "asddf",
-                RecievedBy = "asdfd",
+                RecievedBy = "Rakesh Kumar",
                 SubmittedTo = "asdf",
                 IsApproved = false,
                 OrderId = 1,
@@ -184,7 +216,7 @@ namespace IMS.UnitTesting.CoreTests
                 CompanyIdentificationNumber = "fda",
                 ContactNumber = "fsda",
                 Id = 1,
-                Name = "dasf",
+                Name = "Rakesh Kumar",
                 PAN = "dss"
             };
         }
