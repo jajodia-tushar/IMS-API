@@ -11,8 +11,9 @@ namespace IMS.Core.Validators
         public static Response ValidateShelf(Shelf shelf)
         {
             Response validateResponse = new Response();
-            if(String.IsNullOrEmpty(shelf.Name) || String.IsNullOrEmpty(shelf.Code))
+            if (String.IsNullOrEmpty(shelf.Name) || String.IsNullOrEmpty(shelf.Code))
             {
+                validateResponse.Error = new Error();
                 validateResponse.Error.ErrorCode = Constants.ErrorCodes.BadRequest;
                 validateResponse.Error.ErrorMessage = Constants.ErrorMessages.InvalidShelfDetails;
             }
