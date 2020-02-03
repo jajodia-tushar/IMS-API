@@ -20,12 +20,14 @@ namespace IMS.UnitTesting.CoreTests
         public Mock<ITokenProvider> _moqTokenProvider;
         public Mock<ILogManager> _moqLogManager;
         public Mock<IHttpContextAccessor> _moqHttpContextAccessor;
+        IShelfService shelfServiceObject = null;
         public ShelfServiceTests()
         {
             _moqShelfDbContext = new Mock<IShelfDbContext>();
             _moqTokenProvider = new Mock<ITokenProvider>();
             _moqLogManager = new Mock<ILogManager>();
             _moqHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
         }
 
         [Fact]
@@ -33,7 +35,6 @@ namespace IMS.UnitTesting.CoreTests
         {
             List<Shelf> shelves = new List<Shelf>();
             _moqShelfDbContext.Setup(p => p.GetAllShelves()).Returns(Task.FromResult(shelves));
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.GetShelfList();
             Assert.Equal(Status.Failure, resultant.Status);
             Assert.Equal(Constants.ErrorCodes.NotFound, resultant.Error.ErrorCode);
@@ -44,7 +45,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void Return_Shelf_When_Shelf_Id_Is_Valid()
         {
             _moqShelfDbContext.Setup(p => p.GetShelfByShelfCode("A")).Returns(Task.FromResult(GetShelf()));
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.GetShelfByShelfCode("A");
             Assert.Equal(Status.Success, resultant.Status);
         }
@@ -53,7 +53,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void Return_All_Shelves()
         {
             _moqShelfDbContext.Setup(p => p.GetAllShelves()).Returns(GetShelvesList());
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.GetShelfList();
             Assert.Equal(Status.Success, resultant.Status);
         }
@@ -63,7 +62,6 @@ namespace IMS.UnitTesting.CoreTests
         {
             Shelf shelf = null;
             _moqShelfDbContext.Setup(p => p.GetShelfByShelfCode("D")).Returns(Task.FromResult(shelf));
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.GetShelfByShelfCode("D");
             Assert.Equal(Status.Failure, resultant.Status);
             Assert.Equal(Constants.ErrorCodes.NotFound, resultant.Error.ErrorCode);
@@ -74,7 +72,6 @@ namespace IMS.UnitTesting.CoreTests
         public async void Return_Success_When_New_Shelf_Added()
         {
             _moqShelfDbContext.Setup(p => p.AddShelf(It.Is<Shelf>(r => r.Name.Equals("Ninth Floor") && r.Code.Equals("D") && r.IsActive.Equals(true)))).Returns(Task.FromResult(GetNewShelf()));
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.AddShelf(new Shelf { Name = "Ninth Floor", Code = "D" ,IsActive = true});
             Assert.Equal(Status.Success, resultant.Status);
             Assert.Null(resultant.Error);
@@ -85,7 +82,6 @@ namespace IMS.UnitTesting.CoreTests
         {
             _moqShelfDbContext.Setup(p => p.AddShelf(It.Is<Shelf>(r => r.Name.Equals("First Floor") && r.Code.Equals("A") && r.IsActive.Equals(true)))).Returns(Task.FromResult(GetNewShelf()));
             _moqShelfDbContext.Setup(p => p.IsShelfPresentByCode("A")).Returns(Task.FromResult(true));
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.AddShelf(new Shelf { Name = "First Floor", Code = "A", IsActive = true });
             Assert.Equal(Status.Failure, resultant.Status);
             Assert.Equal(Constants.ErrorCodes.BadRequest,resultant.Error.ErrorCode);
@@ -98,7 +94,6 @@ namespace IMS.UnitTesting.CoreTests
             _moqShelfDbContext.Setup(p => p.IsShelfPresentByCode("A")).Returns(Task.FromResult(true));
             _moqShelfDbContext.Setup(p => p.GetShelfStatusByCode("A")).Returns(Task.FromResult(true));
             _moqShelfDbContext.Setup(p => p.DeleteShelfByCode("A")).Returns(GetShelvesList());
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.Delete("A");
             Assert.Equal(Status.Success, resultant.Status);
         }
@@ -109,7 +104,6 @@ namespace IMS.UnitTesting.CoreTests
             _moqShelfDbContext.Setup(p => p.IsShelfPresentByCode("A")).Returns(Task.FromResult(false));
             _moqShelfDbContext.Setup(p => p.GetShelfStatusByCode("A")).Returns(Task.FromResult(false));
             _moqShelfDbContext.Setup(p => p.DeleteShelfByCode("A")).Returns(GetShelvesList());
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.Delete("A");
             Assert.Equal(Status.Failure, resultant.Status);
         }
@@ -121,7 +115,6 @@ namespace IMS.UnitTesting.CoreTests
             context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
             _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
             _moqShelfDbContext.Setup(p => p.UpdateShelf(It.Is<Shelf>(r => r.Name.Equals("First Floor") && r.Code.Equals("A") && r.IsActive.Equals(true)))).Returns(Task.FromResult(GetShelf()));
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant =await shelfServiceObject.Update(new Shelf { Name ="First Floor", Code ="A", IsActive = true});
             Assert.Equal(Status.Success, resultant.Status);
         }
@@ -133,7 +126,6 @@ namespace IMS.UnitTesting.CoreTests
             var context = new DefaultHttpContext();
             context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
             _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.Update(new Shelf { Name = "", Code = "A", IsActive = true });
             Assert.Equal(Status.Failure, resultant.Status);
 
@@ -148,7 +140,6 @@ namespace IMS.UnitTesting.CoreTests
             context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
             _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
             _moqShelfDbContext.Setup(p => p.UpdateShelf(It.Is<Shelf>(r => r.Name.Equals("First Floor") && r.Code.Equals("A") && r.IsActive.Equals(true)))).Returns(Task.FromResult(shelf));
-            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.Update(new Shelf { Name = "First Floor", Code = "A", IsActive = true });
             Assert.Equal(Status.Failure, resultant.Status);
         }
