@@ -326,15 +326,8 @@ namespace IMS.Core.services
                     bool isEmailOrUsernameRepeated = await _userDbContext.CheckEmailOrUserNameAvailability(newUser.Email, newUser.Username);
                     if (isEmailOrUsernameRepeated)
                         throw new InvalidEmailException("Given UserName or Email is already registered");
-                    string requestedRoleName = requestedUser.Role.Name.Trim().ToLower();
-                    int requestedRoleId = requestedUser.Role.Id;
                     int isApproved = 1;
                     int isActive = 1;
-                    if (requestedRoleName.Equals(Constants.Roles.Admin) && requestedRoleId == newUser.Role.Id)
-                    {
-                        isApproved = 0;
-                        isActive = 0;
-                    }
                     newUser.Password = Utility.Hash(newUser.Password);
                     bool isSaved = await _userDbContext.Save(newUser, isApproved, isActive);
                     if (isSaved)
