@@ -170,7 +170,7 @@ namespace IMS.DataLayer
         public async Task<Shelf> UpdateShelf(Shelf updatedShelf)
         {
             DbDataReader reader = null;
-            Shelf shelf = new Shelf();
+            Shelf shelf = null;
             using (var connection = await _dbProvider.GetConnection(Databases.IMS))
             {
                 try
