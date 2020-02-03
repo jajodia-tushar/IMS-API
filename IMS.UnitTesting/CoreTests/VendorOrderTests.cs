@@ -107,7 +107,19 @@ namespace IMS.UnitTesting.CoreTests
         }
 
         [Fact]
-        public async void Last_Modified_User_Returned_For_If_Order_Is_Modified()
+        public async void User_Already_Modified_Order_Should_Return_Can_Edit_False()
+        {
+            int orderId = 1;
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(GetVendorOrderByOrderId(orderId));
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(29, orderId)).Returns(Task.FromResult(true));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult(It.IsAny<string>()));
+            var vendorOrderResponse = await _orderService.GetVendorOrderByOrderId(orderId);
+            Assert.False(vendorOrderResponse.CanEdit);
+        }
+
+
+        [Fact]
+        public async void Last_Modified_User_Returned_If_Order_Is_Modified()
         {
             int orderId = 1;
             _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(GetVendorOrderByOrderId(orderId));
@@ -116,6 +128,87 @@ namespace IMS.UnitTesting.CoreTests
             var vendorOrderResponse = await _orderService.GetVendorOrderByOrderId(orderId);
             Assert.Equal("Ekta Singh", vendorOrderResponse.LastModifiedBy);
         }
+
+        [Fact]
+        public async void Approves_Order_If_Approved_By_SuperAdmin()
+        {
+            int orderId = 1;
+            var vendorOrder = GetVendorOrderByOrderId(orderId);
+            var nonThreadedVendorOrder = new VendorOrder()
+            {
+                Vendor = GetVendor(),
+                VendorOrderDetails = GetVendorOrderDetails()
+            };
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(vendorOrder);
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(29, orderId)).Returns(Task.FromResult(true));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult("Ekta Singh"));
+            _moqVendorOrderDbContext.Setup(m => m.ApproveOrder(nonThreadedVendorOrder)).Returns(Task.FromResult(true));
+            var vendorOrderResponse = await _orderService.ApproveVendorOrder(nonThreadedVendorOrder);
+            Assert.Equal(Status.Success, vendorOrderResponse.Status);
+        }
+
+        [Fact]
+        public async void Approve_Order_Requested_By_Admin_If_Not_Edited_By_That_Admin()
+        {
+            int orderId = 1;
+            var vendorOrder = GetVendorOrderByOrderId(orderId);
+            var nonThreadedVendorOrder = new VendorOrder()
+            {
+                Vendor = GetVendor(),
+                VendorOrderDetails = GetVendorOrderDetails()
+            };
+            _context.Request.Headers["Authorization"] = "bearer " + Tokens.Admin;
+            _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(_context);
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(vendorOrder);
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(32, orderId)).Returns(Task.FromResult(false));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult("Ekta Singh"));
+            _moqVendorOrderDbContext.Setup(m => m.ApproveOrder(nonThreadedVendorOrder)).Returns(Task.FromResult(true));
+            var vendorOrderResponse = await _orderService.ApproveVendorOrder(nonThreadedVendorOrder);
+            Assert.Equal(Status.Success, vendorOrderResponse.Status);
+        }
+
+        [Fact]
+        public async void Edit_Order_Requested_By_Admin_If_Not_Edited_By_That_Admin_Should_Return_Success()
+        {
+            int orderId = 1;
+            var vendorOrder = GetVendorOrderByOrderId(orderId);
+            var nonThreadedVendorOrder = new VendorOrder()
+            {
+                Vendor = GetVendor(),
+                VendorOrderDetails = GetVendorOrderDetails()
+            };
+            nonThreadedVendorOrder.VendorOrderDetails.ChallanNumber = "abcdef";
+            _context.Request.Headers["Authorization"] = "bearer " + Tokens.Admin;
+            _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(_context);
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(vendorOrder);
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(32, orderId)).Returns(Task.FromResult(false));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult("Ekta Singh"));
+            _moqVendorOrderDbContext.Setup(m => m.EditOrder(It.IsAny<VendorOrder>(),It.IsAny<User>())).Returns(Task.FromResult(true));
+            var vendorOrderResponse = await _orderService.ApproveVendorOrder(nonThreadedVendorOrder);
+            Assert.Equal(Status.Success, vendorOrderResponse.Status);
+        }
+
+        [Fact]
+        public async void Edit_Order_Requested_By_Already_Edited_Admin_Should_Return_Failure()
+        {
+            int orderId = 1;
+            var vendorOrder = GetVendorOrderByOrderId(orderId);
+            var nonThreadedVendorOrder = new VendorOrder()
+            {
+                Vendor = GetVendor(),
+                VendorOrderDetails = GetVendorOrderDetails()
+            };
+            nonThreadedVendorOrder.VendorOrderDetails.ChallanNumber = "abcdef";
+            _context.Request.Headers["Authorization"] = "bearer " + Tokens.Admin;
+            _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(_context);
+            _moqVendorOrderDbContext.Setup(m => m.GetVendorOrdersByOrderId(orderId)).Returns(vendorOrder);
+            _moqVendorOrderDbContext.Setup(m => m.CheckUserEditedOrderBefore(32, orderId)).Returns(Task.FromResult(true));
+            _moqVendorOrderDbContext.Setup(m => m.GetLastOrderModifiedUser(orderId)).Returns(Task.FromResult("Ekta Singh"));
+            _moqVendorOrderDbContext.Setup(m => m.EditOrder(It.IsAny<VendorOrder>(), It.IsAny<User>())).Returns(Task.FromResult(true));
+            var vendorOrderResponse = await _orderService.ApproveVendorOrder(nonThreadedVendorOrder);
+            Assert.Equal(Status.Failure, vendorOrderResponse.Status);
+        }
+
         private async Task<VendorOrder> GetVendorOrderByOrderId(int orderId)
         {
             VendorOrder vendorOrder = null;
