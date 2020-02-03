@@ -74,11 +74,17 @@ namespace IMS.Core.services
                             }
                         }
                     }
+                    catch (CustomException e)
+                    {
+
+                        deleteVendorOrderResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                        new Task(() => { _logger.LogException(e, "DeleteVendorOrder", Severity.Critical, orderId, deleteVendorOrderResponse); }).Start();
+                    }
                     catch (Exception exception)
                     {
                         deleteVendorOrderResponse.Status = Status.Failure;
                         deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "Delete", Severity.High, orderId, deleteVendorOrderResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "DeleteVendorOrder", Severity.High, orderId, deleteVendorOrderResponse); }).Start();
                     }
                     return deleteVendorOrderResponse;
                 }
@@ -405,8 +411,8 @@ namespace IMS.Core.services
             {
                 RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                 if (!request.HasValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = request.User;
+                    throw new InvalidTokenException();
+                var user = request.User;
                 userId = user.Id;
                 var response =  await RestrictOrderApproval(vendorOrder, user);
                 if (response.Status.Equals(Status.Success))
@@ -535,8 +541,8 @@ namespace IMS.Core.services
             {
                 RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                 if (!request.HasValidToken)
-                    throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                User user = request.User;
+                    throw new InvalidTokenException();
+                var user = request.User;
                 userId = user.Id;
                 var vendorResponse = await _vendorService.GetVendorById(vendorId);
                 if (vendorResponse.Status.Equals(Status.Failure))
@@ -585,8 +591,8 @@ namespace IMS.Core.services
                 {
                     RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
                     if (!request.HasValidToken)
-                        throw new InvalidTokenException(Constants.ErrorMessages.InvalidToken);
-                    User user = request.User;
+                        throw new InvalidTokenException();
+                    var user = request.User;
                     userId = user.Id;
                     var vendorOrder = await _vendorOrderDbContext.GetVendorOrdersByOrderId(orderId);
                     if (vendorOrder.VendorOrderDetails != null)

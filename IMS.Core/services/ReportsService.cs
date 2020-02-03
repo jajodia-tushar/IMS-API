@@ -215,7 +215,11 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
-
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                var user = request.User;
+                userId = user.Id;
                 var warehouseRAGStatusList = await GetWarehouseRAGStatusList();
                 var shelfRAGStatusList = await GetShelfRAGStatusList();
                 if (warehouseRAGStatusList != null && shelfRAGStatusList != null && warehouseRAGStatusList.Count > 0 && shelfRAGStatusList.Count > 0)
@@ -497,6 +501,11 @@ namespace IMS.Core.services
             int userId = -1;
             try
             {
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (!request.HasValidToken)
+                    throw new InvalidTokenException();
+                var user = request.User;
+                userId = user.Id;
                 object inputColour;
                 if (pageSize <= 0 || pageNumber <= 0)
                     throw new InvalidPagingInfo();
