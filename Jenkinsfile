@@ -23,7 +23,7 @@ pipeline {
 		stage('Deploy'){
 			steps {
 				script {
-					withCredentials([usernamePassword(credentialsId: '65f1a44b-0c4a-4057-965f-8689d2e2a0ba', passwordVariable: 'HOST_PASSWORD', usernameVariable: 'HOST_USERNAME')]) {
+					withCredentials([usernamePassword(credentialsId: 'fa4a5d0d-21b0-410e-88b2-2d5260b28c48', passwordVariable: 'HOST_PASSWORD', usernameVariable: 'HOST_USERNAME')]) {
 						remote.name = "$HOST_NAME"
 						remote.host = "$HOST_NAME"
 						remote.user = "$HOST_USERNAME"
