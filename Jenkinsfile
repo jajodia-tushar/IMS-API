@@ -31,10 +31,13 @@ pipeline {
 						remote.allowAnyHosts = true
 					}
 				}
+				withCredentials([usernamePassword(credentialsId: 'cc8e493d-fe72-441b-8ffd-96ec86877c2d', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+					sh "docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
 				sshCommand remote: remote, command: "docker service rm ims-api || echo 'service dosent exist'"
 				sshCommand remote: remote, command: "docker images $DOCKER_REGISTRY/$DOCKER_REPO -q| xargs docker rmi -f || echo 'no tags for this image'"
 				sshCommand remote: remote, command: "docker pull $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG"
 				sshCommand remote: remote, command: "docker service create --name ims-api --network ims --publish 5000:80 $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG"
+				}
 				
 			}
 		}
