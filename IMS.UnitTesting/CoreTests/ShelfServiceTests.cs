@@ -61,7 +61,7 @@ namespace IMS.UnitTesting.CoreTests
         [Fact]
         public async void Return_Invalid_Shelf_Id_Message_When_Shelf_Id_Is_Invalid()
         {
-            Shelf shelf = new Shelf();
+            Shelf shelf = null;
             _moqShelfDbContext.Setup(p => p.GetShelfByShelfCode("D")).Returns(Task.FromResult(shelf));
             var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
             var resultant = await shelfServiceObject.GetShelfByShelfCode("D");
