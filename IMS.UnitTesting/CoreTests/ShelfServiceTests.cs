@@ -127,17 +127,32 @@ namespace IMS.UnitTesting.CoreTests
         }
 
         [Fact]
-        public async void Return_Failure_When_Shelf_Update_Is_Null()
+        public async void Return_Failure_When_Shelf_Validation_Get_Fails()
         {
             _moqTokenProvider.Setup(t => t.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
             var context = new DefaultHttpContext();
             context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
             _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
             var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
-            var resultant = await shelfServiceObject.Update(new Shelf { Name = " ", Code = "A", IsActive = true });
+            var resultant = await shelfServiceObject.Update(new Shelf { Name = "", Code = "A", IsActive = true });
             Assert.Equal(Status.Failure, resultant.Status);
 
         }
+
+        [Fact]
+        public async void Return_Failure_When_Shelf_Updation_Is_Failed()
+        {
+            Shelf shelf = null;
+            _moqTokenProvider.Setup(t => t.IsValidToken(It.IsAny<string>())).Returns(Task.FromResult(true));
+            var context = new DefaultHttpContext();
+            context.Request.Headers["Authorization"] = "bearer " + Tokens.SuperAdmin;
+            _moqHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
+            _moqShelfDbContext.Setup(p => p.UpdateShelf(It.Is<Shelf>(r => r.Name.Equals("First Floor") && r.Code.Equals("A") && r.IsActive.Equals(true)))).Returns(Task.FromResult(shelf));
+            var shelfServiceObject = new ShelfService(_moqShelfDbContext.Object, _moqLogManager.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object);
+            var resultant = await shelfServiceObject.Update(new Shelf { Name = "First Floor", Code = "A", IsActive = true });
+            Assert.Equal(Status.Failure, resultant.Status);
+        }
+
 
         private List<Shelf> GetNewShelf()
         {
