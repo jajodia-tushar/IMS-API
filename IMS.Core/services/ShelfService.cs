@@ -73,10 +73,8 @@ namespace IMS.Core.services
                         ErrorCode = Constants.ErrorCodes.NotFound,
                         ErrorMessage = Constants.ErrorMessages.InvalidShelfCode
                     };
-                    
-
                 }
-                if (Shelf != null)
+                else
                 {
                     shelfResponse.Status = Status.Success;
                     shelfResponse.Shelves = new List<Shelf> { Shelf };

@@ -45,8 +45,24 @@ namespace IMS_API.Controllers
         public async Task<ShelfResponse> Get()
         {
             IMS.Contracts.ShelfResponse dtoShelfResponse;
-            IMS.Entities.ShelfResponse doShelfResponse = await _shelfService.GetShelfList();
-            dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
+            try
+            {
+                IMS.Entities.ShelfResponse doShelfResponse = await _shelfService.GetShelfList();
+                dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoShelfResponse = new IMS.Contracts.ShelfResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetShelfList", IMS.Entities.Severity.High,"", dtoShelfResponse); }).Start();
+            }
             return dtoShelfResponse;
         }
         /// <summary>
@@ -69,10 +85,25 @@ namespace IMS_API.Controllers
         public async Task<ShelfResponse> Get(string shelfCode)
         {
             IMS.Contracts.ShelfResponse dtoShelfResponse;
-            IMS.Entities.ShelfResponse doShelfResponse =await _shelfService.GetShelfByShelfCode(shelfCode);
-            dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
-            return dtoShelfResponse;
-            
+            try
+            {
+                IMS.Entities.ShelfResponse doShelfResponse = await _shelfService.GetShelfByShelfCode(shelfCode);
+                dtoShelfResponse = ShelfTranslator.ToDataContractsObject(doShelfResponse);
+            }
+            catch (Exception exception)
+            {
+                dtoShelfResponse = new IMS.Contracts.ShelfResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetShelfByShelfCode", IMS.Entities.Severity.High,shelfCode, dtoShelfResponse); }).Start();
+            }
+            return dtoShelfResponse;     
         }
 
         /// <summary>
