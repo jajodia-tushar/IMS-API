@@ -74,11 +74,17 @@ namespace IMS.Core.services
                             }
                         }
                     }
+                    catch (CustomException e)
+                    {
+
+                        deleteVendorOrderResponse.Error = Utility.ErrorGenerator(e.ErrorCode, e.ErrorMessage);
+                        new Task(() => { _logger.LogException(e, "DeleteVendorOrder", Severity.Critical, orderId, deleteVendorOrderResponse); }).Start();
+                    }
                     catch (Exception exception)
                     {
                         deleteVendorOrderResponse.Status = Status.Failure;
                         deleteVendorOrderResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
-                        new Task(() => { _logger.LogException(exception, "Delete", Severity.High, orderId, deleteVendorOrderResponse); }).Start();
+                        new Task(() => { _logger.LogException(exception, "DeleteVendorOrder", Severity.High, orderId, deleteVendorOrderResponse); }).Start();
                     }
                     return deleteVendorOrderResponse;
                 }
