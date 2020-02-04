@@ -261,7 +261,7 @@ namespace IMS.Core.services
                         pageSize = 10;
                     }
                     employeeRecentOrderResponse = await _employeeOrderDbContext.GetRecentEmployeeOrders(pageSize,pageNumber);
-                    if (employeeRecentOrderResponse != null)
+                    if (employeeRecentOrderResponse != null && employeeRecentOrderResponse.EmployeeOrders.Count > 0)
                     {
                         employeeRecentOrderResponse.Status = Status.Success;
                     }
