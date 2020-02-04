@@ -672,7 +672,7 @@ namespace IMS.Core.services
                     throw new InvalidPagingInfo(Constants.ErrorMessages.InvalidPagingDetails);
 
                 Tuple<int,List<EmployeeBulkOrder>> bulkOrdersResultFromDb = await _employeeBulkOrderDbContext.GetAllEmployeeBulkOrders(currentPageNumber, currentPageSize, startDate, endDate);
-                if (bulkOrdersResultFromDb.Item2.Count < 0)
+                if (bulkOrdersResultFromDb.Item2.Count == 0)
                     throw new RecordsNotFoundException(Constants.ErrorMessages.RecordNotFound);
                 
                 pageInfo.TotalResults = bulkOrdersResultFromDb.Item1;
