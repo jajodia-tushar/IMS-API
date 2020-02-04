@@ -120,5 +120,200 @@ namespace IMS.UnitTesting.CoreTests
             var response = await _orderService.GetEmployeeBulkOrders(1, 1, fromDate, toDate);
             Assert.Equal(Status.Success, response.Status);
          }
+
+        [Fact]
+        public async void Return_Failure_For_SaveOrder_If_Order_Is_Invalid()
+        {
+            EmployeeBulkOrder order = GetEmployeeBulkOrder();
+            ValidateToken(true, Tokens.SuperAdmin);
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.SaveOrder(order)).Returns(Task.FromResult(false));
+            var response = await _orderService.PlaceEmployeeBulkOrder(order);
+            Assert.Equal(Status.Failure, response.Status);
+            Assert.Equal(Constants.ErrorCodes.BadRequest, response.Error.ErrorCode);
+        }
+        [Fact]
+        public async void Return_Success_For_SaveOrder_If_Order_Is_Valid()
+        {
+            EmployeeBulkOrder order = GetEmployeeBulkOrder();
+            ValidateToken(true, Tokens.SuperAdmin);
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.SaveOrder(order)).Returns(Task.FromResult(true));
+            var response = await _orderService.PlaceEmployeeBulkOrder(order);
+            Assert.Equal(Status.Success, response.Status);
+       
+        }
+
+        //Approve Order
+        [Fact]
+        public async void Return_Failure_For_ApproveOrder_If_Order_Is_negative()
+        {
+            ApproveEmployeeBulkOrder order = GetApproveBulkOrder();
+            ValidateToken(true, Tokens.SuperAdmin);
+            
+            var response = await _orderService.ApproveEmployeeBulkOrder(-1,order);
+            Assert.Equal(Status.Failure, response.Status);
+            Assert.Equal(Constants.ErrorCodes.BadRequest, response.Error.ErrorCode);
+            Assert.Equal(Constants.ErrorMessages.InvalidOrderId, response.Error.ErrorMessage);
+
+        }
+        [Fact]
+        public async void Return_Failure_For_ApproveOrder_If_Order_Is_NotPresent_In_Database()
+        {
+            int orderIdDifferntFromUrl = GetOrderId();
+            int orderIdInBody = 2;
+            ApproveEmployeeBulkOrder orderFromRequest = GetApproveBulkOrder();
+            orderFromRequest.BulkOrderId = orderIdInBody;
+            EmployeeBulkOrder orderFromDb = GetEmployeeBulkOrder();
+            ValidateToken(true, Tokens.SuperAdmin);
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.GetOrderById(orderIdDifferntFromUrl)).Returns(Task.FromResult((EmployeeBulkOrder)null));
+            var response = await _orderService.ApproveEmployeeBulkOrder(orderIdDifferntFromUrl, orderFromRequest);
+            Assert.Equal(Status.Failure, response.Status);
+            Assert.Equal(Constants.ErrorCodes.BadRequest, response.Error.ErrorCode);
+            Assert.Equal(Constants.ErrorMessages.InvalidOrderId, response.Error.ErrorMessage);
+
+        }
+        [Fact]
+        public async void Return_Failure_For_ApproveOrder_If_Order_Is_Invalid()
+        {
+            int orderIdDifferntFromUrl = GetOrderId();
+            int orderIdInBody = 2;
+            ApproveEmployeeBulkOrder orderFromRequest = GetApproveBulkOrder();
+            orderFromRequest.BulkOrderId = orderIdInBody;
+            EmployeeBulkOrder orderFromDb = GetEmployeeBulkOrder();
+            ValidateToken(true, Tokens.SuperAdmin);
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.GetOrderById(orderIdDifferntFromUrl)).Returns(Task.FromResult(orderFromDb));
+            var response = await _orderService.ApproveEmployeeBulkOrder(orderIdDifferntFromUrl, orderFromRequest);
+            Assert.Equal(Status.Failure, response.Status);
+            Assert.Equal(Constants.ErrorCodes.BadRequest, response.Error.ErrorCode);
+            Assert.Equal(Constants.ErrorMessages.InvalidOrder, response.Error.ErrorMessage);
+
+        }
+        [Fact]
+        public async void Return_Failure_For_ApproveOrder_If_Order_Is_Not_In_Pending_State()
+        {
+            
+            ApproveEmployeeBulkOrder orderFromRequest = GetApproveBulkOrder();           
+            EmployeeBulkOrder orderFromDb = GetEmployeeBulkOrder();
+            orderFromDb.EmployeeBulkOrderDetails.BulkOrderRequestStatus = BulkOrderRequestStatus.Approved;
+            ValidateToken(true, Tokens.SuperAdmin);
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.GetOrderById(GetOrderId())).Returns(Task.FromResult(orderFromDb));
+            var response = await _orderService.ApproveEmployeeBulkOrder(GetOrderId(), orderFromRequest);
+            Assert.Equal(Status.Failure, response.Status);
+            Assert.Equal(Constants.ErrorCodes.BadRequest, response.Error.ErrorCode);
+            Assert.Equal(Constants.ErrorMessages.InvalidOrderToApprove, response.Error.ErrorMessage);
+
+        }
+        [Fact]
+        public async void Return_Failure_For_ApproveOrder_If_Items_Are_Not_AVailable()
+        {
+
+            ApproveEmployeeBulkOrder orderFromRequest = GetApproveBulkOrder();
+            EmployeeBulkOrder orderFromDb = GetEmployeeBulkOrder();
+             ValidateToken(true, Tokens.SuperAdmin);
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.GetOrderById(GetOrderId())).Returns(Task.FromResult(orderFromDb));
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.ApproveOrder(orderFromRequest)).Returns(Task.FromResult(false));
+            var response = await _orderService.ApproveEmployeeBulkOrder(GetOrderId(), orderFromRequest);
+            Assert.Equal(Status.Failure, response.Status);
+            Assert.Equal(Constants.ErrorCodes.BadRequest, response.Error.ErrorCode); 
+            Assert.Equal(Constants.ErrorMessages.ItemsUnavailability, response.Error.ErrorMessage);
+
+        }
+        [Fact]
+        public async void Return_Success_For_ApproveOrder_If_Order_is_Valid()
+        {
+
+            ApproveEmployeeBulkOrder orderFromRequest = GetApproveBulkOrder();
+            EmployeeBulkOrder orderFromDb = GetEmployeeBulkOrder();
+            ValidateToken(true, Tokens.SuperAdmin);
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.GetOrderById(GetOrderId())).Returns(Task.FromResult(orderFromDb));
+            _moqEmployeeBulkOrderDbContext.Setup(m => m.ApproveOrder(orderFromRequest)).Returns(Task.FromResult(true));
+            var response = await _orderService.ApproveEmployeeBulkOrder(GetOrderId(), orderFromRequest);
+            Assert.Equal(Status.Success, response.Status);
+           
+
+        }
+
+
+        public static ApproveEmployeeBulkOrder GetApproveBulkOrder()
+        {
+            ItemLocationQuantityMapping itemLocationQuantityMapping = new ItemLocationQuantityMapping
+            {
+                Item = new Item { Id = 1 },
+                LocationQuantityMappings = new List<LocationQuantityMapping>
+                {
+
+                        new LocationQuantityMapping
+                        {
+                            Location="shelf1",
+                            Quantity=15
+                        },
+                        new LocationQuantityMapping
+                        {
+                            Location="shelf2",
+                            Quantity=15
+                        }
+
+                }
+            };
+            return new ApproveEmployeeBulkOrder
+            {
+                ItemLocationQuantityMappings = new List<ItemLocationQuantityMapping>
+                {
+                    itemLocationQuantityMapping
+
+                },
+                Employee = GetEmployee(),
+                EmployeeBulkOrderDetails = GetEmployeeBulkOrderDetails(),
+                BulkOrderId=GetOrderId()
+
+            };
+        }
+
+        private static int GetOrderId()
+        {
+            return 302;
+        }
+
+        public static EmployeeBulkOrder GetEmployeeBulkOrder()
+        {
+            return new EmployeeBulkOrder
+            {
+                BulkOrderId=GetOrderId(),
+                Employee = GetEmployee(),
+                EmployeeBulkOrderDetails = GetEmployeeBulkOrderDetails()
+            };
+        }
+
+        private static EmployeeBulkOrderDetails GetEmployeeBulkOrderDetails()
+        {
+            
+           return new EmployeeBulkOrderDetails
+            {
+               ReasonForRequirement ="okr seminar",
+             RequirementDate= DateTime.Now.AddDays(3),
+              BulkOrderRequestStatus=BulkOrderRequestStatus.Pending,
+              ItemsQuantityList=GetItemQuantityList()
+
+           };
+        }
+
+        private static List<BulkOrderItemQuantityMapping> GetItemQuantityList()
+        {
+            return new List<BulkOrderItemQuantityMapping>
+            {
+                { new BulkOrderItemQuantityMapping { Item=new Item{Id=1},QuantityOrdered=30 } }
+            };
+        }
+
+        private static Employee GetEmployee()
+        {
+            return new Employee
+            {
+                Id = "1098",
+                Email = "vreddy@tavisca.com",
+                Firstname = "vijay",
+                Lastname = "mohan",
+                IsActive = true
+            };
+        }
     }
 }
