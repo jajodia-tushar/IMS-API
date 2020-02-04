@@ -23,7 +23,7 @@ pipeline {
 		stage('Deploy'){
 			steps {
 				script {
-					withCredentials([usernamePassword(credentialsId: '65f1a44b-0c4a-4057-965f-8689d2e2a0ba', passwordVariable: 'HOST_PASSWORD', usernameVariable: 'HOST_USERNAME')]) {
+					withCredentials([usernamePassword(credentialsId: 'fa4a5d0d-21b0-410e-88b2-2d5260b28c48', passwordVariable: 'HOST_PASSWORD', usernameVariable: 'HOST_USERNAME')]) {
 						remote.name = "$HOST_NAME"
 						remote.host = "$HOST_NAME"
 						remote.user = "$HOST_USERNAME"
@@ -31,10 +31,13 @@ pipeline {
 						remote.allowAnyHosts = true
 					}
 				}
+				withCredentials([usernamePassword(credentialsId: 'cc8e493d-fe72-441b-8ffd-96ec86877c2d', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+				sshCommand remote: remote, command: "docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
 				sshCommand remote: remote, command: "docker service rm ims-api || echo 'service dosent exist'"
 				sshCommand remote: remote, command: "docker images $DOCKER_REGISTRY/$DOCKER_REPO -q| xargs docker rmi -f || echo 'no tags for this image'"
 				sshCommand remote: remote, command: "docker pull $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG"
 				sshCommand remote: remote, command: "docker service create --name ims-api --network ims --publish 5000:80 $DOCKER_REGISTRY/$DOCKER_REPO:$IMAGE_TAG"
+				}
 				
 			}
 		}
@@ -45,3 +48,4 @@ pipeline {
 		}
 	}		
 }
+
