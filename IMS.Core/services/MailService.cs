@@ -184,7 +184,7 @@ namespace IMS.Core.services
                 if (user!=null)
                 {
                     email.FromAddress = Constants.EmailFromAddress.NoReplyMailAddress;
-                    email.ToAddress = "preddy@tavisca.com";
+                    email.ToAddress = user.Email;
                     email.Body = GenerateApprovedBulkOrderHTMLTemplateForAdmin(user,order, approveEmployeeBulkOrder.ItemLocationQuantityMappings,order.Employee);
                     email.Subject = "Approved Order Id#:"+order.BulkOrderId+" "+"Receipt";
                     return await _notificationProvider.SendEmail(email);

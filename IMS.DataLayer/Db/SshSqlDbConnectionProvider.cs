@@ -21,21 +21,28 @@ namespace IMS.DataLayer.Db
         public async Task<MySqlConnection> GetConnection(string databaseName)
         {  try
              {
+                string sshServer = Environment.GetEnvironmentVariable("SSH_SERVER");
+                string sshUsername = Environment.GetEnvironmentVariable("SSH_USERNAME");
+                string sshPassword = Environment.GetEnvironmentVariable("SSH_PASSWORD");
+                string sqlServer = Environment.GetEnvironmentVariable("SQL_SERVER");
+                string sqlUsername = Environment.GetEnvironmentVariable("SQL_USERNAME");
+                string sqlPassword = Environment.GetEnvironmentVariable("SQL_PASSWORD");
+                
                 if (!IsSshClientConnected())
                     (_sshClient, _localPort) =  ConnectSsh(
-                                                       _configuration["Ssh:Server"],
-                                                       _configuration["Ssh:UserName"],
-                                                       _configuration["Ssh:Password"]
+                                                      GetEnvironmentValue(_configuration["Ssh:Server"]),
+                                                       GetEnvironmentValue(_configuration["Ssh:UserName"]),
+                                                       GetEnvironmentValue(_configuration["Ssh:Password"])
                                                      );
 
                 MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder
                 {
-                    Server = _configuration["Sql:Server"],
+                    Server = GetEnvironmentValue(_configuration["Sql:Server"]),
                     Database=databaseName,
 
                     Port = _localPort,
-                    UserID = _configuration["Sql:UserName"],
-                    Password = _configuration["Sql:Password"],
+                    UserID = GetEnvironmentValue(_configuration["Sql:UserName"]),
+                    Password = GetEnvironmentValue(_configuration["Sql:Password"]),
                 };
 
                 return new MySqlConnection(csb.ConnectionString);
@@ -46,6 +53,14 @@ namespace IMS.DataLayer.Db
             }
                
             
+        }
+
+        private static string GetEnvironmentValue(string environmentKey)
+        {
+            string result = Environment.GetEnvironmentVariable(environmentKey);
+            if (string.IsNullOrEmpty(result))
+                throw new Exception("No Values In Environment");
+            return result;
         }
 
         private static bool IsSshClientConnected()

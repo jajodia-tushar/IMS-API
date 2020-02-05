@@ -40,8 +40,8 @@ namespace NotificationApi.Core
                             }
                             using (var client = new SmtpClient())
                             {
-                                client.Host = _configuration["SmtpServer:Host"];
-                                client.Port = int.Parse(_configuration["SmtpServer:Port"]); 
+                                client.Host = Environment.GetEnvironmentVariable(_configuration["SmtpServer:Host"]);
+                                client.Port = int.Parse(Environment.GetEnvironmentVariable(_configuration["SmtpServer:Port"])); 
                                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                                 client.Send(emailMessage);
                             }
