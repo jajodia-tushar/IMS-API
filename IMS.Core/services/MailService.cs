@@ -240,7 +240,7 @@ namespace IMS.Core.services
             emailBody += @"</table>
                             </div>
                             <div class='report-text' style='margin-top: 30px; margin-bottom: 30px;'>
-                                <h5>Please drop an email to admin@tavisca.com to report if this transaction was not authorized by you.</h5>
+                                <h5>If this action was not performed by you, please report to Admin Team at Tavisca, immediately.</h5>
                             </div>
                             <div class='regards-text' style='margin-bottom: 50px;'>
                                 <h5>Regards, <br> Tavisca IMS </h5>
