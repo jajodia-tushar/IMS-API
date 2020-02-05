@@ -27,7 +27,8 @@ namespace IMS.TokenManagement
         }
         public async Task<string> GenerateToken(User user,DateTime expirationTime)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            string key = Environment.GetEnvironmentVariable(_configuration["Jwt:Key"]);
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             
             var claims = new[] {
