@@ -114,6 +114,10 @@ namespace IMS.Core
 
             public const string ActivityLogsNotPresent = "No Activity Logs Present";
         }
+        public static class EmailFromAddress
+        {
+            public const string NoReplyMailAddress = "noreply@tavisca.com";
+        }
 
         public static class ErrorCodes
         {

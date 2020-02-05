@@ -26,26 +26,28 @@ namespace NotificationApi.Core
             {
                 if (Validator.Validate(email))
                 {
-                    SmtpClient client = new SmtpClient(_configuration["SmtpServer:Host"]);
-                    client.Port = int.Parse(_configuration["SmtpServer:Port"]);
-                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                    client.UseDefaultCredentials = false;
-                    System.Net.NetworkCredential credentials =
-                        new System.Net.NetworkCredential(_configuration["Email:FromAddress"], _configuration["Email:Password"]);
-                    client.EnableSsl = true;
-                    client.Credentials = credentials;
-                    var mail = new MailMessage(_configuration["Email:FromAddress"], email.ToAddress);
-                    mail.Subject = email.Subject;
-                    mail.Body = email.Body;
-                    if (email.CC != null)
+                    using (var emailMessage = new MailMessage())
                     {
-                        MailAddress copy = new MailAddress(email.CC);
-                        mail.CC.Add(copy);
+                            emailMessage.From = new MailAddress(email.FromAddress);
+                            emailMessage.To.Add(new MailAddress(email.ToAddress));
+                            emailMessage.Subject = email.Subject;
+                            emailMessage.Body = email.Body;
+                            emailMessage.IsBodyHtml = true;
+                            if (email.CC != null)
+                            {
+                                MailAddress copy = new MailAddress(email.CC);
+                                emailMessage.CC.Add(copy);
+                            }
+                            using (var client = new SmtpClient())
+                            {
+                                client.Host = _configuration["SmtpServer:Host"];
+                                client.Port = int.Parse(_configuration["SmtpServer:Port"]); 
+                                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                                client.Send(emailMessage);
+                            }
+                        response.Status = Status.Success;
                     }
-                    mail.SubjectEncoding = System.Text.Encoding.UTF8;
-                    mail.IsBodyHtml = true;
-                    await client.SendMailAsync(mail);
-                    response.Status = Status.Success;
+                    
                 }
                 else
                 {
@@ -61,7 +63,7 @@ namespace NotificationApi.Core
 
                 throw ex;
             }
-          return response ;
+            return response ;
         }
     }
 }

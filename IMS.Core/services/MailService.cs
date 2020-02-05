@@ -31,6 +31,7 @@ namespace IMS.Core.services
                 var employeeResponse = await _employeeService.ValidateEmployee(employeeOrder.Employee.Id);
                 if (employeeResponse.Status.Equals(Status.Success))
                 {
+                    email.FromAddress = Constants.EmailFromAddress.NoReplyMailAddress;
                     email.ToAddress = employeeResponse.Employee.Email;
                     email.Body = GenerateEmployeeOrderHTMLTemplate(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList, employeeResponse.Employee.Firstname + " " + employeeResponse.Employee.Lastname);
                     email.Subject = "Order Reciept";
@@ -52,6 +53,7 @@ namespace IMS.Core.services
                 var employeeResponse = await _employeeService.ValidateEmployee(employeeBulkOrder.Employee.Id);
                 if (employeeResponse.Status.Equals(Status.Success))
                 {
+                    email.FromAddress = Constants.EmailFromAddress.NoReplyMailAddress;
                     email.ToAddress = employeeResponse.Employee.Email;
                     email.Body = GenerateEmployeeBulkOrderHTMLTemplate(employeeBulkOrder.BulkOrderId,employeeBulkOrder.EmployeeBulkOrderDetails,orderStatus, employeeResponse.Employee.Firstname+" "+employeeResponse.Employee.Lastname);
                     email.Subject = "Order Id:#"+employeeBulkOrder.BulkOrderId+" is "+orderStatus.ToString();
@@ -181,6 +183,7 @@ namespace IMS.Core.services
                 var user = await _userDbContext.GetUserById(loggedInUserId);
                 if (user!=null)
                 {
+                    email.FromAddress = Constants.EmailFromAddress.NoReplyMailAddress;
                     email.ToAddress = "preddy@tavisca.com";
                     email.Body = GenerateApprovedBulkOrderHTMLTemplateForAdmin(user,order, approveEmployeeBulkOrder.ItemLocationQuantityMappings,order.Employee);
                     email.Subject = "Approved Order Id#:"+order.BulkOrderId+" "+"Receipt";
