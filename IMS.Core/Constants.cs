@@ -138,8 +138,8 @@ namespace IMS.Core
             public const string Clerk = "clerk";
             public static Dictionary<string, int> ExpirationTimeInMinutes = new Dictionary<string, int>()
             {
-                { Roles.SuperAdmin,60 },
-                { Roles.Admin,60 },
+                { Roles.SuperAdmin,30 },
+                { Roles.Admin,30 },
                 { Roles.Clerk,60 },
                 {Roles.Shelf,720 }
             };

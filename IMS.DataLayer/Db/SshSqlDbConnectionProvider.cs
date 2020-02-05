@@ -21,12 +21,7 @@ namespace IMS.DataLayer.Db
         public async Task<MySqlConnection> GetConnection(string databaseName)
         {  try
              {
-                string sshServer = Environment.GetEnvironmentVariable("SSH_SERVER");
-                string sshUsername = Environment.GetEnvironmentVariable("SSH_USERNAME");
-                string sshPassword = Environment.GetEnvironmentVariable("SSH_PASSWORD");
-                string sqlServer = Environment.GetEnvironmentVariable("SQL_SERVER");
-                string sqlUsername = Environment.GetEnvironmentVariable("SQL_USERNAME");
-                string sqlPassword = Environment.GetEnvironmentVariable("SQL_PASSWORD");
+                
                 
                 if (!IsSshClientConnected())
                     (_sshClient, _localPort) =  ConnectSsh(
