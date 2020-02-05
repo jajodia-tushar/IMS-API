@@ -27,7 +27,7 @@ namespace IMS.Core.services
             {
                 HttpClient client = new HttpClient();
                 JObject emailJson = JsonMaker(email);
-                var content = new StringContent(emailJson.ToString()+ _configuration["docker"], Encoding.UTF8, "application/json");
+                var content = new StringContent(emailJson.ToString()+"hello"+ _configuration["docker"]+"hello", Encoding.UTF8, "application/json");
                 var result = client.PostAsync(_configuration["baseURL"]+"/api/Notification", content).Result;
                 if (result.IsSuccessStatusCode)
                 {
