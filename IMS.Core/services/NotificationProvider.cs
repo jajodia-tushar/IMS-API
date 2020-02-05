@@ -27,8 +27,8 @@ namespace IMS.Core.services
             {
                 HttpClient client = new HttpClient();
                 JObject emailJson = JsonMaker(email);
-                var content = new StringContent(emailJson.ToString(), Encoding.UTF8, "application/json");
-                var result = client.PostAsync("http://"+_configuration["baseURL"]+":5003"+"/api/Notification", content).Result;
+                var content = new StringContent(emailJson.ToString()+ _configuration["baseURL"], Encoding.UTF8, "application/json");
+                var result = client.PostAsync("http:172.16.3.99:5003/api/Notification", content).Result;
                 if (result.IsSuccessStatusCode)
                 {
                     string responseString = result.Content.ReadAsStringAsync().Result;
