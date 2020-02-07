@@ -8,6 +8,7 @@ using IMS.Entities;
 using IMS.Entities.Interfaces;
 using IMS.Core;
 using IMS.Logging;
+using System.Threading.Tasks;
 
 namespace IMS.UnitTest.CoreTests
 {
@@ -60,11 +61,12 @@ namespace IMS.UnitTest.CoreTests
             var loginRequest = GetValidLoginRequest();
             User user = GetUserDetails();
             string token = "abcdefghijklmnopqrstuvwxyz";
-            //_moqUserDbContext.Setup(m => m.GetUserByCredintials(It.Is<String>(s => s.Equals(loginRequest.Username)), It.Is<String>(s => s.Equals(loginRequest.Password)))).Returns(user);
-            //_moqTokenProvider.Setup(m => m.GenerateToken(user,DateTime.Now)).Returns(token);
+            _moqUserDbContext.Setup(m => m.GetUserByCredintials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(user));
+            _moqTokenProvider.Setup(m => m.GenerateToken(user, It.IsAny<DateTime>())).Returns(Task.FromResult(token));
             var loginService = new LoginService(_moqUserDbContext.Object, _moqTokenProvider.Object, _moqHttpContextAccessor.Object, _moqLogManager.Object);
             var response = await loginService.Login(loginRequest);
 
+            Assert.Equal(Status.Success, response.Status);
             Assert.Equal(token, response.AccessToken);
         }
 
