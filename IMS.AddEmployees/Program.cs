@@ -23,7 +23,7 @@ namespace IMS.EmployeeDataDumper
             IConfiguration configuration = builder.Build();
             var services = new ServiceCollection().AddTransient<EmployeesDataInjector>()
                 .AddSingleton(typeof(IConfiguration), configuration)
-                .AddTransient<IDbConnectionProvider, SshSqlDbConnectionProvider>()
+                .AddSingleton<IDbConnectionProvider, SshSqlDbConnectionProvider>()
                 .AddTransient<IEmployeesDataDbContext,EmployeesDataDbContext>()
                 .AddTransient<ILogManager, LogImplementation>()
                 .AddTransient<ILogDbContext, LogDbContext>();
