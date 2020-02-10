@@ -25,14 +25,7 @@ namespace IMS.UnitTest.CoreTests
             _moqTokenDbContext = new Mock<ITokenDbContext>();
         }
 
-        [Fact]
-        public void Get_String_Type_JWT_Token_Succeeds()
-        {
-            var user = GetUserDetails();
-            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
-            var response = jwtTokenprovider.GenerateToken(user,DateTime.Now);
-            Assert.IsType<String>(response);
-        }
+
 
         [Fact]
         public void Returns_Success_when_Jwt_Token_Is_Not_Null()
@@ -42,21 +35,6 @@ namespace IMS.UnitTest.CoreTests
             var response = jwtTokenprovider.GenerateToken(user,DateTime.Now);
             Assert.NotNull(response);
         }
-
-        [Fact]
-        public async void Returns_Success_When_Check_For_FirstName_And_Lastname_From_JWT_Token_Claims()
-        {
-            var user = GetUserDetails();
-            JwtTokenProvider jwtTokenprovider = new JwtTokenProvider(_configuration, _moqTokenDbContext.Object);
-            var response =  jwtTokenprovider.GenerateToken(user,DateTime.Now);
-            string[] words = { "", "" };//response.Split('.');
-            string payload = words[1];
-            var payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(payload));
-            var payloadData = JObject.Parse(payloadJson);
-            Assert.Equal("rochit", JObject.Parse(payloadData.ToString())["Firstname"]);
-            Assert.Equal("aggarwal", JObject.Parse(payloadData.ToString())["Lastname"]);
-        }
-
         private static byte[] Base64UrlDecode(string input)
         {
             var output = input;
