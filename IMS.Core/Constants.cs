@@ -114,9 +114,11 @@ namespace IMS.Core
 
             public const string ActivityLogsNotPresent = "No Activity Logs Present";
         }
-        public static class EmailFromAddress
+        public static class Email
         {
-            public const string NoReplyMailAddress = "noreply@tavisca.com";
+            public const string NoReply = "noreply@tavisca.com";
+            public const string TaviscaIMS="Tavisca-IMS@tavisca.com";
+            public const string Admin = "admin@tavisca.com";
         }
 
         public static class ErrorCodes
