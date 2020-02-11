@@ -740,6 +740,7 @@ namespace IMS.Core.services
                 if (response.Status == Status.Success)
                 {
                     new Task(() => { _mailService.SendEmployeeBulkOrderReciept(employeeBulkOrder,BulkOrderRequestStatus.Pending); }).Start();
+                    new Task(() => { _mailService.SendPlacedBulkOrderToAdmin(employeeBulkOrder); }).Start();
                 }
             }
             return response;

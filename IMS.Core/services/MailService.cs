@@ -31,7 +31,7 @@ namespace IMS.Core.services
                 var employeeResponse = await _employeeService.ValidateEmployee(employeeOrder.Employee.Id);
                 if (employeeResponse.Status.Equals(Status.Success))
                 {
-                    email.FromAddress = Constants.EmailFromAddress.NoReplyMailAddress;
+                    email.FromAddress = Constants.Email.NoReply;
                     email.ToAddress = employeeResponse.Employee.Email;
                     email.Body = GenerateEmployeeOrderHTMLTemplate(employeeOrder.EmployeeOrderDetails.EmployeeItemsQuantityList, employeeResponse.Employee.Firstname + " " + employeeResponse.Employee.Lastname);
                     email.Subject = "Order Reciept";
@@ -53,7 +53,7 @@ namespace IMS.Core.services
                 var employeeResponse = await _employeeService.ValidateEmployee(employeeBulkOrder.Employee.Id);
                 if (employeeResponse.Status.Equals(Status.Success))
                 {
-                    email.FromAddress = Constants.EmailFromAddress.NoReplyMailAddress;
+                    email.FromAddress = Constants.Email.NoReply;
                     email.ToAddress = employeeResponse.Employee.Email;
                     email.Body = GenerateEmployeeBulkOrderHTMLTemplate(employeeBulkOrder.BulkOrderId,employeeBulkOrder.EmployeeBulkOrderDetails,orderStatus, employeeResponse.Employee.Firstname+" "+employeeResponse.Employee.Lastname);
                     email.Subject = "Order Id:#"+employeeBulkOrder.BulkOrderId+" is "+orderStatus.ToString();
@@ -74,12 +74,12 @@ namespace IMS.Core.services
                 <body style='padding : 0px; margin: 0px;font-family: sans-serif;'>
                     <section style='margin-top: 40px;'>
                         <div class='container' style='width: 80%; margin-left: 10%;'>";
-            emailBody += "<h2 style='margin-bottom: 10px;'>Hello, &nbsp" + name + "&nbsp</h2>";
-            emailBody += "<h4 style='margin: 0px;'>You have placed bulk order of &nbsp" + orderDetails.ItemsQuantityList.Count + "&nbsp items</h4><br>";
+            emailBody += "<h2 style='margin-bottom: 10px;'>Hello &nbsp" + name + ",&nbsp</h2>";
+            emailBody += "<h4 style='margin: 0px;'>You have placed bulk order of &nbsp" + orderDetails.ItemsQuantityList.Count + "&nbsp item(s)</h4><br>";
             emailBody += "<h4 style='margin: 0px;'>Order Status:&nbsp" +orderStatus.ToString() + "&nbsp</h4><br>";
            
             emailBody += "<h4 style='margin: 0px;'>Reason For Requirement :&nbsp" + orderDetails.ReasonForRequirement + "&nbsp</h4><br>";
-            emailBody += "<h4 style='margin: 0px;'>Requirement Date :&nbsp" + orderDetails.RequirementDate.ToString() + "&nbsp</h4><br>";
+            emailBody += "<h4 style='margin: 0px;'>Requirement Date :&nbsp" + orderDetails.RequirementDate.ToString("MM/dd/yyyy") + "&nbsp</h4><br>";
             emailBody += "<h3 style='margin: 0px;'>Item Details&nbsp</h4>";
 
             emailBody += @"<div class='item-table' style='margin-top: 40px;'>
@@ -123,7 +123,7 @@ namespace IMS.Core.services
         {
             switch(orderStatus)
             {
-                case BulkOrderRequestStatus.Pending:return "You will get Notification after the Approval of order by Admin Team.";
+                case BulkOrderRequestStatus.Pending:return "You will be notified via email once the order is approved by the Admin Team.";
                 case BulkOrderRequestStatus.Rejected:return "Please Contact Admin Team for further assistance.";
                 case BulkOrderRequestStatus.Approved:return "Please collect items from Admin Team.";
                 case BulkOrderRequestStatus.Cancelled:return "If you have already taken the items, please return it immediately, ignore this message if you have already returned them.";
@@ -137,8 +137,8 @@ namespace IMS.Core.services
                 <body style='padding : 0px; margin: 0px;font-family: sans-serif;'>
                     <section style='margin-top: 40px;'>
                         <div class='container' style='width: 80%; margin-left: 10%;'>";
-            emailBody += "<h2 style='margin-bottom: 10px;'>Hello, &nbsp" + name + "&nbsp</h2>";
-            emailBody += "<h4 style='margin: 0px;'>You have taken &nbsp" + employeeItemsQuantityList.Count + "&nbsp items</h4>";
+            emailBody += "<h2 style='margin-bottom: 10px;'>Hello &nbsp" + name + ",&nbsp</h2>";
+            emailBody += "<h4 style='margin: 0px;'>You have taken &nbsp" + employeeItemsQuantityList.Count + "&nbsp item(s)</h4>";
                          
             emailBody += @"<div class='item-table' style='margin-top: 40px;'>
                                 <table style='border-collapse: collapse; border: 1px solid #d4c7c7; width: 100%;'>
@@ -183,7 +183,7 @@ namespace IMS.Core.services
                 var user = await _userDbContext.GetUserById(loggedInUserId);
                 if (user!=null)
                 {
-                    email.FromAddress = Constants.EmailFromAddress.NoReplyMailAddress;
+                    email.FromAddress = Constants.Email.TaviscaIMS;
                     email.ToAddress = user.Email;
                     email.Body = GenerateApprovedBulkOrderHTMLTemplateForAdmin(user,order, approveEmployeeBulkOrder.ItemLocationQuantityMappings,order.Employee);
                     email.Subject = "Approved Order Id#:"+order.BulkOrderId+" "+"Receipt";
@@ -209,14 +209,14 @@ namespace IMS.Core.services
                 <body style='padding : 0px; margin: 0px;font-family: sans-serif;'>
                     <section style='margin-top: 40px;'>
                         <div class='container' style='width: 80%; margin-left: 10%;'>";
-            emailBody += "<h2 style='margin-bottom: 10px;'>Hello, &nbsp" + LoggedInUser.Firstname+" "+LoggedInUser.Lastname + "&nbsp</h2>";
+            emailBody += "<h2 style='margin-bottom: 10px;'>Hello &nbsp" + LoggedInUser.Firstname+" "+LoggedInUser.Lastname + ",&nbsp</h2>";
             emailBody += "<h3 style='margin: 0px;'>You have Approved bulkorder of Id:# " + order.BulkOrderId + "&nbsp</h3><br>";
             emailBody += "<h3 style='margin: 0px;'>Order Details &nbsp</h3><br>";
             emailBody += "<h5 style='margin: 0px;'>EmployeeId: &nbsp" + employee.Id+ "&nbsp</h5><br>";
             emailBody += "<h5 style='margin: 0px;'>Employee Name: &nbsp" + employee.Firstname+" "+employee.Lastname + "&nbsp</h5><br>";
             emailBody += "<h5 style='margin: 0px;'>Employee EmaildId: &nbsp" + employee.Email + "&nbsp</h5><br>";
             emailBody += "<h5 style='margin: 0px;'>Reason for Requirement: &nbsp" + order.EmployeeBulkOrderDetails.ReasonForRequirement + "&nbsp</h5><br>";
-            emailBody += "<h5 style='margin: 0px;'>RequirementDate: &nbsp" + order.EmployeeBulkOrderDetails.ReasonForRequirement.ToString() + "&nbsp</h5><br>";
+            emailBody += "<h5 style='margin: 0px;'>RequirementDate: &nbsp" + order.EmployeeBulkOrderDetails.RequirementDate.ToString("MM/dd/yyyy") + "&nbsp</h5><br>";
             emailBody += "<h3 style='margin: 0px;'>Item Details &nbsp</h3>";
             emailBody += @"<div class='item-table' style='margin-top: 40px;'>
                                 <table style='border-collapse: collapse; border: 1px solid #d4c7c7; width: 100%;'>
@@ -244,6 +244,84 @@ namespace IMS.Core.services
                             </div>
                             <div class='regards-text' style='margin-bottom: 50px;'>
                                 <h5>Regards, <br> Tavisca IMS </h5>
+                            </div>
+                        </div>
+                    </section>";
+
+            emailBody += @"<footer style='position: fixed; bottom: 0;color: #fff; background-color: #222437; width: 100%; text-align: center; height: 30px;'> 
+                            <div class='footer-text' style='padding-top: 9px; font-size: small;'>";
+
+            emailBody += "&copy; Tavisca Solutions Pvt. Ltd " + DateTime.Today.ToString("yyyy") + " All Rights Reserved";
+
+            emailBody += @"</div>
+                    </footer>
+               </body>";
+
+            return emailBody;
+        }
+
+        public async Task<bool> SendPlacedBulkOrderToAdmin(EmployeeBulkOrder employeeBulkOrder)
+        {
+            try
+            {
+                var employeeResponse = await _employeeService.ValidateEmployee(employeeBulkOrder.Employee.Id);
+                if (employeeResponse.Status.Equals(Status.Success))
+                {
+                    Employee employee = employeeResponse.Employee;
+                    var email = new Email();
+
+                    email.FromAddress = Constants.Email.TaviscaIMS;
+                    email.ToAddress = Constants.Email.Admin;
+                    email.Body = GeneratePlacedBulkOrderHTMLTemplateForAdmin(employeeBulkOrder,employee);
+                    email.Subject = "Order Id#:" + employeeBulkOrder.BulkOrderId + " placed by EmployeeId:" + employee.Id;
+                    return await _notificationProvider.SendEmail(email);
+                }
+                return false;
+               
+            }
+            catch (Exception exception)
+            {
+                new Task(() => { _logger.LogException(exception, "SendPlacedBulkOrderToAdmin", IMS.Entities.Severity.Critical, employeeBulkOrder, false); }).Start();
+                return false;
+            }
+        }
+
+        private string GeneratePlacedBulkOrderHTMLTemplateForAdmin(EmployeeBulkOrder order,Employee employee)
+        {
+            
+            EmployeeBulkOrderDetails orderDetails = order.EmployeeBulkOrderDetails;
+            string emailBody = @"
+                <body style='padding : 0px; margin: 0px;font-family: sans-serif;'>
+                    <section style='margin-top: 40px;'>
+                        <div class='container' style='width: 80%; margin-left: 10%;'>";
+             emailBody += "<h3 style='margin: 0px;'>"+ employee.Firstname+" "+ employee.Lastname+" placed bulk order of &nbsp" + orderDetails.ItemsQuantityList.Count + "&nbsp item(s)</h3><br>";
+            emailBody += "<h4 style='margin: 0px;'>Employee Id:&nbsp" + employee.Id + "&nbsp</h4><br>";
+            emailBody += "<h4 style='margin: 0px;'>Order Status:&nbsp" + BulkOrderRequestStatus.Pending.ToString() + "&nbsp</h4><br>";
+
+            emailBody += "<h4 style='margin: 0px;'>Reason For Requirement :&nbsp" + orderDetails.ReasonForRequirement + "&nbsp</h4><br>";
+            emailBody += "<h4 style='margin: 0px;'>Requirement Date :&nbsp" + orderDetails.RequirementDate.ToString("MM/dd/yyyy") + "&nbsp</h4><br>";
+            emailBody += "<h3 style='margin: 0px;'>Item Details&nbsp</h4>";
+
+            emailBody += @"<div class='item-table' style='margin-top: 40px;'>
+                                <table style='border-collapse: collapse; border: 1px solid #d4c7c7; width: 100%;'>
+                                    <tr>
+                                        <th style='border: 1px solid #d4c7c7; padding: 15px;'>Item name</th>
+                                        <th style='border: 1px solid #d4c7c7; padding: 15px;'>Quantity Ordered</th>
+                                    </tr>";
+            foreach (var employeeItemQuantity in orderDetails.ItemsQuantityList)
+            {
+                emailBody += ("<tr><td style='border: 1px solid #d4c7c7; padding: 15px; text-align: center;'>" + employeeItemQuantity.Item.Name + "</td>");
+                emailBody += ("<td style='border: 1px solid #d4c7c7; padding: 15px;text-align: center;'>" + employeeItemQuantity.QuantityOrdered + "</td></tr>");
+            }
+
+
+            emailBody += @"</table>
+                            </div><br>";
+            emailBody += @"<div class='report-text' style='margin-top: 30px; margin-bottom: 30px;'>";
+                               
+            emailBody += @"</div>
+                            <div class='regards-text' style='margin-bottom: 50px;'>
+                                <h5>Regards, <br> Tavisca IMS Team</h5>
                             </div>
                         </div>
                     </section>";
