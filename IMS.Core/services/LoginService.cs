@@ -9,6 +9,7 @@ using IMS.Logging;
 using IMS.TokenManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -69,22 +70,14 @@ namespace IMS.Core.services
                 else
                 {
                     loginResponse.Status = Status.Failure;
-                    loginResponse.Error = new Error()
-                    {
-                        ErrorCode = Constants.ErrorCodes.UnAuthorized,
-                        ErrorMessage = Constants.ErrorMessages.InvalidUserNameOrPassword
-                    };
+                    loginResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidUserNameOrPassword);                 
 
                 }
             }
             catch(Exception exception)
             {
                 loginResponse.Status = Status.Failure;
-                loginResponse.Error = new Error()
-                {
-                    ErrorCode = Constants.ErrorCodes.ServerError,
-                    ErrorMessage = Constants.ErrorMessages.ServerError
-                };
+                loginResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
                 new Task(() => { _logger.LogException(exception, "Login", Severity.Critical, loginRequest, loginResponse); }).Start();
             }
             finally
@@ -92,12 +85,42 @@ namespace IMS.Core.services
                 Severity severity = Severity.No;
                 if (loginResponse.Status == Status.Failure)
                     severity = Severity.Critical;
+                
 
-                new Task(() => { _logger.Log(loginRequest, loginResponse,"Login", loginResponse.Status, severity, -1); }).Start();
+                new Task(() => {
+                                LoginResponse responseToLog = CloneOf(loginResponse);
+                                responseToLog.AccessToken = null;
+                                _logger.Log(loginRequest, responseToLog, "Login", loginResponse.Status, severity, -1);
+                               }).Start();
             }
 
             return loginResponse;
 
+        }
+
+        private static LoginResponse CloneOf(LoginResponse loginResponse)
+        {
+            string response=(string)JsonConvert.SerializeObject(loginResponse).Clone();
+            return JsonConvert.DeserializeObject<LoginResponse>(response);
+            /*User user = loginResponse.User;
+            return new LoginResponse
+            {
+                Status = loginResponse.Status,
+                Error = loginResponse.Error == null ? null : Utility.ErrorGenerator(loginResponse.Error.ErrorCode, loginResponse.Error.ErrorMessage),
+                User = user == null ? null:new User
+                {
+                    Id = user.Id,
+                    Firstname = user.Firstname,
+                    Lastname = user.Lastname,
+                    Email = user.Email,
+                    Username = user.Username,
+                    Password = user.Password,
+                    Role = new Role
+                    {
+                    }
+                },
+            };
+            */
         }
 
         public async Task<Response> Logout()
