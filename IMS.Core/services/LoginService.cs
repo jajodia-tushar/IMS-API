@@ -102,25 +102,6 @@ namespace IMS.Core.services
         {
             string response=(string)JsonConvert.SerializeObject(loginResponse).Clone();
             return JsonConvert.DeserializeObject<LoginResponse>(response);
-            /*User user = loginResponse.User;
-            return new LoginResponse
-            {
-                Status = loginResponse.Status,
-                Error = loginResponse.Error == null ? null : Utility.ErrorGenerator(loginResponse.Error.ErrorCode, loginResponse.Error.ErrorMessage),
-                User = user == null ? null:new User
-                {
-                    Id = user.Id,
-                    Firstname = user.Firstname,
-                    Lastname = user.Lastname,
-                    Email = user.Email,
-                    Username = user.Username,
-                    Password = user.Password,
-                    Role = new Role
-                    {
-                    }
-                },
-            };
-            */
         }
 
         public async Task<Response> Logout()
