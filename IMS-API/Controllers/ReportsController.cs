@@ -291,5 +291,37 @@ namespace IMS_API.Controllers
             }
             return itemConsumptionDetailsReport;
         }
+        /// <summary>
+        /// Retrieve datewise bulk order details between a given date range
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns>Datewise  bulk order details</returns>
+        /// <response code="200">Returns datewise  bulk order details if input is valid otherwise it returns status failure</response>
+        [Route("GetEmployeeBulkOrders")]
+        [HttpGet]
+        public async Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrders(string startDate, string endDate, int pageNumber, int pageSize)
+        {
+            EmployeeBulkOrdersResponse employeeBulkOrdersResponse = null;
+            try
+            {
+                IMS.Entities.EmployeeBulkOrdersResponse employeeBulkOrdersResponseEntity = await _reportsService.GetEmployeeBulkOrders(startDate, endDate, pageNumber, pageSize);
+                employeeBulkOrdersResponse = ReportsTranslator.ToDataContractsObject(employeeBulkOrdersResponseEntity);
+            }
+            catch (Exception exception)
+            {
+                employeeBulkOrdersResponse = new IMS.Contracts.EmployeeBulkOrdersResponse()
+                {
+                    Status = Status.Failure,
+                    Error = new Error()
+                    {
+                        ErrorCode = Constants.ErrorCodes.ServerError,
+                        ErrorMessage = Constants.ErrorMessages.ServerError
+                    }
+                };
+                new Task(() => { _logger.LogException(exception, "GetDateEmployeeBulkOrders", IMS.Entities.Severity.High, startDate + ";" + endDate, employeeBulkOrdersResponse); }).Start();
+            }
+            return employeeBulkOrdersResponse;
+        }
     }
 }

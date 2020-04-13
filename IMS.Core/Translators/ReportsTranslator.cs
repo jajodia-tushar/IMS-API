@@ -262,5 +262,81 @@ namespace IMS.Core.Translators
             }
             return dateWiseItemConsumptionDetailsContract;
         }
+
+        public static Contracts.EmployeeBulkOrdersResponse ToDataContractsObject(Entities.EmployeeBulkOrdersResponse employeeBulkOrdersResponseEntity)
+        {
+            var employeeBulkOrdersResponseContract = new Contracts.EmployeeBulkOrdersResponse();
+            if (employeeBulkOrdersResponseEntity.Status == Entities.Status.Success)
+            {
+                employeeBulkOrdersResponseContract.Status = Contracts.Status.Success;
+                employeeBulkOrdersResponseContract.PagingInfo = employeeBulkOrdersResponseEntity.PagingInfo == null ? null : Translator.ToDataContractsObject(employeeBulkOrdersResponseEntity.PagingInfo);
+                employeeBulkOrdersResponseContract.EmployeeBulkOrders = employeeBulkOrdersResponseEntity.EmployeeBulkOrders== null ? null : ToDataContractsObject(employeeBulkOrdersResponseEntity.EmployeeBulkOrders);
+            }
+            else
+            {
+                employeeBulkOrdersResponseContract.Status = Contracts.Status.Failure;
+                employeeBulkOrdersResponseContract.Error = Translator.ToDataContractsObject(employeeBulkOrdersResponseEntity.Error);
+            }
+            return employeeBulkOrdersResponseContract;
+        }
+
+        public static List<Contracts.EmployeeBulkOrder> ToDataContractsObject(List<Entities.EmployeeBulkOrder> employeeBulkOrdersEntity)
+        {
+            List<Contracts.EmployeeBulkOrder> employeeBulkOrdersContract = new List<Contracts.EmployeeBulkOrder>();
+            if (employeeBulkOrdersEntity != null)
+            {
+                foreach ( Entities.EmployeeBulkOrder employeeBulkOrderEntity in employeeBulkOrdersEntity)
+                {
+                    Contracts.EmployeeBulkOrder employeeBulkOrderContract = new Contracts.EmployeeBulkOrder();
+                    employeeBulkOrderContract.BulkOrderId = employeeBulkOrderEntity.BulkOrderId;
+                    employeeBulkOrderContract.Employee = employeeBulkOrderEntity.Employee == null ? null : EmployeeTranslator.ToDataContractsObject(employeeBulkOrderEntity.Employee);
+                    employeeBulkOrderContract.EmployeeBulkOrderDetails= employeeBulkOrderEntity.EmployeeBulkOrderDetails == null ? null : ToDataContractsObject(employeeBulkOrderEntity.EmployeeBulkOrderDetails);
+                    employeeBulkOrdersContract.Add(employeeBulkOrderContract);
+                }
+            }
+            return employeeBulkOrdersContract;
+        }
+
+        public static Contracts.EmployeeBulkOrderDetails ToDataContractsObject(Entities.EmployeeBulkOrderDetails employeeBulkOrderDetailsEntity)
+        {
+            Contracts.EmployeeBulkOrderDetails employeeBulkOrderDetailsContract = new Contracts.EmployeeBulkOrderDetails();
+            if (employeeBulkOrderDetailsEntity != null)
+            {
+                employeeBulkOrderDetailsContract.CreatedOn = employeeBulkOrderDetailsEntity.CreatedOn;
+                employeeBulkOrderDetailsContract.RequirementDate = employeeBulkOrderDetailsEntity.RequirementDate;
+                employeeBulkOrderDetailsContract.ReasonForRequirement = employeeBulkOrderDetailsEntity.ReasonForRequirement;
+                employeeBulkOrderDetailsContract.BulkOrderRequestStatus = ToDataContractsObject(employeeBulkOrderDetailsEntity.BulkOrderRequestStatus);
+                employeeBulkOrderDetailsContract.ItemsQuantityList = employeeBulkOrderDetailsEntity.ItemsQuantityList == null ? null : ToDataContractsObject(employeeBulkOrderDetailsEntity.ItemsQuantityList)
+            }
+            return employeeBulkOrderDetailsContract;
+        }
+
+        public static List<Contracts.BulkOrderItemQuantityMapping> ToDataContractsObject(List<Entities.BulkOrderItemQuantityMapping> itemsQuantityListEntity)
+        {
+            List<Contracts.BulkOrderItemQuantityMapping> itemsQuantityListContract = new List<Contracts.BulkOrderItemQuantityMapping>();
+            if (itemsQuantityListEntity != null)
+            {
+                foreach (Entities.BulkOrderItemQuantityMapping itmeQuantityEntity in itemsQuantityListEntity)
+                {
+                    Contracts.BulkOrderItemQuantityMapping itemQuantityContract = new Contracts.BulkOrderItemQuantityMapping();
+                    itemQuantityContract.QuantityOrdered = itmeQuantityEntity.QuantityOrdered;
+                    itemQuantityContract.QuantityUsed = itmeQuantityEntity.QuantityUsed;
+                    itemQuantityContract.Item = itmeQuantityEntity.Item == null ? null : ItemTranslator.ToDataContractsObject(itmeQuantityEntity.Item);
+                    itemsQuantityListContract.Add(itemQuantityContract);
+                }
+            }
+            return itemsQuantityListContract;
+        }
+
+        public static Contracts.BulkOrderRequestStatus ToDataContractsObject(Entities.BulkOrderRequestStatus bulkOrderRequestStatus)
+        {
+            switch(bulkOrderRequestStatus)
+            {
+                case Entities.BulkOrderRequestStatus.Approved : return Contracts.BulkOrderRequestStatus.Approved;
+                case Entities.BulkOrderRequestStatus.Cancelled: return Contracts.BulkOrderRequestStatus.Cancelled;
+                case Entities.BulkOrderRequestStatus.Pending: return Contracts.BulkOrderRequestStatus.Pending;
+            }
+            return Contracts.BulkOrderRequestStatus.Rejected;
+        }
     }
 }

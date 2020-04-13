@@ -16,7 +16,7 @@ namespace IMS.DataLayer.Db
     public class ReportsDbContext : IReportsDbContext
     {
         private IDbConnectionProvider _dbConnectionProvider;
-        public ReportsDbContext(IDbConnectionProvider dbConnectionProvider,IItemDbContext itemDbContext)
+        public ReportsDbContext(IDbConnectionProvider dbConnectionProvider, IItemDbContext itemDbContext)
         {
             _dbConnectionProvider = dbConnectionProvider;
         }
@@ -25,7 +25,7 @@ namespace IMS.DataLayer.Db
         {
             DbDataReader reader = null;
             List<DateItemConsumption> dateItemConsumption = new List<DateItemConsumption>();
-            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -41,7 +41,7 @@ namespace IMS.DataLayer.Db
                     {
                         Date = reader["Date"]?.ToString().Split(" ")[0];
                         Date = Date.Substring(6, 4) + '/' + Date.Substring(0, 2) + '/' + Date.Substring(3, 2);
-                        dateItemConsumption.Add(new DateItemConsumption() { Date = Date,ItemsConsumptionCount = Convert.ToInt32(reader["ItemsCount"] )});
+                        dateItemConsumption.Add(new DateItemConsumption() { Date = Date, ItemsConsumptionCount = Convert.ToInt32(reader["ItemsCount"]) });
                     }
                 }
                 catch (Exception exception)
@@ -95,11 +95,11 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async void GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate,List<ShelfOrderStats> shelfOrderStats)
+        public async void GetShelfWiseOrderCountByDate(DateTime startDate, DateTime toDate, List<ShelfOrderStats> shelfOrderStats)
         {
             DbDataReader reader = null;
             List<ShelfOrderStats> dateShelfOrderMappings = shelfOrderStats;
-            using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
             {
                 try
                 {
@@ -109,8 +109,8 @@ namespace IMS.DataLayer.Db
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetOrderCountByDate";
                     command.Parameters.AddWithValue("@FromDate", startDate);
-                    command.Parameters.AddWithValue("@ToDate", newToDate); 
-                    reader =await command.ExecuteReaderAsync();
+                    command.Parameters.AddWithValue("@ToDate", newToDate);
+                    reader = await command.ExecuteReaderAsync();
                     while (reader.Read())
                     {
 
@@ -141,7 +141,7 @@ namespace IMS.DataLayer.Db
             {
                 DbDataReader reader = null;
                 var dictionaryRAG = new Dictionary<string, List<ColourCountMapping>>();
-                using (var connection =await _dbConnectionProvider.GetConnection(Databases.IMS))
+                using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
@@ -233,7 +233,7 @@ namespace IMS.DataLayer.Db
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
-                    command.CommandType = CommandType.StoredProcedure;               
+                    command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "spGetStockStatus";
                     command.Parameters.AddWithValue("@theLimit", limit);
                     command.Parameters.AddWithValue("@theOffset", offset);
@@ -247,7 +247,7 @@ namespace IMS.DataLayer.Db
                     {
                         stockStatus.PagingInfo.TotalResults = Convert.ToInt32(reader["TotalItems"]);
                         itemId = (int)reader["ItemId"];
-                        if(!(stockStatus.Items.Select(x => x.Id).Distinct().Contains(itemId)))
+                        if (!(stockStatus.Items.Select(x => x.Id).Distinct().Contains(itemId)))
                         {
                             stockStatus.Items.Add(Extract(reader));
                             stockStatus.StockStatus.Add(itemId, new List<StockStatus>());
@@ -262,7 +262,7 @@ namespace IMS.DataLayer.Db
                                 stockStatus.StockStatus[itemId].Add(new StockStatus() { Location = shelfName, Colour = ragColor, Quantity = quantity });
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
 
                         }
@@ -309,7 +309,7 @@ namespace IMS.DataLayer.Db
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@colour",colour.ToUpper());
+                    command.Parameters.AddWithValue("@colour", colour.ToUpper());
                     command.Parameters.AddWithValue("@lim", limit);
                     command.Parameters.AddWithValue("@off", offset);
                     command.Parameters.Add("@orderCount", MySqlDbType.Int32, 32);
@@ -331,7 +331,7 @@ namespace IMS.DataLayer.Db
             }
         }
 
-        public async Task<ItemsAvailabilityResponse> GetShelfAvailability(int id, string colour,int pageNumber,int pageSize)
+        public async Task<ItemsAvailabilityResponse> GetShelfAvailability(int id, string colour, int pageNumber, int pageSize)
         {
             ItemsAvailabilityResponse itemsAvailabilityResponse = new ItemsAvailabilityResponse();
             PagingInfo pagingInfo = new PagingInfo();
@@ -347,7 +347,7 @@ namespace IMS.DataLayer.Db
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@colour",colour.ToUpper());
+                    command.Parameters.AddWithValue("@colour", colour.ToUpper());
                     command.Parameters.AddWithValue("@id", id);
                     command.Parameters.AddWithValue("@lim", limit);
                     command.Parameters.AddWithValue("@off", offset);
@@ -397,7 +397,7 @@ namespace IMS.DataLayer.Db
             return itemQuantityMappings;
         }
 
-        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReports(int limit, int offset,string fromDate, string toDate)
+        public async Task<DateWiseItemsConsumption> GetItemsConsumptionReports(int limit, int offset, string fromDate, string toDate)
         {
             DbDataReader reader = null;
             DateWiseItemsConsumption dateWiseItemsConsumption = new DateWiseItemsConsumption();
@@ -436,7 +436,8 @@ namespace IMS.DataLayer.Db
                         };
 
                         dateItemMapping.Add
-                         (new DateItemsMapping {
+                         (new DateItemsMapping
+                         {
                              Date = Date,
                              ItemQuantityMappings = itemQuantityMapping
                          });
@@ -458,10 +459,10 @@ namespace IMS.DataLayer.Db
                     }).ToList();
 
 
-                dateWiseItemsConsumption.DateItemMapping =  result.OrderByDescending(obj => obj.Date).ToList();
+                dateWiseItemsConsumption.DateItemMapping = result.OrderByDescending(obj => obj.Date).ToList();
 
                 return dateWiseItemsConsumption;
-            }          
+            }
         }
         public async Task<ItemConsumptionDetailsResponse> GetDateWiseItemConsumptionDetails(string startDate, string endDate, int limit, int offset)
         {
@@ -551,5 +552,164 @@ namespace IMS.DataLayer.Db
             }
             return consumptionList;
         }
+
+        public async Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrders(int limit, int offset, string startDate, string endDate)
+        {
+            DbDataReader reader = null;
+            List<EmployeeBulkOrder> employeeBulkOrders = new List<EmployeeBulkOrder>();
+            List<EmployeeBulkOrderDto> employeeBulkOrdersDto = new List<EmployeeBulkOrderDto>();
+            EmployeeBulkOrdersResponse employeeBulkOrdersResponse = new EmployeeBulkOrdersResponse();
+            int totalResuls = 0;
+            using (var connection = await _dbConnectionProvider.GetConnection(Databases.IMS))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandType = CommandType.StoredProcedure;
+                command.CommandText = "spGetAllBulkOrders";
+                command.Parameters.AddWithValue("@lim", limit);
+                command.Parameters.AddWithValue("@off", offset);
+                command.Parameters.AddWithValue("@fromDate", startDate);
+                command.Parameters.AddWithValue("@toDate", endDate);
+                command.Parameters.Add("@recordCount", MySqlDbType.Int32, 32);
+                command.Parameters["@recordCount"].Direction = ParameterDirection.Output;
+                var out_recordCount = command.Parameters["@recordCount"];
+                reader = await command.ExecuteReaderAsync();
+                while (reader.Read())
+                {
+                    employeeBulkOrdersDto.Add(Reader(reader));
+                }
+                reader.Close();
+                if (out_recordCount.Value != DBNull.Value)
+                    totalResuls = Convert.ToInt32(out_recordCount.Value);
+            }
+            employeeBulkOrdersResponse.EmployeeBulkOrders = DtoToEntitiesBulkOrders(employeeBulkOrdersDto);
+            employeeBulkOrdersResponse.PagingInfo = new PagingInfo();
+            employeeBulkOrdersResponse.PagingInfo.TotalResults = totalResuls;
+            return employeeBulkOrdersResponse;
+        }
+
+        private EmployeeBulkOrderDto Reader(DbDataReader reader)
+        {
+            return new EmployeeBulkOrderDto()
+            {
+                EmployeeId = reader["EmployeeId"].ToString(),
+                FirstName = reader["FirstName"].ToString(),
+                LastName = reader["LastName"]?.ToString(),
+                Email = reader["Email"].ToString(),
+                ContactNumber = reader["ContactNumber"]?.ToString(),
+                TemporaryCardNumber = reader["TemporaryCardNumber"]?.ToString(),
+                AccessCardNumber = reader["AccessCardNumber"]?.ToString(),
+                EmployeeStatus = (bool)reader["EmployeeStatus"],
+                BulkOrderId = (int)reader["BulkOrderId"],
+                CreatedOn = (DateTime)reader["CreatedOn"],
+                RequirementDate = (DateTime)reader["RequirementDate"],
+                RequestStatus = reader["RequestStatus"].ToString(),
+                ReasonForRequirement = reader["ReasonForRequirement"].ToString(),
+                ItemId = (int)reader["ItemId"],
+                ItemName = reader["ItemName"].ToString(),
+                ItemQuantityOrdered = (int)reader["ItemQuantityOrdered"],
+                ItemQuantityUsed = (int)reader["ItemQuantityUsed"],
+                ItemIsActive = (bool)reader["ItemIsActive"],
+                ItemMaxLimit = (int)reader["ItemMaxLimit"],
+                ItemImageUrl = reader["ItemImageUrl"]?.ToString(),
+
+            };
+        }
+
+        // DTO To Model Translation
+        private List<EmployeeBulkOrder> DtoToEntitiesBulkOrders(List<EmployeeBulkOrderDto> employeeBulkOrdersDto)
+        {
+            List<EmployeeBulkOrder> employeeBulkOrders = null;
+            Dictionary<int, EmployeeBulkOrder> mapping = new Dictionary<int, EmployeeBulkOrder>();
+            foreach (var bulkOrderDto in employeeBulkOrdersDto)
+            {
+                if (mapping.ContainsKey(bulkOrderDto.BulkOrderId))
+                {
+                    BulkOrderItemQuantityMapping itemQtyMapping = DtoToItemQuantityMapping(bulkOrderDto);
+                    mapping[bulkOrderDto.BulkOrderId].EmployeeBulkOrderDetails.ItemsQuantityList.Add(itemQtyMapping);
+                }
+                else
+                {
+                    EmployeeBulkOrder employeeBulkOrder = ToEmployeeBulkOrder(bulkOrderDto);
+                    employeeBulkOrder.EmployeeBulkOrderDetails.ItemsQuantityList.Add(DtoToItemQuantityMapping(bulkOrderDto));
+                    mapping.Add(bulkOrderDto.BulkOrderId, employeeBulkOrder);
+                }
+            }
+            employeeBulkOrders = mapping.Values.ToList();
+
+            if (employeeBulkOrders == null)
+            {
+                employeeBulkOrders = new List<EmployeeBulkOrder>();
+            }
+            return employeeBulkOrders;
+        }
+
+        private EmployeeBulkOrder ToEmployeeBulkOrder(EmployeeBulkOrderDto bulkOrderDto)
+        {
+            return new EmployeeBulkOrder()
+            {
+                BulkOrderId = bulkOrderDto.BulkOrderId,
+                Employee = DtoToEmployeeObject(bulkOrderDto),
+                EmployeeBulkOrderDetails = DtoToEmployeeBulkOrder(bulkOrderDto)
+            };
+        }
+
+        private EmployeeBulkOrderDetails DtoToEmployeeBulkOrder(EmployeeBulkOrderDto bulkOrderDto)
+        {
+            return new EmployeeBulkOrderDetails()
+            {
+                CreatedOn = bulkOrderDto.CreatedOn,
+                RequirementDate = bulkOrderDto.RequirementDate,
+                ReasonForRequirement = bulkOrderDto.ReasonForRequirement,
+                BulkOrderRequestStatus = StringToBulkOrderRequestStatus(bulkOrderDto.RequestStatus),
+                ItemsQuantityList = new List<BulkOrderItemQuantityMapping>()
+            };
+
+        }
+
+        private BulkOrderRequestStatus StringToBulkOrderRequestStatus(string requestStatus)
+        {
+            BulkOrderRequestStatus bulkOrderRequestStatus = BulkOrderRequestStatus.Pending;
+            return Enum.TryParse<BulkOrderRequestStatus>(requestStatus, out BulkOrderRequestStatus status) ? status : bulkOrderRequestStatus;
+        }
+
+        private Employee DtoToEmployeeObject(EmployeeBulkOrderDto bulkOrderDto)
+        {
+            return new Employee
+            {
+                Id = bulkOrderDto.EmployeeId,
+                Firstname = bulkOrderDto.FirstName,
+                Lastname = bulkOrderDto.LastName,
+                Email = bulkOrderDto.Email,
+                ContactNumber = bulkOrderDto.ContactNumber,
+                AccessCardNumber = bulkOrderDto.AccessCardNumber,
+                TemporaryCardNumber = bulkOrderDto.TemporaryCardNumber,
+                IsActive = bulkOrderDto.EmployeeStatus
+            };
+        }
+
+        private BulkOrderItemQuantityMapping DtoToItemQuantityMapping(EmployeeBulkOrderDto bulkOrderDto)
+        {
+            return new BulkOrderItemQuantityMapping
+            {
+                Item = DtoToItem(bulkOrderDto),
+                QuantityOrdered = bulkOrderDto.ItemQuantityOrdered,
+                QuantityUsed = bulkOrderDto.ItemQuantityUsed
+            };
+        }
+
+        private Item DtoToItem(EmployeeBulkOrderDto bulkOrderDto)
+        {
+            return new Item
+            {
+
+                Id = bulkOrderDto.ItemId,
+                Name = bulkOrderDto.ItemName,
+                IsActive = bulkOrderDto.ItemIsActive,
+                MaxLimit = bulkOrderDto.ItemMaxLimit,
+                ImageUrl = bulkOrderDto.ItemImageUrl
+            };
+        }
     }
 }
+
