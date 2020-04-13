@@ -306,7 +306,7 @@ namespace IMS.Core.Translators
                 employeeBulkOrderDetailsContract.RequirementDate = employeeBulkOrderDetailsEntity.RequirementDate;
                 employeeBulkOrderDetailsContract.ReasonForRequirement = employeeBulkOrderDetailsEntity.ReasonForRequirement;
                 employeeBulkOrderDetailsContract.BulkOrderRequestStatus = ToDataContractsObject(employeeBulkOrderDetailsEntity.BulkOrderRequestStatus);
-                employeeBulkOrderDetailsContract.ItemsQuantityList = employeeBulkOrderDetailsEntity.ItemsQuantityList == null ? null : ToDataContractsObject(employeeBulkOrderDetailsEntity.ItemsQuantityList)
+                employeeBulkOrderDetailsContract.ItemsQuantityList = employeeBulkOrderDetailsEntity.ItemsQuantityList == null ? null : ToDataContractsObject(employeeBulkOrderDetailsEntity.ItemsQuantityList);
             }
             return employeeBulkOrderDetailsContract;
         }

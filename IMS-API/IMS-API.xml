@@ -286,6 +286,15 @@
             <returns>Datewise item consumption count</returns>
             <response code="200">Returns datewise item consumption details if input is valid otherwise it returns status failure</response>
         </member>
+        <member name="M:IMS_API.Controllers.ReportsController.GetEmployeeBulkOrders(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Retrieve datewise bulk order details between a given date range
+            </summary>
+            <param name="startDate"></param>
+            <param name="endDate"></param>
+            <returns>Datewise  bulk order details</returns>
+            <response code="200">Returns datewise  bulk order details if input is valid otherwise it returns status failure</response>
+        </member>
         <member name="M:IMS_API.Controllers.RolesController.GetAllRoles">
             <summary>
             returns all roles
