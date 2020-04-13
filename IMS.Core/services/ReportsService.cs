@@ -730,14 +730,12 @@ namespace IMS.Core.services
                             bulkOrdersResponse.Status = Status.Failure;
                             bulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
                         }
-                        return bulkOrdersResponse;
                     }
                     else
                     {
                         bulkOrdersResponse.Status = Status.Failure;
                         bulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDate);
                     }
-                    return bulkOrdersResponse;
                 }
                 else
                 {
