@@ -692,5 +692,71 @@ namespace IMS.Core.services
             }
             return itemConsumptionResponse;
         }
+
+        public async Task<EmployeeBulkOrdersResponse> GetEmployeeBulkOrders(string startDate, string endDate, int pageNumber, int pageSize)
+        {
+            EmployeeBulkOrdersResponse bulkOrdersResponse = new EmployeeBulkOrdersResponse();
+            int userId = -1;
+            try
+            {
+                RequestData request = await Utility.GetRequestDataFromHeader(_httpContextAccessor, _tokenProvider);
+                if (request.HasValidToken)
+                {
+                    User user = request.User;
+                    userId = user.Id;
+                    if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate) && ReportsValidator.ValidateDate(startDate, endDate))
+                    {
+                        if (pageNumber < 0 || pageSize < 0)
+                        {
+                            bulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.BadRequest, Constants.ErrorMessages.InvalidPagingDetails);
+                            return bulkOrdersResponse;
+                        }
+                        if (pageNumber == 0 || pageSize == 0)
+                        {
+                            pageSize = 10;
+                            pageNumber = 1;
+                        }
+                        int limit = pageSize;
+                        int offset = (pageNumber - 1) * pageSize;
+                        bulkOrdersResponse = await _reportsDbContext.GetEmployeeBulkOrders(limit, offset, startDate, endDate);
+                        if (bulkOrdersResponse.EmployeeBulkOrders != null)
+                        {
+                            bulkOrdersResponse.PagingInfo.PageNumber = pageNumber;
+                            bulkOrdersResponse.PagingInfo.PageSize = pageSize;
+                            bulkOrdersResponse.Status = Status.Success;
+                        }
+                        else
+                        {
+                            bulkOrdersResponse.Status = Status.Failure;
+                            bulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.RecordNotFound);
+                        }
+                    }
+                    else
+                    {
+                        bulkOrdersResponse.Status = Status.Failure;
+                        bulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.NotFound, Constants.ErrorMessages.InvalidDate);
+                    }
+                }
+                else
+                {
+                    bulkOrdersResponse.Status = Status.Failure;
+                    bulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.UnAuthorized, Constants.ErrorMessages.InvalidToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                bulkOrdersResponse.Status = Status.Failure;
+                bulkOrdersResponse.Error = Utility.ErrorGenerator(Constants.ErrorCodes.ServerError, Constants.ErrorMessages.ServerError);
+                new Task(() => { _logger.LogException(exception, "GetEmployeeBulkOrders", Severity.High, startDate + ";" + endDate, bulkOrdersResponse); }).Start();
+            }
+            finally
+            {
+                Severity severity = Severity.Medium;
+                if (bulkOrdersResponse.Status == Status.Failure)
+                    severity = Severity.High;
+                new Task(() => { _logger.Log(startDate + ";" + endDate, bulkOrdersResponse, "GetEmployeeBulkOrders", bulkOrdersResponse.Status, severity, userId); }).Start();
+            }
+            return bulkOrdersResponse;
+        }
     }
 }
