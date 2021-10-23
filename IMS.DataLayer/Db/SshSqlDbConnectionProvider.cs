@@ -11,7 +11,7 @@ namespace IMS.DataLayer.Db
 {
     public class SshSqlDbConnectionProvider : IDbConnectionProvider
     { private static SshClient _sshClient;
-        private static uint _localPort;
+        private static uint _localPort = 3306;
         private IConfiguration _configuration;
         public SshSqlDbConnectionProvider(IConfiguration configuration)
         {
@@ -22,22 +22,14 @@ namespace IMS.DataLayer.Db
         {  try
              {
                 
-                
-                if (!IsSshClientConnected())
-                    (_sshClient, _localPort) =  ConnectSsh(
-                                                      GetEnvironmentValue(_configuration["Ssh:Server"]),
-                                                       GetEnvironmentValue(_configuration["Ssh:UserName"]),
-                                                       GetEnvironmentValue(_configuration["Ssh:Password"])
-                                                     );
-
                 MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder
                 {
-                    Server = GetEnvironmentValue(_configuration["Sql:Server"]),
+                    Server = _configuration["Sql:Server"],
                     Database=databaseName,
 
                     Port = _localPort,
-                    UserID = GetEnvironmentValue(_configuration["Sql:UserName"]),
-                    Password = GetEnvironmentValue(_configuration["Sql:Password"]),
+                    UserID = _configuration["Sql:UserName"],
+                    Password = _configuration["Sql:Password"],
                 };
 
                 return new MySqlConnection(csb.ConnectionString);
